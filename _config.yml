@@ -1,0 +1,9 @@
+source: _source
+destination: .
+
+sass: true
+haml: true
+
+pygments: false
+
+lsi: true

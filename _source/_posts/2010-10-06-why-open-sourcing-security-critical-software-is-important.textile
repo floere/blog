@@ -1,0 +1,5 @@
+---
+layout: blog
+title: Why open sourcing security critical software is important
+---
+"Why open sourcing security critical software is important":http://www.freedom-to-tinker.com/blog/jhalderm/hacking-dc-internet-voting-pilot 

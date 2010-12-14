@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    	<meta name="generator" content="Tumblr Backup 0.3>" />
+    	<meta name="backup-date" content="Sun, 12 Dec 10 18:06:27 -0500" />
+    	<link rel="stylesheet" href="../style.css"/>
+    	<link rel="icon" href="../avatar.png"/>
+    </head>
+    <body class="archive_body">        
+        <div class="post_meta">
+            <span class="timestamp">May 31, 2010, 8:25 pm</span>
+            <a class="permalink" href="../posts/651513557.html">#</a>
+        </div>
+        
+        <h1>String#intern and String#to_sym vs. :&#039;&#039; and :&quot;&quot;</h1><div><p>Why does everybody use</p>
+<pre><code>"my #{interpolation_here} string".to_sym</code></pre>
+<p>or</p>
+<pre><code>"my #{interpolation_here} string".intern</code></pre>
+<p>when there is</p>
+<pre><code>:"my #{interpolation_here} string"</code></pre>
+<p>or</p>
+<pre><code>:'1337 numbers and spaces in a symbol'</code></pre>
+<p>?</p>
+<p>I Like it much better.</p></div>        
+        <div class="post_meta">
+            <span class="timestamp">May 31, 2010, 8:21 pm</span>
+            <a class="permalink" href="../posts/651503040.html">#</a>
+        </div>
+        
+        <h1>Reload a running Ruby application (revisited)</h1><div><p>Reload a running Ruby app:</p>
+<script src="http://gist.github.com/420411.js?file=better_self_reloader.rb"></script><p>If you need to rename the load_application method, then</p>
+<pre><code>
+class &lt;&lt; self
+  alias new_load_application load_application
+end
+</code></pre>
+<p>and reload, then remove the alias, and reload again. (Just try it if you don&#8217;t get it right now)</p>
+<p>Used in production, by the way. One needs to be a bit cautious though…</p></div>        
+        <div class="post_meta">
+            <span class="timestamp">May 22, 2010, 4:50 pm</span>
+            <a class="permalink" href="../posts/622966337.html">#</a>
+        </div>
+        
+        <p><a class="link" href="http://mugtug.com/sketchpad/">Drawing in the Browser&hellip;</a></p> <div><p>… using HTML5.</p></div>        
+        <div class="post_meta">
+            <span class="timestamp">May 21, 2010, 10:59 am</span>
+            <a class="permalink" href="../posts/619355252.html">#</a>
+        </div>
+        
+        <h1>Voted most important Ruby method 2010</h1><div><p><script src="http://gist.github.com/408937.js"></script></p></div>        
+        <div class="post_meta">
+            <span class="timestamp">May 13, 2010, 7:18 pm</span>
+            <a class="permalink" href="../posts/596375316.html">#</a>
+        </div>
+        
+        <div class="quote">&ldquo;Programming is one of the most difficult branches of applied mathematics; the poorer mathematicians had better remain pure mathematicians.&rdquo;</div><div>&mdash; Edsger W. Dijkstra (via <a href="http://fuckyeahcomputerscience.tumblr.com/" class="tumblr_blog">fuckyeahcomputerscience</a>)</div>        
+        <div class="post_meta">
+            <span class="timestamp">May 11, 2010, 2:40 pm</span>
+            <a class="permalink" href="../posts/590137816.html">#</a>
+        </div>
+        
+        <p><a class="link" href="http://www.globalnerdy.com/2010/05/09/new-programming-jargon/">New Programming Jargon</a></p> <div><p>Need to remember Bugfoot and Shrug Report… And especially Duck!</p></div>        
+        <div class="post_meta">
+            <span class="timestamp">May 9, 2010, 5:29 pm</span>
+            <a class="permalink" href="../posts/584975979.html">#</a>
+        </div>
+        
+        <h1>Fat slows you down.</h1><div><p>If you really need speed in Ruby 1.9, consider this example:<br/><script src="http://gist.github.com/395419.js"></script></p></div>
+</body></html>

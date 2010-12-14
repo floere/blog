@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <!-- BEGIN TUMBLR XML
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <post id="651503040" url="http://codeiscode.tumblr.com/post/651503040" url-with-slug="http://codeiscode.tumblr.com/post/651503040/reload-a-running-ruby-application-revisited" type="regular" date-gmt="2010-06-01 00:21:00 GMT" date="Mon, 31 May 2010 20:21:00" unix-timestamp="1275351660" format="html" reblog-key="SjSNYjBd" slug="reload-a-running-ruby-application-revisited"><regular-title>Reload a running Ruby application (revisited)</regular-title><regular-body>&lt;p&gt;Reload a running Ruby app:&lt;/p&gt;
+&lt;script src="http://gist.github.com/420411.js?file=better_self_reloader.rb"&gt;&lt;/script&gt;&lt;p&gt;If you need to rename the load_application method, then&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+class &amp;lt;&amp;lt; self
+  alias new_load_application load_application
+end
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and reload, then remove the alias, and reload again. (Just try it if you don&amp;#8217;t get it right now)&lt;/p&gt;
+&lt;p&gt;Used in production, by the way. One needs to be a bit cautious though…&lt;/p&gt;</regular-body><tag>reload</tag><tag>ruby</tag><tag>application</tag><tag>running</tag></post>
+
+        END TUMBLR XML -->
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    	<meta name="generator" content="Tumblr Backup 0.3" />
+    	<meta name="backup-date" content="Sun, 12 Dec 10 18:06:27 -0500" />
+    	<link rel="stylesheet" href="../style.css"/>
+    	<link rel="icon" href="../avatar.png"/>
+    </head>
+    <body class="regular_body">
+                
+        <div class="post_meta">
+            <span class="timestamp">May 31, 2010, 8:21 pm</span>
+            
+        </div>
+        
+        <h1>Reload a running Ruby application (revisited)</h1><div><p>Reload a running Ruby app:</p>
+<script src="http://gist.github.com/420411.js?file=better_self_reloader.rb"></script><p>If you need to rename the load_application method, then</p>
+<pre><code>
+class &lt;&lt; self
+  alias new_load_application load_application
+end
+</code></pre>
+<p>and reload, then remove the alias, and reload again. (Just try it if you don&#8217;t get it right now)</p>
+<p>Used in production, by the way. One needs to be a bit cautious though…</p></div>    </body>
+</html>

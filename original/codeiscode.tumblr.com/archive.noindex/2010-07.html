@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    	<meta name="generator" content="Tumblr Backup 0.3>" />
+    	<meta name="backup-date" content="Sun, 12 Dec 10 18:06:27 -0500" />
+    	<link rel="stylesheet" href="../style.css"/>
+    	<link rel="icon" href="../avatar.png"/>
+    </head>
+    <body class="archive_body">        
+        <div class="post_meta">
+            <span class="timestamp">July 30, 2010, 12:49 pm</span>
+            <a class="permalink" href="../posts/880306007.html">#</a>
+        </div>
+        
+        <h1>Unicorn Harakiri Rack Middleware (simple)</h1><div><p>This is the simple Request counting Unicorn Harakiri Middleware.</p>
+
+<p>The idea is that the Unicorn child sends itself a QUIT signal after a given number of requests (50 as a default, set with after=). It will then finish the request, but shortly after die honorably. The Unicorn master will see that a child is missing, and fork a new one.</p>
+
+<p>Nature can be cruel.</p>
+
+<p><script src="http://gist.github.com/497539.js"> </script></p>
+
+<p>That&#8217;s it.</p></div>
+</body></html>

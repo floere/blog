@@ -1,0 +1,19 @@
+!!!
+%html{ :xmlns => "http://www.w3.org/1999/xhtml", :'xml:lang' => "en", :lang => "en" }
+  %head
+    %meta{ :'http-equiv' => "Content-type", :content => "text/html; charset=utf-8" }
+    %link{ :rel => 'stylesheet', :href => 'basic.css', :type => 'text/css' }
+    %title= page.title
+  %body
+    %ol.nav
+      %li
+        %a{ :href => 'http://floere.github.com/' } home
+        •
+      %li
+        %a{ :href => 'http://floere.github.com/picky' } picky
+        •
+      %li
+        %a{ :href => 'http://floere.github.com/view_models' } view models
+    %h1= page.title
+    %div
+      = content

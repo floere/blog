@@ -1,6 +1,9 @@
 ---
-layout: blog
+layout: post
 title: Speccing methods called in initialize
+categories:
+  - ruby
+  - testing
 ---
 Recently when writing "Picky, the clever small text search engine":http://floere.github.com/picky/, I encountered the following problem: How do I test methods that are called in an initializer?
 

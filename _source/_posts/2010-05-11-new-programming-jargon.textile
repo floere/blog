@@ -1,0 +1,10 @@
+---
+layout: post
+title: New programming jargon
+categories:
+  - coding
+  - naming things
+---
+"New Programming Jargon":http://www.globalnerdy.com/2010/05/09/new-programming-jargon/
+
+Need to remember Bugfoot and Shrug Report… And especially Duck!

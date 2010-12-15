@@ -2,5 +2,16 @@
 layout: blog
 title: Blog
 ---
-- site.posts.each do |post|
-  %a{ :href => post.url }= post.title
+- year, month = nil, nil
+- site.posts.sort_by { |post| post.date }.reverse.each do |post|
+  - if post.date.year != year
+    - year = post.date.year
+    .year
+      = year
+  - if post.date.month != month
+    - month = post.date.month
+    .month
+      = site.config['months'][month-1]
+  %a.line{ :href => post.url }
+    %span.calendar= post.date.strftime('%d')
+    = post.title

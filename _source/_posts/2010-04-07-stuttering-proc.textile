@@ -1,0 +1,8 @@
+---
+layout: post
+title: Stuttering Proc
+categories:
+  - ruby
+  - funky
+---
+<script src="http://gist.github.com/358947.js"></script>

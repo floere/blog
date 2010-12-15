@@ -1,0 +1,15 @@
+---
+layout: post
+title: Challenged
+categories:
+  - codetry
+---
+The framework looms in front of you. Clouds cover the gray sky. You plunge in. Full unit test rewrite, nothing is where it was before, but right: The mailbox is in front of the house, the bathtub is finally in the bath, the fridge contains organic food. There is a pot on the fire, full of juicy stuff.
+
+But you are wearing glasses that let you only see 10 centimeters. You set wild eyes on the integration tests: Guests are entering the house, trying to eat from the toilet, sleeping in the oven, or jumping out of windows. It is fail, fail, fail, wherever you happen to look.
+
+You are close to despair. Everything is right. Right? You trudge on, teeth gnashing.
+
+Then, somehow, you adjust the doormat ever so slightly, piece in the last crumb of information. And magically, it just works. Everything. Just. Works. The gargantuan task is finished. For minutes, you revel in the sun&#8217;s rays. The clouds, they never reappear.
+
+It is done.

@@ -7,7 +7,7 @@ categories:
 ---
 Recently when writing "Picky, the clever small text search engine":http://floere.github.com/picky/, I encountered the following problem: How do I test methods that are called in an initializer?
 
-(Of course I could call Testee.new in the spec and then just call the method again. But what if that method sets a state?)
+(Of course I could call @Testee.new@ in the spec and then just call the method again. But what if that method sets a state?)
 
 In code:
 <script src="http://gist.github.com/648878.js"></script>

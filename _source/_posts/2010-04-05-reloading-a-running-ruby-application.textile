@@ -1,0 +1,9 @@
+---
+layout: post
+title: Reloading a running Ruby application
+categories:
+  - ruby
+  - funky
+---
+Here's how I do it:
+<script src="http://gist.github.com/351776.js"></script>

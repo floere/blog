@@ -1,3 +1,4 @@
+@charset "UTF-8";
 h1 { margin-bottom: 10px; }
 
 a.line { display: block; padding: 10px; text-decoration: none; }
@@ -9,3 +10,5 @@ div.month { font-size: 1.1em; }
 span.calendar { border: 1px solid black; padding: 5px; }
 
 span.categories { font-size: 0.5em; color: gray; }
+
+.post a:before { content: "☛ "; }

@@ -6,7 +6,7 @@ haml: true
 
 pygments: false
 
-lsi: true
+lsi: false # true
 
 months:
   - January

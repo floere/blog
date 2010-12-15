@@ -1,0 +1,33 @@
+---
+layout: post
+title: A hole in the wall
+categories:
+  - codetry
+---
+His stool leaned back at a dangerous angle, he displays a pair of jamaica-colored sneakers to the public. Them sticking out of his business hole seems rather odd, considering the sober surroundings of the Niederdorf, or "nether village", as this particular place in Zürich is called.
+
+Slurping a botanic tea, idly facebooking and tumbling through the depths, no, shallows of the net, waiting for customers. It's been that way now for more than a day, and he starts to wonder if the customer specific context ads are just a fluke.
+
+An abrupt "Oh hey" directed his way throws him out of the structural code improvements that have been waiting for him at the back of his mind. "Hey", a burly businessman with slightly high blood pressure - he surmises from the corona of hair still clinging on – asks: "Are you the man that types?", "Yes, yes I do, I code." "Oh, code. Yeah, sorry, my bad. Well, look, I need a small program that does a few calculations based on this."
+
+And he whips out a napkin with a few calculations on it, in black lines what looks to be from an eyeliner, or a piece of coal. "Don't mind the looks – how long do you think this takes?"
+
+"Hmm, well. I think the design might take me a few hours. Then we'd need to meet again to see if we're on the right track. Then I'll have to code it, and clean it up a little. Might take me another 2 hours."
+
+"For 90 an hour, right?" "That's right, as advertised." "Ok, well. See you in three."
+
+He rights his stool, leans forward, sketches boxes and lines, boxes and lines, lines and boxes. Then he goes for a quick walk, takes in the morning, letting the cogs turn. Half an hour of showing tourists the view, and a hot chocolate at the riverside. Finally, he plumps down in front of his sleek, metal-clad machine and types.
+
+What he did was transform the mascara lines into byroliner lines and boxes as a straw where the mind can cling on to, and from there to typed text on a luminescent screen, for him to read and others to understand, finally into the core of the machine, and the zeros and ones people who have no understanding regurgitate so often.
+
+Entering the formula was pretty straightforward. But there are other things to consider: What is the best user interface for a burly businessman? Will it be used repeatedly? As if on cue, burly biz arrives and asks "Done yet?" "Oh hi."
+
+Back and forth: The customer starts with a lot of questions, have you put this in? He cuts him short, and explains what he will see, his understanding of the formula. There is much going on, but boils down to this: The clearing of misunderstandings. And they get cleared. It must be his happy day, the businessman knows the power of an ad-hoc team, and how it should work, how progress can come from it.
+
+The discussion dies down, lots of nodding all around, and smiles emerge. A handshake, and both are off – shorty no doubt to a meeting, where money and hand sweat is moved, our coder off to the plane of lines and boxes. A prototype stands, but this is not where it ends. He wants it to be perfect. After all, he is a craftsman, and craft is what defines him. The table might look nice to an outsider, but the craft is inside: The distribution of weight, the structure of the wood: What holds the thing together and doesn't make it bend, for year after year.
+
+Before he cleans up however, there is yoga waiting for him, and another stroll an the riverside. Can it be improved? How? The response comes to him during the most innocent of activities, stroking a cat that has found, purring, a new home around his legs. He leaves the cat slightly shocked behind – but she improves the situation by licking her paw – and runs up the street, repeating and repeating the idea, urging it not to leave his head.
+
+Panting, he types it in. The tests run, the code checker tool give him a green light. He opens it, it works. Puts it on a stick, wraps it in a package, puts it into a nice box which brandishes his logo – doodled on the back of a napkin by his sister, three years ago – and puts it aside for the customer, due to arrive in an hour.
+
+And finally. Finally the sneakers rest again on the sill of the hole.

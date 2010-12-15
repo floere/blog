@@ -7,3 +7,5 @@ div.year { font-size: 1.5em; margin-bottom: 0.5em; }
 div.month { font-size: 1.1em; }
 
 span.calendar { border: 1px solid black; padding: 5px; }
+
+span.categories { font-size: 0.5em; color: gray; }

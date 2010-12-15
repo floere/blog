@@ -1,0 +1,9 @@
+---
+layout: post
+title: IE didn't get the CSS3 memo?
+categories:
+  - css
+---
+"IE didn't get the CSS3 memo?":http://kimblim.dk/css-tests/selectors/
+
+Or, as is my guess: The code they based the new browsers on was fully untested, totally disorganized, and thus brutally hard to extend. IE9 though, gives one hope.

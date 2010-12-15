@@ -1,0 +1,13 @@
+---
+layout: post
+title: Oh yeah, Amazon?
+categories:
+  - marketing
+---
+From the latest Newsletter:
+
+@Support for Session Stickiness in Elastic Load Balancing Amazon Elastic MapReduce Introduces Custom Cluster Configuration Option@
+
+They also have Gurble Blurble Fickleness, introducing Jambawambing Lordle Figuconation Schnorptions.
+
+At least that's what I hear when I read stuff like that.

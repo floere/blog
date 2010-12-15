@@ -1,0 +1,7 @@
+---
+layout: post
+title: Ruby 1.9 params
+categories:
+  - ruby
+---
+<script src="http://gist.github.com/372372.js"></script>

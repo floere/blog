@@ -1,0 +1,9 @@
+---
+layout: post
+title: 97% is as good as a 100%
+categories:
+  - pragmatism
+---
+@If you're in a hurry and you need to pack up your bags and go, 97% is as good as a 100%. The 100% mark does not have the same (show-stopping) magic as 0%, where the difference between 3% and 0% really is important.@
+
+– "Omit Needless Code":http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html

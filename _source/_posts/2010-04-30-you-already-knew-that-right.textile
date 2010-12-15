@@ -1,0 +1,9 @@
+---
+layout: post
+title: You already knew that, right? (Assigning with splats)
+categories:
+  - ruby
+---
+<script src="http://gist.github.com/385121.js"></script>
+
+Referring to the fact that I want to sleep with the splat operator…

@@ -1,0 +1,20 @@
+---
+layout: post
+title: elements.each(*p)
+categories:
+  - ruby
+  - patterns
+---
+I often use
+
+@ary.map(&:upcase)@
+
+instead of
+
+@ary.map { |a| a.upcase }@
+
+But what can I do to use the elements as param as in the following code?
+
+@ary.each { |a| p a }@
+
+<script src="http://gist.github.com/385117.js"></script>

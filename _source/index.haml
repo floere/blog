@@ -12,7 +12,7 @@ title: Blog
     - month = post.date.month
     .month
       = site.config['months'][month-1]
-  %a.line{ :href => post.url }
+  %a.line{ :href => "./#{post.url}" }
     %span.calendar= post.date.strftime('%d')
     = post.title
     %span.categories= post.categories.join(', ')

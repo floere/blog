@@ -1,0 +1,13 @@
+---
+layout: post
+title: What I want for Picky #1 (Separation of HTTP and Multiprocessing)
+categories:
+  - ruby
+  - picky
+---
+
+TODO
+- Status
+- Problems / Wishes
+- Possible Path to Improvement
+- Outlook

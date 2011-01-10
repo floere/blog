@@ -1,0 +1,15 @@
+---
+layout: post
+title: Reflecting on my visit to the Ruby User Group Berlin
+categories:
+  - ruby
+  - presenting
+---
+
+TODO
+
+- Status
+- Presentation (with content)
+- Improvements
+- Berlin
+- Thanks

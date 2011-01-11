@@ -1,13 +1,70 @@
 ---
 layout: post
-title: What I want for Picky #1 (Separation of HTTP and Multiprocessing)
+title: What I want for Picky 1 (Separation of HTTP and Multiprocessing)
 categories:
   - ruby
   - picky
 ---
+Recently, I've been thinking about how I handle search requests in "Picky":http://floere.github.com/picky/.
 
-TODO
-- Status
-- Problems / Wishes
-- Possible Path to Improvement
-- Outlook
+h2. The Situation
+
+What goes on currently is this:
+I have a Unicorn master and Unicorn worker children.
+
+When a HTTP Request arrives, a child is called to unwrap the HTTP specific stuff, then the child's Application#call method is called, which in turn calls a query's #search_with_text method which takes a query string and an offset.
+
+The routing uses Joshua Peek's "rack-mount":http://github.com/josh/rack-mount, which is also used in Rails 3.
+
+In Picky, you route queries like this:
+
+<pre><code>route %r{\A/path/of/query\Z} => my_beautiful_query</code></pre>
+
+This will route e.g. @localhost:8080/path/of/query?query=test@ to the query object @my_beautiful_query@, where #search_with_text will be called with the parameters "test" and an offset of 0 (the default).
+
+h2. How I'd like it to be
+
+Performance tests have shown that sometimes, a search in Picky is even faster than the HTTP overhead.
+
+Also, since all full searches first go through a web app (to enrich the results), it doesn't necessarily make sense to use HTTP again from the web app to Picky.
+
+What I'd like to offer the Picky users is not just a HTTP @route@ method, but also methods for TCP, or sockets.
+
+<pre><code>map_tcp 3001 => my_other_beautiful_query</code></pre>
+
+or
+
+<pre><code>socket '/path/to/socket' => yet_another_beautiful_query</code></pre>
+
+Note: Perhaps I use the @route@ method for all of them.
+
+h2. The Problem
+
+Unicorn only supports HTTP. That in itself would not be a problem.
+
+The problem stems from the fact that
+# the forking of worker children
+# the HTTP parsing
+are baked together, making my offering multiple interfaces impossible, or very hard.
+
+"Unicorn":http://unicorn.bogomips.org/ is great, btw.
+
+h2. So what I'd really like
+
+I'd like to separate the HTTP handling and the forking of worker children.
+
+What would be best:
+# 1 master process
+# N children with adapters for HTTP/TCP/Socket requests
+
+Alternatively, each child only processes the HTTP/TCP/Socket requests and then passes on (to a Unix socket) a standardized message with the query text and an offset. Another child (or the same) would then perform the standardized search request.
+
+So in short I'd like to be able to say: Start me a server with 10 children which map HTTP requests to that query, while full requests just use TCP since they come from a webserver.
+
+h2. Outlook
+
+The @Query#search_with_text@ interface is already defined.
+
+What I will start working on is extracting the HTTP parsing from (probably) Mongrel. For multiprocessing, I could use "procrastinate":https://rubygems.org/gems/procrastinate. The thing that's yet missing is a buffering parent-child communication, which I might write myself, or use one of Kaspar Schiess' future IPC gems :)
+
+So, a great future is ahead. I hope it all turns out as I'd like it.

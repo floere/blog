@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>code is code</title>
+ <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
+ <link href="http://floere.github.com/blog/"/>
+ <updated>2011-01-11T14:24:38+01:00</updated>
+ <id>http://floere.github.com/blog/</id>
+ <author>
+   <name>Florian Hanke</name>
+   <email>florian.hanke@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>What I want for Picky 1 (Separation of HTTP and Multiprocessing)</title>
+   <link href="http://blog.absurd.li/ruby/picky/2011/01/11/what-i-want-for-picky-1.html"/>
+   <updated>2011-01-11T00:00:00+01:00</updated>
+   <id>http://floere.github.com/blog/ruby/picky/2011/01/11/what-i-want-for-picky-1</id>
+   <content type="html">&lt;p&gt;Recently, I&amp;#8217;ve been thinking about how I handle search requests in &lt;a href=&quot;http://floere.github.com/picky/&quot;&gt;Picky&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;The Situation&lt;/h2&gt;
+&lt;p&gt;What goes on currently is this:
+I have a Unicorn master and Unicorn worker children.&lt;/p&gt;
+&lt;p&gt;When a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; Request arrives, a child is called to unwrap the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; specific stuff, then the child&amp;#8217;s Application#call method is called, which in turn calls a query&amp;#8217;s #search_with_text method which takes a query string and an offset.&lt;/p&gt;
+&lt;p&gt;The routing uses Joshua Peek&amp;#8217;s &lt;a href=&quot;http://github.com/josh/rack-mount&quot;&gt;rack-mount&lt;/a&gt;, which is also used in Rails 3.&lt;/p&gt;
+&lt;p&gt;In Picky, you route queries like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;route %r{\A/path/of/query\Z} =&amp;gt; my_beautiful_query&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This will route e.g. &lt;code&gt;localhost:8080/path/of/query?query=test&lt;/code&gt; to the query object &lt;code&gt;my_beautiful_query&lt;/code&gt;, where #search_with_text will be called with the parameters &amp;#8220;test&amp;#8221; and an offset of 0 (the default).&lt;/p&gt;
+&lt;h2&gt;How I&amp;#8217;d like it to be&lt;/h2&gt;
+&lt;p&gt;Performance tests have shown that sometimes, a search in Picky is even faster than the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; overhead.&lt;/p&gt;
+&lt;p&gt;Also, since all full searches first go through a web app (to enrich the results), it doesn&amp;#8217;t necessarily make sense to use &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; again from the web app to Picky.&lt;/p&gt;
+&lt;p&gt;What I&amp;#8217;d like to offer the Picky users is not just a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; &lt;code&gt;route&lt;/code&gt; method, but also methods for &lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;, or sockets.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;map_tcp 3001 =&amp;gt; my_other_beautiful_query&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;socket '/path/to/socket' =&amp;gt; yet_another_beautiful_query&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note: Perhaps I use the &lt;code&gt;route&lt;/code&gt; method for all of them.&lt;/p&gt;
+&lt;h2&gt;The Problem&lt;/h2&gt;
+&lt;p&gt;Unicorn only supports &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;. That in itself would not be a problem.&lt;/p&gt;
+&lt;p&gt;The problem stems from the fact that&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;the forking of worker children&lt;/li&gt;
+	&lt;li&gt;the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing
+are baked together, making my offering multiple interfaces impossible, or very hard.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;Unicorn&lt;/a&gt; is great, btw.&lt;/p&gt;
+&lt;h2&gt;So what I&amp;#8217;d really like&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;d like to separate the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; handling and the forking of worker children.&lt;/p&gt;
+&lt;p&gt;What would be best:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;1 master process&lt;/li&gt;
+	&lt;li&gt;N children with adapters for &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;/&lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;/Socket requests&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Alternatively, each child only processes the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;/&lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;/Socket requests and then passes on (to a Unix socket) a standardized message with the query text and an offset. Another child (or the same) would then perform the standardized search request.&lt;/p&gt;
+&lt;p&gt;So in short I&amp;#8217;d like to be able to say: Start me a server with 10 children which map &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; requests to that query, while full requests just use &lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt; since they come from a webserver.&lt;/p&gt;
+&lt;h2&gt;Outlook&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;Query#search_with_text&lt;/code&gt; interface is already defined.&lt;/p&gt;
+&lt;p&gt;What I will start working on is extracting the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing from (probably) Mongrel. For multiprocessing, I could use &lt;a href=&quot;https://rubygems.org/gems/procrastinate&quot;&gt;procrastinate&lt;/a&gt;. The thing that&amp;#8217;s yet missing is a buffering parent-child communication, which I might write myself, or use one of Kaspar Schiess&amp;#8217; future &lt;span class=&quot;caps&quot;&gt;IPC&lt;/span&gt; gems :)&lt;/p&gt;
+&lt;p&gt;So, a great future is ahead. I hope it all turns out as I&amp;#8217;d like it.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Reflecting on my visit to the Ruby User Group Berlin</title>
+   <link href="http://blog.absurd.li/ruby/presenting/2011/01/10/ruby-user-group-berlin.html"/>
+   <updated>2011-01-10T00:00:00+01:00</updated>
+   <id>http://floere.github.com/blog/ruby/presenting/2011/01/10/ruby-user-group-berlin</id>
+   <content type="html">&lt;p&gt;&lt;span class=&quot;caps&quot;&gt;TODO&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;- Status
+- Presentation (with content)
+- Improvements
+- Berlin
+- Thanks&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Speccing methods called in initialize</title>
+   <link href="http://blog.absurd.li/ruby/testing/2010/10/27/speccing-methods-called-in-initialize.html"/>
+   <updated>2010-10-27T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/testing/2010/10/27/speccing-methods-called-in-initialize</id>
+   <content type="html">&lt;p&gt;Recently when writing &lt;a href=&quot;http://floere.github.com/picky/&quot;&gt;Picky, the clever small text search engine&lt;/a&gt;, I encountered the following problem: How do I test methods that are called in an initializer?&lt;/p&gt;
+&lt;p&gt;(Of course I could call &lt;code&gt;Testee.new&lt;/code&gt; in the spec and then just call the method again. But what if that method sets a state?)&lt;/p&gt;
+&lt;p&gt;In code:
+&lt;script src=&quot;http://gist.github.com/648878.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Why open sourcing security critical software is important</title>
+   <link href="http://blog.absurd.li/security/open source/2010/10/06/why-open-sourcing-security-critical-software-is-important.html"/>
+   <updated>2010-10-06T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/security/open source/2010/10/06/why-open-sourcing-security-critical-software-is-important</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.freedom-to-tinker.com/blog/jhalderm/hacking-dc-internet-voting-pilot&quot;&gt;Why open sourcing security critical software is important&lt;/a&gt;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Profiling MySQL Queries</title>
+   <link href="http://blog.absurd.li/database/profiling/2010/09/27/in-detail-performance-measurements-for-MySQL.html"/>
+   <updated>2010-09-27T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/database/profiling/2010/09/27/in-detail-performance-measurements-for-MySQL</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://dev.mysql.com/tech-resources/articles/using-new-query-profiler.html&quot;&gt;Profiling MySQL Queries&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In-detail performance measurements for MySQL queries.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>New programming jargon</title>
+   <link href="http://blog.absurd.li/coding/naming things/2010/05/11/new-programming-jargon.html"/>
+   <updated>2010-05-11T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/coding/naming things/2010/05/11/new-programming-jargon</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.globalnerdy.com/2010/05/09/new-programming-jargon/&quot;&gt;New Programming Jargon&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Need to remember Bugfoot and Shrug Report… And especially Duck!&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Fat slows you down</title>
+   <link href="http://blog.absurd.li/ruby/performance/2010/05/09/fat-slows-you-down.html"/>
+   <updated>2010-05-09T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/performance/2010/05/09/fat-slows-you-down</id>
+   <content type="html">&lt;p&gt;Fat slows you down.&lt;/p&gt;
+&lt;p&gt;If you really need speed in Ruby 1.9, consider this example:
+&lt;script src=&quot;http://gist.github.com/395419.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>You already knew that, right? (Assigning with splats)</title>
+   <link href="http://blog.absurd.li/ruby/2010/04/30/you-already-knew-that-right.html"/>
+   <updated>2010-04-30T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/2010/04/30/you-already-knew-that-right</id>
+   <content type="html">&lt;script src=&quot;http://gist.github.com/385121.js&quot;&gt;&lt;/script&gt;&lt;p&gt;Referring to the fact that I want to sleep with the splat operator…&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>97% is as good as a 100%</title>
+   <link href="http://blog.absurd.li/pragmatism/2010/04/30/if-you-re-in-a-hurry.html"/>
+   <updated>2010-04-30T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/pragmatism/2010/04/30/if-you-re-in-a-hurry</id>
+   <content type="html">&lt;p&gt;&lt;code&gt;If you're in a hurry and you need to pack up your bags and go, 97% is as good as a 100%. The 100% mark does not have the same (show-stopping) magic as 0%, where the difference between 3% and 0% really is important.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;– &lt;a href=&quot;http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html&quot;&gt;Omit Needless Code&lt;/a&gt;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>elements.each(*p)</title>
+   <link href="http://blog.absurd.li/ruby/patterns/2010/04/30/elements-each-p.html"/>
+   <updated>2010-04-30T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/patterns/2010/04/30/elements-each-p</id>
+   <content type="html">&lt;p&gt;I often use&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ary.map(&amp;amp;:upcase)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;instead of&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ary.map { |a| a.upcase }&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;But what can I do to use the elements as param as in the following code?&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ary.each { |a| p a }&lt;/code&gt;&lt;/p&gt;
+&lt;script src=&quot;http://gist.github.com/385117.js&quot;&gt;&lt;/script&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Strategy pattern pattern pattern pattern</title>
+   <link href="http://blog.absurd.li/ruby/patterns/2010/04/29/strategy-pattern-pattern-pattern-pattern.html"/>
+   <updated>2010-04-29T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/patterns/2010/04/29/strategy-pattern-pattern-pattern-pattern</id>
+   <content type="html">&lt;p&gt;A pattern that I often see cropping up in my &lt;a href=&quot;http://github.com/floere/gosu_extensions&quot;&gt;game framework&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It can be used for configuring subclasses that act according to an order of calls defined in the superclass. How the calls exactly work can be defined in the subclasses (or in an external configuration) using the class methods.&lt;/p&gt;
+&lt;script src=&quot;http://gist.github.com/383325.js&quot;&gt;&lt;/script&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Mastery is a mindset</title>
+   <link href="http://blog.absurd.li/quotes/2010/04/26/mastery-is-a-mindset.html"/>
+   <updated>2010-04-26T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/quotes/2010/04/26/mastery-is-a-mindset</id>
+   <content type="html">&lt;p&gt;&lt;code&gt;Mastery is a mindset.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;From the book &amp;#8220;Drive&amp;#8221;, by Pink.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d reformulate it as: &amp;#8220;Mastery is neither a question of time, or experience, but a mindset.&amp;#8221;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Ruby 1.9 params</title>
+   <link href="http://blog.absurd.li/ruby/2010/04/20/ruby-19-params.html"/>
+   <updated>2010-04-20T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/2010/04/20/ruby-19-params</id>
+   <content type="html">&lt;script src=&quot;http://gist.github.com/372372.js&quot;&gt;&lt;/script&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Riddle</title>
+   <link href="http://blog.absurd.li/riddles/2010/04/18/riddle.html"/>
+   <updated>2010-04-18T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/riddles/2010/04/18/riddle</id>
+   <content type="html">&lt;p&gt;&lt;code&gt;3735928559&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Why is this number unappealing to vegetarians?&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>A hole in the wall</title>
+   <link href="http://blog.absurd.li/codetry/2010/04/18/a-hole-in-the-wall.html"/>
+   <updated>2010-04-18T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/codetry/2010/04/18/a-hole-in-the-wall</id>
+   <content type="html">&lt;p&gt;His stool leaned back at a dangerous angle, he displays a pair of jamaica-colored sneakers to the public. Them sticking out of his business hole seems rather odd, considering the sober surroundings of the Niederdorf, or &amp;#8220;nether village&amp;#8221;, as this particular place in Zürich is called.&lt;/p&gt;
+&lt;p&gt;Slurping a botanic tea, idly facebooking and tumbling through the depths, no, shallows of the net, waiting for customers. It&amp;#8217;s been that way now for more than a day, and he starts to wonder if the customer specific context ads are just a fluke.&lt;/p&gt;
+&lt;p&gt;An abrupt &amp;#8220;Oh hey&amp;#8221; directed his way throws him out of the structural code improvements that have been waiting for him at the back of his mind. &amp;#8220;Hey&amp;#8221;, a burly businessman with slightly high blood pressure &amp;#8211; he surmises from the corona of hair still clinging on – asks: &amp;#8220;Are you the man that types?&amp;#8221;, &amp;#8220;Yes, yes I do, I code.&amp;#8221; &amp;#8220;Oh, code. Yeah, sorry, my bad. Well, look, I need a small program that does a few calculations based on this.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;And he whips out a napkin with a few calculations on it, in black lines what looks to be from an eyeliner, or a piece of coal. &amp;#8220;Don&amp;#8217;t mind the looks – how long do you think this takes?&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Hmm, well. I think the design might take me a few hours. Then we&amp;#8217;d need to meet again to see if we&amp;#8217;re on the right track. Then I&amp;#8217;ll have to code it, and clean it up a little. Might take me another 2 hours.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;For 90 an hour, right?&amp;#8221; &amp;#8220;That&amp;#8217;s right, as advertised.&amp;#8221; &amp;#8220;Ok, well. See you in three.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;He rights his stool, leans forward, sketches boxes and lines, boxes and lines, lines and boxes. Then he goes for a quick walk, takes in the morning, letting the cogs turn. Half an hour of showing tourists the view, and a hot chocolate at the riverside. Finally, he plumps down in front of his sleek, metal-clad machine and types.&lt;/p&gt;
+&lt;p&gt;What he did was transform the mascara lines into byroliner lines and boxes as a straw where the mind can cling on to, and from there to typed text on a luminescent screen, for him to read and others to understand, finally into the core of the machine, and the zeros and ones people who have no understanding regurgitate so often.&lt;/p&gt;
+&lt;p&gt;Entering the formula was pretty straightforward. But there are other things to consider: What is the best user interface for a burly businessman? Will it be used repeatedly? As if on cue, burly biz arrives and asks &amp;#8220;Done yet?&amp;#8221; &amp;#8220;Oh hi.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Back and forth: The customer starts with a lot of questions, have you put this in? He cuts him short, and explains what he will see, his understanding of the formula. There is much going on, but boils down to this: The clearing of misunderstandings. And they get cleared. It must be his happy day, the businessman knows the power of an ad-hoc team, and how it should work, how progress can come from it.&lt;/p&gt;
+&lt;p&gt;The discussion dies down, lots of nodding all around, and smiles emerge. A handshake, and both are off – shorty no doubt to a meeting, where money and hand sweat is moved, our coder off to the plane of lines and boxes. A prototype stands, but this is not where it ends. He wants it to be perfect. After all, he is a craftsman, and craft is what defines him. The table might look nice to an outsider, but the craft is inside: The distribution of weight, the structure of the wood: What holds the thing together and doesn&amp;#8217;t make it bend, for year after year.&lt;/p&gt;
+&lt;p&gt;Before he cleans up however, there is yoga waiting for him, and another stroll an the riverside. Can it be improved? How? The response comes to him during the most innocent of activities, stroking a cat that has found, purring, a new home around his legs. He leaves the cat slightly shocked behind – but she improves the situation by licking her paw – and runs up the street, repeating and repeating the idea, urging it not to leave his head.&lt;/p&gt;
+&lt;p&gt;Panting, he types it in. The tests run, the code checker tool give him a green light. He opens it, it works. Puts it on a stick, wraps it in a package, puts it into a nice box which brandishes his logo – doodled on the back of a napkin by his sister, three years ago – and puts it aside for the customer, due to arrive in an hour.&lt;/p&gt;
+&lt;p&gt;And finally. Finally the sneakers rest again on the sill of the hole.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Oh yeah, Amazon?</title>
+   <link href="http://blog.absurd.li/marketing/2010/04/14/oh-yeah-amazon-question-mark.html"/>
+   <updated>2010-04-14T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/marketing/2010/04/14/oh-yeah-amazon-question-mark</id>
+   <content type="html">&lt;p&gt;From the latest Newsletter:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Support for Session Stickiness in Elastic Load Balancing Amazon Elastic MapReduce Introduces Custom Cluster Configuration Option&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;They also have Gurble Blurble Fickleness, introducing Jambawambing Lordle Figuconation Schnorptions.&lt;/p&gt;
+&lt;p&gt;At least that&amp;#8217;s what I hear when I read stuff like that.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>IE didn't get the CSS3 memo?</title>
+   <link href="http://blog.absurd.li/css/2010/04/13/ie-didnt-get-the-css3-memo-question-mark.html"/>
+   <updated>2010-04-13T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/css/2010/04/13/ie-didnt-get-the-css3-memo-question-mark</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://kimblim.dk/css-tests/selectors/&quot;&gt;IE didn&amp;#8217;t get the CSS3 memo?&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Or, as is my guess: The code they based the new browsers on was fully untested, totally disorganized, and thus brutally hard to extend. IE9 though, gives one hope.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Challenged</title>
+   <link href="http://blog.absurd.li/codetry/2010/04/12/challenged.html"/>
+   <updated>2010-04-12T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/codetry/2010/04/12/challenged</id>
+   <content type="html">&lt;p&gt;The framework looms in front of you. Clouds cover the gray sky. You plunge in. Full unit test rewrite, nothing is where it was before, but right: The mailbox is in front of the house, the bathtub is finally in the bath, the fridge contains organic food. There is a pot on the fire, full of juicy stuff.&lt;/p&gt;
+&lt;p&gt;But you are wearing glasses that let you only see 10 centimeters. You set wild eyes on the integration tests: Guests are entering the house, trying to eat from the toilet, sleeping in the oven, or jumping out of windows. It is fail, fail, fail, wherever you happen to look.&lt;/p&gt;
+&lt;p&gt;You are close to despair. Everything is right. Right? You trudge on, teeth gnashing.&lt;/p&gt;
+&lt;p&gt;Then, somehow, you adjust the doormat ever so slightly, piece in the last crumb of information. And magically, it just works. Everything. Just. Works. The gargantuan task is finished. For minutes, you revel in the sun&amp;#8217;s rays. The clouds, they never reappear.&lt;/p&gt;
+&lt;p&gt;It is done.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Stuttering Proc</title>
+   <link href="http://blog.absurd.li/ruby/funky/2010/04/07/stuttering-proc.html"/>
+   <updated>2010-04-07T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/funky/2010/04/07/stuttering-proc</id>
+   <content type="html">&lt;script src=&quot;http://gist.github.com/358947.js&quot;&gt;&lt;/script&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Reloading a running Ruby application</title>
+   <link href="http://blog.absurd.li/ruby/funky/2010/04/05/reloading-a-running-ruby-application.html"/>
+   <updated>2010-04-05T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/funky/2010/04/05/reloading-a-running-ruby-application</id>
+   <content type="html">&lt;p&gt;Here&amp;#8217;s how I do it:
+&lt;script src=&quot;http://gist.github.com/351776.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Javuby?</title>
+   <link href="http://blog.absurd.li/ruby/java/2010/04/05/javuby-question-mark.html"/>
+   <updated>2010-04-05T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/ruby/java/2010/04/05/javuby-question-mark</id>
+   <content type="html">&lt;script src=&quot;http://gist.github.com/356227.js&quot;&gt;&lt;/script&gt;</content>
+   
+ </entry>
+ 
+ 
+</feed>

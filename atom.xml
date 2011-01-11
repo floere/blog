@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-11T14:33:15+01:00</updated>
+ <updated>2011-01-11T14:34:54+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -54,7 +54,7 @@ are baked together, making my offering multiple interfaces impossible, or very h
 &lt;p&gt;So in short I&amp;#8217;d like to be able to say: Start me a server with 10 children which map &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; requests to that query, while full requests just use &lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt; since they come from a webserver.&lt;/p&gt;
 &lt;h2&gt;Outlook&lt;/h2&gt;
 &lt;p&gt;The &lt;code&gt;Query#search_with_text&lt;/code&gt; interface is already defined.&lt;/p&gt;
-&lt;p&gt;What I will start working on is extracting the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing from (probably) Mongrel. For multiprocessing, I could use &lt;a href=&quot;https://rubygems.org/gems/procrastinate&quot;&gt;procrastinate&lt;/a&gt;. The thing that&amp;#8217;s yet missing is a buffering parent-child communication, which I might write myself, or use one of Kaspar Schiess&amp;#8217; future &lt;span class=&quot;caps&quot;&gt;IPC&lt;/span&gt; gems :)&lt;/p&gt;
+&lt;p&gt;What I will start working on is extracting the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing from (probably) Mongrel. For multiprocessing, I could use &lt;a href=&quot;https://rubygems.org/gems/procrastinate&quot;&gt;procrastinate&lt;/a&gt;. The thing that&amp;#8217;s yet missing is a buffering interprocess communication, which I might write myself, or use one of Kaspar Schiess&amp;#8217; future &lt;span class=&quot;caps&quot;&gt;IPC&lt;/span&gt; gems :)&lt;/p&gt;
 &lt;p&gt;So, a great future is ahead. I hope it all turns out as I&amp;#8217;d like it.&lt;/p&gt;</content>
    
  </entry>

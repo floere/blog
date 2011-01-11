@@ -65,6 +65,6 @@ h2. Outlook
 
 The @Query#search_with_text@ interface is already defined.
 
-What I will start working on is extracting the HTTP parsing from (probably) Mongrel. For multiprocessing, I could use "procrastinate":https://rubygems.org/gems/procrastinate. The thing that's yet missing is a buffering parent-child communication, which I might write myself, or use one of Kaspar Schiess' future IPC gems :)
+What I will start working on is extracting the HTTP parsing from (probably) Mongrel. For multiprocessing, I could use "procrastinate":https://rubygems.org/gems/procrastinate. The thing that's yet missing is a buffering interprocess communication, which I might write myself, or use one of Kaspar Schiess' future IPC gems :)
 
 So, a great future is ahead. I hope it all turns out as I'd like it.

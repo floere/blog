@@ -5,9 +5,6 @@ pre
   :margin 5px
   :padding 10px
 
-ol, ul
-  :list-style decimal
-
 a.line
   :display block
   :padding 10px
@@ -28,11 +25,14 @@ span.categories
   :font-size 0.5em
   :color gray
   
-div.post a
-  :padding 5px 10px
-        
-  &:before
-    :content '☛ '
+div.post
+  ol, ul
+    :list-style decimal
+  a
+    :padding 5px 10px
+    
+    &:before
+      :content '☛ '
 
 div.gist
   :font-size 0.9em

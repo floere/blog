@@ -3,8 +3,6 @@ h1 { margin-bottom: 10px; }
 
 pre { margin: 5px; padding: 10px; }
 
-ol, ul { list-style: decimal; }
-
 a.line { display: block; padding: 10px; text-decoration: none; }
 
 div.year { font-size: 1.5em; margin-bottom: 0.5em; }
@@ -15,6 +13,7 @@ span.calendar { border: 1px solid black; padding: 5px; }
 
 span.categories { font-size: 0.5em; color: gray; }
 
+div.post ol, div.post ul { list-style: decimal; }
 div.post a { padding: 5px 10px; }
 div.post a:before { content: "☛ "; }
 

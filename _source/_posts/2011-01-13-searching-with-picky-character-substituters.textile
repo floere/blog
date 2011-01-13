@@ -1,0 +1,9 @@
+---
+published: false
+layout: post
+title: Searching with Picky&#58; Character&nbsp;Substitution
+categories:
+  - series
+  - ruby
+  - picky
+---

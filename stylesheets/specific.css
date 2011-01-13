@@ -21,6 +21,7 @@ div.post { font-family: "lucida grande"; }
 div.post ol, div.post ul { list-style: decimal; }
 div.post a { background-color: #eeeeee; padding: 5px 10px; }
 div.post a:before { content: "☛ "; }
+div.post a:hover { background-color: #abcdef; }
 
 div.gist { font-size: 0.9em; }
 div.gist a:before { content: ""; }

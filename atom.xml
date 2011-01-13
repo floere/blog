@@ -4,13 +4,98 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-13T21:46:27+01:00</updated>
+ <updated>2011-01-13T22:46:32+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Searching with Picky&#58; Character&nbsp;Substitution</title>
+   <link href="http://blog.absurd.li/series/ruby/picky/2011/01/13/searching-with-picky-character-substituters.html"/>
+   <updated>2011-01-13T00:00:00+01:00</updated>
+   <id>http://floere.github.com/blog/series/ruby/picky/2011/01/13/searching-with-picky-character-substituters</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://floere.github.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://floere.github.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;h2&gt;What is Character Substitution?&lt;/h2&gt;
+&lt;p&gt;Character substitution in a search engine is one of the first steps in the process of sanitizing your users&amp;#8217; input.&lt;/p&gt;
+&lt;p&gt;Examples:
+&lt;code&gt;ä =&amp;gt; ae&lt;/code&gt;,
+&lt;code&gt;ø =&amp;gt; o&lt;/code&gt;,
+&lt;code&gt;é =&amp;gt; e&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This is used to make the search engine indifferent to a user&amp;#8217;s origin or way of writing.&lt;/p&gt;
+&lt;p&gt;For example, my hometown is called &lt;code&gt;Zürich&lt;/code&gt;, with an &lt;em&gt;umlaut&lt;/em&gt; character, &lt;code&gt;ü&lt;/code&gt;.
+German users will search with an ü. However, most users of the world don&amp;#8217;t know this character, and will simply type &lt;code&gt;Zurich&lt;/code&gt;. So what we want is make the search engine ignore the &lt;em&gt;umlaut diacritics&lt;/em&gt;, the two dots over the u.&lt;/p&gt;
+&lt;h2&gt;How do we do this?&lt;/h2&gt;
+&lt;p&gt;Usually, what search engines do is perform a sort of &lt;em&gt;character substitution&lt;/em&gt; before putting text into the index, so &lt;code&gt;Zürich&lt;/code&gt; will go into the index as &lt;code&gt;zurich&lt;/code&gt;. For that, we character substituted &lt;code&gt;ü =&amp;gt; u&lt;/code&gt;. I also &lt;em&gt;lowercased&lt;/em&gt; it, since that is what search engines also do, to significantly save index space.&lt;/p&gt;
+&lt;p&gt;So now we have &lt;code&gt;Zurich&lt;/code&gt; in the index. If a user now searched for &lt;code&gt;Zürich&lt;/code&gt;, the search engine wouldn&amp;#8217;t find it.&lt;/p&gt;
+&lt;p&gt;So what we do is also perform this character substitution in a query, so that if the user enters an &lt;code&gt;ü&lt;/code&gt;, it is replaced by an &lt;code&gt;u&lt;/code&gt;, making &lt;code&gt;Zurich&lt;/code&gt; out of &lt;code&gt;Zürich&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In a nutshell, the indexing and the querying map both &lt;code&gt;Zürich&lt;/code&gt; and &lt;code&gt;Zurich&lt;/code&gt; to &lt;code&gt;Zurich&lt;/code&gt; and a user will find it, regardless if they searched for my hometown with or without umlaut.&lt;/p&gt;
+&lt;h2&gt;How do we do this in Picky?&lt;/h2&gt;
+&lt;p&gt;Picky offers two class methods in a Picky &lt;code&gt;Application&lt;/code&gt; where you can define how characters are substituted, amongst other things:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;&lt;code&gt;default_indexing options = {}&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;default_querying options = {}&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The &lt;code&gt;default_&lt;/code&gt; in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.&lt;/p&gt;
+&lt;p&gt;One of the options is &lt;code&gt;substitutes_characters_with&lt;/code&gt; and you give it a character substituter object.&lt;/p&gt;
+&lt;p&gt;Picky already includes one for west european character sets. You use it as follows:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I use the Ruby 1.9 hash style, &lt;code&gt;key: value&lt;/code&gt;, for that. The rocket I use for mapping things, &lt;code&gt;map '/some/path' =&amp;gt; controller&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What the west european character substituter does is this:
+&lt;code&gt;ä =&amp;gt; ae&lt;/code&gt;,
+&lt;code&gt;Ä =&amp;gt; Ae&lt;/code&gt;,
+&lt;code&gt;ë =&amp;gt; e&lt;/code&gt;,
+&lt;code&gt;Ë =&amp;gt; E&lt;/code&gt;,
+&lt;code&gt;ï =&amp;gt; i&lt;/code&gt;,
+&lt;code&gt;Ï =&amp;gt; I&lt;/code&gt;,
+&lt;code&gt;ö =&amp;gt; oe&lt;/code&gt;,
+&lt;code&gt;Ö =&amp;gt; Oe&lt;/code&gt;,
+&lt;code&gt;ü =&amp;gt; ue&lt;/code&gt;,
+&lt;code&gt;Ü =&amp;gt; Ue&lt;/code&gt;,
+and 22 other. See &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb&quot;&gt;the spec&lt;/a&gt; if you&amp;#8217;d like to know more.&lt;/p&gt;
+&lt;p&gt;So a query like &lt;code&gt;Hände Nüsse&lt;/code&gt; will be sanitized to &lt;code&gt;haende nuesse&lt;/code&gt; before being further processed. Again also lowercasing it, since this is usually also done.&lt;/p&gt;
+&lt;h2&gt;How do I define my own character substituter&lt;/h2&gt;
+&lt;p&gt;It is extremely simple. A character substituter just needs to implement a &lt;code&gt;substitute(text)&lt;/code&gt; method that returns the substituted text.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/character_substituters/west_european.rb&quot;&gt;the source of the west european substituter&lt;/a&gt; if you want to see how I did it.&lt;/p&gt;
+&lt;p&gt;Why is it so illegibly written?&lt;/p&gt;
+&lt;p&gt;It is heavily optimized. Since this method will be called for all indexed data, and for each query it should be performant.&lt;/p&gt;
+&lt;p&gt;The west european spec includes two performance specs for that:
+&lt;pre&gt;&lt;code&gt;
+describe &quot;speed&quot; do
+  it &quot;is fast&quot; do
+    result = performance_of { @substituter.substitute('ä') }
+    result.should &amp;lt; 0.00009
+  end
+  it &quot;is fast&quot; do
+    result = performance_of { @substituter.substitute('abcdefghijklmnopqrstuvwxyz1234567890') }
+    result.should &amp;lt; 0.00015
+  end
+end
+&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;The method &lt;code&gt;performance_of&lt;/code&gt; is used in Picky quite often to maintain performance and notify me should anything get slower. It looks like this:
+&lt;pre&gt;&lt;code&gt;
+def performance_of &amp;amp;block
+  GC.disable
+  result = Benchmark.realtime &amp;amp;block
+  GC.enable
+  result
+end
+&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that most search engines need a character substituter.&lt;/li&gt;
+	&lt;li&gt;that character substituter help your international users find things.&lt;/li&gt;
+	&lt;li&gt;how they are configured in Picky.&lt;/li&gt;
+	&lt;li&gt;how you can write your own.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;h2&gt;Contributing one to Picky&lt;/h2&gt;
+&lt;p&gt;If you write your own, please let me know!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Speccing methods called in initialize</title>

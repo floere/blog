@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: Searching with Picky&#58; Character&nbsp;Substitution
 categories:
@@ -7,3 +6,108 @@ categories:
   - ruby
   - picky
 ---
+This is a post in the "Picky":http://floere.github.com/picky/index.html series on its configuration. If you haven't tried it yet, do so in the "Getting Started":http://floere.github.com/picky/getting_started.html section. It's quick and painless :)
+
+h2. What is Character Substitution?
+
+Character substitution in a search engine is one of the first steps in the process of sanitizing your users' input.
+
+Examples:
+@ä => ae@,
+@ø => o@,
+@é => e@
+
+This is used to make the search engine indifferent to a user's origin or way of writing.
+
+For example, my hometown is called @Zürich@, with an _umlaut_ character, @ü@.
+German users will search with an ü. However, most users of the world don't know this character, and will simply type @Zurich@. So what we want is make the search engine ignore the _umlaut diacritics_, the two dots over the u.
+
+h2. How do we do this?
+
+Usually, what search engines do is perform a sort of _character substitution_ before putting text into the index, so @Zürich@ will go into the index as @zurich@. For that, we character substituted @ü => u@. I also _lowercased_ it, since that is what search engines also do, to significantly save index space.
+
+So now we have @Zurich@ in the index. If a user now searched for @Zürich@, the search engine wouldn't find it.
+
+So what we do is also perform this character substitution in a query, so that if the user enters an @ü@, it is replaced by an @u@, making @Zurich@ out of @Zürich@.
+
+In a nutshell, the indexing and the querying map both @Zürich@ and @Zurich@ to @Zurich@ and a user will find it, regardless if they searched for my hometown with or without umlaut.
+
+h2. How do we do this in Picky?
+
+Picky offers two class methods in a Picky @Application@ where you can define how characters are substituted, amongst other things: 
+# @default_indexing options = {}@
+# @default_querying options = {}@
+
+The @default_@ in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.
+
+One of the options is @substitutes_characters_with@ and you give it a character substituter object.
+
+Picky already includes one for west european character sets. You use it as follows:
+
+<pre><code>default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new</code></pre>
+
+I use the Ruby 1.9 hash style, @key: value@, for that. The rocket I use for mapping things, @map '/some/path' => controller@.
+
+What the west european character substituter does is this:
+@ä => ae@,
+@Ä => Ae@,
+@ë => e@,
+@Ë => E@,
+@ï => i@,
+@Ï => I@,
+@ö => oe@,
+@Ö => Oe@,
+@ü => ue@,
+@Ü => Ue@,
+and 22 other. See "the spec":http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb if you'd like to know more.
+
+So a query like @Hände Nüsse@ will be sanitized to @haende nuesse@ before being further processed. Again also lowercasing it, since this is usually also done.
+
+h2. How do I define my own character substituter
+
+It is extremely simple. A character substituter just needs to implement a @substitute(text)@ method that returns the substituted text.
+
+See "the source of the west european substituter":http://github.com/floere/picky/blob/master/server/lib/picky/character_substituters/west_european.rb if you want to see how I did it.
+
+Why is it so illegibly written?
+
+It is heavily optimized. Since this method will be called for all indexed data, and for each query it should be performant.
+
+The west european spec includes two performance specs for that:
+<pre><code>
+describe "speed" do
+  it "is fast" do
+    result = performance_of { @substituter.substitute('ä') }
+    result.should < 0.00009
+  end
+  it "is fast" do
+    result = performance_of { @substituter.substitute('abcdefghijklmnopqrstuvwxyz1234567890') }
+    result.should < 0.00015
+  end
+end
+</code></pre>
+
+The method @performance_of@ is used in Picky quite often to maintain performance and notify me should anything get slower. It looks like this:
+<pre><code>
+def performance_of &block
+  GC.disable
+  result = Benchmark.realtime &block
+  GC.enable
+  result
+end
+</code></pre>
+
+h2. Conclusion
+
+So we've seen
+# that most search engines need a character substituter.
+# that character substituter help your international users find things.
+# how they are configured in Picky.
+# how you can write your own.
+
+Hope you learnt something new :)
+
+h2. Contributing one to Picky
+
+If you write your own, please let me know!
+

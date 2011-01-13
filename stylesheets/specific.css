@@ -3,7 +3,7 @@ h1 { margin-bottom: 10px; }
 
 pre { margin: 5px; padding: 10px; }
 
-code { padding: 5px; background-color: #eeeeee; }
+code { padding: 1px 5px; background-color: #eeeeee; }
 
 p { margin-top: 0.6em; margin-bottom: 0.6em; }
 
@@ -19,7 +19,7 @@ span.categories { font-size: 0.5em; color: gray; }
 
 div.post { font-family: "lucida grande"; }
 div.post ol, div.post ul { list-style: decimal; }
-div.post a { background-color: #eeeeee; padding: 5px 10px; }
+div.post a { background-color: #eeeeee; padding: 1px 10px 2px; }
 div.post a:before { content: "☛ "; }
 div.post a:hover { background-color: #abcdef; }
 

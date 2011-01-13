@@ -5,14 +5,22 @@
     / Ugh.
     %link{ :rel => 'stylesheet', :href => '/blog/stylesheets/basic.css', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => '/blog/stylesheets/specific.css', :type => 'text/css' }
+    %link{ :rel => 'stylesheet', :href => '/stylesheets/basic.css', :type => 'text/css' }
+    %link{ :rel => 'stylesheet', :href => '/stylesheets/specific.css', :type => 'text/css' }
     %title= page.title
   %body
     %ol.nav
       %li
-        %a{ :href => '/' } home
+        %a{ :href => 'http://floere.github.com' } home
+        •
+      %li
+        %a{ :href => '/' } blog home
         •
       %li
         %a{ :href => '/../picky' } picky
+        •
+      %li
+        %a{ :href => '/../phony' } phony
         •
       %li
         %a{ :href => '/../view_models' } view models

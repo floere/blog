@@ -13,7 +13,7 @@ h2. The Situation
 What goes on currently is this:
 I have a Unicorn master and Unicorn worker children.
 
-When a HTTP Request arrives, a child is called to unwrap the HTTP specific stuff, then the child's Application#call method is called, which in turn calls a query's #search_with_text method which takes a query string and an offset.
+When a HTTP Request arrives, a child is called to unwrap the HTTP specific stuff, then the child's @Application#call@ method is called, which in turn calls a query's @#search_with_text@ method which takes a query string and an offset.
 
 The routing uses Joshua Peek's "rack-mount":http://github.com/josh/rack-mount, which is also used in Rails 3.
 
@@ -21,7 +21,7 @@ In Picky, you route queries like this:
 
 <pre><code>route %r{\A/path/of/query\Z} => my_beautiful_query</code></pre>
 
-This will route e.g. @localhost:8080/path/of/query?query=test@ to the query object @my_beautiful_query@, where #search_with_text will be called with the parameters "test" and an offset of 0 (the default).
+This will route e.g. @localhost:8080/path/of/query?query=test@ to the query object @my_beautiful_query@, where @#search_with_text@ will be called with the parameters "test" and an offset of 0 (the default).
 
 h2. How I'd like it to be
 
@@ -37,7 +37,7 @@ or
 
 <pre><code>socket '/path/to/socket' => yet_another_beautiful_query</code></pre>
 
-Note: Perhaps I use the @route@ method for all of them.
+Note: Perhaps I should use the @route@ method for all of them.
 
 h2. The Problem
 

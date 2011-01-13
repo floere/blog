@@ -4,74 +4,13 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-11T14:34:54+01:00</updated>
+ <updated>2011-01-13T16:44:12+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
- 
- <entry>
-   <title>What I want for Picky 1 (Separation of HTTP and Multiprocessing)</title>
-   <link href="http://blog.absurd.li/ruby/picky/2011/01/11/what-i-want-for-picky-1.html"/>
-   <updated>2011-01-11T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/ruby/picky/2011/01/11/what-i-want-for-picky-1</id>
-   <content type="html">&lt;p&gt;Recently, I&amp;#8217;ve been thinking about how I handle search requests in &lt;a href=&quot;http://floere.github.com/picky/&quot;&gt;Picky&lt;/a&gt;.&lt;/p&gt;
-&lt;h2&gt;The Situation&lt;/h2&gt;
-&lt;p&gt;What goes on currently is this:
-I have a Unicorn master and Unicorn worker children.&lt;/p&gt;
-&lt;p&gt;When a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; Request arrives, a child is called to unwrap the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; specific stuff, then the child&amp;#8217;s Application#call method is called, which in turn calls a query&amp;#8217;s #search_with_text method which takes a query string and an offset.&lt;/p&gt;
-&lt;p&gt;The routing uses Joshua Peek&amp;#8217;s &lt;a href=&quot;http://github.com/josh/rack-mount&quot;&gt;rack-mount&lt;/a&gt;, which is also used in Rails 3.&lt;/p&gt;
-&lt;p&gt;In Picky, you route queries like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;route %r{\A/path/of/query\Z} =&amp;gt; my_beautiful_query&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This will route e.g. &lt;code&gt;localhost:8080/path/of/query?query=test&lt;/code&gt; to the query object &lt;code&gt;my_beautiful_query&lt;/code&gt;, where #search_with_text will be called with the parameters &amp;#8220;test&amp;#8221; and an offset of 0 (the default).&lt;/p&gt;
-&lt;h2&gt;How I&amp;#8217;d like it to be&lt;/h2&gt;
-&lt;p&gt;Performance tests have shown that sometimes, a search in Picky is even faster than the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; overhead.&lt;/p&gt;
-&lt;p&gt;Also, since all full searches first go through a web app (to enrich the results), it doesn&amp;#8217;t necessarily make sense to use &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; again from the web app to Picky.&lt;/p&gt;
-&lt;p&gt;What I&amp;#8217;d like to offer the Picky users is not just a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; &lt;code&gt;route&lt;/code&gt; method, but also methods for &lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;, or sockets.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;map_tcp 3001 =&amp;gt; my_other_beautiful_query&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;or&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;socket '/path/to/socket' =&amp;gt; yet_another_beautiful_query&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Note: Perhaps I use the &lt;code&gt;route&lt;/code&gt; method for all of them.&lt;/p&gt;
-&lt;h2&gt;The Problem&lt;/h2&gt;
-&lt;p&gt;Unicorn only supports &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;. That in itself would not be a problem.&lt;/p&gt;
-&lt;p&gt;The problem stems from the fact that&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;the forking of worker children&lt;/li&gt;
-	&lt;li&gt;the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing
-are baked together, making my offering multiple interfaces impossible, or very hard.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;Unicorn&lt;/a&gt; is great, btw.&lt;/p&gt;
-&lt;h2&gt;So what I&amp;#8217;d really like&lt;/h2&gt;
-&lt;p&gt;I&amp;#8217;d like to separate the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; handling and the forking of worker children.&lt;/p&gt;
-&lt;p&gt;What would be best:&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;1 master process&lt;/li&gt;
-	&lt;li&gt;N children with adapters for &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;/&lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;/Socket requests&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Alternatively, each child only processes the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt;/&lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt;/Socket requests and then passes on (to a Unix socket) a standardized message with the query text and an offset. Another child (or the same) would then perform the standardized search request.&lt;/p&gt;
-&lt;p&gt;So in short I&amp;#8217;d like to be able to say: Start me a server with 10 children which map &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; requests to that query, while full requests just use &lt;span class=&quot;caps&quot;&gt;TCP&lt;/span&gt; since they come from a webserver.&lt;/p&gt;
-&lt;h2&gt;Outlook&lt;/h2&gt;
-&lt;p&gt;The &lt;code&gt;Query#search_with_text&lt;/code&gt; interface is already defined.&lt;/p&gt;
-&lt;p&gt;What I will start working on is extracting the &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; parsing from (probably) Mongrel. For multiprocessing, I could use &lt;a href=&quot;https://rubygems.org/gems/procrastinate&quot;&gt;procrastinate&lt;/a&gt;. The thing that&amp;#8217;s yet missing is a buffering interprocess communication, which I might write myself, or use one of Kaspar Schiess&amp;#8217; future &lt;span class=&quot;caps&quot;&gt;IPC&lt;/span&gt; gems :)&lt;/p&gt;
-&lt;p&gt;So, a great future is ahead. I hope it all turns out as I&amp;#8217;d like it.&lt;/p&gt;</content>
-   
- </entry>
- 
- <entry>
-   <title>Reflecting on my visit to the Ruby User Group Berlin</title>
-   <link href="http://blog.absurd.li/ruby/presenting/2011/01/10/ruby-user-group-berlin.html"/>
-   <updated>2011-01-10T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/ruby/presenting/2011/01/10/ruby-user-group-berlin</id>
-   <content type="html">&lt;p&gt;&lt;span class=&quot;caps&quot;&gt;TODO&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;- Status
-- Presentation (with content)
-- Improvements
-- Berlin
-- Thanks&lt;/p&gt;</content>
-   
- </entry>
  
  <entry>
    <title>Speccing methods called in initialize</title>

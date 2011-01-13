@@ -71,7 +71,7 @@ See "the source of the west european substituter":http://github.com/floere/picky
 
 Why is it so illegibly written?
 
-It is heavily optimized. Since this method will be called for all indexed data, and for each query it should be performant.
+It is heavily optimized. Since this method will be called for all indexed data, and for each query, it should be performant.
 
 The west european spec includes two performance specs for that:
 <pre><code>

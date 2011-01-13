@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-13T22:49:19+01:00</updated>
+ <updated>2011-01-13T22:50:36+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -60,7 +60,7 @@ and 22 others. See &lt;a href=&quot;http://github.com/floere/picky/blob/master/s
 &lt;p&gt;It is extremely simple. A character substituter just needs to implement a &lt;code&gt;substitute(text)&lt;/code&gt; method that returns the substituted text.&lt;/p&gt;
 &lt;p&gt;See &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/character_substituters/west_european.rb&quot;&gt;the source of the west european substituter&lt;/a&gt; if you want to see how I did it.&lt;/p&gt;
 &lt;p&gt;Why is it so illegibly written?&lt;/p&gt;
-&lt;p&gt;It is heavily optimized. Since this method will be called for all indexed data, and for each query it should be performant.&lt;/p&gt;
+&lt;p&gt;It is heavily optimized. Since this method will be called for all indexed data, and for each query, it should be performant.&lt;/p&gt;
 &lt;p&gt;The west european spec includes two performance specs for that:
 &lt;pre&gt;&lt;code&gt;
 describe &quot;speed&quot; do

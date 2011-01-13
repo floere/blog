@@ -40,7 +40,7 @@ Picky offers two class methods in a Picky @Application@ where you can define how
 
 The @default_@ in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.
 
-One of the options is @substitutes_characters_with@ and you give it a character substituter object.
+One of the options is @substitutes_characters_with@ and you give it a character substituter object that has a @#substitute(text)@ method.
 
 Picky already includes one for west european character sets. You use it as follows:
 
@@ -59,7 +59,7 @@ What the west european character substituter does is this:
 @Ö => Oe@,
 @ü => ue@,
 @Ü => Ue@,
-and 22 other. See "the spec":http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb if you'd like to know more.
+and 22 others. See "the spec":http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb if you'd like to know more.
 
 So a query like @Hände Nüsse@ will be sanitized to @haende nuesse@ before being further processed. Again also lowercasing it, since this is usually also done.
 

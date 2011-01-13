@@ -55,7 +55,7 @@
       	<li><code>default_querying options = {}</code></li>
       </ol>
       <p>The <code>default_</code> in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.</p>
-      <p>One of the options is <code>substitutes_characters_with</code> and you give it a character substituter object.</p>
+      <p>One of the options is <code>substitutes_characters_with</code> and you give it a character substituter object that has a <code>#substitute(text)</code> method.</p>
       <p>Picky already includes one for west european character sets. You use it as follows:</p>
       <pre><code>default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new</code></pre>
       <p>I use the Ruby 1.9 hash style, <code>key: value</code>, for that. The rocket I use for mapping things, <code>map '/some/path' =&gt; controller</code>.</p>
@@ -70,7 +70,7 @@
       <code>Ö =&gt; Oe</code>,
       <code>ü =&gt; ue</code>,
       <code>Ü =&gt; Ue</code>,
-      and 22 other. See <a href="http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb">the spec</a> if you&#8217;d like to know more.</p>
+      and 22 others. See <a href="http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb">the spec</a> if you&#8217;d like to know more.</p>
       <p>So a query like <code>Hände Nüsse</code> will be sanitized to <code>haende nuesse</code> before being further processed. Again also lowercasing it, since this is usually also done.</p>
       <h2>How do I define my own character substituter</h2>
       <p>It is extremely simple. A character substituter just needs to implement a <code>substitute(text)</code> method that returns the substituted text.</p>

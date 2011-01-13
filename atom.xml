@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-13T22:46:32+01:00</updated>
+ <updated>2011-01-13T22:49:19+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -39,7 +39,7 @@ German users will search with an ü. However, most users of the world don&amp;#8
 	&lt;li&gt;&lt;code&gt;default_querying options = {}&lt;/code&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;The &lt;code&gt;default_&lt;/code&gt; in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.&lt;/p&gt;
-&lt;p&gt;One of the options is &lt;code&gt;substitutes_characters_with&lt;/code&gt; and you give it a character substituter object.&lt;/p&gt;
+&lt;p&gt;One of the options is &lt;code&gt;substitutes_characters_with&lt;/code&gt; and you give it a character substituter object that has a &lt;code&gt;#substitute(text)&lt;/code&gt; method.&lt;/p&gt;
 &lt;p&gt;Picky already includes one for west european character sets. You use it as follows:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I use the Ruby 1.9 hash style, &lt;code&gt;key: value&lt;/code&gt;, for that. The rocket I use for mapping things, &lt;code&gt;map '/some/path' =&amp;gt; controller&lt;/code&gt;.&lt;/p&gt;
@@ -54,7 +54,7 @@ German users will search with an ü. However, most users of the world don&amp;#8
 &lt;code&gt;Ö =&amp;gt; Oe&lt;/code&gt;,
 &lt;code&gt;ü =&amp;gt; ue&lt;/code&gt;,
 &lt;code&gt;Ü =&amp;gt; Ue&lt;/code&gt;,
-and 22 other. See &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb&quot;&gt;the spec&lt;/a&gt; if you&amp;#8217;d like to know more.&lt;/p&gt;
+and 22 others. See &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb&quot;&gt;the spec&lt;/a&gt; if you&amp;#8217;d like to know more.&lt;/p&gt;
 &lt;p&gt;So a query like &lt;code&gt;Hände Nüsse&lt;/code&gt; will be sanitized to &lt;code&gt;haende nuesse&lt;/code&gt; before being further processed. Again also lowercasing it, since this is usually also done.&lt;/p&gt;
 &lt;h2&gt;How do I define my own character substituter&lt;/h2&gt;
 &lt;p&gt;It is extremely simple. A character substituter just needs to implement a &lt;code&gt;substitute(text)&lt;/code&gt; method that returns the substituted text.&lt;/p&gt;

@@ -72,7 +72,7 @@
       <code>Ü =&gt; Ue</code>,
       and 22 others. See <a href="http://github.com/floere/picky/blob/master/server/spec/lib/character_substituters/west_european_spec.rb">the spec</a> if you&#8217;d like to know more.</p>
       <p>So a query like <code>Hände Nüsse</code> will be sanitized to <code>haende nuesse</code> before being further processed. Again also lowercasing it, since this is usually also done.</p>
-      <h2>How do I define my own character substituter</h2>
+      <h2>How do I define my own character substituter?</h2>
       <p>It is extremely simple. A character substituter just needs to implement a <code>substitute(text)</code> method that returns the substituted text.</p>
       <p>See <a href="http://github.com/floere/picky/blob/master/server/lib/picky/character_substituters/west_european.rb">the source of the west european substituter</a> if you want to see how I did it.</p>
       <p>Why is it so illegibly written?</p>

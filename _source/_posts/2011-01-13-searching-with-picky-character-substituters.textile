@@ -63,7 +63,7 @@ and 22 others. See "the spec":http://github.com/floere/picky/blob/master/server/
 
 So a query like @Hände Nüsse@ will be sanitized to @haende nuesse@ before being further processed. Again also lowercasing it, since this is usually also done.
 
-h2. How do I define my own character substituter
+h2. How do I define my own character substituter?
 
 It is extremely simple. A character substituter just needs to implement a @substitute(text)@ method that returns the substituted text.
 

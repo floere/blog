@@ -2,15 +2,18 @@
 %html{ :xmlns => "http://www.w3.org/1999/xhtml", :'xml:lang' => "en", :lang => "en" }
   %head
     %meta{ :'http-equiv' => "Content-type", :content => "text/html; charset=utf-8" }
-    %script{ :type => 'text/javascript', :src => '/javascripts/shjs-0.6/sh_main.min.js' }
-    %link{ :type => 'text/css', :rel => 'stylesheet', :href => '/javascripts/shjs-0.6/css/sh_acid.min.css' }
     / Ugh.
+    %script{ :type => 'text/javascript', :src => '/blog/javascripts/shjs-0.6/sh_main.min.js' }
+    %link{ :type => 'text/css', :rel => 'stylesheet', :href => '/blog/javascripts/shjs-0.6/css/sh_acid.min.css' }
     %link{ :rel => 'stylesheet', :href => '/blog/stylesheets/basic.css', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => '/blog/stylesheets/specific.css', :type => 'text/css' }
+    / Ugh.
+    %script{ :type => 'text/javascript', :src => '/javascripts/shjs-0.6/sh_main.min.js' }
+    %link{ :type => 'text/css', :rel => 'stylesheet', :href => '/javascripts/shjs-0.6/css/sh_acid.min.css' }
     %link{ :rel => 'stylesheet', :href => '/stylesheets/basic.css', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => '/stylesheets/specific.css', :type => 'text/css' }
     %title= page.title
-  %body{:onload => 'sh_highlightDocument("/javascripts/shjs-0.6/lang/", ".min.js")'}
+  %body{:onload => 'sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'}
     %ol.nav
       %li
         %a{ :href => 'http://floere.github.com' } home

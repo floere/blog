@@ -4,7 +4,7 @@ destination: .
 sass: true
 haml: true
 
-pygments: false
+pygments: true
 
 lsi: false # true
 

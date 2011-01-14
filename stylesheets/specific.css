@@ -1,7 +1,8 @@
 @charset "UTF-8";
 h1 { margin-bottom: 10px; }
 
-pre { margin: 5px; padding: 10px; }
+pre { margin: 5px -120px; padding: 10px; }
+pre code { background-color: transparent; }
 
 code { padding: 1px 5px; background-color: #eeeeee; }
 

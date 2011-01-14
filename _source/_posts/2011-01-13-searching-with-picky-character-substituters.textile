@@ -44,7 +44,7 @@ One of the options is @substitutes_characters_with@ and you give it a character 
 
 Picky already includes one for west european character sets. You use it as follows:
 
-<pre><code>default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new</code></pre>
+<pre class="sh_ruby"><code>default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new</code></pre>
 
 I use the Ruby 1.9 hash style, @key: value@, for that. The rocket I use for mapping things, @map '/some/path' => controller@.
 
@@ -74,7 +74,7 @@ Why is it so illegibly written?
 It is heavily optimized. Since this method will be called for all indexed data, and for each query, it should be performant.
 
 The west european spec includes two performance specs for that:
-<pre><code>
+<pre class="sh_ruby"><code>
 describe "speed" do
   it "is fast" do
     result = performance_of { @substituter.substitute('ä') }
@@ -88,7 +88,7 @@ end
 </code></pre>
 
 The method @performance_of@ is used in Picky quite often to maintain performance and notify me should anything get slower. It looks like this:
-<pre><code>
+<pre class="sh_ruby"><code>
 def performance_of &block
   GC.disable
   result = Benchmark.realtime &block

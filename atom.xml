@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-13T23:51:25+01:00</updated>
+ <updated>2011-01-14T19:12:30+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -41,7 +41,7 @@ German users will search with an ü. However, most users of the world don&amp;#8
 &lt;p&gt;The &lt;code&gt;default_&lt;/code&gt; in the method name comes from the fact that whatever options are given, will be used for all indexing and querying unless overridden. So most of the time you will be configuring it there.&lt;/p&gt;
 &lt;p&gt;One of the options is &lt;code&gt;substitutes_characters_with&lt;/code&gt; and you give it a character substituter object that has a &lt;code&gt;#substitute(text)&lt;/code&gt; method.&lt;/p&gt;
 &lt;p&gt;Picky already includes one for west european character sets. You use it as follows:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;default_indexing substitutes_characters_with: CharacterSubstituters::WestEuropean.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I use the Ruby 1.9 hash style, &lt;code&gt;key: value&lt;/code&gt;, for that. The rocket I use for mapping things, &lt;code&gt;map '/some/path' =&amp;gt; controller&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;What the west european character substituter does is this:
 &lt;code&gt;ä =&amp;gt; ae&lt;/code&gt;,
@@ -62,7 +62,7 @@ and 22 others. See &lt;a href=&quot;http://github.com/floere/picky/blob/master/s
 &lt;p&gt;Why is it so illegibly written?&lt;/p&gt;
 &lt;p&gt;It is heavily optimized. Since this method will be called for all indexed data, and for each query, it should be performant.&lt;/p&gt;
 &lt;p&gt;The west european spec includes two performance specs for that:
-&lt;pre&gt;&lt;code&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;
 describe &quot;speed&quot; do
   it &quot;is fast&quot; do
     result = performance_of { @substituter.substitute('ä') }
@@ -75,7 +75,7 @@ describe &quot;speed&quot; do
 end
 &lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;The method &lt;code&gt;performance_of&lt;/code&gt; is used in Picky quite often to maintain performance and notify me should anything get slower. It looks like this:
-&lt;pre&gt;&lt;code&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;
 def performance_of &amp;amp;block
   GC.disable
   result = Benchmark.realtime &amp;amp;block

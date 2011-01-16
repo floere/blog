@@ -31,15 +31,17 @@
         %a{ :href => '/../view_models' } view models
     %div.post
       %h1= page.title
+      .categories= page.categories.join(' / ')
       ~ content
       %h2 Comments?
+      - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread
       :javascript
         var disqus_shortname = 'florianhanke';
-      
+        
         // The following are highly recommended additional parameters. Remove the slashes in front to use.
-        // var disqus_identifier = '';
-        // var disqus_url = 'http://example.com/permalink-to-page.html';
+        var disqus_identifier = '#{page.id}';
+        var disqus_url = '#{permalink}';
       
         /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {

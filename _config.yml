@@ -5,6 +5,7 @@ sass: true
 haml: true
 
 pygments: true
+permalink: /:year/:month/:day/:title.html
 
 lsi: false # true
 

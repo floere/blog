@@ -83,27 +83,9 @@
       <p>Why is it so illegibly written?</p>
       <p>It is heavily optimized. Since this method will be called for all indexed data, and for each query, it should be performant.</p>
       <p>The west european spec includes two performance specs for that:
-      <pre class="sh_ruby"><code>
-      describe "speed" do
-        it "is fast" do
-          result = performance_of { @substituter.substitute('ä') }
-          result.should &lt; 0.00009
-        end
-        it "is fast" do
-          result = performance_of { @substituter.substitute('abcdefghijklmnopqrstuvwxyz1234567890') }
-          result.should &lt; 0.00015
-        end
-      end
-      </code></pre></p>
+      <pre class="sh_ruby"><code>describe "speed" do&#x000A;  it "is fast" do&#x000A;    result = performance_of { @substituter.substitute('ä') }&#x000A;    result.should &lt; 0.00009&#x000A;  end&#x000A;  it "is fast" do&#x000A;    result = performance_of { @substituter.substitute('abcdefghijklmnopqrstuvwxyz1234567890') }&#x000A;    result.should &lt; 0.00015&#x000A;  end&#x000A;end&#x000A;</code></pre></p>
       <p>The method <code>performance_of</code> is used in Picky quite often to maintain performance and notify me should anything get slower. It looks like this:
-      <pre class="sh_ruby"><code>
-      def performance_of &amp;block
-        GC.disable
-        result = Benchmark.realtime &amp;block
-        GC.enable
-        result
-      end
-      </code></pre></p>
+      <pre class="sh_ruby"><code>def performance_of &amp;block&#x000A;  GC.disable&#x000A;  result = Benchmark.realtime &amp;block&#x000A;  GC.enable&#x000A;  result&#x000A;end&#x000A;</code></pre></p>
       <h2>Conclusion</h2>
       <p>So we&#8217;ve seen</p>
       <ol>

@@ -24,5 +24,7 @@ div.post a { background-color: #eeeeee; padding: 1px 10px 2px; }
 div.post a:before { content: "☛ "; }
 div.post a:hover { background-color: #abcdef; }
 
+#disqus_thread a:before { content: ""; }
+
 div.gist { font-size: 0.9em; }
 div.gist a:before { content: ""; }

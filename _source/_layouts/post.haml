@@ -34,13 +34,13 @@
       .categories= page.categories.join(' / ')
       ~ content
       %h2 Comments?
-      - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
+      / permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread
       :javascript
         var disqus_shortname = 'florianhanke';
         var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
         var disqus_identifier = '#{page.id}';
-        var disqus_url = '#{permalink}';
+        // var disqus_url = ''; // permalink
       
         /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {

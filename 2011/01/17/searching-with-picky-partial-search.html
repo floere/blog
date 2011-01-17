@@ -73,7 +73,7 @@
       This method returns a new index that might look like this:
       <pre class="sh_ruby"><code>Partial::Random.new.generate_from(:picky =&gt; [1,2,3]) # =&gt; { :ick =&gt; [1,2,3] }&#x000A;</code></pre>
       Of course, the example is not very performant – but legible for you.</p>
-      <p>Finally, you&#8217;d use it for your data categories like this:
+      <p>Finally, you&#8217;d use it for your data categories in <code>app/application.rb</code> like this:
       <pre class="sh_ruby"><code>some_index = index :main, Sources::DB.new('SELECT id, title FROM books', file: 'app/db.yml')&#x000A;some_index.define_category :title, partial: Partial::Random.new&#x000A;</code></pre></p>
       <p>A better idea might be to create a substring partial that generates a partial index where the asterisk is actually at the front of the word:
       <pre class="sh_ruby"><code>{&#x000A;  :picky =&gt; [1,2,3],&#x000A;  :icky  =&gt; [1,2,3],&#x000A;  :cky   =&gt; [1,2,3],&#x000A;  :ky    =&gt; [1,2,3],&#x000A;  :y     =&gt; [1,2,3]&#x000A;}&#x000A;</code></pre>

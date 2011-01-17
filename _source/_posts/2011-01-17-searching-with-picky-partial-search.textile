@@ -88,7 +88,7 @@ This method returns a new index that might look like this:
 </code></pre>
 Of course, the example is not very performant – but legible for you.
 
-Finally, you'd use it for your data categories like this:
+Finally, you'd use it for your data categories in @app/application.rb@ like this:
 <pre class="sh_ruby"><code>some_index = index :main, Sources::DB.new('SELECT id, title FROM books', file: 'app/db.yml')
 some_index.define_category :title, partial: Partial::Random.new
 </code></pre>

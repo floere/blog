@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-17T16:29:46+01:00</updated>
+ <updated>2011-01-17T16:32:09+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -77,7 +77,7 @@ This method returns a new index that might look like this:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Partial::Random.new.generate_from(:picky =&amp;gt; [1,2,3]) # =&amp;gt; { :ick =&amp;gt; [1,2,3] }
 &lt;/code&gt;&lt;/pre&gt;
 Of course, the example is not very performant – but legible for you.&lt;/p&gt;
-&lt;p&gt;Finally, you&amp;#8217;d use it for your data categories like this:
+&lt;p&gt;Finally, you&amp;#8217;d use it for your data categories in &lt;code&gt;app/application.rb&lt;/code&gt; like this:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;some_index = index :main, Sources::DB.new('SELECT id, title FROM books', file: 'app/db.yml')
 some_index.define_category :title, partial: Partial::Random.new
 &lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;

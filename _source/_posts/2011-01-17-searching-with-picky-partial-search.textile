@@ -1,0 +1,121 @@
+---
+layout: post
+title: Searching with Picky&#58; Partial Search
+categories:
+  - series
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://floere.github.com/picky/index.html series on its configuration. If you haven't tried it yet, do so in the "Getting Started":http://floere.github.com/picky/getting_started.html section. It's quick and painless :)
+
+h2. What is a Partial Search?
+
+Partial searching is when the user only enters part of a query word, but the search engine still manages to find the whole word.
+
+Example:
+We want to find all @chunky bacon@. If the search engine supports a partial search, we should be able to search for just @chunky ba@ and @chunky bacon@ will still be found.
+
+Note that @chunky bards@ will also be found, and so will @chunky babes@. So beware.
+
+Usually, the character used for partial searches is the asterisk, @*@.
+So you would search for @chunky ba*@ to have the search engine look for @ba@ followed by anything.
+
+h2. In Picky
+
+At the time of writing, Picky offers a postfix partial search, meaning that only words _ending_ in anything can be searched. (Or a @Partial::None@ partial search that just ignores the @*@.)
+
+The thing you use is @Partial::Substring@, like this:
+<pre class="sh_ruby"><code>some_index = index :main, Sources::DB.new('SELECT id, title FROM books', file: 'app/db.yml')
+some_index.define_category :title, partial: Partial::Substring.new(from: 1)</code></pre>
+
+So you define a data category on the index and give it the @partial@ option. With this option you tell Picky to use the following class for generating the index in a special way to support partial indexing and querying.
+
+What we want in the example above is have Picky use a @Partial::Substring@, and have a query word match @from@ the first position (position @1@).
+
+Example:
+A word like @picky@ would match on @p@, @pi@, @pic@, @pick@ and @picky@. If you defined @from: 3@, then it would only match @pic@, @pick@, @picky@. Setting @from@ to @1@ is indexing intensive, but will find everything.
+
+It is super-easy to write your own partial search. See below for that. The sky is the limit, basically.
+
+On a side-note: Picky will always search the last word of a query with a @*@, except if you use double quotes, like so: @"chunky bac"@. This will really only find @chunky bac@, not @chunky bacon@.
+
+h2. How does Picky do this?
+
+Picky aims to be very extensible, so what it does is very simple.
+
+Picky uses a partial generator, like @Partial::Substring@ which takes an exact index (more below) and returns a partial index.
+
+An exact index in Picky is just a hash that maps words to an array of ids.
+
+So @Partial::Substring.new(from: 3)@ takes something like that:
+<pre class="sh_ruby"><code>{
+  :picky => [1, 16, 3, 999],
+  :pickle => [800, 3, 55]
+}
+</code></pre>
+(the index for exact matches) and transforms it into something like that:
+<pre class="sh_ruby"><code>{
+  :pickle => [800, 3, 55],
+  :pickl  => [800, 3, 55],
+  :picky => [1, 16, 3, 999],
+  :pick  => [1, 16, 3, 999, 800, 3, 55],
+  :pic  => [1, 16, 3, 999, 800, 3, 55]
+}
+</code></pre>
+So in @pic@, there are both the ids from @picky@ and the ids from @pickle@. If someone looks for @pic@, we return a mix of both ids.
+
+h2. How do I define my own Partial Search?
+
+It is extremely simple. A partial search just needs to implement a @generate_from(exact_index)@ method that returns the new partial index.
+
+You could for example implement a partial index that has _random_ substring matches of up to 3 characters (silly, I know :)):
+<pre class="sh_ruby"><code>class Partial::Random
+  def generate_from exact_index
+    exact_index.inject({}) do |partial_index, word_and_ids|
+      word, ids = *word_and_ids
+      start  = rand word.size
+      ending = rand(3) + 1
+      random_substring = word[start, ending]
+      partial_index[random_substring] ||= []
+      partial_index[random_substring] += ids
+      partial_index
+    end
+  end
+end
+</code></pre>
+This method returns a new index that might look like this:
+<pre class="sh_ruby"><code>Partial::Random.new.generate_from(:picky => [1,2,3]) # => { :ick => [1,2,3] }
+</code></pre>
+Of course, the example is not very performant – but legible for you.
+
+Finally, you'd use it for your data categories like this:
+<pre class="sh_ruby"><code>some_index = index :main, Sources::DB.new('SELECT id, title FROM books', file: 'app/db.yml')
+some_index.define_category :title, partial: Partial::Random.new
+</code></pre>
+
+A better idea might be to create a substring partial that generates a partial index where the asterisk is actually at the front of the word:
+<pre class="sh_ruby"><code>{
+  :picky => [1,2,3],
+  :icky  => [1,2,3],
+  :cky   => [1,2,3],
+  :ky    => [1,2,3],
+  :y     => [1,2,3]
+}
+</code></pre>
+This will match @picky@ if you enter just a @y@!
+
+Picky is very flexible – do what you want however you want it.
+
+h2. Conclusion
+
+So we've seen
+# what a partial search is.
+# how Picky does a partial search.
+# how a partial search is configured in Picky.
+# how you can write your own.
+
+Hope you learnt something new :)
+
+h2. Contributing one to Picky
+
+If you write your own, please let me know!

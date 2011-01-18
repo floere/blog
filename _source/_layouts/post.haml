@@ -33,6 +33,13 @@
       %h1= page.title
       .categories= page.categories.join(' / ')
       ~ content
+      - if page.next
+        Next
+        %a{ :href => page.next.url, :title => "Next post: #{page.next.title}" }= page.next.title
+      %br
+      - if page.previous
+        Previous
+        %a{ :href => page.previous.url, :title => "Next post: #{page.previous.title}" }= page.previous.title
       %h2 Comments?
       - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread

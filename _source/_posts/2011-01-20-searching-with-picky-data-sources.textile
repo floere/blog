@@ -13,7 +13,7 @@ h2. What is a Data Source in Picky?
 A data source is where the indexes get their data. Every index needs a data source.
 
 The way to do this is pass the @index(identifier, source)@ method's source param a source instance, like so (in @app/application.rb@):
-<pre class="sh_ruby"><code>books_index = index :books, Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+<pre class="sh_ruby"><code>books_index = index :books, Sources::DB.new('SELECT id, title, author FROM books', file: 'app/db.yml')</code></pre>
 Here we passed a database source that uses a simple select. Which database the source uses is defined in the file @app/db.yml@ and follows the configuration structure of Active Record. You could, instead of passing in a @file@ option, just pass in the Active Record config hash.
 
 There are various data sources already defined beside the DB source (see below), but if the one you need is missing, writing your own is easy. 

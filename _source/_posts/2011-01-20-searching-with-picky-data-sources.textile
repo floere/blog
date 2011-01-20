@@ -35,14 +35,44 @@ Do a @SELECT id, t_01 as title ...@ or use the @from@ option when you define the
 The @from@ option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
 <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01
 books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)</code></pre>
-  
-In fact you can have crazy indexes where every category has its own data source:
+Lots of possibilities, I'm sure you'll find more useful ones!
+
+There's more. You can have crazy indexes where every category has its own data source:
 <pre class="sh_ruby"><code>books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')</code></pre>
 Now the title category takes its data from a library.csv. If you do this, be careful that all data sources use the same ids or Picky's core mechanism won't work.
 
 h2. Currently available data sources
 
+Picky offers a few data sources, @DB@ for databases, @CSV@ for comma-separated files, @Couch@ for couch DB, and @Delicious@, for delicious bookmarks. Mmh.
+
+This is how you use them. We've already seen the database source:
+<pre class="sh_ruby"><code>Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+Don't hesitate to use JOINs or other SQL expressions for some extreme databasing!
+<pre class="sh_ruby"><code>Sources::CSV.new(:title, :author, :isbn, :year, :publisher, :subjects, file: 'data/books.csv')</code></pre>
+This source assumes that your first column is the id column. It takes its data from the file given in the @file@ option.
+<pre class="sh_ruby"><code>Sources::Couch.new(:title, :author, :isbn, url: 'http://localhost:5984/picky', keys: Sources::Couch::UUIDKeys.new)</code></pre>
+The CouchDB source takes a url where couch DB serves its data. By default it assumes that you are using Hex Keys. But you can pass in one of @Sources::Couch::HexKeys.new@, @Sources::Couch::UUIDKeys.new@, or @Sources::Couch::IntegerKeys.new@ in the @keys@ option to tell Picky what keys you have.
+I'm afraid that currently you have to recalculate your keys in the client to get back the original keys. I am working on non-integer keys, but it takes its time. Sorry about that.
+<pre class="sh_ruby"><code>Sources::Delicious.new(:username, :password)</code></pre>
+Delicious is the easiest source, since it comes with fixed data categories @title@, @tags@, @url@ that you can categorize.
+
 h2. How do I define my own Data Source?
+
+Defining your own source is easy. The Couch DB source for example has actually been sent in by "Stanley":http://github.com/stanley.
+
+This piece of code is the superclass of all sources in Picky and is there simply for illustrative purposes, so you can see what methods should be implemented:
+"http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb":http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb.
+
+I recommend to make your source also its subclass, since it implements empty methods that are called by the indexer. But it actually just needs one worker method. This one:
+@harvest(index, category)@
+It gets the index and the current category and should @yield(id, text_data_for_id)@. It is called by the indexer when it needs the data.
+
+The two other methods that are called by the indexer are
+@connect_backend@, which is called once per index/category, and @take_snapshot@, which is called once for each index, before @harvest@-ing the data. Use it to create temporary tables etc.
+
+So if your duck subclasses @Sources::Base@, quacks @#harvest@ and yields @id, text_data_for_id@ your data source is set to go!
+
+Simple and easy to understand, isn't it?
 
 h2. Conclusion
 

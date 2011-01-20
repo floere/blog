@@ -6,7 +6,7 @@ categories:
   - ruby
   - picky
 ---
-Recently, I've been thinking about how I handle search requests in "Picky":http://floere.github.com/picky/.
+Recently, I've been thinking about how I handle search requests in "Picky":http://florianhanke.com/picky/.
 
 h2. The Situation
 

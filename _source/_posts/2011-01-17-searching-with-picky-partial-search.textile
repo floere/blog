@@ -6,7 +6,7 @@ categories:
   - ruby
   - picky
 ---
-This is a post in the "Picky":http://floere.github.com/picky/index.html series on its configuration. If you haven't tried it yet, do so in the "Getting Started":http://floere.github.com/picky/getting_started.html section. It's quick and painless :)
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its configuration. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
 
 h2. What is a Partial Search?
 

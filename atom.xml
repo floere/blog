@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-20T11:13:28+01:00</updated>
+ <updated>2011-01-20T11:16:57+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -13,7 +13,7 @@
 
  
  <entry>
-   <title>Searching with Picky&#58; Partial Search</title>
+   <title>Searching with Picky&#58; Data Sources</title>
    <link href="http://blog.absurd.li/2011/01/20/searching-with-picky-data-sources.html"/>
    <updated>2011-01-20T00:00:00+01:00</updated>
    <id>http://floere.github.com/blog/2011/01/20/searching-with-picky-data-sources</id>

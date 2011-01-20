@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Searching with Picky&#58; Partial Search
+title: Searching with Picky&#58; Data Sources
 categories:
   - series
   - ruby

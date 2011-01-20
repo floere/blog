@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_acid.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_acid.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Searching with Picky&#58; Partial Search</title>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Searching with Picky&#58; Partial Search</h1>
+      <div class="categories">series / ruby / picky</div>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its configuration. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
+      <h2>What is a Data Source in Picky?</h2>
+      <p>A data source is where the indexes get their data. Every index needs a data source.</p>
+      <p>The way to do this is pass the <code>index(identifier, source)</code> method&#8217;s source param a source instance, like so (in <code>app/application.rb</code>):
+      <pre class="sh_ruby"><code>books_index = index :books, Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+      Here we passed a database source that uses a simple select. Which database the source uses is defined in the file <code>app/db.yml</code> and follows the configuration structure of Active Record. You could, instead of passing in a <code>file</code> option, just pass in the Active Record config hash.</p>
+      <p>There are various data sources already defined beside the DB source (see below), but if the one you need is missing, writing your own is easy.</p>
+      <p>After that comes the most important part in Picky! :) No, really. Because what we are now going to do is categorize the data we got from the source.</p>
+      <p>Categorizing the data is so important, because it allows Picky to make guesses as to which category a query word is in and get better feedback from the user. Say, if you categorized both first name and last name in the category <code>name</code>, Picky would not be able to help your users find what you are looking for, since it can&#8217;t ask back specifically what you mean, like &#8220;Did you mean Florian as first name or last name?&#8221;.</p>
+      <p>It&#8217;s best if you just <a href="http://florianhanke.com/picky/getting_started.html">get started</a>, and see for yourself. Picky is best experienced, and not told.</p>
+      <p>Back to the example: Now that we have defined a data source, it&#8217;s easy to define a category on it. If you define a <code>title</code> category
+      <pre class="sh_ruby"><code>books_index.define_category :title</code></pre>
+      it will use whatever data came back from the database.</p>
+      <p>If your database doesn&#8217;t have nice column names, don&#8217;t worry, you have two options:
+      Do a <code>SELECT id, t_01 as title ...</code> or use the <code>from</code> option when you define the category:
+      <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01</code></pre></p>
+      <p>The <code>from</code> option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
+      <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01&#x000A;books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)</code></pre>
+      Lots of possibilities, I&#8217;m sure you&#8217;ll find more useful ones!</p>
+      <p>There&#8217;s more. You can have crazy indexes where every category has its own data source:
+      <pre class="sh_ruby"><code>books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')</code></pre>
+      Now the title category takes its data from a library.csv. If you do this, be careful that all data sources use the same ids or Picky&#8217;s core mechanism won&#8217;t work.</p>
+      <h2>Currently available data sources</h2>
+      <p>Picky offers a few data sources, <code>DB</code> for databases, <code>CSV</code> for comma-separated files, <code>Couch</code> for couch DB, and <code>Delicious</code>, for delicious bookmarks. Mmh.</p>
+      <p>This is how you use them. We&#8217;ve already seen the database source:
+      <pre class="sh_ruby"><code>Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+      Don&#8217;t hesitate to use JOINs or other <span class="caps">SQL</span> expressions for some extreme databasing!
+      <pre class="sh_ruby"><code>Sources::CSV.new(:title, :author, :isbn, :year, :publisher, :subjects, file: 'data/books.csv')</code></pre>
+      This source assumes that your first column is the id column. It takes its data from the file given in the <code>file</code> option.
+      <pre class="sh_ruby"><code>Sources::Couch.new(:title, :author, :isbn, url: 'http://localhost:5984/picky', keys: Sources::Couch::UUIDKeys.new)</code></pre>
+      The CouchDB source takes a url where couch DB serves its data. By default it assumes that you are using Hex Keys. But you can pass in one of <code>Sources::Couch::HexKeys.new</code>, <code>Sources::Couch::UUIDKeys.new</code>, or <code>Sources::Couch::IntegerKeys.new</code> in the <code>keys</code> option to tell Picky what keys you have.
+      I&#8217;m afraid that currently you have to recalculate your keys in the client to get back the original keys. I am working on non-integer keys, but it takes its time. Sorry about that.
+      <pre class="sh_ruby"><code>Sources::Delicious.new(:username, :password)</code></pre>
+      Delicious is the easiest source, since it comes with fixed data categories <code>title</code>, <code>tags</code>, <code>url</code> that you can categorize.</p>
+      <h2>How do I define my own Data Source?</h2>
+      <p>Defining your own source is easy. The Couch DB source for example has actually been sent in by <a href="http://github.com/stanley">Stanley</a>.</p>
+      <p>This piece of code is the superclass of all sources in Picky and is there simply for illustrative purposes, so you can see what methods should be implemented:
+      <a href="http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb">http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb</a>.</p>
+      <p>I recommend to make your source also its subclass, since it implements empty methods that are called by the indexer. But it actually just needs one worker method. This one:
+      <code>harvest(index, category)</code>
+      It gets the index and the current category and should <code>yield(id, text_data_for_id)</code>. It is called by the indexer when it needs the data.</p>
+      <p>The two other methods that are called by the indexer are
+      <code>connect_backend</code>, which is called once per index/category, and <code>take_snapshot</code>, which is called once for each index, before <code>harvest</code>-ing the data. Use it to create temporary tables etc.</p>
+      <p>So if your duck subclasses <code>Sources::Base</code>, quacks <code>#harvest</code> and yields <code>id, text_data_for_id</code> your data source is set to go!</p>
+      <p>Simple and easy to understand, isn&#8217;t it?</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>what a data source in Picky is.</li>
+      	<li>what data sources are currently available.</li>
+      	<li>how you write your own.</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
+      <h2>Contributing one to Picky</h2>
+      <p>If you write your own data source, please let me know!</p>
+      <br />
+      Previous
+      <a href="/blog/2011/01/17/searching-with-picky-partial-search.html" title="Next post: Searching with Picky&#58; Partial Search">Searching with Picky&#58; Partial Search</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/01/20/searching-with-picky-data-sources';
+          var disqus_url = 'http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

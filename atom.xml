@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-18T14:35:19+01:00</updated>
+ <updated>2011-01-20T11:13:28+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -14,10 +14,74 @@
  
  <entry>
    <title>Searching with Picky&#58; Partial Search</title>
+   <link href="http://blog.absurd.li/2011/01/20/searching-with-picky-data-sources.html"/>
+   <updated>2011-01-20T00:00:00+01:00</updated>
+   <id>http://floere.github.com/blog/2011/01/20/searching-with-picky-data-sources</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;h2&gt;What is a Data Source in Picky?&lt;/h2&gt;
+&lt;p&gt;A data source is where the indexes get their data. Every index needs a data source.&lt;/p&gt;
+&lt;p&gt;The way to do this is pass the &lt;code&gt;index(identifier, source)&lt;/code&gt; method&amp;#8217;s source param a source instance, like so (in &lt;code&gt;app/application.rb&lt;/code&gt;):
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index = index :books, Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
+Here we passed a database source that uses a simple select. Which database the source uses is defined in the file &lt;code&gt;app/db.yml&lt;/code&gt; and follows the configuration structure of Active Record. You could, instead of passing in a &lt;code&gt;file&lt;/code&gt; option, just pass in the Active Record config hash.&lt;/p&gt;
+&lt;p&gt;There are various data sources already defined beside the DB source (see below), but if the one you need is missing, writing your own is easy.&lt;/p&gt;
+&lt;p&gt;After that comes the most important part in Picky! :) No, really. Because what we are now going to do is categorize the data we got from the source.&lt;/p&gt;
+&lt;p&gt;Categorizing the data is so important, because it allows Picky to make guesses as to which category a query word is in and get better feedback from the user. Say, if you categorized both first name and last name in the category &lt;code&gt;name&lt;/code&gt;, Picky would not be able to help your users find what you are looking for, since it can&amp;#8217;t ask back specifically what you mean, like &amp;#8220;Did you mean Florian as first name or last name?&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s best if you just &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;get started&lt;/a&gt;, and see for yourself. Picky is best experienced, and not told.&lt;/p&gt;
+&lt;p&gt;Back to the example: Now that we have defined a data source, it&amp;#8217;s easy to define a category on it. If you define a &lt;code&gt;title&lt;/code&gt; category
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title&lt;/code&gt;&lt;/pre&gt;
+it will use whatever data came back from the database.&lt;/p&gt;
+&lt;p&gt;If your database doesn&amp;#8217;t have nice column names, don&amp;#8217;t worry, you have two options:
+Do a &lt;code&gt;SELECT id, t_01 as title ...&lt;/code&gt; or use the &lt;code&gt;from&lt;/code&gt; option when you define the category:
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, from: t_01&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;from&lt;/code&gt; option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, from: t_01
+books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)&lt;/code&gt;&lt;/pre&gt;
+Lots of possibilities, I&amp;#8217;m sure you&amp;#8217;ll find more useful ones!&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s more. You can have crazy indexes where every category has its own data source:
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')&lt;/code&gt;&lt;/pre&gt;
+Now the title category takes its data from a library.csv. If you do this, be careful that all data sources use the same ids or Picky&amp;#8217;s core mechanism won&amp;#8217;t work.&lt;/p&gt;
+&lt;h2&gt;Currently available data sources&lt;/h2&gt;
+&lt;p&gt;Picky offers a few data sources, &lt;code&gt;DB&lt;/code&gt; for databases, &lt;code&gt;CSV&lt;/code&gt; for comma-separated files, &lt;code&gt;Couch&lt;/code&gt; for couch DB, and &lt;code&gt;Delicious&lt;/code&gt;, for delicious bookmarks. Mmh.&lt;/p&gt;
+&lt;p&gt;This is how you use them. We&amp;#8217;ve already seen the database source:
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
+Don&amp;#8217;t hesitate to use JOINs or other &lt;span class=&quot;caps&quot;&gt;SQL&lt;/span&gt; expressions for some extreme databasing!
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::CSV.new(:title, :author, :isbn, :year, :publisher, :subjects, file: 'data/books.csv')&lt;/code&gt;&lt;/pre&gt;
+This source assumes that your first column is the id column. It takes its data from the file given in the &lt;code&gt;file&lt;/code&gt; option.
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::Couch.new(:title, :author, :isbn, url: 'http://localhost:5984/picky', keys: Sources::Couch::UUIDKeys.new)&lt;/code&gt;&lt;/pre&gt;
+The CouchDB source takes a url where couch DB serves its data. By default it assumes that you are using Hex Keys. But you can pass in one of &lt;code&gt;Sources::Couch::HexKeys.new&lt;/code&gt;, &lt;code&gt;Sources::Couch::UUIDKeys.new&lt;/code&gt;, or &lt;code&gt;Sources::Couch::IntegerKeys.new&lt;/code&gt; in the &lt;code&gt;keys&lt;/code&gt; option to tell Picky what keys you have.
+I&amp;#8217;m afraid that currently you have to recalculate your keys in the client to get back the original keys. I am working on non-integer keys, but it takes its time. Sorry about that.
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::Delicious.new(:username, :password)&lt;/code&gt;&lt;/pre&gt;
+Delicious is the easiest source, since it comes with fixed data categories &lt;code&gt;title&lt;/code&gt;, &lt;code&gt;tags&lt;/code&gt;, &lt;code&gt;url&lt;/code&gt; that you can categorize.&lt;/p&gt;
+&lt;h2&gt;How do I define my own Data Source?&lt;/h2&gt;
+&lt;p&gt;Defining your own source is easy. The Couch DB source for example has actually been sent in by &lt;a href=&quot;http://github.com/stanley&quot;&gt;Stanley&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This piece of code is the superclass of all sources in Picky and is there simply for illustrative purposes, so you can see what methods should be implemented:
+&lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb&quot;&gt;http://github.com/floere/picky/blob/master/server/lib/picky/sources/base.rb&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I recommend to make your source also its subclass, since it implements empty methods that are called by the indexer. But it actually just needs one worker method. This one:
+&lt;code&gt;harvest(index, category)&lt;/code&gt;
+It gets the index and the current category and should &lt;code&gt;yield(id, text_data_for_id)&lt;/code&gt;. It is called by the indexer when it needs the data.&lt;/p&gt;
+&lt;p&gt;The two other methods that are called by the indexer are
+&lt;code&gt;connect_backend&lt;/code&gt;, which is called once per index/category, and &lt;code&gt;take_snapshot&lt;/code&gt;, which is called once for each index, before &lt;code&gt;harvest&lt;/code&gt;-ing the data. Use it to create temporary tables etc.&lt;/p&gt;
+&lt;p&gt;So if your duck subclasses &lt;code&gt;Sources::Base&lt;/code&gt;, quacks &lt;code&gt;#harvest&lt;/code&gt; and yields &lt;code&gt;id, text_data_for_id&lt;/code&gt; your data source is set to go!&lt;/p&gt;
+&lt;p&gt;Simple and easy to understand, isn&amp;#8217;t it?&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;what a data source in Picky is.&lt;/li&gt;
+	&lt;li&gt;what data sources are currently available.&lt;/li&gt;
+	&lt;li&gt;how you write your own.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;h2&gt;Contributing one to Picky&lt;/h2&gt;
+&lt;p&gt;If you write your own data source, please let me know!&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Searching with Picky&#58; Partial Search</title>
    <link href="http://blog.absurd.li/2011/01/17/searching-with-picky-partial-search.html"/>
    <updated>2011-01-17T00:00:00+01:00</updated>
    <id>http://floere.github.com/blog/2011/01/17/searching-with-picky-partial-search</id>
-   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://floere.github.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://floere.github.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is a Partial Search?&lt;/h2&gt;
 &lt;p&gt;Partial searching is when the user only enters part of a query word, but the search engine still manages to find the whole word.&lt;/p&gt;
 &lt;p&gt;Example:
@@ -111,7 +175,7 @@ This will match &lt;code&gt;picky&lt;/code&gt; if you enter just a &lt;code&gt;y
    <link href="http://blog.absurd.li/2011/01/13/searching-with-picky-character-substituters.html"/>
    <updated>2011-01-13T00:00:00+01:00</updated>
    <id>http://floere.github.com/blog/2011/01/13/searching-with-picky-character-substituters</id>
-   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://floere.github.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://floere.github.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is Character Substitution?&lt;/h2&gt;
 &lt;p&gt;Character substitution in a search engine is one of the first steps in the process of sanitizing your users&amp;#8217; input.&lt;/p&gt;
 &lt;p&gt;Examples:

@@ -4,5 +4,5 @@ title: Drawing in the browser
 categories:
   - web
 ---
-"Drawing in the Browser":http://mugtug.com/sketchpad/&hellip;</a>
+"Drawing in the Browser":http://mugtug.com/sketchpad/</a>
 ... using HTML5.

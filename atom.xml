@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-20T11:16:57+01:00</updated>
+ <updated>2011-01-20T11:18:55+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -35,7 +35,7 @@ Do a &lt;code&gt;SELECT id, t_01 as title ...&lt;/code&gt; or use the &lt;code&g
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, from: t_01&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;from&lt;/code&gt; option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, from: t_01
-books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)&lt;/code&gt;&lt;/pre&gt;
+books_index.define_category :similar_title, from: t_01, similarity: Similarity::Phonetic.new(3)&lt;/code&gt;&lt;/pre&gt;
 Lots of possibilities, I&amp;#8217;m sure you&amp;#8217;ll find more useful ones!&lt;/p&gt;
 &lt;p&gt;There&amp;#8217;s more. You can have crazy indexes where every category has its own data source:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')&lt;/code&gt;&lt;/pre&gt;
@@ -43,7 +43,7 @@ Now the title category takes its data from a library.csv. If you do this, be car
 &lt;h2&gt;Currently available data sources&lt;/h2&gt;
 &lt;p&gt;Picky offers a few data sources, &lt;code&gt;DB&lt;/code&gt; for databases, &lt;code&gt;CSV&lt;/code&gt; for comma-separated files, &lt;code&gt;Couch&lt;/code&gt; for couch DB, and &lt;code&gt;Delicious&lt;/code&gt;, for delicious bookmarks. Mmh.&lt;/p&gt;
 &lt;p&gt;This is how you use them. We&amp;#8217;ve already seen the database source:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::DB.new('SELECT id, title, author FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
 Don&amp;#8217;t hesitate to use JOINs or other &lt;span class=&quot;caps&quot;&gt;SQL&lt;/span&gt; expressions for some extreme databasing!
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::CSV.new(:title, :author, :isbn, :year, :publisher, :subjects, file: 'data/books.csv')&lt;/code&gt;&lt;/pre&gt;
 This source assumes that your first column is the id column. It takes its data from the file given in the &lt;code&gt;file&lt;/code&gt; option.

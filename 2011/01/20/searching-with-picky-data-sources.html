@@ -56,7 +56,7 @@
       Do a <code>SELECT id, t_01 as title ...</code> or use the <code>from</code> option when you define the category:
       <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01</code></pre></p>
       <p>The <code>from</code> option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
-      <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01&#x000A;books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)</code></pre>
+      <pre class="sh_ruby"><code>books_index.define_category :title, from: t_01&#x000A;books_index.define_category :similar_title, from: t_01, similarity: Similarity::Phonetic.new(3)</code></pre>
       Lots of possibilities, I&#8217;m sure you&#8217;ll find more useful ones!</p>
       <p>There&#8217;s more. You can have crazy indexes where every category has its own data source:
       <pre class="sh_ruby"><code>books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')</code></pre>
@@ -64,7 +64,7 @@
       <h2>Currently available data sources</h2>
       <p>Picky offers a few data sources, <code>DB</code> for databases, <code>CSV</code> for comma-separated files, <code>Couch</code> for couch DB, and <code>Delicious</code>, for delicious bookmarks. Mmh.</p>
       <p>This is how you use them. We&#8217;ve already seen the database source:
-      <pre class="sh_ruby"><code>Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+      <pre class="sh_ruby"><code>Sources::DB.new('SELECT id, title, author FROM books', file: 'app/db.yml')</code></pre>
       Don&#8217;t hesitate to use JOINs or other <span class="caps">SQL</span> expressions for some extreme databasing!
       <pre class="sh_ruby"><code>Sources::CSV.new(:title, :author, :isbn, :year, :publisher, :subjects, file: 'data/books.csv')</code></pre>
       This source assumes that your first column is the id column. It takes its data from the file given in the <code>file</code> option.

@@ -1,0 +1,8 @@
+---
+layout: post
+title: Drawing in the browser
+categories:
+  - web
+---
+"Drawing in the Browser":http://mugtug.com/sketchpad/&hellip;</a>
+... using HTML5.

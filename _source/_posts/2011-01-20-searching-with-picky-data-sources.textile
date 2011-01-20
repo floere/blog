@@ -1,0 +1,58 @@
+---
+layout: post
+title: Searching with Picky&#58; Partial Search
+categories:
+  - series
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its configuration. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+h2. What is a Data Source in Picky?
+
+A data source is where the indexes get their data. Every index needs a data source.
+
+The way to do this is pass the @index(identifier, source)@ method's source param a source instance, like so (in @app/application.rb@):
+<pre class="sh_ruby"><code>books_index = index :books, Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')</code></pre>
+Here we passed a database source that uses a simple select. Which database the source uses is defined in the file @app/db.yml@ and follows the configuration structure of Active Record. You could, instead of passing in a @file@ option, just pass in the Active Record config hash.
+
+There are various data sources already defined beside the DB source (see below), but if the one you need is missing, writing your own is easy. 
+
+After that comes the most important part in Picky! :) No, really. Because what we are now going to do is categorize the data we got from the source.
+
+Categorizing the data is so important, because it allows Picky to make guesses as to which category a query word is in and get better feedback from the user. Say, if you categorized both first name and last name in the category @name@, Picky would not be able to help your users find what you are looking for, since it can't ask back specifically what you mean, like "Did you mean Florian as first name or last name?".
+
+It's best if you just "get started":http://florianhanke.com/picky/getting_started.html, and see for yourself. Picky is best experienced, and not told.
+
+Back to the example: Now that we have defined a data source, it's easy to define a category on it. If you define a @title@ category
+<pre class="sh_ruby"><code>books_index.define_category :title</code></pre>
+it will use whatever data came back from the database.
+
+If your database doesn't have nice column names, don't worry, you have two options:
+Do a @SELECT id, t_01 as title ...@ or use the @from@ option when you define the category:
+<pre class="sh_ruby"><code>books_index.define_category :title, from: t_01</code></pre>
+
+The @from@ option is quite cool, as it allows you to have multiple categories on the same data! Say you wanted a similarity search in one category and none on the other:
+<pre class="sh_ruby"><code>books_index.define_category :title, from: t_01
+books_index.define_category :similar_title, from: t_01, similarity: similarity: Similarity::Phonetic.new(3)</code></pre>
+  
+In fact you can have crazy indexes where every category has its own data source:
+<pre class="sh_ruby"><code>books_index.define_category :title, source: Sources::CSV.new(:title, :author, file: 'data/library.csv', col_sep: ',')</code></pre>
+Now the title category takes its data from a library.csv. If you do this, be careful that all data sources use the same ids or Picky's core mechanism won't work.
+
+h2. Currently available data sources
+
+h2. How do I define my own Data Source?
+
+h2. Conclusion
+
+So we've seen
+# what a data source in Picky is.
+# what data sources are currently available.
+# how you write your own.
+
+Hope you learnt something new :)
+
+h2. Contributing one to Picky
+
+If you write your own data source, please let me know!

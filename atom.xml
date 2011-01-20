@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-20T11:24:33+01:00</updated>
+ <updated>2011-01-20T11:34:37+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -281,6 +281,17 @@ end
    <id>http://floere.github.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://dev.mysql.com/tech-resources/articles/using-new-query-profiler.html&quot;&gt;Profiling MySQL Queries&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;In-detail performance measurements for MySQL queries.&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Programming Applied Mathematics</title>
+   <link href="http://blog.absurd.li/2010/05/13/programming-applied-mathematics.html"/>
+   <updated>2010-05-13T00:00:00+02:00</updated>
+   <id>http://floere.github.com/blog/2010/05/13/programming-applied-mathematics</id>
+   <content type="html">&lt;p&gt;&lt;code&gt;Programming is one of the most difficult branches of applied mathematics / the poorer mathematicians had better remain pure mathematicians.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;– Edsger W. Dijkstra&lt;/p&gt;
+&lt;p&gt;(via &lt;a href=&quot;http://fuckyeahcomputerscience.tumblr.com/&quot;&gt;fuckyeahcomputerscience&lt;/a&gt;)&lt;/p&gt;</content>
    
  </entry>
  

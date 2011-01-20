@@ -1,0 +1,8 @@
+---
+layout: post
+title: Most important Ruby method 2010
+categories:
+  - quotes
+---
+h1. Voted most important Ruby method 2010
+<script src="http://gist.github.com/408937.js"></script>

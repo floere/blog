@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-20T11:18:55+01:00</updated>
+ <updated>2011-01-20T11:22:06+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -21,7 +21,7 @@
 &lt;h2&gt;What is a Data Source in Picky?&lt;/h2&gt;
 &lt;p&gt;A data source is where the indexes get their data. Every index needs a data source.&lt;/p&gt;
 &lt;p&gt;The way to do this is pass the &lt;code&gt;index(identifier, source)&lt;/code&gt; method&amp;#8217;s source param a source instance, like so (in &lt;code&gt;app/application.rb&lt;/code&gt;):
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index = index :books, Sources::DB.new('SELECT id, title, author, year FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index = index :books, Sources::DB.new('SELECT id, title, author FROM books', file: 'app/db.yml')&lt;/code&gt;&lt;/pre&gt;
 Here we passed a database source that uses a simple select. Which database the source uses is defined in the file &lt;code&gt;app/db.yml&lt;/code&gt; and follows the configuration structure of Active Record. You could, instead of passing in a &lt;code&gt;file&lt;/code&gt; option, just pass in the Active Record config hash.&lt;/p&gt;
 &lt;p&gt;There are various data sources already defined beside the DB source (see below), but if the one you need is missing, writing your own is easy.&lt;/p&gt;
 &lt;p&gt;After that comes the most important part in Picky! :) No, really. Because what we are now going to do is categorize the data we got from the source.&lt;/p&gt;

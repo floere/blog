@@ -53,7 +53,8 @@
       <p>And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the <code>HUP</code> signal to have it restart), losing a fantastic amount of <span class="caps">CPU</span> cycles that would have been better used for searching with Picky.</p>
       <p><img src="/blog/images/suckerfish1.png" alt="" /></p>
       <p>This would be called changing <em>lame parameters</em>. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain <em>je-ne-sais-quoi</em> that only surfers have.</p>
-      <p>Live parameters are parameters that can be changed hot – in the running server. Funking A, right?</p>
+      <p>Live parameters are parameters that can be changed hot – in the running server.</p>
+      <p>Now wouldn&#8217;t that be nice? Turns out it isn&#8217;t as easy as I thought.</p>
       <h2>How do I achieve this?</h2>
       <p>The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.</p>
       <p><img src="/blog/images/suckerfish2.png" alt="" /></p>

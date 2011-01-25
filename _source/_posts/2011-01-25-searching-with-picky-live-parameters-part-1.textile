@@ -34,7 +34,9 @@ And you do, but: What you have to do now is change the config, deploy, restart t
 
 This would be called changing _lame parameters_. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain _je-ne-sais-quoi_ that only surfers have.
 
-Live parameters are parameters that can be changed hot – in the running server. Funking A, right?
+Live parameters are parameters that can be changed hot – in the running server.
+
+Now wouldn't that be nice? Turns out it isn't as easy as I thought.
 
 h2. How do I achieve this?
 

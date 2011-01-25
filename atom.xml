@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-26T00:02:44+01:00</updated>
+ <updated>2011-01-26T00:04:20+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -31,7 +31,8 @@
 &lt;p&gt;And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the &lt;code&gt;HUP&lt;/code&gt; signal to have it restart), losing a fantastic amount of &lt;span class=&quot;caps&quot;&gt;CPU&lt;/span&gt; cycles that would have been better used for searching with Picky.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/blog/images/suckerfish1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;This would be called changing &lt;em&gt;lame parameters&lt;/em&gt;. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain &lt;em&gt;je-ne-sais-quoi&lt;/em&gt; that only surfers have.&lt;/p&gt;
-&lt;p&gt;Live parameters are parameters that can be changed hot – in the running server. Funking A, right?&lt;/p&gt;
+&lt;p&gt;Live parameters are parameters that can be changed hot – in the running server.&lt;/p&gt;
+&lt;p&gt;Now wouldn&amp;#8217;t that be nice? Turns out it isn&amp;#8217;t as easy as I thought.&lt;/p&gt;
 &lt;h2&gt;How do I achieve this?&lt;/h2&gt;
 &lt;p&gt;The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/blog/images/suckerfish2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;

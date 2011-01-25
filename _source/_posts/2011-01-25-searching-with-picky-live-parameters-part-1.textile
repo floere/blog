@@ -30,7 +30,7 @@ At this point, what would be really good to have is a way of changing Picky's be
 
 And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the @HUP@ signal to have it restart), losing a fantastic amount of CPU cycles that would have been better used for searching with Picky.
 
-!/images/suckerfish1.png!
+!/blog/images/suckerfish1.png!
 
 This would be called changing _lame parameters_. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain _je-ne-sais-quoi_ that only surfers have.
 
@@ -40,7 +40,7 @@ h2. How do I achieve this?
 
 The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.
 
-!/images/suckerfish2.png!
+!/blog/images/suckerfish2.png!
 
 So let's call this thing that updates the configuration a "Suckerfish":http://en.wikipedia.org/wiki/Echeneidae. Suckerfishes – or Remoras – attach to a host (Fig. A), mostly sharks, by sucking onto them. This suckerfish (in the form of a request) would attach itself to a child, and from there open a channel, a pipe, to the master, where it could update the master config.
 

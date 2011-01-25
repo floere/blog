@@ -1,0 +1,55 @@
+---
+layout: post
+title: Searching with Picky&#58; Live Parameters Part 1
+categories:
+  - series
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+This time I want to do a two-part post on live parameters.
+
+h2. What are Live Parameters?
+
+Imagine this situation:
+
+You are sitting at your desk. A few levels below is an array of Picky servers, contentedly humming at a bagillion requests per second…
+
+Ok, this is actually a fantasy of mine, but bear with me.
+
+Suddenly, your boss enters, his hair pointier than ever!
+
+He tells you that a customer's space bar is not working anymore and now he'd like to use the comma @,@ character to designate where words are separated.
+
+Of course you roll your eyes, but he doesn't give up. The customer needs to be served, no matter what!
+
+At this point, what would be really good to have is a way of changing Picky's behaviour with splitting words in queries.
+
+(Btw, the @splits_text_on@ option, a regexp, defines how picky splits text into tokens, or words.)
+
+And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the @HUP@ signal to have it restart), losing a fantastic amount of CPU cycles that would have been better used for searching with Picky.
+
+!/images/suckerfish1.png!
+
+This would be called changing _lame parameters_. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain _je-ne-sais-quoi_ that only surfers have.
+
+Live parameters are parameters that can be changed hot – in the running server. Funking A, right?
+
+h2. How do I achieve this?
+
+The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.
+
+!/images/suckerfish2.png!
+
+So let's call this thing that updates the configuration a "Suckerfish":http://en.wikipedia.org/wiki/Echeneidae. Suckerfishes – or Remoras – attach to a host (Fig. A), mostly sharks, by sucking onto them. This suckerfish (in the form of a request) would attach itself to a child, and from there open a channel, a pipe, to the master, where it could update the master config.
+
+So after attaching itself, this fish would then whisper Picky sweet and golden nothings in its ear, causing it to update its master config.
+
+h2. That's fine, but where can I try it?
+
+Suckerfish is ready, but not release-ready yet. So you could "clone picky":http://github.com/floere/picky, and call @./install@ in the top level directory to install all 1.3.0 gems locally.
+
+But bear with me, for in part 2 (after the release of 1.3.0 and the picky-live gem, the "Suckerfish" gem) I'll show how this can be done and how you can use Suckerfish as a weapon against pointy-haired bosses, or just for easy experimentation with your search parameters.
+
+Don't worry, it will get technical soon ;)

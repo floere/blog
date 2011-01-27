@@ -190,5 +190,7 @@ So we've seen
 # how Picky does it
 # how the the picky-live gem looks and works
 # How you can try it yourself
+# that it is fast
+# that it can be dangerous if you don't know what to do
 
 Hope you learnt something new :)

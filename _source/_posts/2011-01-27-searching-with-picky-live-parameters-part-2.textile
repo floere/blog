@@ -1,0 +1,89 @@
+---
+published: false
+layout: post
+title: Searching with Picky&#58; Live Parameters Part 2
+categories:
+  - series
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like "unicorn":unicorn.bogomips.org.
+
+h2. What's the problem, again?
+
+The problem and the goal 
+
+So what we'd need is for the child to write the parent. And it's actually quite easy to do in Ruby. But how?
+
+h2. The simplest way to write your parents.
+
+… apart from picking up a pen once in a while? Your mother didn't spend 70 hours of her life in labor just for fun, you know!
+
+Heh.
+
+First, you open an @IO.pipe@. Then, in the @fork@ (the child), you @close@ off the "child" and then you are ready to @write@.
+
+In the parent, you do the opposite, and call for example @gets@ then wait for a message from the child.
+
+<pre class="sh_ruby"><code>child, parent = IO.pipe
+
+fork do
+  # In child.
+  #
+  child.close
+  puts "#{Process.pid}: I'll write soon."
+  parent.write "Hello from child!"
+end
+
+# In parent.
+#
+parent.close
+message = child.gets '!'
+puts "#{Process.pid}: #{message}"</code></pre>
+
+It's copy-and-try!
+
+@Process.pid@ returns the current process id, which is different in the child and the parent, as you can see after trying the example.
+In the parent, the @child.gets@ with a parameter will read up until having received that string, then return whatever has been read so far.
+
+h2. How Picky does it
+
+h2. How you configure it in Picky
+
+Simple – you open a http interface in @app/application.rb@ the same way as you would for a query. But this time, instead of a query, you have it point to an instance of @LiveParameters@
+
+<pre class="sh_ruby"><code>route %r{\A/admin\Z} => LiveParameters.new</code></pre>
+
+And then, you have to…
+
+No, wait. That's it.
+
+This opens a JSON interface into the heart of your Picky configuration.
+
+h2. The interface
+
+# HTTP query params in, JSON hash out.
+# On success, it returns the complete config, always.
+# On failure, it returns the offending key with the value "ERROR".
+# If you pass in no query params, nothing will get updated, but you still get the config hash.
+# If you pass in something like ...?querying_splits_text_on=\s, it will update its config to split text on whitespaces.
+
+h2. Beware
+
+Just one thing: Be sure to not let your users have access to this url.
+
+And also, be sure not to let your users have access to this url.
+
+h2. The picky-live gem
+
+h2. Conclusion
+
+So we've seen
+# that we can't just update a config in a child (in a multiprocessing server)
+# how a child can communicate with its parent
+# how Picky does it
+# how the the picky-live gem looks and works
+
+Hope you learnt something new :)

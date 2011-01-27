@@ -49,7 +49,7 @@
       %br
       - if page.previous
         Previous
-        %a{ :href => "/blog#{page.previous.url}", :title => "Next post: #{page.previous.title}" }= page.previous.title
+        %a{ :href => "/blog#{page.previous.url}", :title => "Previous post: #{page.previous.title}" }= page.previous.title
       %h2 Comments?
       - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread

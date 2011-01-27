@@ -11,21 +11,37 @@ This is a post in the "Picky":http://florianhanke.com/picky/index.html series on
 
 This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like "unicorn":unicorn.bogomips.org.
 
-h2. What's the problem, again?
+h2. tl;dr
 
-The problem and the goal 
+# @gem install picky-live@
+# Server: In @app/application.rb@, insert <pre class="sh_ruby"><code>route %r{\A/admin\Z} => LiveParameters.new</code></pre>
+# Enter @picky live@ on the command line.
+# Open "The Suckerfish Interface":http://localhost:4568/.
+# Have fun!
 
-So what we'd need is for the child to write the parent. And it's actually quite easy to do in Ruby. But how?
+h2. What was the problem, again?
+
+The goal is that we want to update Picky's config while it is answering search requests.
+
+The problem is that we need to update the config in the master process, but most multiprocessing servers don't allow easy access. And it's good like that.
+
+!/blog/images/suckerfish2.png!
+
+What I'd like to do is provide access for a suckerfish. But since it isn't easy or a good idea to open direct access to the parent, the suckerfish must go through the child.
+
+The child would accept data incoming from the suckerfish, process it and tell the parent what to change.
+
+So what we'd need is for the child to be able to write the parent. It's actually quite easy to do in Ruby. But how?
 
 h2. The simplest way to write your parents.
 
-… apart from picking up a pen once in a while? Your mother didn't spend 70 hours of her life in labor just for fun, you know!
+… apart from picking up a pen once in a while? Your mother didn't spend 20 hours of her life in labor just for fun, you know!
 
 Heh.
 
-First, you open an @IO.pipe@. Then, in the @fork@ (the child), you @close@ off the "child" and then you are ready to @write@.
+First, you open an "IO.pipe":http://ruby.runpaint.org/io#pipes. Then, in the @fork@ (the child), you @close@ off the "child" and then you are ready to @write@.
 
-In the parent, you do the opposite, and call for example @gets@ then wait for a message from the child.
+In the parent, you do the opposite, and call @gets@ (for example) then wait for a message from the child.
 
 <pre class="sh_ruby"><code>child, parent = IO.pipe
 
@@ -48,12 +64,44 @@ It's copy-and-try!
 @Process.pid@ returns the current process id, which is different in the child and the parent, as you can see after trying the example.
 In the parent, the @child.gets@ with a parameter will read up until having received that string, then return whatever has been read so far.
 
+I always look at child and server as if the child was a perfect copy of the parent. And anything you change in the child won't affect the parent. But if you change something in the parent, it will affect all future children.
+
 h2. How Picky does it
+
+Five steps:
+# The Picky child receives the config update request.
+# It tries to update its config (more on that below).
+# If successful, it tells the parent. If not, it kills itself, and tells Suckerfish which config was wrong.
+# The parent, on receiving the message, updates itself and kills off all other children (more on that below).
+# The child will answer Suckerfish with the current configuration.
+
+The messaging is basically the same as above, but a bit more elaborate in Picky, since:
+* Picky doesn't have control over the forking.
+This means Picky doesn't know when to close the @child@, which is why on each call received on the API, we just do a <pre class="sh_ruby"><code>@child.close unless @child.closed?</code></pre>
+* The server inside which Picky is running will fork off the parent multiple times, and not just at the beginning.
+So, if the parent would do a <pre class="sh_ruby"><code>@parent.close</code></pre> as in the example, then yes, it would work fine. Up until the next time a child is forked. What happens when a child is forked?
+The connection to the parent would already have been closed off by the parent itself, and the child would be unable to @write@ on it. Solution? I just leave it open, since the parent doesn't need to talk to the child.
+(Ensuring years of therapy for the child)
+
+h2. How does Picky ensure there will be no problems in the parent process?
+
+What would happen if the Suckerfish had direct access to the master's configuration?
+
+We assume that the child is a close to perfect copy of the parent process. So what we do is try updating the configuration in the child first.
+
+If that works, we can assume that in the parent, it will work too (no malformed configuration input). So we just send the parent the data and the parent will use the exact same method as the child to update itself.
+
+Now we have the problem that there are still children hanging around with the old config. So what the parent process – any good parent ;) – does is kill all of these. The one giving it the ok config is spared, since it has the new config already. After that, new children are forked with the correct config.
+
+What happens if the config is malformed? The child that accepted the suckerfish request needs to die, since its config might now be malformed. So what it does is prepare for an honorable _Harakiri_, tell the Suckerfish what is wrong, and perform a horizontal cut through its stomach, using @Process.kill(:QUIT, 0)@.
+
+But… how do I get it to work in Picky?
 
 h2. How you configure it in Picky
 
-Simple – you open a http interface in @app/application.rb@ the same way as you would for a query. But this time, instead of a query, you have it point to an instance of @LiveParameters@
+Simple – you open a http interface in @app/application.rb@ the same way as you would for a query. But this time, instead of a query, you have it point to an instance of @LiveParameters@.
 
+Like that:
 <pre class="sh_ruby"><code>route %r{\A/admin\Z} => LiveParameters.new</code></pre>
 
 And then, you have to…
@@ -72,11 +120,52 @@ h2. The interface
 
 h2. Beware
 
-Just one thing: Be sure to not let your users have access to this url.
+Just one thing: Be sure to not let your users have access to the live params url.
 
-And also, be sure not to let your users have access to this url.
+And also, be sure not to let your users have access to the live params url.
 
 h2. The picky-live gem
+
+Because sending the server configuration messages per HTTP by hand is very tedious, Picky offers a much nicer interface, the picky-live gem.
+
+@gem install picky-live@
+
+Then, just enter
+
+@picky live@
+
+This will start up the Suckerfish web interface on a default port, "localhost:4568":http://localhost:4568, going through the default Suckerfish interface on "/admin":http://localhost:8080/admin in the Picky server.
+
+If you have customized it to be on @/suckerfish@ and you don't want the Suckerfish web interface on the default port, you'd type:
+
+@picky live localhost:8080/suckerfish 1234@
+
+This would start up the interface on "localhost:1234":http://localhost:1234.
+
+The interface looks like this:
+!/blog/images/suckerfish_interface.png!
+
+What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.
+
+If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
+!/blog/images/suckerfish_updating.png!
+
+Then, as soon as I click on the "Update server now" button, a suckerfish speeds off, accesses the child through the right URL, tells the child to update. The child will try to update itself, and if that works, tell the master to update.
+
+In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we're using is brutal!)
+!/blog/images/suckerfish_error.png!
+
+Picky needs the child to perform harakiri, since we do not know if the config is still ok.
+
+If all goes well, the master kills the *other* children (since they need the updated config) and lets the one telling him to update the config live. You will get a confirmation message, and the interface will update with the current configuration.
+
+With suckerfish, children will die.
+
+Sorry about that. What you get in return is a comfortable way of updating the server config on the fly. And that is worth the tradeoff ;)
+
+h2. Disclaimer
+
+Updating everything on the fly is nice. But beware: The configuration in @app/application.rb@ will not be updated. After experimenting with Suckerfish, you still need to update the config by hand.
 
 h2. Conclusion
 
@@ -85,5 +174,6 @@ So we've seen
 # how a child can communicate with its parent
 # how Picky does it
 # how the the picky-live gem looks and works
+# How you can try it yourself
 
 Hope you learnt something new :)

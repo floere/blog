@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: Searching with Picky&#58; Live Parameters Part 2
 categories:
@@ -163,9 +162,25 @@ With suckerfish, children will die.
 
 Sorry about that. What you get in return is a comfortable way of updating the server config on the fly. And that is worth the tradeoff ;)
 
+h2. Performance?
+
+I bombarded the search server with 100'000 requests, concurrency 100 using ab:
+
+@ab -n 100000 -c 100 127.0.0.1:8080/all/full?query=s@
+
+Then, I started a Suckerfish and updated the config.
+
+Result: Not really noticeable. A short hiccup when the master reforks, but not really noticeable.
+
+If the config update fails, since only one worker child dies, the effect is almost not noticeable.
+
+If the update works, one worker child remains, and the others need to be forked. But Unicorn handles this exceptionally gracefully. Thanks, Unicorn! Really proud of ya. Love you. Still, the harakiri stays.
+
 h2. Disclaimer
 
 Updating everything on the fly is nice. But beware: The configuration in @app/application.rb@ will not be updated. After experimenting with Suckerfish, you still need to update the config by hand.
+
+That's syntax pepper.
 
 h2. Conclusion
 

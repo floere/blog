@@ -132,13 +132,13 @@
       <p><code>picky live localhost:8080/suckerfish 1234</code></p>
       <p>This would start up the interface on <a href="http://localhost:1234">localhost:1234</a>.</p>
       <p>The interface looks like this:
-      <img src="/blog/images/suckerfish_interface.png" alt="" /></p>
+      <img src="/blog/images/suckerfish_interface.png" style="margin-left: -200px;" alt="" /></p>
       <p>What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.</p>
       <p>If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
-      <img src="/blog/images/suckerfish_updating.png" alt="" /></p>
+      <img src="/blog/images/suckerfish_updating.png" style="margin-left: -200px;" alt="" /></p>
       <p>Then, as soon as I click on the &#8220;Update server now&#8221; button, a suckerfish speeds off, accesses the child through the right <span class="caps">URL</span>, tells the child to update. The child will try to update itself, and if that works, tell the master to update.</p>
       <p>In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we&#8217;re using is brutal!)
-      <img src="/blog/images/suckerfish_error.png" alt="" /></p>
+      <img src="/blog/images/suckerfish_error.png" style="margin-left: -200px;" alt="" /></p>
       <p>Picky needs the child to perform harakiri, since we do not know if the config is still ok.</p>
       <p>If all goes well, the master kills the <strong>other</strong> children (since they need the updated config) and lets the one telling him to update the config live. You will get a confirmation message, and the interface will update with the current configuration.</p>
       <p>With suckerfish, children will die.</p>

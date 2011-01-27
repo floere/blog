@@ -142,17 +142,17 @@ If you have customized it to be on @/suckerfish@ and you don't want the Suckerfi
 This would start up the interface on "localhost:1234":http://localhost:1234.
 
 The interface looks like this:
-!/blog/images/suckerfish_interface.png!
+!{margin-left: -200px}/blog/images/suckerfish_interface.png!
 
 What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.
 
 If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
-!/blog/images/suckerfish_updating.png!
+!{margin-left: -200px}/blog/images/suckerfish_updating.png!
 
 Then, as soon as I click on the "Update server now" button, a suckerfish speeds off, accesses the child through the right URL, tells the child to update. The child will try to update itself, and if that works, tell the master to update.
 
 In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we're using is brutal!)
-!/blog/images/suckerfish_error.png!
+!{margin-left: -200px}/blog/images/suckerfish_error.png!
 
 Picky needs the child to perform harakiri, since we do not know if the config is still ok.
 

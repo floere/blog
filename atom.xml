@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-01-27T12:20:28+01:00</updated>
+ <updated>2011-01-27T12:41:46+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -111,13 +111,13 @@ The connection to the parent would already have been closed off by the parent it
 &lt;p&gt;&lt;code&gt;picky live localhost:8080/suckerfish 1234&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;This would start up the interface on &lt;a href=&quot;http://localhost:1234&quot;&gt;localhost:1234&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The interface looks like this:
-&lt;img src=&quot;/blog/images/suckerfish_interface.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/blog/images/suckerfish_interface.png&quot; style=&quot;margin-left: -200px;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.&lt;/p&gt;
 &lt;p&gt;If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
-&lt;img src=&quot;/blog/images/suckerfish_updating.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/blog/images/suckerfish_updating.png&quot; style=&quot;margin-left: -200px;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;Then, as soon as I click on the &amp;#8220;Update server now&amp;#8221; button, a suckerfish speeds off, accesses the child through the right &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, tells the child to update. The child will try to update itself, and if that works, tell the master to update.&lt;/p&gt;
 &lt;p&gt;In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we&amp;#8217;re using is brutal!)
-&lt;img src=&quot;/blog/images/suckerfish_error.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/blog/images/suckerfish_error.png&quot; style=&quot;margin-left: -200px;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;Picky needs the child to perform harakiri, since we do not know if the config is still ok.&lt;/p&gt;
 &lt;p&gt;If all goes well, the master kills the &lt;strong&gt;other&lt;/strong&gt; children (since they need the updated config) and lets the one telling him to update the config live. You will get a confirmation message, and the interface will update with the current configuration.&lt;/p&gt;
 &lt;p&gt;With suckerfish, children will die.&lt;/p&gt;

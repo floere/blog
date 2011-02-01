@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Running Sinatra inside a Ruby Gem</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Running Sinatra inside a Ruby Gem</h1>
+      <div class="categories">series / ruby / picky / gems</div>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
+      <p><img src="/blog/images/sinatra.png" alt="" /></p>
+      <p>In this post I&#8217;ll show how to have <a href="http://www.sinatrarb.com/">Sinatra</a> run directly from inside a gem. And at the end, how Picky uses this for its advantage.</p>
+      <p>Let&#8217;s go singing in the gem!</p>
+      <h2>The thing is…</h2>
+      <p>What I wanted, was to add a nice statistics web interface to Picky.</p>
+      <p>First I though about adding it to the server, but soon after (~1.2µs) decided that this was a silly idea.</p>
+      <p>Picky is heavily designed around loosely connected elements in the server. I think this is even a better idea outside of a large component such as a server. So what I found myself thinking about – while showering – next was, to have a gem which generates a <a href="http://www.sinatrarb.com/">Sinatra</a> application…</p>
+      <p>Suddenly the room lit up and I spotted, scrawled on the wall in burning letters of blood:</p>
+      <p><code>The wrong question.</code></p>
+      <p>I gave it not much thought, as it can get crazy in this part of Zürich. Then, while gorging myself on my beloved alphabet soup, and thinking about how to structure files in this web application exactly, the letters suddenly formed a sentence:</p>
+      <p><code>Dude the wrong, fucking question.</code></p>
+      <p>(Soups can only spell <em>so</em> well)</p>
+      <p>I only got it a few hours later, while three swedish massage therapists kneaded my shoulders.</p>
+      <p>Ok, they didn&#8217;t. But they should have!</p>
+      <p>In computer science, the answers aren&#8217;t nearly as important as asking:</p>
+      <p><code>…the right fucking question.</code></p>
+      <h2>The right fucking question</h2>
+      <p>The right question is:</p>
+      <p>How do I fit a web application wholly in a gem, such that I can do a</p>
+      <p><code>$ picky stats log/search.log</code></p>
+      <p>on any Picky logfile and it will parse it and show me a nice statistical representation of it in a browser without soiling the directory and everything else?</p>
+      <h2>The right fucking tool for the job</h2>
+      <p>That&#8217;s <a href="http://www.sinatrarb.com/">Sinatra</a> I&#8217;m talking about. The great and <strong>extremely</strong> easy to use Ruby <span class="caps">DSL</span> for web applications.</p>
+      <p>Give it a whirl if you haven&#8217;t seen it!</p>
+      <h2>How to do it</h2>
+      <p>First, set up a gem structure – let&#8217;s call the gem &#8220;rain_sining&#8221;. Then, inside it, set up the following structure:</p>
+      <pre class="sh_text"><code>rain_singing&#x000A;  /bin&#x000A;  /lib&#x000A;    /rain_singing&#x000A;      /application   # &lt;- the app is in here&#x000A;        app.rb       # &lt;- the webapp itself&#x000A;        /images&#x000A;        /javascripts&#x000A;        /stylesheets&#x000A;        /views&#x000A;    rain_singing.rb&#x000A;  rain_singing.gemspec&#x000A;  /spec</code></pre>
+      <p>The &#8220;hardest&#8221; thing is getting the directories correctly set up.</p>
+      <p>So what you do inside <code>app.rb</code> is:</p>
+      <pre class="sh_ruby"><code>require 'sinatra'&#x000A;require 'haml' # if you use haml views&#x000A;&#x000A;class SingingRain &lt; Sinatra::Base&#x000A;&#x000A;  set :static, true                             # set up static file routing&#x000A;  set :public, File.expand_path('..', __FILE__) # set up the static dir (with images/js/css inside)&#x000A;  &#x000A;  set :views,  File.expand_path('../views', __FILE__) # set up the views dir&#x000A;  set :haml, { :format =&gt; :html5 }                    # if you use haml&#x000A;  &#x000A;  # Your "actions" go here…&#x000A;  #&#x000A;  get '/' do&#x000A;    haml :'/index'&#x000A;  end&#x000A;  &#x000A;end&#x000A;&#x000A;# Run the app!&#x000A;#&#x000A;puts "Hello, you're running your web app from a gem!"&#x000A;SingingRain.run! :port =&gt; port</code></pre>
+      <p>And that&#8217;s already it for the app.</p>
+      <p>Now, if you want to define a binary for the gem, put an executable <code>rain_singing</code> file into <code>/bin</code>. Into this file you&#8217;d write:</p>
+      <pre class="sh_ruby"><code>#!/usr/bin/env ruby&#x000A;#&#x000A;begin&#x000A;  require 'rain_singing/application/app.rb'&#x000A;rescue LoadError =&gt; e&#x000A;  require 'rubygems'&#x000A;  path = File.expand_path '../../lib', __FILE__&#x000A;  $:.unshift(path) if File.directory?(path) &amp;&amp; !$:.include?(path)&#x000A;  require 'rain_singing/application/app.rb'&#x000A;end</code></pre>
+      <p>After generating your gem with</p>
+      <pre class="sh_text"><code>$ gem build rain_singing.gemspec</code></pre>
+      <p>and installing it with</p>
+      <pre class="sh_text"><code>$ gem install rain_singing-1.0.0.gem</code></pre>
+      <p>you are ready to run</p>
+      <pre class="sh_text"><code>$ rain_singing&#x000A;Hello, you're running your web app from a gem!</code></pre>
+      <p>Good stuff. Good stuff. Makes me want to sing in the rain.</p>
+      <h2>In Picky</h2>
+      <p>Picky uses this for two things.</p>
+      <p>A statistics interface (<code>$ gem install picky-statistics</code>), run</p>
+      <pre class="sh_text"><code>$ picky stats path/to/your/search.log 1234</code></pre>
+      <p>or the live interface to the running server (<code>$ gem install picky-live</code>), run</p>
+      <pre class="sh_text"><code>$ picky live localhost:8080/admin 1234</code></pre>
+      <p>You need to add <code>route %r{/admin} =&gt; LiveParameters.new%</code> in the server to have it work. But then you get the interface <a href="http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html">described in this blog post</a>.</p>
+      <p>Nice, eh?</p>
+      <h2>Conclusions</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Sinatra rocks my noodles</li>
+      	<li>that a Gem can contain a whole webapp without footprint</li>
+      	<li>that Picky uses both for maximal profit!</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
+      <br />
+      Previous
+      <a href="/blog/2011/02/01/parslet-intro.html" title="Previous post: Parslet Intro">Parslet Intro</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/02/02/running-sinatra-inside-a-gem';
+          var disqus_url = 'http://florianhanke.com/blog/2011/02/02/running-sinatra-inside-a-gem.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

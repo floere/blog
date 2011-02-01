@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: Running Sinatra inside a Ruby Gem
 categories:
@@ -9,3 +8,152 @@ categories:
   - gems
 ---
 This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+!/blog/images/sinatra.png!
+
+In this post I'll show how to have "Sinatra":http://www.sinatrarb.com/ run directly from inside a gem. And at the end, how Picky uses this for its advantage.
+
+Let's go singing in the gem!
+
+h2. The thing is…
+
+What I wanted, was to add a nice statistics web interface to Picky.
+
+First I though about adding it to the server, but soon after (~1.2µs) decided that this was a silly idea.
+
+Picky is heavily designed around loosely connected elements in the server. I think this is even a better idea outside of a large component such as a server. So what I found myself thinking about – while showering – next was, to have a gem which generates a "Sinatra":http://www.sinatrarb.com/ application…
+
+Suddenly the room lit up and I spotted, scrawled on the wall in burning letters of blood:
+
+@The wrong question.@
+
+I gave it not much thought, as it can get crazy in this part of Zürich. Then, while gorging myself on my beloved alphabet soup, and thinking about how to structure files in this web application exactly, the letters suddenly formed a sentence:
+
+@Dude the wrong, fucking question.@
+
+(Soups can only spell _so_ well)
+
+I only got it a few hours later, while three swedish massage therapists kneaded my shoulders.
+
+Ok, they didn't. But they should have!
+
+In computer science, the answers aren't nearly as important as asking:
+
+@…the right fucking question.@
+
+h2. The right fucking question
+
+The right question is:
+
+How do I fit a web application wholly in a gem, such that I can do a
+
+@$ picky stats log/search.log@
+
+on any Picky logfile and it will parse it and show me a nice statistical representation of it in a browser without soiling the directory and everything else?
+
+h2. The right fucking tool for the job
+
+That's "Sinatra":http://www.sinatrarb.com/ I'm talking about. The great and *extremely* easy to use Ruby DSL for web applications.
+
+Give it a whirl if you haven't seen it!
+
+h2. How to do it
+
+First, set up a gem structure – let's call the gem "rain_sining". Then, inside it, set up the following structure:
+
+<pre class="sh_text"><code>rain_singing
+  /bin
+  /lib
+    /rain_singing
+      /application   # <- the app is in here
+        app.rb       # <- the webapp itself
+        /images
+        /javascripts
+        /stylesheets
+        /views
+    rain_singing.rb
+  rain_singing.gemspec
+  /spec</code></pre>
+
+The "hardest" thing is getting the directories correctly set up.
+
+So what you do inside @app.rb@ is:
+
+<pre class="sh_ruby"><code>require 'sinatra'
+require 'haml' # if you use haml views
+
+class SingingRain < Sinatra::Base
+
+  set :static, true                             # set up static file routing
+  set :public, File.expand_path('..', __FILE__) # set up the static dir (with images/js/css inside)
+  
+  set :views,  File.expand_path('../views', __FILE__) # set up the views dir
+  set :haml, { :format => :html5 }                    # if you use haml
+  
+  # Your "actions" go here…
+  #
+  get '/' do
+    haml :'/index'
+  end
+  
+end
+
+# Run the app!
+#
+puts "Hello, you're running your web app from a gem!"
+SingingRain.run! :port => port</code></pre>
+
+And that's already it for the app.
+
+Now, if you want to define a binary for the gem, put an executable @rain_singing@ file into @/bin@. Into this file you'd write:
+
+<pre class="sh_ruby"><code>#!/usr/bin/env ruby
+#
+begin
+  require 'rain_singing/application/app.rb'
+rescue LoadError => e
+  require 'rubygems'
+  path = File.expand_path '../../lib', __FILE__
+  $:.unshift(path) if File.directory?(path) && !$:.include?(path)
+  require 'rain_singing/application/app.rb'
+end</code></pre>
+
+After generating your gem with
+
+<pre class="sh_text"><code>$ gem build rain_singing.gemspec</code></pre>
+
+and installing it with
+
+<pre class="sh_text"><code>$ gem install rain_singing-1.0.0.gem</code></pre>
+
+you are ready to run
+
+<pre class="sh_text"><code>$ rain_singing
+Hello, you're running your web app from a gem!</code></pre>
+
+Good stuff. Good stuff. Makes me want to sing in the rain.
+
+h2. In Picky
+
+Picky uses this for two things.
+
+A statistics interface (@$ gem install picky-statistics@), run
+
+<pre class="sh_text"><code>$ picky stats path/to/your/search.log 1234</code></pre>
+
+or the live interface to the running server (@$ gem install picky-live@), run
+
+<pre class="sh_text"><code>$ picky live localhost:8080/admin 1234</code></pre>
+
+You need to add @route %r{/admin} => LiveParameters.new%@ in the server to have it work. But then you get the interface "described in this blog post":http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html.
+
+Nice, eh?
+
+h2. Conclusions
+
+So we've seen
+# that Sinatra rocks my noodles
+# that a Gem can contain a whole webapp without footprint
+# that Picky uses both for maximal profit!
+
+Hope you learnt something new :)

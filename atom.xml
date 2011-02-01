@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T23:36:00+01:00</updated>
+ <updated>2011-02-01T23:36:50+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,8 +17,8 @@
    <link href="http://blog.absurd.li/2011/02/02/running-sinatra-inside-a-gem.html"/>
    <updated>2011-02-02T00:00:00+01:00</updated>
    <id>http://floere.github.com/blog/2011/02/02/running-sinatra-inside-a-gem</id>
-   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/blog/images/sinatra.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;&lt;img src=&quot;/blog/images/sinatra.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;In this post I&amp;#8217;ll show how to have &lt;a href=&quot;http://www.sinatrarb.com/&quot;&gt;Sinatra&lt;/a&gt; run directly from inside a gem. And at the end, how Picky uses this for its advantage.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s go singing in the gem!&lt;/p&gt;
 &lt;h2&gt;The thing is…&lt;/h2&gt;

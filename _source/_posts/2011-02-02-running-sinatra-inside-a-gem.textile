@@ -7,9 +7,9 @@ categories:
   - picky
   - gems
 ---
-This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
-
 !/blog/images/sinatra.png!
+
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
 
 In this post I'll show how to have "Sinatra":http://www.sinatrarb.com/ run directly from inside a gem. And at the end, how Picky uses this for its advantage.
 

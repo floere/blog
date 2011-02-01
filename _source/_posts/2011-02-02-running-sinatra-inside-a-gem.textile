@@ -145,7 +145,7 @@ or the live interface to the running server (@$ gem install picky-live@), run
 
 <pre class="sh_text"><code>$ picky live localhost:8080/admin 1234</code></pre>
 
-You need to add @route %r{/admin} => LiveParameters.new%@ in the server to have it work. But then you get the interface "described in this blog post":http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html.
+You need to add @route %r{/admin} => LiveParameters.new@ in the server to have it work. But then you get the interface "described in this blog post":http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html.
 
 Nice, eh?
 

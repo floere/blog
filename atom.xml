@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T21:55:23+01:00</updated>
+ <updated>2011-02-01T22:02:42+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -84,8 +84,8 @@ Niiice.&lt;/p&gt;
 parser = (str('Hello') | str('Hi')).as(:greeting)
 p parser.parse('Hello')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;In Parslet, you can run the parser with a subset of its rules:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;&amp;lt;%= name %&amp;gt;&quot;)&lt;/code&gt;&lt;/pre&gt; while &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;Hello, &amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt; would fail.
-Running a parse on a subrule works because a parser is composed of &lt;em&gt;Parslets&lt;/em&gt;, or parser atoms, hence the name. &lt;code&gt;str('hello')&lt;/code&gt; is one of these atoms, and so is a sequence of atoms, like &lt;code&gt;str('no') &amp;gt;&amp;gt; str('kidding')&lt;/code&gt;. And you can do a parse directly with one of these, if you want, &lt;code&gt;(str('Hello') | str('Hi')).parse('Hello')&lt;/code&gt; as we have seen before.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;&amp;lt;%= name %&amp;gt;&quot;)&lt;/code&gt;&lt;/pre&gt; while &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;Hello, &amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt; would fail since the &lt;code&gt;erb_with_tags&lt;/code&gt; rule just covers text which starts with &lt;code&gt;&amp;lt;%=&lt;/code&gt; and ends with &lt;code&gt;%&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Running a parse on a subrule works because a parser is composed of &lt;em&gt;Parslets&lt;/em&gt;, or parser atoms, hence the name. &lt;code&gt;str('hello')&lt;/code&gt; is one of these atoms, and so is a sequence of atoms, like &lt;code&gt;str('no') &amp;gt;&amp;gt; str('kidding')&lt;/code&gt;. And you can do a parse directly with one of these, if you want, &lt;code&gt;(str('Hello') | str('Hi')).parse('Hello')&lt;/code&gt; as we have seen before.&lt;/p&gt;
 &lt;p&gt;Did I say it&amp;#8217;s pure Ruby? Why, yes! Let&amp;#8217;s harness the power of Ruby, and combine it with the power of Parslet parser atoms.&lt;/p&gt;
 &lt;p&gt;I need a parser that is case insensitive regarding the string.
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def case_insensitive string

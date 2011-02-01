@@ -96,6 +96,8 @@ Again, if you run it, you get:
 <pre class="sh_ruby"><code>[{:text=>"Hello, my name is"}, {:ruby=>" name "}, {:text=>"!"}]</code></pre>
 Niiice.
 
+Let's not think about the transform step for a second and look at some of the good shit.
+
 h2. Goodies that will blow your mind.
 
 Parslet doesn't force you to use a class. It's totally ok to just do this:
@@ -104,8 +106,31 @@ parser = (str('Hello') | str('Hi')).as(:greeting)
 p parser.parse('Hello')</code></pre>
 
 In Parslet, you can run the parser with a subset of its rules:
-<pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("<%= name %>")</code></pre>
-This works because a parser is composed of _Parslets_, or parser atoms, hence the name. @str('hello')@ is one of these atoms, and so is a sequence of atoms, like @str('no') >> str('kidding')@. And you can do a parse directly with one of these, if you want, @(str('Hello') | str('Hi')).parse('Hello')@ as we have seen before.
+<pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("<%= name %>")</code></pre> while <pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("Hello, <%= name %>!")</code></pre> would fail.
+Running a parse on a subrule works because a parser is composed of _Parslets_, or parser atoms, hence the name. @str('hello')@ is one of these atoms, and so is a sequence of atoms, like @str('no') >> str('kidding')@. And you can do a parse directly with one of these, if you want, @(str('Hello') | str('Hi')).parse('Hello')@ as we have seen before.
+
+Did I say it's pure Ruby? Why, yes! Let's harness the power of Ruby, and combine it with the power of Parslet parser atoms.
+
+I need a parser that is case insensitive regarding the string.
+<pre class="sh_ruby"><code>def case_insensitive string
+  chars = string.split //
+  chars.inject(str('')) do |parslet, char|
+    parslet >> match("[#{char.downcase}|#{char.upcase}]")
+  end
+end
+
+p case_insensitive('hello').parse('HeLLo')
+
+What it does is generate this:
+match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
+This returns me a case insensitive parser that I can directly use to parse the @HeLLo@. Or why not combine it with other parslets?
+<pre class="sh_ruby"><code>p (case_insensitive('hello') >> str(' ') >> str('Florian')).parse('HeLLo Florian')</code></pre>
+
+h2. Transforming
+
+Can you take a quick look at the "ERB parser":https://github.com/kschiess/parslet/blob/master/example/erb.rb, copy it into a script and give it a go?
+
+As you can see, it's not just able to recognize ruby expressions (@<%= ruby expression %>@), but also comments (@<%# comment %>@) and normal ruby code (@<% ruby %>@) that is not inserted into the result.
 
 h2. Conclusion
 

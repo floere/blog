@@ -1,0 +1,10 @@
+---
+layout: post
+title: Running Sinatra inside a Ruby Gem
+categories:
+  - series
+  - ruby
+  - picky
+  - gems
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)

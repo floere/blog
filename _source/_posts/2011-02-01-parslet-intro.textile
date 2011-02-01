@@ -1,0 +1,86 @@
+---
+layout: post
+title: Parslet Intro
+categories:
+  - ruby
+  - parser
+---
+Tonight I wanted to take some time off from Picky to write about a "Parslet":http://kschiess.github.com/parslet/, a parser construction library by my dear friend "Kaspar Schiess":http://www.absurd.li/.
+
+h2. tl;dr
+
+# Parslet is great.
+# @gem install parslet@
+# Look at "any of the examples":https://github.com/kschiess/parslet/tree/master/example.
+# Try, learn, try again, profit!
+
+h2. What is it?
+
+In Kaspar's words: "A small Ruby library for constructing parsers in the "PEG":http://en.wikipedia.org/wiki/Parsing_expression_grammar (Parsing Expression Grammar) fashion".
+
+A parser is used to transform text data into a semantically meaningful structure by injecting information based on assumptions on the text's structure. For example, @"Hello, Florian!"@ could be parsed into something like: @[sentence: [greeting:hello, separation:comma, name:florian, mark:exclamation]]@.
+
+It's probably best if you just "tried it for yourself":http://kschiess.github.com/parslet/get-started.html.
+
+h2. Are there other parser constructors?
+
+Yes, "Citrus":https://github.com/mjijackson/citrus and "Treetop":http://treetop.rubyforge.org/. But let's be frank here. Parslet eats these for breakfast in terms of ease of use and power, in my humble and almost unbiased opinion. Let me explain why.
+
+h2. Why is it so powerful and easy?
+
+On the main page, Kaspar notes that Parslet is especially easy by "providing the best error reporting" and "not generating reams of code for you to debug".
+
+While both are certainly true, and I do not disagree, but I don't think that that is what makes Parslet so easy or powerful. Surely easi-_er_, but the main reason I love it is that it harnesses the power of Ruby.
+
+The second reason I consider it so great is that it split into a _parser_ and a _transformer_ step, with an intermediate syntax tree that is entirely in Ruby basic atoms, like hashes and arrays.
+
+Why is this cool? To repeat my example, above:
+The parser would first parse @"Hello, Florian!"@ into @[sentence: [greeting:hello, separation:comma, name:florian, mark:exclamation]]@ and then, for example,
+a @FrenchTransformer@ could be used to transform this into: @Bonjour, Florian!@, the french representation of the english input sentence. So first we get an intermediate semantic expression that we can then transform into something else. And there can be a lot of transformers starting from where the parser ended. Thinking about a @SwedishTransformer@ or an @ItalianTransformer@? Me too. "Optimus Primo, transformate! Ciao!"
+
+Or a chain of transformers that first take the intermediate tree and morph it into a different intermediate tree. The possibilities are endless.
+
+h2. Simple Example
+
+Let's consider a simple example. It is a subpart of the "ERB":http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html "parser and transformer":https://github.com/kschiess/parslet/blob/master/example/erb.rb parser and transformer. ERB is a Ruby templating language by Seki Masatoshi.
+
+We'll look at the whole thing later on.
+
+A simple ERB example would be ERB with a Ruby expression inside:
+<pre class="sh_ruby"><code>Hello, my name is<%= name >!</code></pre>
+
+What we get out of the parser is the parts that are text, and the parts that are ruby code.
+So with parslet we'd write this:
+<pre class="sh_ruby"><code>require 'parslet'
+
+class ErbParser < Parslet::Parser
+  rule(:text) { (str('<%=').absnt? >> any).repeat(1).as(:text) }
+  rule(:ruby_expression) { (str('%>').absnt? >> any).repeat.as(:ruby) }
+  
+  rule(:erb_with_tags) { str('<%=') >> ruby_expression >> str('%>') }
+  
+  rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
+  root(:text_with_ruby_expressions)
+end
+
+p ErbParser.new.parse("Hello, my name is<%= name %>!")</code></pre>
+
+Just run it :) What you get is a nice semantic tree:
+<pre class="sh_ruby"><code>[{:text=>"Hello, my name is"}, {:ruby=>" name "}, {:text=>"!"}]</code></pre>
+
+Let me go through it in steps:
+<pre class="sh_ruby"><code></code></pre>
+<pre class="sh_ruby"><code></code></pre>
+<pre class="sh_ruby"><code></code></pre>
+<pre class="sh_ruby"><code></code></pre>
+<pre class="sh_ruby"><code></code></pre>
+
+h2. Conclusion
+
+
+
+So we've seen
+# that Parslet harnishes Ruby's powers
+# 
+
+Hope you learnt something new :)

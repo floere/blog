@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T21:37:43+01:00</updated>
+ <updated>2011-02-01T21:44:43+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -40,7 +40,7 @@ The parser would first parse &lt;code&gt;&quot;Hello, Florian!&quot;&lt;/code&gt
 a &lt;code&gt;FrenchTransformer&lt;/code&gt; could be used to transform this into: &lt;code&gt;Bonjour, Florian!&lt;/code&gt;, the french representation of the english input sentence. So first we get an intermediate semantic expression that we can then transform into something else. And there can be a lot of transformers starting from where the parser ended. Thinking about a &lt;code&gt;SwedishTransformer&lt;/code&gt; or an &lt;code&gt;ItalianTransformer&lt;/code&gt;? Me too. &amp;#8220;Optimus Primo, transformate! Ciao!&amp;#8221;&lt;/p&gt;
 &lt;p&gt;Or a chain of transformers that first take the intermediate tree and morph it into a different intermediate tree. The possibilities are endless.&lt;/p&gt;
 &lt;h2&gt;Simple Example&lt;/h2&gt;
-&lt;p&gt;Let&amp;#8217;s consider a simple example. It is a subpart of the &lt;a href=&quot;http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt;&lt;/a&gt; &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;parser and transformer&lt;/a&gt;  that I wrote. &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; is a Ruby templating language by Seki Masatoshi.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s consider a simple example. It is a subpart of the &lt;a href=&quot;http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt;&lt;/a&gt; &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;parser&amp;nbsp;and&amp;nbsp;transformer&lt;/a&gt;  that I wrote. &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; is a Ruby templating language by Seki Masatoshi.&lt;/p&gt;
 &lt;p&gt;We&amp;#8217;ll look at the whole thing later on.&lt;/p&gt;
 &lt;p&gt;A simple &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; example would be &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; with a Ruby expression inside:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Hello, my name is&amp;lt;%= name &amp;gt;!&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;

@@ -42,7 +42,7 @@ Or a chain of transformers that first take the intermediate tree and morph it in
 
 h2. Simple Example
 
-Let's consider a simple example. It is a subpart of the "ERB":http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html "parser and transformer":https://github.com/kschiess/parslet/blob/master/example/erb.rb parser and transformer. ERB is a Ruby templating language by Seki Masatoshi.
+Let's consider a simple example. It is a subpart of the "ERB":http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html "parser and transformer":https://github.com/kschiess/parslet/blob/master/example/erb.rb parser and transformer that I wrote. ERB is a Ruby templating language by Seki Masatoshi.
 
 We'll look at the whole thing later on.
 
@@ -121,8 +121,8 @@ end
 
 p case_insensitive('hello').parse('HeLLo')
 
-What it does is generate this:
-match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
+# What it does is generate this:
+# match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
 This returns me a case insensitive parser that I can directly use to parse the @HeLLo@. Or why not combine it with other parslets?
 <pre class="sh_ruby"><code>p (case_insensitive('hello') >> str(' ') >> str('Florian')).parse('HeLLo Florian')</code></pre>
 
@@ -130,14 +130,83 @@ h2. Transforming
 
 Can you take a quick look at the "ERB parser":https://github.com/kschiess/parslet/blob/master/example/erb.rb, copy it into a script and give it a go?
 
-As you can see, it's not just able to recognize ruby expressions (@<%= ruby expression %>@), but also comments (@<%# comment %>@) and normal ruby code (@<% ruby %>@) that is not inserted into the result.
+As you can see, it's not just able to parse text and ruby expressions (@<%= ruby expression %>@), but also comments (@<%# comment %>@) and normal ruby code (@<% ruby %>@) that both will not be inserted into the rendered text.
+
+Now we'll have a look at the transformer that will spit out rendered text:
+<pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do
+  
+  erb_binding = binding
+  
+  rule(:code => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding); '' }  
+  rule(:expression => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding) }
+  rule(:comment => { :ruby => simple(:ruby) }) { '' }
+  
+  rule(:text => simple(:text)) { text }
+  rule(:text => sequence(:texts)) { texts.join }
+  
+end</code></pre>
+Ignore for now the part where bindings are used.
+
+A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
+<pre class="sh_ruby"><code>rule(:text => sequence(:texts)) { texts.join }</code></pre>
+Recognizes hashes that look like @:text => sequence(:texts)@, sequences of things that are denoted @as@ text. The identifier @:texts@ is used in the block where we tell the transformer what to do: @{ texts.join }@. So what we do is simple, we just join a sequence of texts together.
+
+Another rule, the comment rule,
+<pre class="sh_ruby"><code>rule(:comment => { :ruby => simple(:ruby) }) { '' }</code></pre>
+will return just nothing.
+
+Now, if we want to parse and transform something like this:
+<pre class="sh_ruby"><code>The <% a = 2 %>not printed result of "a = 2".
+The <%# a = 1 %>not printed non-evaluated comment "a = 1", see the value of a below.
+The <%= 'nicely' %> printed result.
+The <% b = 3 %>value of a is <%= a %>, and b is <%= b %>.</code></pre>
+It gets a little more complicated. If you look at line 1, you see that @a@ is given a value of @2@. And then we will use that value in line 4, where we put the result of @2@ into the rendered template. Have you tried it? No? Run it and see :)
+
+h2. Remembering State
+
+If you want the transformer rules to remember values in between transformations, you'll need state of some sort.
+
+I can show you the way I did it with the ERB transformer. I'm sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we'll have a look at this:
+<pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do
+  
+  erb_binding = binding
+  
+  rule(:code => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding); '' }
+  
+  ...
+  
+end</code></pre>
+
+What happens here?
+First, I assign the binding of the block to @erb_binding@:
+<pre class="sh_ruby"><code>erb_binding = binding</code></pre>
+This is the object where we will safe the state.
+
+It's a good thing for me that the @rule@ method uses a block to define what to do when encountering a rule. Why? Well, since it is a block, the local variable @erb_binding@ is bound in the context of the block, which means that I have easy access to it in @{ eval(ruby, erb_binding); '' }@.
+
+So what I do with
+<pre class="sh_ruby"><code>eval(ruby, erb_binding); ''</code></pre>
+is: Evaluate the code piece that I get in the variable ruby, and evaluate it with the binding I have saved. Then, I return an empty string since @<% ruby code %>@ should not write anything into the resulting rendered template.
+
+Not so in the expression:
+<pre class="sh_ruby"><code>rule(:expression => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding) }</code></pre>
+Here I return whatever the evaluation returned to be inserted into the rendered result.
+
+Isn't it nice? And between parser and transformer I was able to look at my nice semantic tree, to check that everything is a-ok.
+
+Writing tests, as everything is in Ruby, is a breeze, as you can imagine!
 
 h2. Conclusion
 
+My personal conclusion is that this thing is here to stay.
 
+Not only is it easy to use, but you have the full power of Ruby available to write parsers, comfortably.
+
+It already has garnered the attention of quite a few excellent Rubyists – the hard core of parslet users – which hang out at the #parslet IRC channel.
 
 So we've seen
-# that Parslet harnishes Ruby's powers
-# 
+# that Parslet harnishes Ruby's powers for success and profit.
+# that it offers a parser constructor AND a tranformer constructor, which is a good thing.
+# that trying it yourself is fun and a piece of cake.
 
 Hope you learnt something new :)

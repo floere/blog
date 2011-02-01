@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T23:36:50+01:00</updated>
+ <updated>2011-02-01T23:39:04+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -81,7 +81,7 @@ end
 # Run the app!
 #
 puts &quot;Hello, you're running your web app from a gem!&quot;
-SingingRain.run! :port =&amp;gt; port&lt;/code&gt;&lt;/pre&gt;
+SingingRain.run!&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And that&amp;#8217;s already it for the app.&lt;/p&gt;
 &lt;p&gt;Now, if you want to define a binary for the gem, put an executable &lt;code&gt;rain_singing&lt;/code&gt; file into &lt;code&gt;/bin&lt;/code&gt;. Into this file you&amp;#8217;d write:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;#!/usr/bin/env ruby

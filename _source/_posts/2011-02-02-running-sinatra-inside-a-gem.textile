@@ -101,7 +101,7 @@ end
 # Run the app!
 #
 puts "Hello, you're running your web app from a gem!"
-SingingRain.run! :port => port</code></pre>
+SingingRain.run!</code></pre>
 
 And that's already it for the app.
 

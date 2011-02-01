@@ -5,7 +5,7 @@ categories:
   - ruby
   - parser
 ---
-Tonight I wanted to take some time off from Picky to write about a "Parslet":http://kschiess.github.com/parslet/, a parser construction library by my dear friend "Kaspar Schiess":http://www.absurd.li/.
+Tonight I wanted to take some time off from Picky to write about a "Parslet":http://kschiess.github.com/parslet/, a parser construction library by my dear friend "Kaspar&nbsp;Schiess":http://www.absurd.li/.
 
 h2. tl;dr
 

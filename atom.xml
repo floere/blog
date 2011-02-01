@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T21:37:07+01:00</updated>
+ <updated>2011-02-01T21:37:43+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,7 @@
    <link href="http://blog.absurd.li/2011/02/01/parslet-intro.html"/>
    <updated>2011-02-01T00:00:00+01:00</updated>
    <id>http://floere.github.com/blog/2011/02/01/parslet-intro</id>
-   <content type="html">&lt;p&gt;Tonight I wanted to take some time off from Picky to write about a &lt;a href=&quot;http://kschiess.github.com/parslet/&quot;&gt;Parslet&lt;/a&gt;, a parser construction library by my dear friend &lt;a href=&quot;http://www.absurd.li/&quot;&gt;Kaspar Schiess&lt;/a&gt;.&lt;/p&gt;
+   <content type="html">&lt;p&gt;Tonight I wanted to take some time off from Picky to write about a &lt;a href=&quot;http://kschiess.github.com/parslet/&quot;&gt;Parslet&lt;/a&gt;, a parser construction library by my dear friend &lt;a href=&quot;http://www.absurd.li/&quot;&gt;Kaspar&amp;nbsp;Schiess&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;tl;dr&lt;/h2&gt;
 &lt;ol&gt;
 	&lt;li&gt;Parslet is great.&lt;/li&gt;

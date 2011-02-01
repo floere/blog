@@ -54,10 +54,10 @@ So with parslet we'd write this:
 <pre class="sh_ruby"><code>require 'parslet'
 
 class ErbParser < Parslet::Parser
-  rule(:text) { (str('<%=').absnt? >> any).repeat(1).as(:text) }
   rule(:ruby_expression) { (str('%>').absnt? >> any).repeat.as(:ruby) }
-  
   rule(:erb_with_tags) { str('<%=') >> ruby_expression >> str('%>') }
+  
+  rule(:text) { (str('<%=').absnt? >> any).repeat(1).as(:text) }
   
   rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
   root(:text_with_ruby_expressions)
@@ -68,12 +68,44 @@ p ErbParser.new.parse("Hello, my name is<%= name %>!")</code></pre>
 Just run it :) What you get is a nice semantic tree:
 <pre class="sh_ruby"><code>[{:text=>"Hello, my name is"}, {:ruby=>" name "}, {:text=>"!"}]</code></pre>
 
-Let me go through it in steps:
-<pre class="sh_ruby"><code></code></pre>
-<pre class="sh_ruby"><code></code></pre>
-<pre class="sh_ruby"><code></code></pre>
-<pre class="sh_ruby"><code></code></pre>
-<pre class="sh_ruby"><code></code></pre>
+Let me go through it in steps. I've found out that it is easiest for me to go top-down to define a parser. I hope this suits you too.
+
+We define the starting point, aka the @root@ of the parser with the @root@ method:
+<pre class="sh_ruby"><code>root(:text_with_ruby_expressions)</code></pre>
+This just says, start with the @rule(:text_with_ruby_expressions)@.
+
+So, now what we know about our simple-ERB language is that it is basically a sequence of text and ruby expressions, repeating. So let's define that:
+<pre class="sh_ruby"><code>rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }</code></pre>
+So either we have text OR (@|@) a ruby expression. And we have that in a repeating fashion. Just as the rule says.
+
+Let's look at the text rule we just used:
+<pre class="sh_ruby"><code>rule(:text) { (str('<%=').absnt? >> any).repeat(1).as(:text) }</code></pre>
+This means: As long as you don't encounter a ERB start tag (@<%=@), keep taking everything as text. This will stop if it encounters a @<%=@.
+
+At which point Parslet will try to apply the other rule:
+<pre class="sh_ruby"><code>rule(:erb_with_tags) { str('<%=') >> ruby_expression >> str('%>') }</code></pre>
+This rule just matches anything with erb start @<%=@ and end tags @%>@ around it, with a ruby expression inside.
+
+The ruby expression is simple:
+<pre class="sh_ruby"><code>rule(:ruby_expression) { (str('%>').absnt? >> any).repeat.as(:ruby) }</code></pre>
+We know this already: As long as you don't encounter an ERB end tag, keep consuming as ruby code.
+
+Got it?
+
+Again, if you run it, you get:
+<pre class="sh_ruby"><code>[{:text=>"Hello, my name is"}, {:ruby=>" name "}, {:text=>"!"}]</code></pre>
+Niiice.
+
+h2. Goodies that will blow your mind.
+
+Parslet doesn't force you to use a class. It's totally ok to just do this:
+<pre class="sh_ruby"><code>include Parslet
+parser = (str('Hello') | str('Hi')).as(:greeting)
+p parser.parse('Hello')</code></pre>
+
+In Parslet, you can run the parser with a subset of its rules:
+<pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("<%= name %>")</code></pre>
+This works because a parser is composed of _Parslets_, or parser atoms, hence the name. @str('hello')@ is one of these atoms, and so is a sequence of atoms, like @str('no') >> str('kidding')@. And you can do a parse directly with one of these, if you want, @(str('Hello') | str('Hi')).parse('Hello')@ as we have seen before.
 
 h2. Conclusion
 

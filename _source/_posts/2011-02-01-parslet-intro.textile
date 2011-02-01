@@ -42,7 +42,7 @@ Or a chain of transformers that first take the intermediate tree and morph it in
 
 h2. Simple Example
 
-Let's consider a simple example. It is a subpart of the "ERB":http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html "parser and transformer":https://github.com/kschiess/parslet/blob/master/example/erb.rb parser and transformer that I wrote. ERB is a Ruby templating language by Seki Masatoshi.
+Let's consider a simple example. It is a subpart of the "ERB":http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html "parser and transformer":https://github.com/kschiess/parslet/blob/master/example/erb.rb  that I wrote. ERB is a Ruby templating language by Seki Masatoshi.
 
 We'll look at the whole thing later on.
 

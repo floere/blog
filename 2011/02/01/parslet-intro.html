@@ -75,7 +75,7 @@
       a <code>FrenchTransformer</code> could be used to transform this into: <code>Bonjour, Florian!</code>, the french representation of the english input sentence. So first we get an intermediate semantic expression that we can then transform into something else. And there can be a lot of transformers starting from where the parser ended. Thinking about a <code>SwedishTransformer</code> or an <code>ItalianTransformer</code>? Me too. &#8220;Optimus Primo, transformate! Ciao!&#8221;</p>
       <p>Or a chain of transformers that first take the intermediate tree and morph it into a different intermediate tree. The possibilities are endless.</p>
       <h2>Simple Example</h2>
-      <p>Let&#8217;s consider a simple example. It is a subpart of the <a href="http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html"><span class="caps">ERB</span></a> <a href="https://github.com/kschiess/parslet/blob/master/example/erb.rb">parser and transformer</a> parser and transformer that I wrote. <span class="caps">ERB</span> is a Ruby templating language by Seki Masatoshi.</p>
+      <p>Let&#8217;s consider a simple example. It is a subpart of the <a href="http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html"><span class="caps">ERB</span></a> <a href="https://github.com/kschiess/parslet/blob/master/example/erb.rb">parser and transformer</a>  that I wrote. <span class="caps">ERB</span> is a Ruby templating language by Seki Masatoshi.</p>
       <p>We&#8217;ll look at the whole thing later on.</p>
       <p>A simple <span class="caps">ERB</span> example would be <span class="caps">ERB</span> with a Ruby expression inside:
       <pre class="sh_ruby"><code>Hello, my name is&lt;%= name &gt;!</code></pre></p>

@@ -52,17 +52,13 @@ A simple ERB example would be ERB with a Ruby expression inside:
 What we get out of the parser is the parts that are text, and the parts that are ruby code.
 So with parslet we'd write this:
 <pre class="sh_ruby"><code>require 'parslet'
-
 class ErbParser < Parslet::Parser
   rule(:ruby_expression) { (str('%>').absnt? >> any).repeat.as(:ruby) }
   rule(:erb_with_tags) { str('<%=') >> ruby_expression >> str('%>') }
-  
   rule(:text) { (str('<%=').absnt? >> any).repeat(1).as(:text) }
-  
   rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
   root(:text_with_ruby_expressions)
 end
-
 p ErbParser.new.parse("Hello, my name is<%= name %>!")</code></pre>
 
 Just run it :) What you get is a nice semantic tree:

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T21:33:51+01:00</updated>
+ <updated>2011-02-01T21:35:25+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -46,16 +46,15 @@ a &lt;code&gt;FrenchTransformer&lt;/code&gt; could be used to transform this int
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Hello, my name is&amp;lt;%= name &amp;gt;!&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;What we get out of the parser is the parts that are text, and the parts that are ruby code.
 So with parslet we&amp;#8217;d write this:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'parslet'&lt;/p&gt;
-&lt;p&gt;class ErbParser &amp;lt; Parslet::Parser
-  rule(:ruby_expression) { (str(&amp;#8216;%&amp;gt;&amp;#8217;).absnt? &amp;gt;&amp;gt; any).repeat.as(:ruby) }
-  rule(:erb_with_tags) { str(&amp;#8216;&amp;lt;%=&amp;#8217;) &amp;gt;&amp;gt; ruby_expression &amp;gt;&amp;gt; str(&amp;#8216;%&amp;gt;&amp;#8217;) }&lt;/p&gt;
-rule(:text) { (str(&amp;#8216;&amp;lt;%=&amp;#8217;).absnt? &amp;gt;&amp;gt; any).repeat(1).as(:text) }
-
-rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
-root(:text_with_ruby_expressions)
-&lt;p&gt;end&lt;/p&gt;
-&lt;p&gt;p ErbParser.new.parse(&amp;#8220;Hello, my name is&amp;lt;%= name %&amp;gt;!&amp;#8221;)&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'parslet'
+class ErbParser &amp;lt; Parslet::Parser
+  rule(:ruby_expression) { (str('%&amp;gt;').absnt? &amp;gt;&amp;gt; any).repeat.as(:ruby) }
+  rule(:erb_with_tags) { str('&amp;lt;%=') &amp;gt;&amp;gt; ruby_expression &amp;gt;&amp;gt; str('%&amp;gt;') }
+  rule(:text) { (str('&amp;lt;%=').absnt? &amp;gt;&amp;gt; any).repeat(1).as(:text) }
+  rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
+  root(:text_with_ruby_expressions)
+end
+p ErbParser.new.parse(&quot;Hello, my name is&amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;Just run it :) What you get is a nice semantic tree:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[{:text=&amp;gt;&quot;Hello, my name is&quot;}, {:ruby=&amp;gt;&quot; name &quot;}, {:text=&amp;gt;&quot;!&quot;}]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;Let me go through it in steps. I&amp;#8217;ve found out that it is easiest for me to go top-down to define a parser. I hope this suits you too.&lt;/p&gt;

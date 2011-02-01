@@ -104,7 +104,7 @@ p parser.parse('Hello')</code></pre>
 In Parslet, you can run the parser with a subset of its rules:
 <pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("<%= name %>")</code></pre> while <pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("Hello, <%= name %>!")</code></pre> would fail since the @erb_with_tags@ rule just covers text which starts with @<%=@ and ends with @%>@.
 
-Running a parse on a subrule works because a parser is composed of _Parslets_, or parser atoms, hence the name. @str('hello')@ is one of these atoms, and so is a sequence of atoms, like @str('no') >> str('kidding')@. And you can do a parse directly with one of these, if you want, @(str('Hello') | str('Hi')).parse('Hello')@ as we have seen before.
+Running a @parse@ on a subrule works because a parser is composed of _Parslets_, or parser atoms, hence the name. @str('hello')@ is one of these atoms, and so is a sequence of atoms, like @str('no') >> str('kidding')@. And you can do a parse directly with one of these, if you want, @(str('Hello') | str('Hi')).parse('Hello')@ as we have seen before.
 
 Did I say it's pure Ruby? Why, yes! Let's harness the power of Ruby, and combine it with the power of Parslet parser atoms.
 
@@ -116,10 +116,10 @@ I need a parser that is case insensitive regarding the string.
   end
 end
 
-p case_insensitive('hello').parse('HeLLo')
-
+p case_insensitive('hello').parse('HeLLo')</code></pre>
 What it does is generate this:
-match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
+@match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])@
+
 This returns me a case insensitive parser that I can directly use to parse the @HeLLo@. Or why not combine it with other parslets?
 <pre class="sh_ruby"><code>p (case_insensitive('hello') >> str(' ') >> str('Florian')).parse('HeLLo Florian')</code></pre>
 
@@ -142,7 +142,7 @@ Ignore for now the part where bindings are used.
 
 A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
 <pre class="sh_ruby"><code>rule(:text => sequence(:texts)) { texts.join }</code></pre>
-Recognizes hashes that look like @:text => sequence(:texts)@, sequences of things that are denoted @as@ text. The identifier @:texts@ is used in the block where we tell the transformer what to do: @{ texts.join }@. So what we do is simple, we just join a sequence of texts together.
+recognizes hashes that look like @:text => sequence(:texts)@, sequences of things that are denoted @as@ text. The identifier @:texts@ is used in the block where we tell the transformer what to do: @{ texts.join }@. So what we do is simple, we just join a sequence of texts together.
 
 Another rule, the comment rule,
 <pre class="sh_ruby"><code>rule(:comment => { :ruby => simple(:ruby) }) { '' }</code></pre>
@@ -157,7 +157,7 @@ It gets a little more complicated. If you look at line 1, you see that @a@ is gi
 
 h2. Remembering State
 
-If you want the transformer rules to remember values in between transformations, you'll need state of some sort.
+If you want the transformer rules to remember values in between transformations – like the @a@ that is set to @2@, above, you'll need state of some sort.
 
 I can show you the way I did it with the ERB transformer. I'm sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we'll have a look at this:
 <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do

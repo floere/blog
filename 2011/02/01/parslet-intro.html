@@ -110,11 +110,13 @@
       <pre class="sh_ruby"><code>include Parslet&#x000A;parser = (str('Hello') | str('Hi')).as(:greeting)&#x000A;p parser.parse('Hello')</code></pre></p>
       <p>In Parslet, you can run the parser with a subset of its rules:
       <pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("&lt;%= name %&gt;")</code></pre> while <pre class="sh_ruby"><code>p ErbParser.new.erb_with_tags.parse("Hello, &lt;%= name %&gt;!")</code></pre> would fail since the <code>erb_with_tags</code> rule just covers text which starts with <code>&lt;%=</code> and ends with <code>%&gt;</code>.</p>
-      <p>Running a parse on a subrule works because a parser is composed of <em>Parslets</em>, or parser atoms, hence the name. <code>str('hello')</code> is one of these atoms, and so is a sequence of atoms, like <code>str('no') &gt;&gt; str('kidding')</code>. And you can do a parse directly with one of these, if you want, <code>(str('Hello') | str('Hi')).parse('Hello')</code> as we have seen before.</p>
+      <p>Running a <code>parse</code> on a subrule works because a parser is composed of <em>Parslets</em>, or parser atoms, hence the name. <code>str('hello')</code> is one of these atoms, and so is a sequence of atoms, like <code>str('no') &gt;&gt; str('kidding')</code>. And you can do a parse directly with one of these, if you want, <code>(str('Hello') | str('Hi')).parse('Hello')</code> as we have seen before.</p>
       <p>Did I say it&#8217;s pure Ruby? Why, yes! Let&#8217;s harness the power of Ruby, and combine it with the power of Parslet parser atoms.</p>
       <p>I need a parser that is case insensitive regarding the string.
-      <pre class="sh_ruby"><code>def case_insensitive string&#x000A;  chars = string.split //&#x000A;  chars.inject(str('')) do |parslet, char|&#x000A;    parslet &gt;&gt; match("[#{char.downcase}|#{char.upcase}]")&#x000A;  end&#x000A;end</p>&#x000A;<p>p case_insensitive(&#8216;hello&#8217;).parse(&#8216;HeLLo&#8217;)</p>&#x000A;<p>What it does is generate this:&#x000A;match([h|H]) &gt;&gt; match([e|E]) &gt;&gt; match([l|L]) &gt;&gt; match([l|L]) &gt;&gt; match([o|O])</code></pre>
-      This returns me a case insensitive parser that I can directly use to parse the <code>HeLLo</code>. Or why not combine it with other parslets?
+      <pre class="sh_ruby"><code>def case_insensitive string&#x000A;  chars = string.split //&#x000A;  chars.inject(str('')) do |parslet, char|&#x000A;    parslet &gt;&gt; match("[#{char.downcase}|#{char.upcase}]")&#x000A;  end&#x000A;end</p>&#x000A;<p>p case_insensitive(&#8216;hello&#8217;).parse(&#8216;HeLLo&#8217;)</code></pre>
+      What it does is generate this:
+      <code>match([h|H]) &gt;&gt; match([e|E]) &gt;&gt; match([l|L]) &gt;&gt; match([l|L]) &gt;&gt; match([o|O])</code></p>
+      <p>This returns me a case insensitive parser that I can directly use to parse the <code>HeLLo</code>. Or why not combine it with other parslets?
       <pre class="sh_ruby"><code>p (case_insensitive('hello') &gt;&gt; str(' ') &gt;&gt; str('Florian')).parse('HeLLo Florian')</code></pre></p>
       <h2>Transforming</h2>
       <p>Can you take a quick look at the <a href="https://github.com/kschiess/parslet/blob/master/example/erb.rb"><span class="caps">ERB</span> parser</a>, copy it into a script and give it a go?</p>
@@ -124,7 +126,7 @@
       Ignore for now the part where bindings are used.</p>
       <p>A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
       <pre class="sh_ruby"><code>rule(:text =&gt; sequence(:texts)) { texts.join }</code></pre>
-      Recognizes hashes that look like <code>:text =&gt; sequence(:texts)</code>, sequences of things that are denoted <code>as</code> text. The identifier <code>:texts</code> is used in the block where we tell the transformer what to do: <code>{ texts.join }</code>. So what we do is simple, we just join a sequence of texts together.</p>
+      recognizes hashes that look like <code>:text =&gt; sequence(:texts)</code>, sequences of things that are denoted <code>as</code> text. The identifier <code>:texts</code> is used in the block where we tell the transformer what to do: <code>{ texts.join }</code>. So what we do is simple, we just join a sequence of texts together.</p>
       <p>Another rule, the comment rule,
       <pre class="sh_ruby"><code>rule(:comment =&gt; { :ruby =&gt; simple(:ruby) }) { '' }</code></pre>
       will return just nothing.</p>
@@ -132,7 +134,7 @@
       <pre class="sh_ruby"><code>The &lt;% a = 2 %&gt;not printed result of "a = 2".&#x000A;The &lt;%# a = 1 %&gt;not printed non-evaluated comment "a = 1", see the value of a below.&#x000A;The &lt;%= 'nicely' %&gt; printed result.&#x000A;The &lt;% b = 3 %&gt;value of a is &lt;%= a %&gt;, and b is &lt;%= b %&gt;.</code></pre>
       It gets a little more complicated. If you look at line 1, you see that <code>a</code> is given a value of <code>2</code>. And then we will use that value in line 4, where we put the result of <code>2</code> into the rendered template. Have you tried it? No? Run it and see :)</p>
       <h2>Remembering State</h2>
-      <p>If you want the transformer rules to remember values in between transformations, you&#8217;ll need state of some sort.</p>
+      <p>If you want the transformer rules to remember values in between transformations – like the <code>a</code> that is set to <code>2</code>, above, you&#8217;ll need state of some sort.</p>
       <p>I can show you the way I did it with the <span class="caps">ERB</span> transformer. I&#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&#8217;ll have a look at this:
       <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do&#x000A;  erb_binding = binding&#x000A;  rule(:code =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }&#x000A;  ...&#x000A;end</code></pre></p>
       <p>What happens here?

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T22:02:42+01:00</updated>
+ <updated>2011-02-01T22:05:44+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -85,7 +85,7 @@ parser = (str('Hello') | str('Hi')).as(:greeting)
 p parser.parse('Hello')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;In Parslet, you can run the parser with a subset of its rules:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;&amp;lt;%= name %&amp;gt;&quot;)&lt;/code&gt;&lt;/pre&gt; while &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;Hello, &amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt; would fail since the &lt;code&gt;erb_with_tags&lt;/code&gt; rule just covers text which starts with &lt;code&gt;&amp;lt;%=&lt;/code&gt; and ends with &lt;code&gt;%&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Running a parse on a subrule works because a parser is composed of &lt;em&gt;Parslets&lt;/em&gt;, or parser atoms, hence the name. &lt;code&gt;str('hello')&lt;/code&gt; is one of these atoms, and so is a sequence of atoms, like &lt;code&gt;str('no') &amp;gt;&amp;gt; str('kidding')&lt;/code&gt;. And you can do a parse directly with one of these, if you want, &lt;code&gt;(str('Hello') | str('Hi')).parse('Hello')&lt;/code&gt; as we have seen before.&lt;/p&gt;
+&lt;p&gt;Running a &lt;code&gt;parse&lt;/code&gt; on a subrule works because a parser is composed of &lt;em&gt;Parslets&lt;/em&gt;, or parser atoms, hence the name. &lt;code&gt;str('hello')&lt;/code&gt; is one of these atoms, and so is a sequence of atoms, like &lt;code&gt;str('no') &amp;gt;&amp;gt; str('kidding')&lt;/code&gt;. And you can do a parse directly with one of these, if you want, &lt;code&gt;(str('Hello') | str('Hi')).parse('Hello')&lt;/code&gt; as we have seen before.&lt;/p&gt;
 &lt;p&gt;Did I say it&amp;#8217;s pure Ruby? Why, yes! Let&amp;#8217;s harness the power of Ruby, and combine it with the power of Parslet parser atoms.&lt;/p&gt;
 &lt;p&gt;I need a parser that is case insensitive regarding the string.
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def case_insensitive string
@@ -94,10 +94,10 @@ p parser.parse('Hello')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
     parslet &amp;gt;&amp;gt; match(&quot;[#{char.downcase}|#{char.upcase}]&quot;)
   end
 end&lt;/p&gt;
-&lt;p&gt;p case_insensitive(&amp;#8216;hello&amp;#8217;).parse(&amp;#8216;HeLLo&amp;#8217;)&lt;/p&gt;
-&lt;p&gt;What it does is generate this:
-match([h|H]) &amp;gt;&amp;gt; match([e|E]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([o|O])&lt;/code&gt;&lt;/pre&gt;
-This returns me a case insensitive parser that I can directly use to parse the &lt;code&gt;HeLLo&lt;/code&gt;. Or why not combine it with other parslets?
+&lt;p&gt;p case_insensitive(&amp;#8216;hello&amp;#8217;).parse(&amp;#8216;HeLLo&amp;#8217;)&lt;/code&gt;&lt;/pre&gt;
+What it does is generate this:
+&lt;code&gt;match([h|H]) &amp;gt;&amp;gt; match([e|E]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([o|O])&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This returns me a case insensitive parser that I can directly use to parse the &lt;code&gt;HeLLo&lt;/code&gt;. Or why not combine it with other parslets?
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p (case_insensitive('hello') &amp;gt;&amp;gt; str(' ') &amp;gt;&amp;gt; str('Florian')).parse('HeLLo Florian')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;h2&gt;Transforming&lt;/h2&gt;
 &lt;p&gt;Can you take a quick look at the &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; parser&lt;/a&gt;, copy it into a script and give it a go?&lt;/p&gt;
@@ -114,7 +114,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 Ignore for now the part where bindings are used.&lt;/p&gt;
 &lt;p&gt;A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text =&amp;gt; sequence(:texts)) { texts.join }&lt;/code&gt;&lt;/pre&gt;
-Recognizes hashes that look like &lt;code&gt;:text =&amp;gt; sequence(:texts)&lt;/code&gt;, sequences of things that are denoted &lt;code&gt;as&lt;/code&gt; text. The identifier &lt;code&gt;:texts&lt;/code&gt; is used in the block where we tell the transformer what to do: &lt;code&gt;{ texts.join }&lt;/code&gt;. So what we do is simple, we just join a sequence of texts together.&lt;/p&gt;
+recognizes hashes that look like &lt;code&gt;:text =&amp;gt; sequence(:texts)&lt;/code&gt;, sequences of things that are denoted &lt;code&gt;as&lt;/code&gt; text. The identifier &lt;code&gt;:texts&lt;/code&gt; is used in the block where we tell the transformer what to do: &lt;code&gt;{ texts.join }&lt;/code&gt;. So what we do is simple, we just join a sequence of texts together.&lt;/p&gt;
 &lt;p&gt;Another rule, the comment rule,
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:comment =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { '' }&lt;/code&gt;&lt;/pre&gt;
 will return just nothing.&lt;/p&gt;
@@ -125,7 +125,7 @@ The &amp;lt;%= 'nicely' %&amp;gt; printed result.
 The &amp;lt;% b = 3 %&amp;gt;value of a is &amp;lt;%= a %&amp;gt;, and b is &amp;lt;%= b %&amp;gt;.&lt;/code&gt;&lt;/pre&gt;
 It gets a little more complicated. If you look at line 1, you see that &lt;code&gt;a&lt;/code&gt; is given a value of &lt;code&gt;2&lt;/code&gt;. And then we will use that value in line 4, where we put the result of &lt;code&gt;2&lt;/code&gt; into the rendered template. Have you tried it? No? Run it and see :)&lt;/p&gt;
 &lt;h2&gt;Remembering State&lt;/h2&gt;
-&lt;p&gt;If you want the transformer rules to remember values in between transformations, you&amp;#8217;ll need state of some sort.&lt;/p&gt;
+&lt;p&gt;If you want the transformer rules to remember values in between transformations – like the &lt;code&gt;a&lt;/code&gt; that is set to &lt;code&gt;2&lt;/code&gt;, above, you&amp;#8217;ll need state of some sort.&lt;/p&gt;
 &lt;p&gt;I can show you the way I did it with the &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; transformer. I&amp;#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&amp;#8217;ll have a look at this:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do
   erb_binding = binding

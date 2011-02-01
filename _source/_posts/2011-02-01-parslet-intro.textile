@@ -117,8 +117,8 @@ end
 
 p case_insensitive('hello').parse('HeLLo')
 
-# What it does is generate this:
-# match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
+What it does is generate this:
+match([h|H]) >> match([e|E]) >> match([l|L]) >> match([l|L]) >> match([o|O])</code></pre>
 This returns me a case insensitive parser that I can directly use to parse the @HeLLo@. Or why not combine it with other parslets?
 <pre class="sh_ruby"><code>p (case_insensitive('hello') >> str(' ') >> str('Florian')).parse('HeLLo Florian')</code></pre>
 
@@ -130,16 +130,12 @@ As you can see, it's not just able to parse text and ruby expressions (@<%= ruby
 
 Now we'll have a look at the transformer that will spit out rendered text:
 <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do
-  
   erb_binding = binding
-  
   rule(:code => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding); '' }  
   rule(:expression => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding) }
   rule(:comment => { :ruby => simple(:ruby) }) { '' }
-  
   rule(:text => simple(:text)) { text }
   rule(:text => sequence(:texts)) { texts.join }
-  
 end</code></pre>
 Ignore for now the part where bindings are used.
 
@@ -164,13 +160,9 @@ If you want the transformer rules to remember values in between transformations,
 
 I can show you the way I did it with the ERB transformer. I'm sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we'll have a look at this:
 <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do
-  
   erb_binding = binding
-  
   rule(:code => { :ruby => simple(:ruby) }) { eval(ruby, erb_binding); '' }
-  
   ...
-  
 end</code></pre>
 
 What happens here?

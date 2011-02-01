@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T21:35:25+01:00</updated>
+ <updated>2011-02-01T21:37:07+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -95,27 +95,22 @@ Running a parse on a subrule works because a parser is composed of &lt;em&gt;Par
   end
 end&lt;/p&gt;
 &lt;p&gt;p case_insensitive(&amp;#8216;hello&amp;#8217;).parse(&amp;#8216;HeLLo&amp;#8217;)&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;What it does is generate this:&lt;/li&gt;
-	&lt;li&gt;match([h|H]) &amp;gt;&amp;gt; match([e|E]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([o|O])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What it does is generate this:
+match([h|H]) &amp;gt;&amp;gt; match([e|E]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([o|O])&lt;/code&gt;&lt;/pre&gt;
 This returns me a case insensitive parser that I can directly use to parse the &lt;code&gt;HeLLo&lt;/code&gt;. Or why not combine it with other parslets?
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p (case_insensitive('hello') &amp;gt;&amp;gt; str(' ') &amp;gt;&amp;gt; str('Florian')).parse('HeLLo Florian')&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p (case_insensitive('hello') &amp;gt;&amp;gt; str(' ') &amp;gt;&amp;gt; str('Florian')).parse('HeLLo Florian')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;h2&gt;Transforming&lt;/h2&gt;
 &lt;p&gt;Can you take a quick look at the &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; parser&lt;/a&gt;, copy it into a script and give it a go?&lt;/p&gt;
 &lt;p&gt;As you can see, it&amp;#8217;s not just able to parse text and ruby expressions (&lt;code&gt;&amp;lt;%= ruby expression %&amp;gt;&lt;/code&gt;), but also comments (&lt;code&gt;&amp;lt;%# comment %&amp;gt;&lt;/code&gt;) and normal ruby code (&lt;code&gt;&amp;lt;% ruby %&amp;gt;&lt;/code&gt;) that both will not be inserted into the rendered text.&lt;/p&gt;
 &lt;p&gt;Now we&amp;#8217;ll have a look at the transformer that will spit out rendered text:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do&lt;/p&gt;
-erb_binding = binding
-
-rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); &amp;#8217;&amp;#8217; }
-rule(:expression =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding) }
-rule(:comment =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { &amp;#8217;&amp;#8217; }
-
-rule(:text =&amp;gt; simple(:text)) { text }
-rule(:text =&amp;gt; sequence(:texts)) { texts.join }
-
-&lt;p&gt;end&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do
+  erb_binding = binding
+  rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }  
+  rule(:expression =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding) }
+  rule(:comment =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { '' }
+  rule(:text =&amp;gt; simple(:text)) { text }
+  rule(:text =&amp;gt; sequence(:texts)) { texts.join }
+end&lt;/code&gt;&lt;/pre&gt;
 Ignore for now the part where bindings are used.&lt;/p&gt;
 &lt;p&gt;A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text =&amp;gt; sequence(:texts)) { texts.join }&lt;/code&gt;&lt;/pre&gt;
@@ -132,14 +127,11 @@ It gets a little more complicated. If you look at line 1, you see that &lt;code&
 &lt;h2&gt;Remembering State&lt;/h2&gt;
 &lt;p&gt;If you want the transformer rules to remember values in between transformations, you&amp;#8217;ll need state of some sort.&lt;/p&gt;
 &lt;p&gt;I can show you the way I did it with the &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; transformer. I&amp;#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&amp;#8217;ll have a look at this:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do&lt;/p&gt;
-erb_binding = binding
-
-rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); &amp;#8217;&amp;#8217; }
-
-&amp;#8230;
-
-&lt;p&gt;end&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do
+  erb_binding = binding
+  rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }
+  ...
+end&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;What happens here?
 First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;:
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;erb_binding = binding&lt;/code&gt;&lt;/pre&gt;

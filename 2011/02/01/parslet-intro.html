@@ -113,15 +113,14 @@
       Running a parse on a subrule works because a parser is composed of <em>Parslets</em>, or parser atoms, hence the name. <code>str('hello')</code> is one of these atoms, and so is a sequence of atoms, like <code>str('no') &gt;&gt; str('kidding')</code>. And you can do a parse directly with one of these, if you want, <code>(str('Hello') | str('Hi')).parse('Hello')</code> as we have seen before.</p>
       <p>Did I say it&#8217;s pure Ruby? Why, yes! Let&#8217;s harness the power of Ruby, and combine it with the power of Parslet parser atoms.</p>
       <p>I need a parser that is case insensitive regarding the string.
-      <pre class="sh_ruby"><code>def case_insensitive string&#x000A;  chars = string.split //&#x000A;  chars.inject(str('')) do |parslet, char|&#x000A;    parslet &gt;&gt; match("[#{char.downcase}|#{char.upcase}]")&#x000A;  end&#x000A;end</p>&#x000A;<p>p case_insensitive(&#8216;hello&#8217;).parse(&#8216;HeLLo&#8217;)</p>&#x000A;<ol>&#x000A;	<li>What it does is generate this:</li>&#x000A;	<li>match([h|H]) &gt;&gt; match([e|E]) &gt;&gt; match([l|L]) &gt;&gt; match([l|L]) &gt;&gt; match([o|O])</code></pre>
+      <pre class="sh_ruby"><code>def case_insensitive string&#x000A;  chars = string.split //&#x000A;  chars.inject(str('')) do |parslet, char|&#x000A;    parslet &gt;&gt; match("[#{char.downcase}|#{char.upcase}]")&#x000A;  end&#x000A;end</p>&#x000A;<p>p case_insensitive(&#8216;hello&#8217;).parse(&#8216;HeLLo&#8217;)</p>&#x000A;<p>What it does is generate this:&#x000A;match([h|H]) &gt;&gt; match([e|E]) &gt;&gt; match([l|L]) &gt;&gt; match([l|L]) &gt;&gt; match([o|O])</code></pre>
       This returns me a case insensitive parser that I can directly use to parse the <code>HeLLo</code>. Or why not combine it with other parslets?
-      <pre class="sh_ruby"><code>p (case_insensitive('hello') &gt;&gt; str(' ') &gt;&gt; str('Florian')).parse('HeLLo Florian')</code></pre></li>
-      </ol>
+      <pre class="sh_ruby"><code>p (case_insensitive('hello') &gt;&gt; str(' ') &gt;&gt; str('Florian')).parse('HeLLo Florian')</code></pre></p>
       <h2>Transforming</h2>
       <p>Can you take a quick look at the <a href="https://github.com/kschiess/parslet/blob/master/example/erb.rb"><span class="caps">ERB</span> parser</a>, copy it into a script and give it a go?</p>
       <p>As you can see, it&#8217;s not just able to parse text and ruby expressions (<code>&lt;%= ruby expression %&gt;</code>), but also comments (<code>&lt;%# comment %&gt;</code>) and normal ruby code (<code>&lt;% ruby %&gt;</code>) that both will not be inserted into the rendered text.</p>
       <p>Now we&#8217;ll have a look at the transformer that will spit out rendered text:
-      <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do</p>&#x000A;erb_binding = binding&#x000A;&#x000A;rule(:code =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding); &#8217;&#8217; }&#x000A;rule(:expression =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding) }&#x000A;rule(:comment =&gt; { :ruby =&gt; simple(:ruby) }) { &#8217;&#8217; }&#x000A;&#x000A;rule(:text =&gt; simple(:text)) { text }&#x000A;rule(:text =&gt; sequence(:texts)) { texts.join }&#x000A;&#x000A;<p>end</code></pre>
+      <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do&#x000A;  erb_binding = binding&#x000A;  rule(:code =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }  &#x000A;  rule(:expression =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding) }&#x000A;  rule(:comment =&gt; { :ruby =&gt; simple(:ruby) }) { '' }&#x000A;  rule(:text =&gt; simple(:text)) { text }&#x000A;  rule(:text =&gt; sequence(:texts)) { texts.join }&#x000A;end</code></pre>
       Ignore for now the part where bindings are used.</p>
       <p>A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
       <pre class="sh_ruby"><code>rule(:text =&gt; sequence(:texts)) { texts.join }</code></pre>
@@ -135,7 +134,7 @@
       <h2>Remembering State</h2>
       <p>If you want the transformer rules to remember values in between transformations, you&#8217;ll need state of some sort.</p>
       <p>I can show you the way I did it with the <span class="caps">ERB</span> transformer. I&#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&#8217;ll have a look at this:
-      <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do</p>&#x000A;erb_binding = binding&#x000A;&#x000A;rule(:code =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding); &#8217;&#8217; }&#x000A;&#x000A;&#8230;&#x000A;&#x000A;<p>end</code></pre></p>
+      <pre class="sh_ruby"><code>evaluator = Parslet::Transform.new do&#x000A;  erb_binding = binding&#x000A;  rule(:code =&gt; { :ruby =&gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }&#x000A;  ...&#x000A;end</code></pre></p>
       <p>What happens here?
       First, I assign the binding of the block to <code>erb_binding</code>:
       <pre class="sh_ruby"><code>erb_binding = binding</code></pre>

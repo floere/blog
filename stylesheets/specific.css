@@ -30,3 +30,5 @@ div.gist { font-size: 0.9em; }
 div.gist a:before { content: ""; }
 
 div.categories { font-size: 0.9em; color: #777777; }
+
+pre.sh_sourceCode { background-color: #efefef; }

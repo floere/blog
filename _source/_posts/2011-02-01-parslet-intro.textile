@@ -197,5 +197,6 @@ So we've seen
 # that Parslet harnishes Ruby's powers for success and profit.
 # that it offers a parser constructor AND a transformer constructor, which is a good thing.
 # that trying it yourself is fun and a piece of cake.
+# And: That using bindings is crazy fun when used at the right place :)
 
 Hope you learnt something new :)

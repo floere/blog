@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T22:08:59+01:00</updated>
+ <updated>2011-02-01T22:09:49+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -154,6 +154,7 @@ Here I return whatever the evaluation returned to be inserted into the rendered 
 	&lt;li&gt;that Parslet harnishes Ruby&amp;#8217;s powers for success and profit.&lt;/li&gt;
 	&lt;li&gt;that it offers a parser constructor &lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt; a transformer constructor, which is a good thing.&lt;/li&gt;
 	&lt;li&gt;that trying it yourself is fun and a piece of cake.&lt;/li&gt;
+	&lt;li&gt;And: That using bindings is crazy fun when used at the right place :)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Hope you learnt something new :)&lt;/p&gt;</content>
    

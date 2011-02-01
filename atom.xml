@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T23:32:35+01:00</updated>
+ <updated>2011-02-01T23:36:00+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -151,107 +151,124 @@ a &lt;code&gt;FrenchTransformer&lt;/code&gt; could be used to transform this int
 &lt;h2&gt;Simple Example&lt;/h2&gt;
 &lt;p&gt;Let&amp;#8217;s consider a simple example. It is a subpart of the &lt;a href=&quot;http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/classes/ERB.html&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt;&lt;/a&gt; &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;parser&amp;nbsp;and&amp;nbsp;transformer&lt;/a&gt;  that I wrote. &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; is a Ruby templating language by Seki Masatoshi.&lt;/p&gt;
 &lt;p&gt;We&amp;#8217;ll look at the whole thing later on.&lt;/p&gt;
-&lt;p&gt;A simple &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; example would be &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; with a Ruby expression inside:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Hello, my name is&amp;lt;%= name &amp;gt;!&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;A simple &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; example would be &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; with a Ruby expression inside:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Hello, my name is&amp;lt;%= name &amp;gt;!&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;What we get out of the parser is the parts that are text, and the parts that are ruby code.
-So with parslet we&amp;#8217;d write this:
+So with parslet we&amp;#8217;d write this:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'parslet'
+
 class ErbParser &amp;lt; Parslet::Parser
+  
   rule(:ruby_expression) { (str('%&amp;gt;').absnt? &amp;gt;&amp;gt; any).repeat.as(:ruby) }
   rule(:erb_with_tags) { str('&amp;lt;%=') &amp;gt;&amp;gt; ruby_expression &amp;gt;&amp;gt; str('%&amp;gt;') }
+  
   rule(:text) { (str('&amp;lt;%=').absnt? &amp;gt;&amp;gt; any).repeat(1).as(:text) }
+  
   rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }
   root(:text_with_ruby_expressions)
 end
-p ErbParser.new.parse(&quot;Hello, my name is&amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
-&lt;p&gt;Just run it :) What you get is a nice semantic tree:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[{:text=&amp;gt;&quot;Hello, my name is&quot;}, {:ruby=&amp;gt;&quot; name &quot;}, {:text=&amp;gt;&quot;!&quot;}]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
-&lt;p&gt;Let me go through it in steps. I&amp;#8217;ve found out that it is easiest for me to go top-down to define a parser. I hope this suits you too.&lt;/p&gt;
-&lt;p&gt;We define the starting point, aka the &lt;code&gt;root&lt;/code&gt; of the parser with the &lt;code&gt;root&lt;/code&gt; method:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;root(:text_with_ruby_expressions)&lt;/code&gt;&lt;/pre&gt;
-This just says, start with the &lt;code&gt;rule(:text_with_ruby_expressions)&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;So, now what we know about our simple-&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; language is that it is basically a sequence of text and ruby expressions, repeating. So let&amp;#8217;s define that:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }&lt;/code&gt;&lt;/pre&gt;
-So either we have text OR (&lt;code&gt;|&lt;/code&gt;) a ruby expression. And we have that in a repeating fashion. Just as the rule says.&lt;/p&gt;
-&lt;p&gt;Let&amp;#8217;s look at the text rule we just used:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text) { (str('&amp;lt;%=').absnt? &amp;gt;&amp;gt; any).repeat(1).as(:text) }&lt;/code&gt;&lt;/pre&gt;
-This means: As long as you don&amp;#8217;t encounter a &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; start tag (&lt;code&gt;&amp;lt;%=&lt;/code&gt;), keep taking everything as text. This will stop if it encounters a &lt;code&gt;&amp;lt;%=&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;At which point Parslet will try to apply the other rule:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:erb_with_tags) { str('&amp;lt;%=') &amp;gt;&amp;gt; ruby_expression &amp;gt;&amp;gt; str('%&amp;gt;') }&lt;/code&gt;&lt;/pre&gt;
-This rule just matches anything with erb start &lt;code&gt;&amp;lt;%=&lt;/code&gt; and end tags &lt;code&gt;%&amp;gt;&lt;/code&gt; around it, with a ruby expression inside.&lt;/p&gt;
-&lt;p&gt;The ruby expression is simple:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:ruby_expression) { (str('%&amp;gt;').absnt? &amp;gt;&amp;gt; any).repeat.as(:ruby) }&lt;/code&gt;&lt;/pre&gt;
-We know this already: As long as you don&amp;#8217;t encounter an &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; end tag, keep consuming as ruby code.&lt;/p&gt;
-&lt;p&gt;Got it?&lt;/p&gt;
-&lt;p&gt;Again, if you run it, you get:
+
+p ErbParser.new.parse(&quot;Hello, my name is&amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Just run it :) What you get is a nice semantic tree:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[{:text=&amp;gt;&quot;Hello, my name is&quot;}, {:ruby=&amp;gt;&quot; name &quot;}, {:text=&amp;gt;&quot;!&quot;}]&lt;/code&gt;&lt;/pre&gt;
-Niiice.&lt;/p&gt;
+&lt;p&gt;Let me go through it in steps. I&amp;#8217;ve found out that it is easiest for me to go top-down to define a parser. I hope this suits you too.&lt;/p&gt;
+&lt;p&gt;We define the starting point, aka the &lt;code&gt;root&lt;/code&gt; of the parser with the &lt;code&gt;root&lt;/code&gt; method:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;root(:text_with_ruby_expressions)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This just says, start with the &lt;code&gt;rule(:text_with_ruby_expressions)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;So, now what we know about our simple-&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; language is that it is basically a sequence of text and ruby expressions, repeating. So let&amp;#8217;s define that:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text_with_ruby_expressions) { (text | erb_with_tags).repeat }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So either we have text OR (&lt;code&gt;|&lt;/code&gt;) a ruby expression. And we have that in a repeating fashion. Just as the rule says.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s look at the text rule we just used:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text) { (str('&amp;lt;%=').absnt? &amp;gt;&amp;gt; any).repeat(1).as(:text) }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This means: As long as you don&amp;#8217;t encounter a &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; start tag (&lt;code&gt;&amp;lt;%=&lt;/code&gt;), keep taking everything as text. This will stop if it encounters a &lt;code&gt;&amp;lt;%=&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;At which point Parslet will try to apply the other rule:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:erb_with_tags) { str('&amp;lt;%=') &amp;gt;&amp;gt; ruby_expression &amp;gt;&amp;gt; str('%&amp;gt;') }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This rule just matches anything with erb start &lt;code&gt;&amp;lt;%=&lt;/code&gt; and end tags &lt;code&gt;%&amp;gt;&lt;/code&gt; around it, with a ruby expression inside.&lt;/p&gt;
+&lt;p&gt;The ruby expression is simple:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:ruby_expression) { (str('%&amp;gt;').absnt? &amp;gt;&amp;gt; any).repeat.as(:ruby) }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We know this already: As long as you don&amp;#8217;t encounter an &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; end tag, keep consuming as ruby code.&lt;/p&gt;
+&lt;p&gt;Got it?&lt;/p&gt;
+&lt;p&gt;Again, if you run it, you get:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[{:text=&amp;gt;&quot;Hello, my name is&quot;}, {:ruby=&amp;gt;&quot; name &quot;}, {:text=&amp;gt;&quot;!&quot;}]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Niiice.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s not think about the transform step for a second and look at some of the good shit.&lt;/p&gt;
 &lt;h2&gt;Goodies that will blow your mind.&lt;/h2&gt;
-&lt;p&gt;Parslet doesn&amp;#8217;t force you to use a class. It&amp;#8217;s totally ok to just do this:
+&lt;p&gt;Parslet doesn&amp;#8217;t force you to use a class. It&amp;#8217;s totally ok to just do this:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;include Parslet
 parser = (str('Hello') | str('Hi')).as(:greeting)
-p parser.parse('Hello')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
-&lt;p&gt;In Parslet, you can run the parser with a subset of its rules:
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;&amp;lt;%= name %&amp;gt;&quot;)&lt;/code&gt;&lt;/pre&gt; while &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;Hello, &amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt; would fail since the &lt;code&gt;erb_with_tags&lt;/code&gt; rule just covers text which starts with &lt;code&gt;&amp;lt;%=&lt;/code&gt; and ends with &lt;code&gt;%&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+p parser.parse('Hello')&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In Parslet, you can run the parser with a subset of its rules:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;&amp;lt;%= name %&amp;gt;&quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;while&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p ErbParser.new.erb_with_tags.parse(&quot;Hello, &amp;lt;%= name %&amp;gt;!&quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;would fail since the &lt;code&gt;erb_with_tags&lt;/code&gt; rule just covers text which starts with &lt;code&gt;&amp;lt;%=&lt;/code&gt; and ends with &lt;code&gt;%&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Running a &lt;code&gt;parse&lt;/code&gt; on a subrule works because a parser is composed of &lt;em&gt;Parslets&lt;/em&gt;, or parser atoms, hence the name. &lt;code&gt;str('hello')&lt;/code&gt; is one of these atoms, and so is a sequence of atoms, like &lt;code&gt;str('no') &amp;gt;&amp;gt; str('kidding')&lt;/code&gt;. And you can do a parse directly with one of these, if you want, &lt;code&gt;(str('Hello') | str('Hi')).parse('Hello')&lt;/code&gt; as we have seen before.&lt;/p&gt;
 &lt;p&gt;Did I say it&amp;#8217;s pure Ruby? Why, yes! Let&amp;#8217;s harness the power of Ruby, and combine it with the power of Parslet parser atoms.&lt;/p&gt;
-&lt;p&gt;I need a parser that is case insensitive regarding the string.
+&lt;p&gt;I need a parser that is case insensitive regarding the string.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def case_insensitive string
   chars = string.split //
   chars.inject(str('')) do |parslet, char|
     parslet &amp;gt;&amp;gt; match(&quot;[#{char.downcase}|#{char.upcase}]&quot;)
   end
-end&lt;/p&gt;
-&lt;p&gt;p case_insensitive(&amp;#8216;hello&amp;#8217;).parse(&amp;#8216;HeLLo&amp;#8217;)&lt;/code&gt;&lt;/pre&gt;
-What it does is generate this:
+end
+
+p case_insensitive('hello').parse('HeLLo')&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What it does is generate this:
 &lt;code&gt;match([h|H]) &amp;gt;&amp;gt; match([e|E]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([l|L]) &amp;gt;&amp;gt; match([o|O])&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;This returns me a case insensitive parser that I can directly use to parse the &lt;code&gt;HeLLo&lt;/code&gt;. Or why not combine it with other parslets?
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p (case_insensitive('hello') &amp;gt;&amp;gt; str(' ') &amp;gt;&amp;gt; str('Florian')).parse('HeLLo Florian')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;This returns me a case insensitive parser that I can directly use to parse the &lt;code&gt;HeLLo&lt;/code&gt;. Or why not combine it with other parslets?&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p (case_insensitive('hello') &amp;gt;&amp;gt; str(' ') &amp;gt;&amp;gt; str('Florian')).parse('HeLLo Florian')&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;Transforming&lt;/h2&gt;
 &lt;p&gt;Can you take a quick look at the &lt;a href=&quot;https://github.com/kschiess/parslet/blob/master/example/erb.rb&quot;&gt;&lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; parser&lt;/a&gt;, copy it into a script and give it a go?&lt;/p&gt;
 &lt;p&gt;As you can see, it&amp;#8217;s not just able to parse text and ruby expressions (&lt;code&gt;&amp;lt;%= ruby expression %&amp;gt;&lt;/code&gt;), but also comments (&lt;code&gt;&amp;lt;%# comment %&amp;gt;&lt;/code&gt;) and normal ruby code (&lt;code&gt;&amp;lt;% ruby %&amp;gt;&lt;/code&gt;) that both will not be inserted into the rendered text.&lt;/p&gt;
-&lt;p&gt;Now we&amp;#8217;ll have a look at the transformer that will spit out rendered text:
+&lt;p&gt;Now we&amp;#8217;ll have a look at the transformer that will spit out rendered text:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do
+  
   erb_binding = binding
+  
   rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }  
   rule(:expression =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding) }
   rule(:comment =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { '' }
+  
   rule(:text =&amp;gt; simple(:text)) { text }
   rule(:text =&amp;gt; sequence(:texts)) { texts.join }
+  
 end&lt;/code&gt;&lt;/pre&gt;
-Ignore for now the part where bindings are used.&lt;/p&gt;
-&lt;p&gt;A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,
+&lt;p&gt;Ignore for now the part where bindings are used.&lt;/p&gt;
+&lt;p&gt;A transformer consists of a number of rules. And a rule consists of a part that recognizes structure in the semantic tree, and a block which tells the transformer what to do with the recognized thing. Got it? So this rule,&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:text =&amp;gt; sequence(:texts)) { texts.join }&lt;/code&gt;&lt;/pre&gt;
-recognizes hashes that look like &lt;code&gt;:text =&amp;gt; sequence(:texts)&lt;/code&gt;, sequences of things that are denoted &lt;code&gt;as&lt;/code&gt; text. The identifier &lt;code&gt;:texts&lt;/code&gt; is used in the block where we tell the transformer what to do: &lt;code&gt;{ texts.join }&lt;/code&gt;. So what we do is simple, we just join a sequence of texts together.&lt;/p&gt;
-&lt;p&gt;Another rule, the comment rule,
+&lt;p&gt;recognizes hashes that look like &lt;code&gt;:text =&amp;gt; sequence(:texts)&lt;/code&gt;, sequences of things that are denoted &lt;code&gt;as&lt;/code&gt; text. The identifier &lt;code&gt;:texts&lt;/code&gt; is used in the block where we tell the transformer what to do: &lt;code&gt;{ texts.join }&lt;/code&gt;. So what we do is simple, we just join a sequence of texts together.&lt;/p&gt;
+&lt;p&gt;Another rule, the comment rule,&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:comment =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { '' }&lt;/code&gt;&lt;/pre&gt;
-will return just nothing.&lt;/p&gt;
-&lt;p&gt;Now, if we want to parse and transform something like this:
+&lt;p&gt;will return just nothing.&lt;/p&gt;
+&lt;p&gt;Now, if we want to parse and transform something like this:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;The &amp;lt;% a = 2 %&amp;gt;not printed result of &quot;a = 2&quot;.
 The &amp;lt;%# a = 1 %&amp;gt;not printed non-evaluated comment &quot;a = 1&quot;, see the value of a below.
 The &amp;lt;%= 'nicely' %&amp;gt; printed result.
 The &amp;lt;% b = 3 %&amp;gt;value of a is &amp;lt;%= a %&amp;gt;, and b is &amp;lt;%= b %&amp;gt;.&lt;/code&gt;&lt;/pre&gt;
-It gets a little more complicated. If you look at line 1, you see that &lt;code&gt;a&lt;/code&gt; is given a value of &lt;code&gt;2&lt;/code&gt;. And then we will use that value in line 4, where we put the result of &lt;code&gt;2&lt;/code&gt; into the rendered template. Have you tried it? No? Run it and see :)&lt;/p&gt;
+&lt;p&gt;It gets a little more complicated. If you look at line 1, you see that &lt;code&gt;a&lt;/code&gt; is given a value of &lt;code&gt;2&lt;/code&gt;. And then we will use that value in line 4, where we put the result of &lt;code&gt;2&lt;/code&gt; into the rendered template. Have you tried it? No? Run it and see :)&lt;/p&gt;
 &lt;h2&gt;Remembering State&lt;/h2&gt;
 &lt;p&gt;If you want the transformer rules to remember values in between transformations – like the &lt;code&gt;a&lt;/code&gt; that is set to &lt;code&gt;2&lt;/code&gt;, above, you&amp;#8217;ll need state of some sort.&lt;/p&gt;
-&lt;p&gt;I can show you the way I did it with the &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; transformer. I&amp;#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&amp;#8217;ll have a look at this:
+&lt;p&gt;I can show you the way I did it with the &lt;span class=&quot;caps&quot;&gt;ERB&lt;/span&gt; transformer. I&amp;#8217;m sure you can think of many others that are perhaps safer, more powerful, or simply cleaner. But for now, we&amp;#8217;ll have a look at this:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;evaluator = Parslet::Transform.new do
+  
   erb_binding = binding
+  
   rule(:code =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding); '' }
+  
   ...
-end&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+
+end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;What happens here?
-First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;:
+First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;erb_binding = binding&lt;/code&gt;&lt;/pre&gt;
-This is the object where we will safe the state.&lt;/p&gt;
+&lt;p&gt;This is the object where we will safe the state.&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s a good thing for me that the &lt;code&gt;rule&lt;/code&gt; method uses a block to define what to do when encountering a rule. Why? Well, since it is a block, the local variable &lt;code&gt;erb_binding&lt;/code&gt; is bound in the context of the block, which means that I have easy access to it in &lt;code&gt;{ eval(ruby, erb_binding); '' }&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;So what I do with
+&lt;p&gt;So what I do with&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;eval(ruby, erb_binding); ''&lt;/code&gt;&lt;/pre&gt;
-is: Evaluate the code piece that I get in the variable ruby, and evaluate it with the binding I have saved. Then, I return an empty string since &lt;code&gt;&amp;lt;% ruby code %&amp;gt;&lt;/code&gt; should not write anything into the resulting rendered template.&lt;/p&gt;
-&lt;p&gt;Not so in the expression:
+&lt;p&gt;is: Evaluate the code piece that I get in the variable ruby, and evaluate it with the binding I have saved. Then, I return an empty string since &lt;code&gt;&amp;lt;% ruby code %&amp;gt;&lt;/code&gt; should not write anything into the resulting rendered template.&lt;/p&gt;
+&lt;p&gt;Not so in the expression:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;rule(:expression =&amp;gt; { :ruby =&amp;gt; simple(:ruby) }) { eval(ruby, erb_binding) }&lt;/code&gt;&lt;/pre&gt;
-Here I return whatever the evaluation returned to be inserted into the rendered result.&lt;/p&gt;
+&lt;p&gt;Here I return whatever the evaluation returned to be inserted into the rendered result.&lt;/p&gt;
 &lt;p&gt;Isn&amp;#8217;t it nice? And between parser and transformer I was able to look at my nice semantic tree, to check that everything is a-ok.&lt;/p&gt;
 &lt;p&gt;Writing tests, as everything is in Ruby, is a breeze, as you can imagine!&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;

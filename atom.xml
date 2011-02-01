@@ -4,22 +4,13 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T22:18:39+01:00</updated>
+ <updated>2011-02-01T22:20:37+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
- 
- <entry>
-   <title>Running Sinatra inside a Ruby Gem</title>
-   <link href="http://blog.absurd.li/2011/02/02/running-sinatra-inside-a-gem.html"/>
-   <updated>2011-02-02T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/02/02/running-sinatra-inside-a-gem</id>
-   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;</content>
-   
- </entry>
  
  <entry>
    <title>Parslet Intro</title>

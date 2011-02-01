@@ -195,7 +195,7 @@ It already has garnered the attention of quite a few excellent Rubyists – the 
 
 So we've seen
 # that Parslet harnishes Ruby's powers for success and profit.
-# that it offers a parser constructor AND a tranformer constructor, which is a good thing.
+# that it offers a parser constructor AND a transformer constructor, which is a good thing.
 # that trying it yourself is fun and a piece of cake.
 
 Hope you learnt something new :)

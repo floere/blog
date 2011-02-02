@@ -118,6 +118,19 @@ rescue LoadError => e
   require 'rain_singing/application/app.rb'
 end</code></pre>
 
+Then, we need to tell rubygems that this gem has an executable:
+
+<pre class="sh_ruby"><code>Gem::Specification.new do |s|
+  
+  ...
+  
+  s.executables = ['rain_singing']
+  s.default_executable = 'rain_singing'
+  
+  ...
+  
+end</code></pre>
+
 After generating your gem with
 
 <pre class="sh_text"><code>$ gem build rain_singing.gemspec</code></pre>

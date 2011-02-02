@@ -87,6 +87,8 @@
       <p>And that&#8217;s already it for the app.</p>
       <p>Now, if you want to define a binary for the gem, put an executable <code>rain_singing</code> file into <code>/bin</code>. Into this file you&#8217;d write:</p>
       <pre class="sh_ruby"><code>#!/usr/bin/env ruby&#x000A;#&#x000A;begin&#x000A;  require 'rain_singing/application/app.rb'&#x000A;rescue LoadError =&gt; e&#x000A;  require 'rubygems'&#x000A;  path = File.expand_path '../../lib', __FILE__&#x000A;  $:.unshift(path) if File.directory?(path) &amp;&amp; !$:.include?(path)&#x000A;  require 'rain_singing/application/app.rb'&#x000A;end</code></pre>
+      <p>Then, we need to tell rubygems that this gem has an executable:</p>
+      <pre class="sh_ruby"><code>Gem::Specification.new do |s|&#x000A;  &#x000A;  ...&#x000A;  &#x000A;  s.executables = ['rain_singing']&#x000A;  s.default_executable = 'rain_singing'&#x000A;  &#x000A;  ...&#x000A;  &#x000A;end</code></pre>
       <p>After generating your gem with</p>
       <pre class="sh_text"><code>$ gem build rain_singing.gemspec</code></pre>
       <p>and installing it with</p>

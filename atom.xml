@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
  <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-01T23:40:13+01:00</updated>
+ <updated>2011-02-02T10:16:37+01:00</updated>
  <id>http://floere.github.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -93,6 +93,17 @@ rescue LoadError =&amp;gt; e
   path = File.expand_path '../../lib', __FILE__
   $:.unshift(path) if File.directory?(path) &amp;amp;&amp;amp; !$:.include?(path)
   require 'rain_singing/application/app.rb'
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, we need to tell rubygems that this gem has an executable:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Gem::Specification.new do |s|
+  
+  ...
+  
+  s.executables = ['rain_singing']
+  s.default_executable = 'rain_singing'
+  
+  ...
+  
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;After generating your gem with&lt;/p&gt;
 &lt;pre class=&quot;sh_text&quot;&gt;&lt;code&gt;$ gem build rain_singing.gemspec&lt;/code&gt;&lt;/pre&gt;

@@ -5,10 +5,10 @@ layout: nil
 <feed xmlns="http://www.w3.org/2005/Atom">
  
  <title>code is code</title>
- <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
- <link href="http://floere.github.com/blog/"/>
+ <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
+ <link href="http://florianhanke.com/blog/"/>
  <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>http://floere.github.com/blog/</id>
+ <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
@@ -19,7 +19,7 @@ layout: nil
    <title>{{ post.title }}</title>
    <link href="http://florianhanke.com/blog{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
-   <id>http://floere.github.com/blog{{ post.id }}</id>
+   <id>http://florianhanke.com/blog{{ post.id }}</id>
    <content type="html">{{ post.content | xml_escape }}</content>
    {% for tag in post.tags %}
      <category scheme="http://edward.oconnor.cx/tags/"

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
  
  <title>code is code</title>
- <link href="http://floere.github.com/blog/atom.xml" rel="self"/>
- <link href="http://floere.github.com/blog/"/>
- <updated>2011-02-04T07:54:37+01:00</updated>
- <id>http://floere.github.com/blog/</id>
+ <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
+ <link href="http://florianhanke.com/blog/"/>
+ <updated>2011-02-04T08:02:25+01:00</updated>
+ <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
@@ -16,7 +16,7 @@
    <title>Running Sinatra inside a Ruby Gem</title>
    <link href="http://florianhanke.com/blog/2011/02/02/running-sinatra-inside-a-gem.html"/>
    <updated>2011-02-02T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/02/02/running-sinatra-inside-a-gem</id>
+   <id>http://florianhanke.com/blog/2011/02/02/running-sinatra-inside-a-gem</id>
    <content type="html">&lt;p&gt;&lt;img src=&quot;/blog/images/sinatra.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;In this post I&amp;#8217;ll show how to have &lt;a href=&quot;http://www.sinatrarb.com/&quot;&gt;Sinatra&lt;/a&gt; run directly from inside a gem. And at the end, how Picky uses this for its advantage.&lt;/p&gt;
@@ -135,7 +135,7 @@ Hello, you're running your web app from a gem!&lt;/code&gt;&lt;/pre&gt;
    <title>Parslet Intro</title>
    <link href="http://florianhanke.com/blog/2011/02/01/parslet-intro.html"/>
    <updated>2011-02-01T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/02/01/parslet-intro</id>
+   <id>http://florianhanke.com/blog/2011/02/01/parslet-intro</id>
    <content type="html">&lt;p&gt;Tonight I wanted to take some time off from Picky to write about &lt;a href=&quot;http://kschiess.github.com/parslet/&quot;&gt;Parslet&lt;/a&gt;, a parser construction library by my dear friend &lt;a href=&quot;http://www.absurd.li/&quot;&gt;Kaspar&amp;nbsp;Schiess&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;tl;dr&lt;/h2&gt;
 &lt;ol&gt;
@@ -300,7 +300,7 @@ First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;
    <title>Searching with Picky&#58; Live Parameters Part 2</title>
    <link href="http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html"/>
    <updated>2011-01-27T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2</id>
+   <id>http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like &lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;unicorn&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;tl;dr&lt;/h2&gt;
@@ -435,7 +435,7 @@ The connection to the parent would already have been closed off by the parent it
    <title>Searching with Picky&#58; Live Parameters Part 1</title>
    <link href="http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1.html"/>
    <updated>2011-01-25T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1</id>
+   <id>http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This time I want to do a two-part post on live parameters.&lt;/p&gt;
 &lt;h2&gt;What are Live Parameters?&lt;/h2&gt;
@@ -468,7 +468,7 @@ The connection to the parent would already have been closed off by the parent it
    <title>Searching with Picky&#58; Data Sources</title>
    <link href="http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources.html"/>
    <updated>2011-01-20T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/01/20/searching-with-picky-data-sources</id>
+   <id>http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is a Data Source in Picky?&lt;/h2&gt;
 &lt;p&gt;A data source is where the indexes get their data. Every index needs a data source.&lt;/p&gt;
@@ -532,7 +532,7 @@ It gets the index and the current category and should &lt;code&gt;yield(id, text
    <title>Searching with Picky&#58; Partial Search</title>
    <link href="http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search.html"/>
    <updated>2011-01-17T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/01/17/searching-with-picky-partial-search</id>
+   <id>http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is a Partial Search?&lt;/h2&gt;
 &lt;p&gt;Partial searching is when the user only enters part of a query word, but the search engine still manages to find the whole word.&lt;/p&gt;
@@ -626,7 +626,7 @@ This will match &lt;code&gt;picky&lt;/code&gt; if you enter just a &lt;code&gt;y
    <title>Searching with Picky&#58; Character&nbsp;Substitution</title>
    <link href="http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters.html"/>
    <updated>2011-01-13T00:00:00+01:00</updated>
-   <id>http://floere.github.com/blog/2011/01/13/searching-with-picky-character-substituters</id>
+   <id>http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is Character Substitution?&lt;/h2&gt;
 &lt;p&gt;Character substitution in a search engine is one of the first steps in the process of sanitizing your users&amp;#8217; input.&lt;/p&gt;
@@ -709,7 +709,7 @@ end
    <title>Speccing methods called in initialize</title>
    <link href="http://florianhanke.com/blog/2010/10/27/speccing-methods-called-in-initialize.html"/>
    <updated>2010-10-27T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/10/27/speccing-methods-called-in-initialize</id>
+   <id>http://florianhanke.com/blog/2010/10/27/speccing-methods-called-in-initialize</id>
    <content type="html">&lt;p&gt;Recently when writing &lt;a href=&quot;http://floere.github.com/picky/&quot;&gt;Picky, the clever small text search engine&lt;/a&gt;, I encountered the following problem: How do I test methods that are called in an initializer?&lt;/p&gt;
 &lt;p&gt;(Of course I could call &lt;code&gt;Testee.new&lt;/code&gt; in the spec and then just call the method again. But what if that method sets a state?)&lt;/p&gt;
 &lt;p&gt;In code:
@@ -721,7 +721,7 @@ end
    <title>Why open sourcing security critical software is important</title>
    <link href="http://florianhanke.com/blog/2010/10/06/why-open-sourcing-security-critical-software-is-important.html"/>
    <updated>2010-10-06T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/10/06/why-open-sourcing-security-critical-software-is-important</id>
+   <id>http://florianhanke.com/blog/2010/10/06/why-open-sourcing-security-critical-software-is-important</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.freedom-to-tinker.com/blog/jhalderm/hacking-dc-internet-voting-pilot&quot;&gt;Why open sourcing security critical software is important&lt;/a&gt;&lt;/p&gt;</content>
    
  </entry>
@@ -730,7 +730,7 @@ end
    <title>Profiling MySQL Queries</title>
    <link href="http://florianhanke.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL.html"/>
    <updated>2010-09-27T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL</id>
+   <id>http://florianhanke.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://dev.mysql.com/tech-resources/articles/using-new-query-profiler.html&quot;&gt;Profiling MySQL Queries&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;In-detail performance measurements for MySQL queries.&lt;/p&gt;</content>
    
@@ -740,7 +740,7 @@ end
    <title>Drawing in the browser</title>
    <link href="http://florianhanke.com/blog/2010/05/22/drawing-in-the-browser.html"/>
    <updated>2010-05-22T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/05/22/drawing-in-the-browser</id>
+   <id>http://florianhanke.com/blog/2010/05/22/drawing-in-the-browser</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://mugtug.com/sketchpad/&quot;&gt;Drawing in the Browser&lt;/a&gt;&lt;/a&gt;
 &amp;#8230; using HTML5.&lt;/p&gt;</content>
    
@@ -750,7 +750,7 @@ end
    <title>Most important Ruby method 2010</title>
    <link href="http://florianhanke.com/blog/2010/05/21/most-important-ruby-method.html"/>
    <updated>2010-05-21T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/05/21/most-important-ruby-method</id>
+   <id>http://florianhanke.com/blog/2010/05/21/most-important-ruby-method</id>
    <content type="html">&lt;p&gt;It&amp;#8217;s &lt;code&gt;squeeze&lt;/code&gt;!
 &lt;script src=&quot;http://gist.github.com/408937.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
    
@@ -760,7 +760,7 @@ end
    <title>Programming Applied Mathematics</title>
    <link href="http://florianhanke.com/blog/2010/05/13/programming-applied-mathematics.html"/>
    <updated>2010-05-13T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/05/13/programming-applied-mathematics</id>
+   <id>http://florianhanke.com/blog/2010/05/13/programming-applied-mathematics</id>
    <content type="html">&lt;p&gt;&lt;code&gt;Programming is one of the most difficult branches of applied mathematics / the poorer mathematicians had better remain pure mathematicians.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;– Edsger W. Dijkstra&lt;/p&gt;
 &lt;p&gt;(via &lt;a href=&quot;http://fuckyeahcomputerscience.tumblr.com/&quot;&gt;fuckyeahcomputerscience&lt;/a&gt;)&lt;/p&gt;</content>
@@ -771,7 +771,7 @@ end
    <title>New programming jargon</title>
    <link href="http://florianhanke.com/blog/2010/05/11/new-programming-jargon.html"/>
    <updated>2010-05-11T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/05/11/new-programming-jargon</id>
+   <id>http://florianhanke.com/blog/2010/05/11/new-programming-jargon</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.globalnerdy.com/2010/05/09/new-programming-jargon/&quot;&gt;New Programming Jargon&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Need to remember Bugfoot and Shrug Report… And especially Duck!&lt;/p&gt;</content>
    
@@ -781,7 +781,7 @@ end
    <title>Fat slows you down</title>
    <link href="http://florianhanke.com/blog/2010/05/09/fat-slows-you-down.html"/>
    <updated>2010-05-09T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/05/09/fat-slows-you-down</id>
+   <id>http://florianhanke.com/blog/2010/05/09/fat-slows-you-down</id>
    <content type="html">&lt;p&gt;Fat slows you down.&lt;/p&gt;
 &lt;p&gt;If you really need speed in Ruby 1.9, consider this example:
 &lt;script src=&quot;http://gist.github.com/395419.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
@@ -792,7 +792,7 @@ end
    <title>You already knew that, right? (Assigning with splats)</title>
    <link href="http://florianhanke.com/blog/2010/04/30/you-already-knew-that-right.html"/>
    <updated>2010-04-30T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/30/you-already-knew-that-right</id>
+   <id>http://florianhanke.com/blog/2010/04/30/you-already-knew-that-right</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/385121.js&quot;&gt;&lt;/script&gt;&lt;p&gt;Referring to the fact that I want to sleep with the splat operator…&lt;/p&gt;</content>
    
  </entry>
@@ -801,7 +801,7 @@ end
    <title>97% is as good as a 100%</title>
    <link href="http://florianhanke.com/blog/2010/04/30/if-you-re-in-a-hurry.html"/>
    <updated>2010-04-30T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/30/if-you-re-in-a-hurry</id>
+   <id>http://florianhanke.com/blog/2010/04/30/if-you-re-in-a-hurry</id>
    <content type="html">&lt;p&gt;&lt;code&gt;If you're in a hurry and you need to pack up your bags and go, 97% is as good as a 100%. The 100% mark does not have the same (show-stopping) magic as 0%, where the difference between 3% and 0% really is important.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;– &lt;a href=&quot;http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html&quot;&gt;Omit Needless Code&lt;/a&gt;&lt;/p&gt;</content>
    
@@ -811,7 +811,7 @@ end
    <title>elements.each(*p)</title>
    <link href="http://florianhanke.com/blog/2010/04/30/elements-each-p.html"/>
    <updated>2010-04-30T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/30/elements-each-p</id>
+   <id>http://florianhanke.com/blog/2010/04/30/elements-each-p</id>
    <content type="html">&lt;p&gt;I often use&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;ary.map(&amp;amp;:upcase)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;instead of&lt;/p&gt;
@@ -826,7 +826,7 @@ end
    <title>Strategy pattern pattern pattern pattern</title>
    <link href="http://florianhanke.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern.html"/>
    <updated>2010-04-29T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern</id>
+   <id>http://florianhanke.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern</id>
    <content type="html">&lt;p&gt;A pattern that I often see cropping up in my &lt;a href=&quot;http://github.com/floere/gosu_extensions&quot;&gt;game framework&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It can be used for configuring subclasses that act according to an order of calls defined in the superclass. How the calls exactly work can be defined in the subclasses (or in an external configuration) using the class methods.&lt;/p&gt;
 &lt;script src=&quot;http://gist.github.com/383325.js&quot;&gt;&lt;/script&gt;</content>
@@ -837,7 +837,7 @@ end
    <title>Mastery is a mindset</title>
    <link href="http://florianhanke.com/blog/2010/04/26/mastery-is-a-mindset.html"/>
    <updated>2010-04-26T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/26/mastery-is-a-mindset</id>
+   <id>http://florianhanke.com/blog/2010/04/26/mastery-is-a-mindset</id>
    <content type="html">&lt;p&gt;&lt;code&gt;Mastery is a mindset.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;From the book &amp;#8220;Drive&amp;#8221;, by Pink.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;d reformulate it as: &amp;#8220;Mastery is neither a question of time, or experience, but a mindset.&amp;#8221;&lt;/p&gt;</content>
@@ -848,7 +848,7 @@ end
    <title>Ruby 1.9 params</title>
    <link href="http://florianhanke.com/blog/2010/04/20/ruby-19-params.html"/>
    <updated>2010-04-20T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/20/ruby-19-params</id>
+   <id>http://florianhanke.com/blog/2010/04/20/ruby-19-params</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/372372.js&quot;&gt;&lt;/script&gt;</content>
    
  </entry>
@@ -857,7 +857,7 @@ end
    <title>Riddle</title>
    <link href="http://florianhanke.com/blog/2010/04/18/riddle.html"/>
    <updated>2010-04-18T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/18/riddle</id>
+   <id>http://florianhanke.com/blog/2010/04/18/riddle</id>
    <content type="html">&lt;p&gt;&lt;code&gt;3735928559&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Why is this number unappealing to vegetarians?&lt;/p&gt;</content>
    
@@ -867,7 +867,7 @@ end
    <title>A hole in the wall</title>
    <link href="http://florianhanke.com/blog/2010/04/18/a-hole-in-the-wall.html"/>
    <updated>2010-04-18T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/18/a-hole-in-the-wall</id>
+   <id>http://florianhanke.com/blog/2010/04/18/a-hole-in-the-wall</id>
    <content type="html">&lt;p&gt;His stool leaned back at a dangerous angle, he displays a pair of jamaica-colored sneakers to the public. Them sticking out of his business hole seems rather odd, considering the sober surroundings of the Niederdorf, or &amp;#8220;nether village&amp;#8221;, as this particular place in Zürich is called.&lt;/p&gt;
 &lt;p&gt;Slurping a botanic tea, idly facebooking and tumbling through the depths, no, shallows of the net, waiting for customers. It&amp;#8217;s been that way now for more than a day, and he starts to wonder if the customer specific context ads are just a fluke.&lt;/p&gt;
 &lt;p&gt;An abrupt &amp;#8220;Oh hey&amp;#8221; directed his way throws him out of the structural code improvements that have been waiting for him at the back of his mind. &amp;#8220;Hey&amp;#8221;, a burly businessman with slightly high blood pressure &amp;#8211; he surmises from the corona of hair still clinging on – asks: &amp;#8220;Are you the man that types?&amp;#8221;, &amp;#8220;Yes, yes I do, I code.&amp;#8221; &amp;#8220;Oh, code. Yeah, sorry, my bad. Well, look, I need a small program that does a few calculations based on this.&amp;#8221;&lt;/p&gt;
@@ -889,7 +889,7 @@ end
    <title>Oh yeah, Amazon?</title>
    <link href="http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark.html"/>
    <updated>2010-04-14T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/14/oh-yeah-amazon-question-mark</id>
+   <id>http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark</id>
    <content type="html">&lt;p&gt;From the latest Newsletter:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;Support for Session Stickiness in Elastic Load Balancing Amazon Elastic MapReduce Introduces Custom Cluster Configuration Option&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;They also have Gurble Blurble Fickleness, introducing Jambawambing Lordle Figuconation Schnorptions.&lt;/p&gt;
@@ -901,7 +901,7 @@ end
    <title>IE didn't get the CSS3 memo?</title>
    <link href="http://florianhanke.com/blog/2010/04/13/ie-didnt-get-the-css3-memo-question-mark.html"/>
    <updated>2010-04-13T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/13/ie-didnt-get-the-css3-memo-question-mark</id>
+   <id>http://florianhanke.com/blog/2010/04/13/ie-didnt-get-the-css3-memo-question-mark</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://kimblim.dk/css-tests/selectors/&quot;&gt;IE didn&amp;#8217;t get the CSS3 memo?&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Or, as is my guess: The code they based the new browsers on was fully untested, totally disorganized, and thus brutally hard to extend. IE9 though, gives one hope.&lt;/p&gt;</content>
    
@@ -911,7 +911,7 @@ end
    <title>Challenged</title>
    <link href="http://florianhanke.com/blog/2010/04/12/challenged.html"/>
    <updated>2010-04-12T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/12/challenged</id>
+   <id>http://florianhanke.com/blog/2010/04/12/challenged</id>
    <content type="html">&lt;p&gt;The framework looms in front of you. Clouds cover the gray sky. You plunge in. Full unit test rewrite, nothing is where it was before, but right: The mailbox is in front of the house, the bathtub is finally in the bath, the fridge contains organic food. There is a pot on the fire, full of juicy stuff.&lt;/p&gt;
 &lt;p&gt;But you are wearing glasses that let you only see 10 centimeters. You set wild eyes on the integration tests: Guests are entering the house, trying to eat from the toilet, sleeping in the oven, or jumping out of windows. It is fail, fail, fail, wherever you happen to look.&lt;/p&gt;
 &lt;p&gt;You are close to despair. Everything is right. Right? You trudge on, teeth gnashing.&lt;/p&gt;
@@ -924,7 +924,7 @@ end
    <title>Stuttering Proc</title>
    <link href="http://florianhanke.com/blog/2010/04/07/stuttering-proc.html"/>
    <updated>2010-04-07T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/07/stuttering-proc</id>
+   <id>http://florianhanke.com/blog/2010/04/07/stuttering-proc</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/358947.js&quot;&gt;&lt;/script&gt;</content>
    
  </entry>
@@ -933,7 +933,7 @@ end
    <title>Reloading a running Ruby application</title>
    <link href="http://florianhanke.com/blog/2010/04/05/reloading-a-running-ruby-application.html"/>
    <updated>2010-04-05T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/05/reloading-a-running-ruby-application</id>
+   <id>http://florianhanke.com/blog/2010/04/05/reloading-a-running-ruby-application</id>
    <content type="html">&lt;p&gt;Here&amp;#8217;s how I do it:
 &lt;script src=&quot;http://gist.github.com/351776.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
    
@@ -943,7 +943,7 @@ end
    <title>Javuby?</title>
    <link href="http://florianhanke.com/blog/2010/04/05/javuby-question-mark.html"/>
    <updated>2010-04-05T00:00:00+02:00</updated>
-   <id>http://floere.github.com/blog/2010/04/05/javuby-question-mark</id>
+   <id>http://florianhanke.com/blog/2010/04/05/javuby-question-mark</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/356227.js&quot;&gt;&lt;/script&gt;</content>
    
  </entry>

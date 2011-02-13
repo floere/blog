@@ -9,7 +9,7 @@ categories:
 ---
 Some time ago, "Kaspar":http://blog.absurd.li/ mentioned to me that it would be nice to have a _gem dependency search_, i.e. where you could search in which gems a gem is used.
 
-So, while working at his place, I just happened to write one, and more.
+So, while working at his place, I just happened to write one.
 
 Take a look: "http://gemsearch.heroku.com/":http://gemsearch.heroku.com/
 

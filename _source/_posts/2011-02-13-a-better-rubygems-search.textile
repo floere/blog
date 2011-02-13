@@ -1,0 +1,96 @@
+---
+published: false
+layout: post
+title: A better Rubygems search
+categories:
+  - ruby
+  - picky
+  - gems
+---
+Some time ago, "Kaspar":http://blog.absurd.li/ mentioned to me that it would be nice to have a _gem dependency search_, i.e. where you could search in which gems a gem is used.
+
+So, while working at his place, I just happened to write one, and more.
+
+Take a look: "http://gemsearch.heroku.com/":http://gemsearch.heroku.com/
+
+(Note, it might take "Heroku":http://heroku.com some time to ramp up the server)
+
+h2. Current state
+
+While the "current search":http://rubygems.org/ isn't bad, it is missing the possibility of searching for an *author*, *where* a gem is used, or which *version* it has. Or any combination thereof, for that matter. Also, it's not too fast.
+
+h2. Building the search
+
+I happened to have a "fast & clever search engine":http://florianhanke.com/picky/ lying around ;) so this is what I used.
+
+How do you go about building or configuring a search engine?
+
+h3. 1. Look at what your goals are.
+
+My goals seemed simple enough.
+
+Each gem should be findable under:
+* Its *name* ("Try it":http://gemsearch.heroku.com/#/?q=heroku_addon).
+* Its *version(s)*, entered like x.y.z, or part thereof, x, x., x.y, x.y. ("try it":http://gemsearch.heroku.com/#/?q=1%2E2%2E).
+* Its *author's names*, or first/last names. Or parts thereof, like "flo" for florian ("try it":http://gemsearch.heroku.com/#/?q=hanke+flo).
+* The gems it is *dependent* upon. universe-parsing depends on parslet, for example ("try it":http://gemsearch.heroku.com/#/?q=needs%3Aparslet).
+* The names, gem name and dependent gem name should be *phonetically findable* ("try it":http://gemsearch.heroku.com/#/?q=rspoc%7E).
+* The authors too should be *phonetically findable* – since who knows how to write "Heinemeier" ("try it":http://gemsearch.heroku.com/#/?q=heynemeyer%7E)?
+* All should be findable without entering the whole thing, like "1.0", or "activesupp" ("try it":http://gemsearch.heroku.com/#/?q=activesupp).
+* One should be able to specify what he is looking for by prefixing e.g. "uses:" in front of the search term ("Try it":http://gemsearch.heroku.com/#/?q=uses%3Apicky). Or others, like "dependency:", "dependencies:", "depends:", "using:", "uses:", "use:", "needs:" (all possible).
+
+h3. 2. Look at the data.
+
+I downloaded the "Marshal":http://rubygems.org/Marshal.4.8.Z file and restructured it into a readable CSV.
+
+Two potential problems I noticed:
+* Gem names are spaced using either an underscore _ or a hyphen -.
+* For the same name, there are sometimes up to three different encodings. Take the gems of "Nicolás Sanguinetti":http://www.twitter.com/godfoca for example. "Try it":http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti and look at the author names.
+
+Those were problematic. What did I do? Compromise, as always – and get the best possible solution.
+
+h3. 3. Marry the goals and the data.
+
+I decided not to tackle the display issues of the second point, encodings, but just the indexing issues. What I do is use "character substitution":/2011/01/13/searching-with-picky-character-substituters.html, to make "Nicolás" findable under "nicolas". This I do by saving the name as "nicolas" in the index, and also perform this character substitution on each search. "Try it with án áccent":http://gemsearch.heroku.com/#/?q=nicol%C3%A1s+sanguinetti.
+
+Deciding on what to with the gem names was a little harder. What is the problem?
+
+The problem is manyfold. For one, searchers should not need to know whether a gem was spaced with an underscore or a hyphen. Actually, I thought it best they be able to find it using a space. So the picky-live gem should be findable by typing "picky live" ("Try it":http://gemsearch.heroku.com/#/?q=picky+live).
+
+However, if you then look for "sinatra", the actual sinatra gem is not the first in the list. This is because I opted to go for an alphabetical ordering.
+
+However, if I need the user to enter the full name (like "anthonymoralez-apn_on_rails"), they might not find it at all.
+
+So, the way I did it now is have the user be able to use spaces when searching and trust people to depend on Picky's combinatorial nature. For example, if you look for sinatra and know that one of the owners is called Tomayko, you'll get to your answer directly: "Search for 'sinatra tomayko'":http://gemsearch.heroku.com/#/?q=sinatra+tomayko.
+
+Generally, the more you can help Picky, the more it will help you right back.
+
+h3. 4. Have users try it and get feedback.
+
+This is where you come in :)
+
+"Check it out":http://gemsearch.heroku.com/, if you haven't yet and tell me what you think "@hanke":http://www.twitter.com/hanke! Do you have ideas for improvement?
+
+How about we use this search on "rubygems.org":http://rubygems.org? :)
+
+h3. A few technical Picky specifics.
+
+A few Picky specifics for insiders:
+* We have 4 data categories: @name, version, author, dependencies@.
+* The partial search "rail*" is done using @Partial::Substring.new(from: 1)@.
+* The similarity "hallou~" is done using: @Similarity::Phonetic.new(2)@.
+* A singly occurring name will be weighted up a little: @:weights => { [:name] => +1 } }@.
+* The author for example can be prefixed with: @qualifiers: [:author, :authors, :written, :writer, :by]@.
+
+h2. Thanks
+
+Many thanks to "Heroku":http://heroku.com for providing the infrastructure!
+
+h2. Conclusions
+
+So we've seen
+# that there's a better way to search Rubygems
+# where you can go to try it
+# how you could go about creating a search
+
+Hope you learnt something new :)

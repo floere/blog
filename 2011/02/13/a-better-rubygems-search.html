@@ -54,11 +54,11 @@
       <h1>A better Rubygems search</h1>
       <div class="categories">ruby / picky / gems</div>
       <p>Some time ago, <a href="http://blog.absurd.li/">Kaspar</a> mentioned to me that it would be nice to have a <em>gem dependency search</em>, i.e. where you could search in which gems a gem is used.</p>
-      <p>So, while working at his place, I just happened to write one, and more.</p>
+      <p>I thought so too, so I wrote one :)</p>
       <p>Take a look: <a href="http://gemsearch.heroku.com/">http://gemsearch.heroku.com/</a></p>
       <p>(Note, it might take <a href="http://heroku.com">Heroku</a> some time to ramp up the server)</p>
       <h2>Current state</h2>
-      <p>While the <a href="http://rubygems.org/">current search</a> isn&#8217;t bad, it is missing the possibility of searching for an <strong>author</strong>, <strong>where</strong> a gem is used, or which <strong>version</strong> it has. Or any combination thereof, for that matter. Also, it&#8217;s not too fast.</p>
+      <p>While the <a href="http://rubygems.org/">current search</a> isn&#8217;t bad, it is missing the possibility of searching for an <strong>author</strong>, <strong>where</strong> a gem is used, or which <strong>version</strong> it has. Or any combination thereof, for that matter.</p>
       <h2>Building the search</h2>
       <p>I happened to have a <a href="http://florianhanke.com/picky/">fast &amp; clever search engine</a> lying around ;) so this is what I used.</p>
       <p>How do you go about building or configuring a search engine?</p>
@@ -76,13 +76,13 @@
       	<li>One should be able to specify what he is looking for by prefixing e.g. &#8220;uses:&#8221; in front of the search term (<a href="http://gemsearch.heroku.com/#/?q=uses%3Apicky">Try it</a>). Or others, like &#8220;dependency:&#8221;, &#8220;dependencies:&#8221;, &#8220;depends:&#8221;, &#8220;using:&#8221;, &#8220;uses:&#8221;, &#8220;use:&#8221;, &#8220;needs:&#8221; (all possible).</li>
       </ul>
       <h3>2. Look at the data.</h3>
-      <p>I downloaded the <a href="http://rubygems.org/Marshal.4.8.Z">Marshal</a> file and restructured it into a readable <span class="caps">CSV</span>.</p>
+      <p>I downloaded the <a href="http://rubygems.org/Marshal.4.8.Z">Marshal</a> file, extracted the relevant data and restructured it into a readable <span class="caps">CSV</span>.</p>
       <p>Two potential problems I noticed:</p>
       <ul>
       	<li>Gem names are spaced using either an underscore _ or a hyphen -.</li>
       	<li>For the same name, there are sometimes up to three different encodings. Take the gems of <a href="http://www.twitter.com/godfoca">Nicolás Sanguinetti</a> for example. <a href="http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti">Try it</a> and look at the author names.</li>
       </ul>
-      <p>Those were problematic. What did I do? Compromise, as always – and get the best possible solution.</p>
+      <p>Those were problematic. What does one do? Try to find an optimal solution.</p>
       <h3>3. Marry the goals and the data.</h3>
       <p>I decided not to tackle the display issues of the second point, encodings, but just the indexing issues. What I do is use <a href="/2011/01/13/searching-with-picky-character-substituters.html">character substitution</a>, to make &#8220;Nicolás&#8221; findable under &#8220;nicolas&#8221;. This I do by saving the name as &#8220;nicolas&#8221; in the index, and also perform this character substitution on each search. <a href="http://gemsearch.heroku.com/#/?q=nicol%C3%A1s+sanguinetti">Try it with án áccent</a>.</p>
       <p>Deciding on what to with the gem names was a little harder. What is the problem?</p>
@@ -93,7 +93,7 @@
       <p>Generally, the more you can help Picky, the more it will help you right back.</p>
       <h3>4. Have users try it and get feedback.</h3>
       <p>This is where you come in :)</p>
-      <p><a href="http://gemsearch.heroku.com/">Check it out</a>, if you haven&#8217;t yet and tell me what you think <a href="http://www.twitter.com/hanke">@hanke</a>! Do you have ideas for improvement?</p>
+      <p><a href="http://gemsearch.heroku.com/">Check it out</a>, if you haven&#8217;t yet and tell me what you think <a href="http://www.twitter.com/hanke">@hanke</a>! Do you have ideas for improvement? (If yes, tell me which so I can improve it)</p>
       <p>How about we use this search on <a href="http://rubygems.org">rubygems.org</a>? :)</p>
       <h3>A few technical Picky specifics.</h3>
       <p>A few Picky specifics for insiders:</p>

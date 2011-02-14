@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: A better Rubygems search
 categories:
@@ -9,7 +8,7 @@ categories:
 ---
 Some time ago, "Kaspar":http://blog.absurd.li/ mentioned to me that it would be nice to have a _gem dependency search_, i.e. where you could search in which gems a gem is used.
 
-So, while working at his place, I just happened to write one.
+I thought so too, so I wrote one :)
 
 Take a look: "http://gemsearch.heroku.com/":http://gemsearch.heroku.com/
 
@@ -17,7 +16,7 @@ Take a look: "http://gemsearch.heroku.com/":http://gemsearch.heroku.com/
 
 h2. Current state
 
-While the "current search":http://rubygems.org/ isn't bad, it is missing the possibility of searching for an *author*, *where* a gem is used, or which *version* it has. Or any combination thereof, for that matter. Also, it's not too fast.
+While the "current search":http://rubygems.org/ isn't bad, it is missing the possibility of searching for an *author*, *where* a gem is used, or which *version* it has. Or any combination thereof, for that matter.
 
 h2. Building the search
 
@@ -41,13 +40,13 @@ Each gem should be findable under:
 
 h3. 2. Look at the data.
 
-I downloaded the "Marshal":http://rubygems.org/Marshal.4.8.Z file and restructured it into a readable CSV.
+I downloaded the "Marshal":http://rubygems.org/Marshal.4.8.Z file, extracted the relevant data and restructured it into a readable CSV.
 
 Two potential problems I noticed:
 * Gem names are spaced using either an underscore _ or a hyphen -.
 * For the same name, there are sometimes up to three different encodings. Take the gems of "Nicolás Sanguinetti":http://www.twitter.com/godfoca for example. "Try it":http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti and look at the author names.
 
-Those were problematic. What did I do? Compromise, as always – and get the best possible solution.
+Those were problematic. What does one do? Try to find an optimal solution.
 
 h3. 3. Marry the goals and the data.
 
@@ -69,7 +68,7 @@ h3. 4. Have users try it and get feedback.
 
 This is where you come in :)
 
-"Check it out":http://gemsearch.heroku.com/, if you haven't yet and tell me what you think "@hanke":http://www.twitter.com/hanke! Do you have ideas for improvement?
+"Check it out":http://gemsearch.heroku.com/, if you haven't yet and tell me what you think "@hanke":http://www.twitter.com/hanke! Do you have ideas for improvement? (If yes, tell me which so I can improve it)
 
 How about we use this search on "rubygems.org":http://rubygems.org? :)
 

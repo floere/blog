@@ -4,13 +4,82 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-13T23:43:17+01:00</updated>
+ <updated>2011-02-14T08:32:01+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>A better Rubygems search</title>
+   <link href="http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html"/>
+   <updated>2011-02-13T00:00:00+01:00</updated>
+   <id>http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search</id>
+   <content type="html">&lt;p&gt;Some time ago, &lt;a href=&quot;http://blog.absurd.li/&quot;&gt;Kaspar&lt;/a&gt; mentioned to me that it would be nice to have a &lt;em&gt;gem dependency search&lt;/em&gt;, i.e. where you could search in which gems a gem is used.&lt;/p&gt;
+&lt;p&gt;I thought so too, so I wrote one :)&lt;/p&gt;
+&lt;p&gt;Take a look: &lt;a href=&quot;http://gemsearch.heroku.com/&quot;&gt;http://gemsearch.heroku.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;(Note, it might take &lt;a href=&quot;http://heroku.com&quot;&gt;Heroku&lt;/a&gt; some time to ramp up the server)&lt;/p&gt;
+&lt;h2&gt;Current state&lt;/h2&gt;
+&lt;p&gt;While the &lt;a href=&quot;http://rubygems.org/&quot;&gt;current search&lt;/a&gt; isn&amp;#8217;t bad, it is missing the possibility of searching for an &lt;strong&gt;author&lt;/strong&gt;, &lt;strong&gt;where&lt;/strong&gt; a gem is used, or which &lt;strong&gt;version&lt;/strong&gt; it has. Or any combination thereof, for that matter.&lt;/p&gt;
+&lt;h2&gt;Building the search&lt;/h2&gt;
+&lt;p&gt;I happened to have a &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;fast &amp;amp; clever search engine&lt;/a&gt; lying around ;) so this is what I used.&lt;/p&gt;
+&lt;p&gt;How do you go about building or configuring a search engine?&lt;/p&gt;
+&lt;h3&gt;1. Look at what your goals are.&lt;/h3&gt;
+&lt;p&gt;My goals seemed simple enough.&lt;/p&gt;
+&lt;p&gt;Each gem should be findable under:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Its &lt;strong&gt;name&lt;/strong&gt; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=heroku_addon&quot;&gt;Try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;Its &lt;strong&gt;version(s)&lt;/strong&gt;, entered like x.y.z, or part thereof, x, x., x.y, x.y. (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=1%2E2%2E&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;Its &lt;strong&gt;author&amp;#8217;s names&lt;/strong&gt;, or first/last names. Or parts thereof, like &amp;#8220;flo&amp;#8221; for florian (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=hanke+flo&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;The gems it is &lt;strong&gt;dependent&lt;/strong&gt; upon. universe-parsing depends on parslet, for example (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=needs%3Aparslet&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;The names, gem name and dependent gem name should be &lt;strong&gt;phonetically findable&lt;/strong&gt; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=rspoc%7E&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;The authors too should be &lt;strong&gt;phonetically findable&lt;/strong&gt; – since who knows how to write &amp;#8220;Heinemeier&amp;#8221; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=heynemeyer%7E&quot;&gt;try it&lt;/a&gt;)?&lt;/li&gt;
+	&lt;li&gt;All should be findable without entering the whole thing, like &amp;#8220;1.0&amp;#8221;, or &amp;#8220;activesupp&amp;#8221; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=activesupp&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
+	&lt;li&gt;One should be able to specify what he is looking for by prefixing e.g. &amp;#8220;uses:&amp;#8221; in front of the search term (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=uses%3Apicky&quot;&gt;Try it&lt;/a&gt;). Or others, like &amp;#8220;dependency:&amp;#8221;, &amp;#8220;dependencies:&amp;#8221;, &amp;#8220;depends:&amp;#8221;, &amp;#8220;using:&amp;#8221;, &amp;#8220;uses:&amp;#8221;, &amp;#8220;use:&amp;#8221;, &amp;#8220;needs:&amp;#8221; (all possible).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;2. Look at the data.&lt;/h3&gt;
+&lt;p&gt;I downloaded the &lt;a href=&quot;http://rubygems.org/Marshal.4.8.Z&quot;&gt;Marshal&lt;/a&gt; file, extracted the relevant data and restructured it into a readable &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Two potential problems I noticed:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Gem names are spaced using either an underscore _ or a hyphen -.&lt;/li&gt;
+	&lt;li&gt;For the same name, there are sometimes up to three different encodings. Take the gems of &lt;a href=&quot;http://www.twitter.com/godfoca&quot;&gt;Nicolás Sanguinetti&lt;/a&gt; for example. &lt;a href=&quot;http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti&quot;&gt;Try it&lt;/a&gt; and look at the author names.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Those were problematic. What does one do? Try to find an optimal solution.&lt;/p&gt;
+&lt;h3&gt;3. Marry the goals and the data.&lt;/h3&gt;
+&lt;p&gt;I decided not to tackle the display issues of the second point, encodings, but just the indexing issues. What I do is use &lt;a href=&quot;/2011/01/13/searching-with-picky-character-substituters.html&quot;&gt;character substitution&lt;/a&gt;, to make &amp;#8220;Nicolás&amp;#8221; findable under &amp;#8220;nicolas&amp;#8221;. This I do by saving the name as &amp;#8220;nicolas&amp;#8221; in the index, and also perform this character substitution on each search. &lt;a href=&quot;http://gemsearch.heroku.com/#/?q=nicol%C3%A1s+sanguinetti&quot;&gt;Try it with án áccent&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Deciding on what to with the gem names was a little harder. What is the problem?&lt;/p&gt;
+&lt;p&gt;The problem is manyfold. For one, searchers should not need to know whether a gem was spaced with an underscore or a hyphen. Actually, I thought it best they be able to find it using a space. So the picky-live gem should be findable by typing &amp;#8220;picky live&amp;#8221; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=picky+live&quot;&gt;Try it&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;However, if you then look for &amp;#8220;sinatra&amp;#8221;, the actual sinatra gem is not the first in the list. This is because I opted to go for an alphabetical ordering.&lt;/p&gt;
+&lt;p&gt;However, if I need the user to enter the full name (like &amp;#8220;anthonymoralez-apn_on_rails&amp;#8221;), they might not find it at all.&lt;/p&gt;
+&lt;p&gt;So, the way I did it now is have the user be able to use spaces when searching and trust people to depend on Picky&amp;#8217;s combinatorial nature. For example, if you look for sinatra and know that one of the owners is called Tomayko, you&amp;#8217;ll get to your answer directly: &lt;a href=&quot;http://gemsearch.heroku.com/#/?q=sinatra+tomayko&quot;&gt;Search for &amp;#8216;sinatra tomayko&amp;#8217;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Generally, the more you can help Picky, the more it will help you right back.&lt;/p&gt;
+&lt;h3&gt;4. Have users try it and get feedback.&lt;/h3&gt;
+&lt;p&gt;This is where you come in :)&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://gemsearch.heroku.com/&quot;&gt;Check it out&lt;/a&gt;, if you haven&amp;#8217;t yet and tell me what you think &lt;a href=&quot;http://www.twitter.com/hanke&quot;&gt;@hanke&lt;/a&gt;! Do you have ideas for improvement? (If yes, tell me which so I can improve it)&lt;/p&gt;
+&lt;p&gt;How about we use this search on &lt;a href=&quot;http://rubygems.org&quot;&gt;rubygems.org&lt;/a&gt;? :)&lt;/p&gt;
+&lt;h3&gt;A few technical Picky specifics.&lt;/h3&gt;
+&lt;p&gt;A few Picky specifics for insiders:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;We have 4 data categories: &lt;code&gt;name, version, author, dependencies&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;The partial search &amp;#8220;rail*&amp;#8221; is done using &lt;code&gt;Partial::Substring.new(from: 1)&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;The similarity &amp;#8220;hallou~&amp;#8221; is done using: &lt;code&gt;Similarity::Phonetic.new(2)&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;A singly occurring name will be weighted up a little: &lt;code&gt;:weights =&amp;gt; { [:name] =&amp;gt; +1 } }&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;The author for example can be prefixed with: &lt;code&gt;qualifiers: [:author, :authors, :written, :writer, :by]&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Thanks&lt;/h2&gt;
+&lt;p&gt;Many thanks to &lt;a href=&quot;http://heroku.com&quot;&gt;Heroku&lt;/a&gt; for providing the infrastructure!&lt;/p&gt;
+&lt;h2&gt;Conclusions&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that there&amp;#8217;s a better way to search Rubygems&lt;/li&gt;
+	&lt;li&gt;where you can go to try it&lt;/li&gt;
+	&lt;li&gt;how you could go about creating a search&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Running Sinatra inside a Ruby Gem</title>

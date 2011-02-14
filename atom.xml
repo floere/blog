@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-14T09:14:09+01:00</updated>
+ <updated>2011-02-14T10:45:11+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -18,7 +18,8 @@
    <updated>2011-02-13T00:00:00+01:00</updated>
    <id>http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search</id>
    <content type="html">&lt;p&gt;Some time ago, &lt;a href=&quot;http://blog.absurd.li/&quot;&gt;Kaspar&lt;/a&gt; mentioned to me that it would be nice to have a &lt;em&gt;gem dependency search&lt;/em&gt;, i.e. where you could search in which gems a gem is used.&lt;/p&gt;
-&lt;p&gt;I thought so too, so I wrote one :)&lt;/p&gt;
+&lt;p&gt;I thought so too, so I wrote one :)
+(and added some more features in the process)&lt;/p&gt;
 &lt;p&gt;Take a look: &lt;a href=&quot;http://gemsearch.heroku.com/&quot;&gt;http://gemsearch.heroku.com/&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;(Note, it might take &lt;a href=&quot;http://heroku.com&quot;&gt;Heroku&lt;/a&gt; some time to ramp up the server)&lt;/p&gt;
 &lt;h2&gt;Current state&lt;/h2&gt;

@@ -81,6 +81,8 @@ A few Picky specifics for insiders:
 * A singly occurring name will be weighted up a little: @:weights => { [:name] => +1 } }@.
 * The author for example can be prefixed with: @qualifiers: [:author, :authors, :written, :writer, :by]@.
 
+Yes, currently I "break the web with hashtags":http://www.isolani.co.uk/blog/javascript/BreakingTheWebWithHashBangs – I'm rewriting it to use @pushState@.
+
 h2. Thanks
 
 Many thanks to "Heroku":http://heroku.com for providing the infrastructure!

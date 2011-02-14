@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-14T08:32:01+01:00</updated>
+ <updated>2011-02-14T08:54:32+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -68,6 +68,7 @@
 	&lt;li&gt;A singly occurring name will be weighted up a little: &lt;code&gt;:weights =&amp;gt; { [:name] =&amp;gt; +1 } }&lt;/code&gt;.&lt;/li&gt;
 	&lt;li&gt;The author for example can be prefixed with: &lt;code&gt;qualifiers: [:author, :authors, :written, :writer, :by]&lt;/code&gt;.&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;Yes, currently I &lt;a href=&quot;http://www.isolani.co.uk/blog/javascript/BreakingTheWebWithHashBangs&quot;&gt;break the web with hashtags&lt;/a&gt; – I&amp;#8217;m rewriting it to use &lt;code&gt;pushState&lt;/code&gt;.&lt;/p&gt;
 &lt;h2&gt;Thanks&lt;/h2&gt;
 &lt;p&gt;Many thanks to &lt;a href=&quot;http://heroku.com&quot;&gt;Heroku&lt;/a&gt; for providing the infrastructure!&lt;/p&gt;
 &lt;h2&gt;Conclusions&lt;/h2&gt;

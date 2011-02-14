@@ -38,6 +38,10 @@ Each gem should be findable under:
 * All should be findable without entering the whole thing, like "1.0", or "activesupp" ("try it":http://gemsearch.heroku.com/#/?q=activesupp).
 * One should be able to specify what he is looking for by prefixing e.g. "uses:" in front of the search term ("Try it":http://gemsearch.heroku.com/#/?q=uses%3Apicky). Or others, like "dependency:", "dependencies:", "depends:", "using:", "uses:", "use:", "needs:" (all possible).
 
+I leave out the description for now, as it requires quite a bit of thinking and tinkering.
+
+With the goals defined...
+
 h3. 2. Look at the data.
 
 I downloaded the "Marshal":http://rubygems.org/Marshal.4.8.Z file, extracted the relevant data and restructured it into a readable CSV.

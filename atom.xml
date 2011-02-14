@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-14T08:54:32+01:00</updated>
+ <updated>2011-02-14T09:14:09+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -39,6 +39,8 @@
 	&lt;li&gt;All should be findable without entering the whole thing, like &amp;#8220;1.0&amp;#8221;, or &amp;#8220;activesupp&amp;#8221; (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=activesupp&quot;&gt;try it&lt;/a&gt;).&lt;/li&gt;
 	&lt;li&gt;One should be able to specify what he is looking for by prefixing e.g. &amp;#8220;uses:&amp;#8221; in front of the search term (&lt;a href=&quot;http://gemsearch.heroku.com/#/?q=uses%3Apicky&quot;&gt;Try it&lt;/a&gt;). Or others, like &amp;#8220;dependency:&amp;#8221;, &amp;#8220;dependencies:&amp;#8221;, &amp;#8220;depends:&amp;#8221;, &amp;#8220;using:&amp;#8221;, &amp;#8220;uses:&amp;#8221;, &amp;#8220;use:&amp;#8221;, &amp;#8220;needs:&amp;#8221; (all possible).&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;I leave out the description for now, as it requires quite a bit of thinking and tinkering.&lt;/p&gt;
+&lt;p&gt;With the goals defined&amp;#8230;&lt;/p&gt;
 &lt;h3&gt;2. Look at the data.&lt;/h3&gt;
 &lt;p&gt;I downloaded the &lt;a href=&quot;http://rubygems.org/Marshal.4.8.Z&quot;&gt;Marshal&lt;/a&gt; file, extracted the relevant data and restructured it into a readable &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;Two potential problems I noticed:&lt;/p&gt;

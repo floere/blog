@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-20T15:54:07+01:00</updated>
+ <updated>2011-02-20T17:58:22+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -19,7 +19,7 @@
    <id>http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This post is on reloading indexes by way of signals. So, first let&amp;#8217;s talk a little about signals. Then, in the second half, I talk about reloading the memory index in Picky.&lt;/p&gt;
-&lt;p&gt;Warpzone:&lt;/p&gt;
+&lt;p&gt;Warp 9?&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;&lt;a href=&quot;#signals&quot;&gt;Signals in Ruby&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#oldhandler&quot;&gt;Still calling the old trap handler&lt;/a&gt;&lt;/li&gt;

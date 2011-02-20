@@ -10,7 +10,7 @@ This is a post in the "Picky":http://florianhanke.com/picky/index.html series on
 
 This post is on reloading indexes by way of signals. So, first let's talk a little about signals. Then, in the second half, I talk about reloading the memory index in Picky.
 
-Warpzone:
+Warp 9?
 * "Signals in Ruby":#signals
 * "Still calling the old trap handler":#oldhandler
 * "Reloading the indexes":#reloading

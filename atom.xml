@@ -4,13 +4,31 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-14T10:45:11+01:00</updated>
+ <updated>2011-02-20T11:42:49+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Searching with Picky&#58; Live reloading indexes</title>
+   <link href="http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html"/>
+   <updated>2011-02-20T00:00:00+01:00</updated>
+   <id>http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes</id>
+   <content type="html">&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that reloading indexes in a running Picky server is easy&lt;/li&gt;
+	&lt;li&gt;how you use signals to reload the server&lt;/li&gt;
+	&lt;li&gt;how reloading works in different web servers&lt;/li&gt;
+	&lt;li&gt;that reloading the indexes isn&amp;#8217;t without problems&lt;/li&gt;
+	&lt;li&gt;that a Redis backend is in the works and how this would work&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>A better Rubygems search</title>

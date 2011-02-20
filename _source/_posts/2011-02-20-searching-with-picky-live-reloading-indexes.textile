@@ -1,0 +1,19 @@
+---
+layout: post
+title: Searching with Picky&#58; Live reloading indexes
+categories:
+  - ruby
+  - picky
+  - gems
+---
+
+h2. Conclusion
+
+So we've seen
+# that reloading indexes in a running Picky server is easy
+# how you use signals to reload the server
+# how reloading works in different web servers
+# that reloading the indexes isn't without problems
+# that a Redis backend is in the works and how this would work
+
+Hope you learnt something new!

@@ -26,7 +26,7 @@ h2. tl;dr
 
 h2. What is Redis?
 
-Redis is – taken from the website – an "_open source, advanced key-value store_". But this is not all. It also is a "_data structure server_".
+Redis is – taken from the website – an "_open source, advanced key-value store_". But this is not all. It also is a "_data structure server_". Check it out "on its very nicely done website":http://redis.io/
 
 "But we already have the massively fast in-memory backend. Why Redis?", you scream, indignantly.
 

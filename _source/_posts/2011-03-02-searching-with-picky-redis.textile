@@ -82,6 +82,8 @@ The Redis backend implementation in Picky is not yet customizable. This means th
 # Returned entry ids are always strings, even when they were integers going in. You'll have to convert them back.
 # Redis and Memory indexes cannot (yet) be mixed and matched. So this isn't possible: @Query::Full.new(redis_index, memory_index)@. Picky will notify you if you try to do so, so no worries.
 
+I am focusing on these points in the upcoming 1.5.* versions.
+
 h2. Outlook
 
 One of the next blog posts will look at the performance differences between the Redis backend and the memory backend.

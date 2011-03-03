@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-03T16:15:04+01:00</updated>
+ <updated>2011-03-03T16:16:25+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -70,6 +70,7 @@ $ rake start&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;Returned entry ids are always strings, even when they were integers going in. You&amp;#8217;ll have to convert them back.&lt;/li&gt;
 	&lt;li&gt;Redis and Memory indexes cannot (yet) be mixed and matched. So this isn&amp;#8217;t possible: &lt;code&gt;Query::Full.new(redis_index, memory_index)&lt;/code&gt;. Picky will notify you if you try to do so, so no worries.&lt;/li&gt;
 &lt;/ol&gt;
+&lt;p&gt;I am focusing on these points in the upcoming 1.5.* versions.&lt;/p&gt;
 &lt;h2&gt;Outlook&lt;/h2&gt;
 &lt;p&gt;One of the next blog posts will look at the performance differences between the Redis backend and the memory backend.&lt;/p&gt;
 &lt;p&gt;I can already reveal that the memory backend will be faster. Surprise! ;) The question is: Is Redis so much slower as to be unbearable?&lt;/p&gt;

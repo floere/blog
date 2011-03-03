@@ -1,0 +1,100 @@
+---
+layout: post
+title: Searching with Picky&#58; Redis
+categories:
+  - ruby
+  - picky
+  - gems
+  - redis
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+This post will be a very short introduction on Redis index backends and Picky, and how to configure your indexes to run on Redis.
+
+I intended to do a massive writeup, but since all you do is change 6 characters @Memory@ into 5 different characters @Redis@ it just seemed like a massive overkill.
+
+I admit though that many massive writeups have been done on even smaller changes, like "1.8" -> "1.9" ;)
+
+Ok, so what am I talking about?
+
+h2. tl;dr
+
+# "Redis":http://redis.io/ can now be used in Picky as an index backend.
+# In your config, do @Index::Memory.new@ -> @Index::Redis.new@ and you're set :)
+# Memory and Redis indexes cannot (yet) be mixed and matched.
+# In 1.5.0, Picky uses Redis database 15.
+
+h2. What is Redis?
+
+Redis is – taken from the website – an "_open source, advanced key-value store_". But this is not all. It also is a "_data structure server_".
+
+"But we already have the massively fast in-memory backend. Why Redis?", you scream, indignantly.
+
+h2. Why Redis?
+
+Granted, in-memory indexes in Picky are really fast. But they have a few drawbacks:
+# Relatively slow search engine startup, as the JSON index files need to be loaded into memory. This is especially noticeable if the index is around 12 GB.
+# To restart Unicorn without a hitch you need double the space the in-memory index needs, since Unicorn starts up a second master in parallel to the old one.
+# They need to be reloaded to be updated (see last blog post).
+
+I haven't had any problems with that, but I can see the problem. Hence, Redis.
+
+h2. How do you use Redis indexes?
+
+Looking at the configuration that the scaffolding generates, you see that it uses an @Index::Memory@ called books:
+
+<pre class="sh_ruby"><code>books_index = Index::Memory.new :books, Sources::CSV.new(:title, :author, file: 'app/library.csv')</code></pre>
+
+If you'd like to use the Redis backend instead, you'll have to change @Memory@ into @Redis@.
+
+<pre class="sh_ruby"><code>books_index = Index::Redis.new :books, Sources::CSV.new(:title, :author, file: 'app/library.csv')</code></pre>
+
+I know. Picky is hard on the typing hand ;)
+
+Uh. That's already it. Welcome Redis. Bye bye, Memory.
+
+What you have to do now is re-index and start Picky:
+
+<pre class="sh_bash"><code>$ rake index
+... indexing output ...
+$ rake start</code></pre>
+
+Or, start Picky, re-index and search while it is indexing, to get some added fun value.
+
+h2. What is the impact of Redis indexes?
+
+Compared to the in-memory index, what are the advantages and disadvantages?
+
+Advantages:
+
+* Faster startup time, especially with a large index.
+* Indexing as-you-search. (No index reloading)
+
+Drawbacks:
+
+* Factors slower.
+
+h2. Caveats
+
+The Redis backend implementation in Picky is not yet customizable. This means that:
+
+# It uses Redis database 15.
+# Returned entry ids are always strings, even when they were integers going in. You'll have to convert them back.
+# Redis and Memory indexes cannot (yet) be mixed and matched. So this isn't possible: @Query::Full.new(redis_index, memory_index)@. Picky will notify you if you try to do so, so no worries.
+
+h2. Outlook
+
+One of the next blog posts will look at the performance differences between the Redis backend and the memory backend.
+
+I can already reveal that the memory backend will be faster. Surprise! ;) The question is: Is Redis so much slower as to be unbearable?
+
+_Music, pregnant with suspense, fills the room: Dun dun DUNNN._
+
+h2. Conclusion
+
+So we've seen
+# what Redis is.
+# that Picky offers two different index backends: In-Memory and Redis.
+# how you use/implement the Redis index backend in your search.
+
+Hope you learnt something new :)

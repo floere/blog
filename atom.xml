@@ -4,13 +4,86 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-02-20T17:58:22+01:00</updated>
+ <updated>2011-03-03T16:12:12+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Searching with Picky&#58; Redis</title>
+   <link href="http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis.html"/>
+   <updated>2011-03-02T00:00:00+01:00</updated>
+   <id>http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;p&gt;This post will be a very short introduction on Redis index backends and Picky, and how to configure your indexes to run on Redis.&lt;/p&gt;
+&lt;p&gt;I intended to do a massive writeup, but since all you do is change 6 characters &lt;code&gt;Memory&lt;/code&gt; into 5 different characters &lt;code&gt;Redis&lt;/code&gt; it just seemed like a massive overkill.&lt;/p&gt;
+&lt;p&gt;I admit though that many massive writeups have been done on even smaller changes, like &amp;#8220;1.8&amp;#8221; &amp;#8594; &amp;#8220;1.9&amp;#8221; ;)&lt;/p&gt;
+&lt;p&gt;Ok, so what am I talking about?&lt;/p&gt;
+&lt;h2&gt;tl;dr&lt;/h2&gt;
+&lt;ol&gt;
+	&lt;li&gt;&lt;a href=&quot;http://redis.io/&quot;&gt;Redis&lt;/a&gt; can now be used in Picky as an index backend.&lt;/li&gt;
+	&lt;li&gt;In your config, do &lt;code&gt;Index::Memory.new&lt;/code&gt; &amp;#8594; &lt;code&gt;Index::Redis.new&lt;/code&gt; and you&amp;#8217;re set :)&lt;/li&gt;
+	&lt;li&gt;Memory and Redis indexes cannot (yet) be mixed and matched.&lt;/li&gt;
+	&lt;li&gt;In 1.5.0, Picky uses Redis database 15.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;What is Redis?&lt;/h2&gt;
+&lt;p&gt;Redis is – taken from the website – an &amp;#8220;&lt;em&gt;open source, advanced key-value store&lt;/em&gt;&amp;#8221;. But this is not all. It also is a &amp;#8220;&lt;em&gt;data structure server&lt;/em&gt;&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;&amp;#8220;But we already have the massively fast in-memory backend. Why Redis?&amp;#8221;, you scream, indignantly.&lt;/p&gt;
+&lt;h2&gt;Why Redis?&lt;/h2&gt;
+&lt;p&gt;Granted, in-memory indexes in Picky are really fast. But they have a few drawbacks:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;Relatively slow search engine startup, as the &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; index files need to be loaded into memory. This is especially noticeable if the index is around 12 GB.&lt;/li&gt;
+	&lt;li&gt;To restart Unicorn without a hitch you need double the space the in-memory index needs, since Unicorn starts up a second master in parallel to the old one.&lt;/li&gt;
+	&lt;li&gt;They need to be reloaded to be updated (see last blog post).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I haven&amp;#8217;t had any problems with that, but I can see the problem. Hence, Redis.&lt;/p&gt;
+&lt;h2&gt;How do you use Redis indexes?&lt;/h2&gt;
+&lt;p&gt;Looking at the configuration that the scaffolding generates, you see that it uses an &lt;code&gt;Index::Memory&lt;/code&gt; called books:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index = Index::Memory.new :books, Sources::CSV.new(:title, :author, file: 'app/library.csv')&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you&amp;#8217;d like to use the Redis backend instead, you&amp;#8217;ll have to change &lt;code&gt;Memory&lt;/code&gt; into &lt;code&gt;Redis&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;books_index = Index::Redis.new :books, Sources::CSV.new(:title, :author, file: 'app/library.csv')&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I know. Picky is hard on the typing hand ;)&lt;/p&gt;
+&lt;p&gt;Uh. That&amp;#8217;s already it. Welcome Redis. Bye bye, Memory.&lt;/p&gt;
+&lt;p&gt;What you have to do now is re-index and start Picky:&lt;/p&gt;
+&lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ rake index
+... indexing output ...
+$ rake start&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or, start Picky, re-index and search while it is indexing, to get some added fun value.&lt;/p&gt;
+&lt;h2&gt;What is the impact of Redis indexes?&lt;/h2&gt;
+&lt;p&gt;Compared to the in-memory index, what are the advantages and disadvantages?&lt;/p&gt;
+&lt;p&gt;Advantages:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Faster startup time, especially with a large index.&lt;/li&gt;
+	&lt;li&gt;Indexing as-you-search. (No index reloading)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Drawbacks:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Factors slower.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Caveats&lt;/h2&gt;
+&lt;p&gt;The Redis backend implementation in Picky is not yet customizable. This means that:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;It uses Redis database 15.&lt;/li&gt;
+	&lt;li&gt;Returned entry ids are always strings, even when they were integers going in. You&amp;#8217;ll have to convert them back.&lt;/li&gt;
+	&lt;li&gt;Redis and Memory indexes cannot (yet) be mixed and matched. So this isn&amp;#8217;t possible: &lt;code&gt;Query::Full.new(redis_index, memory_index)&lt;/code&gt;. Picky will notify you if you try to do so, so no worries.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Outlook&lt;/h2&gt;
+&lt;p&gt;One of the next blog posts will look at the performance differences between the Redis backend and the memory backend.&lt;/p&gt;
+&lt;p&gt;I can already reveal that the memory backend will be faster. Surprise! ;) The question is: Is Redis so much slower as to be unbearable?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Music, pregnant with suspense, fills the room: Dun dun &lt;span class=&quot;caps&quot;&gt;DUNNN&lt;/span&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;what Redis is.&lt;/li&gt;
+	&lt;li&gt;that Picky offers two different index backends: In-Memory and Redis.&lt;/li&gt;
+	&lt;li&gt;how you use/implement the Redis index backend in your search.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Searching with Picky&#58; Live&nbsp;reloading&nbsp;indexes</title>

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-03T16:28:56+01:00</updated>
+ <updated>2011-03-03T16:29:49+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -30,7 +30,7 @@
 	&lt;li&gt;In 1.5.0, Picky uses Redis database 15.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2&gt;What is Redis?&lt;/h2&gt;
-&lt;p&gt;Redis is – taken from the website – an &amp;#8220;&lt;em&gt;open source, advanced key-value store&lt;/em&gt;&amp;#8221;. But this is not all. It also is a &amp;#8220;&lt;em&gt;data structure server&lt;/em&gt;&amp;#8221;. Check it out &lt;a href=&quot;http://redis.io/&quot;&gt;on its very nicely done website&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Redis is – taken from the website – an &amp;#8220;&lt;em&gt;open source, advanced key-value store&lt;/em&gt;&amp;#8221;. But this is not all. It also is a &amp;#8220;&lt;em&gt;data structure server&lt;/em&gt;&amp;#8221;. Check it out &lt;a href=&quot;http://redis.io/&quot;&gt;on its very nicely done website&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&amp;#8220;But we already have the massively fast in-memory backend. Why Redis?&amp;#8221;, you scream, indignantly.&lt;/p&gt;
 &lt;h2&gt;Why Redis?&lt;/h2&gt;
 &lt;p&gt;Granted, in-memory indexes in Picky are really fast. But they have a few drawbacks:&lt;/p&gt;

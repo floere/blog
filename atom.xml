@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-03T16:12:12+01:00</updated>
+ <updated>2011-03-03T16:15:04+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -63,7 +63,7 @@ $ rake start&lt;/code&gt;&lt;/pre&gt;
 &lt;ul&gt;
 	&lt;li&gt;Factors slower.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2&gt;Caveats&lt;/h2&gt;
+&lt;h2&gt;Caveats / Next Versions&lt;/h2&gt;
 &lt;p&gt;The Redis backend implementation in Picky is not yet customizable. This means that:&lt;/p&gt;
 &lt;ol&gt;
 	&lt;li&gt;It uses Redis database 15.&lt;/li&gt;

@@ -74,7 +74,7 @@ Drawbacks:
 
 * Factors slower.
 
-h2. Caveats
+h2. Caveats / Next Versions
 
 The Redis backend implementation in Picky is not yet customizable. This means that:
 

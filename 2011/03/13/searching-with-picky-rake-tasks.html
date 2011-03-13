@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Searching with Picky&#58; Rake Tasks</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Searching with Picky&#58; Rake Tasks</h1>
+      <div class="categories">ruby / picky / rake</div>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
+      <p>We&#8217;ve all have used <code>rake index</code> and <code>rake start</code> to index and then start up a server. But did you know that Picky (and Rake, one of his best buddies) offer quite a few more?</p>
+      <p>Let&#8217;s do a quick <code>rake -T</code>. What we get is:</p>
+      <pre class="sh_bash"><code>$ rake -T&#x000A;rake analyze                         # Analyze your indexes (needs rake index).&#x000A;rake check:index                     # Checks the index files for files that are small or missing.&#x000A;rake index                           # Generate the index (random order).&#x000A;rake index:ordered                   # Takes a snapshot, indexes, and caches in order given.&#x000A;rake index:randomly                  # Takes a snapshot, indexes, and caches in random order.&#x000A;rake index:specific[index,category]  # Generates a specific index from index snapshots (category opt).&#x000A;rake routes                          # Shows the available URL paths&#x000A;rake spec                            # Run all specs in spec directory.&#x000A;rake start                           # Start the server.&#x000A;rake stats                           # Application summary.&#x000A;rake stop                            # Stop the server.&#x000A;rake try[text,index,category]        # Try the given text in the indexer/query (index/category opt).&#x000A;</code></pre>
+      <p>I will give you a quick overview over each of them, with the idea that you know what&#8217;s there and can try them yourself if you need details.</p>
+      <p>Before we begin, a note on the naming: I used to name rake tasks <code>rake subject:verb</code>, but not in Picky, since Picky has a lot of single word tasks. So they&#8217;re named <code>rake verb:subject</code>, as subjects are usually not present.</p>
+      <p>I&#8217;ll start out with the fun ones.</p>
+      <h2>rake try[text,index,category]</h2>
+      <p>Suppose you send a few queries to Picky and you get empty results, even though you know that &#8220;it must be in the indextubes&#8221; aka &#8220;Y U NO <span class="caps">FIND</span>?&#8221;.</p>
+      <p>This is the task for you! It shows you how a text gets split up into tokens, in indexing and querying. Let me show you with an example project of mine:</p>
+      <pre class="sh_bash"><code>$ rake 'try[flöre.hanke]'&#x000A;...&#x000A;"flöre.hanke" is saved in the index as             [:floerehanke]&#x000A;"flöre.hanke" as a query will be preprocessed into [:"floere.hanke"]&#x000A;</code></pre>
+      <p>I used single quotes to remind you that you might need these to escape special characters.</p>
+      <p>So what we see is that if Picky encounters <code>flöre.hanke</code>, it will index it as one word, with the <code>.</code>
+      gone, and the umlaut <code>ö</code> replaced by <code>oe</code>, as per german rules.</p>
+      <p>However, in a query, if someone searches for <code>flöre.hanke</code>, my specific Picky app will not remove the <code>.</code>
+      but use it as given (with the exception of the replaced <code>ö</code>).</p>
+      <p>So, in this case, nothing would be found.</p>
+      <p>The <code>index</code> and <code>category</code> options let you specify with which index and category you&#8217;d like to <code>try</code> them.</p>
+      <p><code>rake try</code> is your first line of defense against nasty configuration bugs.</p>
+      <p>The interesting thing here is that often, the configurations for indexing and querying are similar.
+      The intelligence and beauty lies in <em>where they are not</em>.</p>
+      <h2>rake routes</h2>
+      <p>Remember Rails? That huge framework that was eventually replaced by Sinatra? Same rake task: <code>rake routes</code>.</p>
+      <p>It blasts out all your routes and where they route to:
+      <pre class="sh_bash"><code>$ rake routes&#x000A;...&#x000A;Note: Anchored (✓) regexps are faster, e.g. /\A.*\Z/ or /^.*$/.&#x000A;✓  \A/admin\Z      =&gt; Suckerfish Live Interface (Use the picky-live gem to introspect)&#x000A;✓  \A/books/full\Z =&gt; Query::Full(books, isbn, weights: {[:author]=&gt;6, [:title, :author]=&gt;5})&#x000A;✓  \A/books/live\Z =&gt; Query::Live(books, isbn, weights: {[:author]=&gt;6, [:title, :author]=&gt;5})&#x000A;</code></pre></p>
+      <h2>rake stats</h2>
+      <p>Similar to Rails&#8217; <code>rake stats</code>, but with more steroids. Let me just show you an example:</p>
+      <pre class="sh_bash"><code>$ rake stats&#x000A;...&#x000A;Application(s)&#x000A;  Definition LOC:    81&#x000A;  Indexes defined:    2&#x000A;&#x000A;  BookSearch&#x000A;    Indexing (default):&#x000A;      Removes characters:        /[^äöüa-zA-Z0-9\s\/\-\"\&amp;\.]/&#x000A;      Stopwords:                 /\b(und|and|the|or|on|of|in|is|to|from|as|at|an)\b/&#x000A;      Splits text on:            /[\s\/\-\"\&amp;]/&#x000A;      Removes chars after split: /[\.]/&#x000A;      Normalizes words:          [[/\$(\w+)/i, "\\1 dollars"]]&#x000A;      Rejects tokens?            Yes, see line 10 in app/application.rb&#x000A;      Substitutes chars?         Yes, using CharacterSubstituters::WestEuropean.&#x000A;&#x000A;    Querying (default):&#x000A;      Removes characters:        /[^ïôåñëäöüa-zA-Z0-9\s\/\-\,\&amp;\.\"\~\*\:]/&#x000A;      Stopwords:                 /\b(und|and|the|or|on|of|in|is|to|from|as|at|an)\b/&#x000A;      Splits text on:            /[\s\/\-\,\&amp;]+/&#x000A;      Removes chars after split: //&#x000A;      Normalizes words:          -&#x000A;      Rejects tokens?            -&#x000A;      Substitutes chars?         Yes, using CharacterSubstituters::WestEuropean.&#x000A;&#x000A;    Indexes:&#x000A;      books (Index::Memory):&#x000A;        source:            Sources::DB("SELECT id, title, author, year FROM books", {:file=&gt;"app/db.yml"})&#x000A;        categories:        id, title, author, year&#x000A;        result identifier: "boooookies"&#x000A;&#x000A;      redis (Index::Redis):&#x000A;        source:            Sources::CSV(title, author, isbn, year, publisher, subjects, {:file=&gt;"data/books.csv"})&#x000A;        categories:        title, author, year, publisher, subjects&#x000A;&#x000A;&#x000A;    Routes:&#x000A;      Note: Anchored (✓) regexps are faster, e.g. /\A.*\Z/ or /^.*$/.&#x000A;&#x000A;      ✓  \A/admin\Z      =&gt; Suckerfish Live Interface (Use the picky-live gem to introspect)&#x000A;      ✓  \A/books/full\Z =&gt; Query::Full(books, redis, weights: {[:author]=&gt;6, [:title, :author]=&gt;5)&#x000A;      ✓  \A/books/live\Z =&gt; Query::Live(books, redis, weights: {[:author]=&gt;6, [:title, :author]=&gt;5)&#x000A;      ✓  \A/redis/full\Z =&gt; Query::Full(redis, weights: {[:author]=&gt;6, [:title, :author]=&gt;5)&#x000A;      ✓  \A/redis/live\Z =&gt; Query::Live(redis, weights: {[:author]=&gt;6, [:title, :author]=&gt;5)&#x000A;</code></pre>
+      <p>This is cool, right? In one fell swoop you see who uses what stopwords,
+      which characters aren&#8217;t removed, and how many <span class="caps">LOC</span> your config file has. I love it.</p>
+      <p>The routes are also available separately for just $9.99 … uh, I mean, as <code>rake routes</code>.</p>
+      <h2>rake analyze</h2>
+      <p>This task takes a look at your indexes and tells you a few statistics about them.
+      This is most likely to evolve into something more powerful with each iteration.</p>
+      <p>For now, it gives you this:</p>
+      <pre class="sh_bash"><code>$ rake analyze&#x000A;...&#x000A;Indexes analysis:&#x000A;  books:id::&#x000A;    exact:&#x000A;      Index matches single characters.&#x000A;      There's only one id per key – you'll only get single results.&#x000A;      index key cardinality:                       540&#x000A;      index key length range (avg):               1..3 (2.8)&#x000A;      index ids per key length range (avg):       1..1 (1.0)&#x000A;      weights range (avg):                    0.0..0.0 (0.0)&#x000A;    partial*:&#x000A;      Index matches single characters.&#x000A;      index key cardinality:                       540&#x000A;      index key length range (avg):               1..3 (2.8)&#x000A;      index ids per key length range (avg):     1..111 (2.8)&#x000A;      weights range (avg):                   0.0..4.71 (0.26)&#x000A;&#x000A;  books:title::&#x000A;    exact:&#x000A;      Index matches single characters.&#x000A;      index key cardinality:                      1681&#x000A;      index key length range (avg):              1..19 (7.4)&#x000A;      index ids per key length range (avg):      1..81 (1.9)&#x000A;      weights range (avg):                   0.0..4.39 (0.33)&#x000A;      similarity key length range (avg):          0..4 (3.58)&#x000A;    partial*:&#x000A;      Index matches single characters.&#x000A;      index key cardinality:                      7010&#x000A;      index key length range (avg):              1..19 (6.29)&#x000A;      index ids per key length range (avg):     1..242 (3.08)&#x000A;      weights range (avg):                   0.0..5.49 (0.52)&#x000A;</code></pre>
+      <p>Most of it is probably gibberish. Picky tries to give you useful notes (in color, not visible above) about the indexes,
+      for example the <span style="color:orange;">Index matches single characters</span> (when a single character already gets results) or
+      as a warning <span style="color:red;">There&#8217;s only one id per key – you&#8217;ll only get single results</span>
+      (when you&#8217;ll only get one result id per query – which might not be what you want).</p>
+      <h2>rake index&#8230;</h2>
+      <p>Frankly, if you haven&#8217;t seen <code>rake index</code> yet, you haven&#8217;t tried Picky yet. If this were a flow diagram, you&#8217;d be sent back to the start ;)</p>
+      <p><code>rake index</code> does just that. It indexes.</p>
+      <p>You can tell it in what order to index them by using <code>rake index:ordered</code> and <code>rake index:randomly</code>, which will index the indexes either in the order they were defined or in a random fashion. Default is randomly, but if you&#8217;re not happy with that, tell Picky explicitly.</p>
+      <p>You can tell Picky to just index a single index, or even more specific, a single category inside a given index. Use <code>rake index:specific[books,title]</code>.
+      It also tells you when an index or category is not there:
+      <pre class="sh_bash"><code>$ rake index:specific[books,isbn]&#x000A;...&#x000A;rake aborted!&#x000A;Index category "isbn" not found. Possible categories: "id", "title", "author", "year".</code></pre></p>
+      <h2>rake check&#8230;</h2>
+      <p><code>rake check:index</code> checks the indexes for suspiciously small or nonexistent indexes.</p>
+      <h2>rake start/stop</h2>
+      <p>One starts a Unicorn server, one stops it. I always forget which is which.</p>
+      <p>It&#8217;s not too webserver agnostic yet, but as soon as somebody complains, I will rewrite it to be so – if you&#8217;re not faster with one of these beloved pull requests :)</p>
+      <h2>rake spec</h2>
+      <p>You will be surprised by this one: Runs the specs in the spec directory.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Picky does not just <code>rake index</code> and <code>rake start</code>.</li>
+      	<li>that Picky gives you a few command line tools (apart from the web tools) to find bugs in your config.</li>
+      	<li>that Picky is not just good for picking up girls in bars.</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
+      <br />
+      Previous
+      <a href="/blog/2011/03/02/searching-with-picky-redis.html" title="Previous post: Searching with Picky&#58; Redis">Searching with Picky&#58; Redis</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/03/13/searching-with-picky-rake-tasks';
+          var disqus_url = 'http://florianhanke.com/blog/2011/03/13/searching-with-picky-rake-tasks.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

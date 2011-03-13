@@ -1,0 +1,215 @@
+---
+layout: post
+title: Searching with Picky&#58; Rake Tasks
+categories:
+  - ruby
+  - picky
+  - rake
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+We've all have used @rake index@ and @rake start@ to index and then start up a server. But did you know that Picky (and Rake, one of his best buddies) offer quite a few more?
+
+Let's do a quick @rake -T@. What we get is:
+
+<pre class="sh_bash"><code>$ rake -T
+rake analyze                         # Analyze your indexes (needs rake index).
+rake check:index                     # Checks the index files for files that are small or missing.
+rake index                           # Generate the index (random order).
+rake index:ordered                   # Takes a snapshot, indexes, and caches in order given.
+rake index:randomly                  # Takes a snapshot, indexes, and caches in random order.
+rake index:specific[index,category]  # Generates a specific index from index snapshots (category opt).
+rake routes                          # Shows the available URL paths
+rake spec                            # Run all specs in spec directory.
+rake start                           # Start the server.
+rake stats                           # Application summary.
+rake stop                            # Stop the server.
+rake try[text,index,category]        # Try the given text in the indexer/query (index/category opt).
+</code></pre>
+
+I will give you a quick overview over each of them, with the idea that you know what's there and can try them yourself if you need details.
+
+Before we begin, a note on the naming: I used to name rake tasks @rake subject:verb@, but not in Picky, since Picky has a lot of single word tasks. So they're named @rake verb:subject@, as subjects are usually not present.
+
+I'll start out with the fun ones.
+
+h2. rake try[text,index,category]
+
+Suppose you send a few queries to Picky and you get empty results, even though you know that "it must be in the indextubes" aka "Y U NO FIND?".
+
+This is the task for you! It shows you how a text gets split up into tokens, in indexing and querying. Let me show you with an example project of mine:
+
+<pre class="sh_bash"><code>$ rake 'try[flöre.hanke]'
+...
+"flöre.hanke" is saved in the index as             [:floerehanke]
+"flöre.hanke" as a query will be preprocessed into [:"floere.hanke"]
+</code></pre>
+
+I used single quotes to remind you that you might need these to escape special characters.
+
+So what we see is that if Picky encounters @flöre.hanke@, it will index it as one word, with the @.@
+gone, and the umlaut @ö@ replaced by @oe@, as per german rules.
+
+However, in a query, if someone searches for @flöre.hanke@, my specific Picky app will not remove the @.@
+but use it as given (with the exception of the replaced @ö@).
+
+So, in this case, nothing would be found.
+
+The @index@ and @category@ options let you specify with which index and category you'd like to @try@ them.
+
+@rake try@ is your first line of defense against nasty configuration bugs.
+
+The interesting thing here is that often, the configurations for indexing and querying are similar.
+The intelligence and beauty lies in _where they are not_.
+
+h2. rake routes
+
+Remember Rails? That huge framework that was eventually replaced by Sinatra? Same rake task: @rake routes@.
+
+It blasts out all your routes and where they route to:
+<pre class="sh_bash"><code>$ rake routes
+...
+Note: Anchored (✓) regexps are faster, e.g. /\A.*\Z/ or /^.*$/.
+✓  \A/admin\Z      => Suckerfish Live Interface (Use the picky-live gem to introspect)
+✓  \A/books/full\Z => Query::Full(books, isbn, weights: {[:author]=>6, [:title, :author]=>5})
+✓  \A/books/live\Z => Query::Live(books, isbn, weights: {[:author]=>6, [:title, :author]=>5})
+</code></pre>
+
+h2. rake stats
+
+Similar to Rails' @rake stats@, but with more steroids. Let me just show you an example:
+
+<pre class="sh_bash"><code>$ rake stats
+...
+Application(s)
+  Definition LOC:    81
+  Indexes defined:    2
+
+  BookSearch
+    Indexing (default):
+      Removes characters:        /[^äöüa-zA-Z0-9\s\/\-\"\&\.]/
+      Stopwords:                 /\b(und|and|the|or|on|of|in|is|to|from|as|at|an)\b/
+      Splits text on:            /[\s\/\-\"\&]/
+      Removes chars after split: /[\.]/
+      Normalizes words:          [[/\$(\w+)/i, "\\1 dollars"]]
+      Rejects tokens?            Yes, see line 10 in app/application.rb
+      Substitutes chars?         Yes, using CharacterSubstituters::WestEuropean.
+
+    Querying (default):
+      Removes characters:        /[^ïôåñëäöüa-zA-Z0-9\s\/\-\,\&\.\"\~\*\:]/
+      Stopwords:                 /\b(und|and|the|or|on|of|in|is|to|from|as|at|an)\b/
+      Splits text on:            /[\s\/\-\,\&]+/
+      Removes chars after split: //
+      Normalizes words:          -
+      Rejects tokens?            -
+      Substitutes chars?         Yes, using CharacterSubstituters::WestEuropean.
+
+    Indexes:
+      books (Index::Memory):
+        source:            Sources::DB("SELECT id, title, author, year FROM books", {:file=>"app/db.yml"})
+        categories:        id, title, author, year
+        result identifier: "boooookies"
+
+      redis (Index::Redis):
+        source:            Sources::CSV(title, author, isbn, year, publisher, subjects, {:file=>"data/books.csv"})
+        categories:        title, author, year, publisher, subjects
+
+
+    Routes:
+      Note: Anchored (✓) regexps are faster, e.g. /\A.*\Z/ or /^.*$/.
+
+      ✓  \A/admin\Z      => Suckerfish Live Interface (Use the picky-live gem to introspect)
+      ✓  \A/books/full\Z => Query::Full(books, redis, weights: {[:author]=>6, [:title, :author]=>5)
+      ✓  \A/books/live\Z => Query::Live(books, redis, weights: {[:author]=>6, [:title, :author]=>5)
+      ✓  \A/redis/full\Z => Query::Full(redis, weights: {[:author]=>6, [:title, :author]=>5)
+      ✓  \A/redis/live\Z => Query::Live(redis, weights: {[:author]=>6, [:title, :author]=>5)
+</code></pre>
+
+This is cool, right? In one fell swoop you see who uses what stopwords,
+which characters aren't removed, and how many LOC your config file has. I love it.
+
+The routes are also available separately for just $9.99 … uh, I mean, as @rake routes@.
+
+h2. rake analyze
+
+This task takes a look at your indexes and tells you a few statistics about them.
+This is most likely to evolve into something more powerful with each iteration.
+
+For now, it gives you this:
+
+<pre class="sh_bash"><code>$ rake analyze
+...
+Indexes analysis:
+  books:id::
+    exact:
+      Index matches single characters.
+      There's only one id per key – you'll only get single results.
+      index key cardinality:                       540
+      index key length range (avg):               1..3 (2.8)
+      index ids per key length range (avg):       1..1 (1.0)
+      weights range (avg):                    0.0..0.0 (0.0)
+    partial*:
+      Index matches single characters.
+      index key cardinality:                       540
+      index key length range (avg):               1..3 (2.8)
+      index ids per key length range (avg):     1..111 (2.8)
+      weights range (avg):                   0.0..4.71 (0.26)
+
+  books:title::
+    exact:
+      Index matches single characters.
+      index key cardinality:                      1681
+      index key length range (avg):              1..19 (7.4)
+      index ids per key length range (avg):      1..81 (1.9)
+      weights range (avg):                   0.0..4.39 (0.33)
+      similarity key length range (avg):          0..4 (3.58)
+    partial*:
+      Index matches single characters.
+      index key cardinality:                      7010
+      index key length range (avg):              1..19 (6.29)
+      index ids per key length range (avg):     1..242 (3.08)
+      weights range (avg):                   0.0..5.49 (0.52)
+</code></pre>
+
+Most of it is probably gibberish. Picky tries to give you useful notes (in color, not visible above) about the indexes,
+for example the %{color:orange}Index matches single characters% (when a single character already gets results) or
+as a warning %{color:red}There's only one id per key – you'll only get single results%
+(when you'll only get one result id per query – which might not be what you want).
+
+h2. rake index...
+
+Frankly, if you haven't seen @rake index@ yet, you haven't tried Picky yet. If this were a flow diagram, you'd be sent back to the start ;)
+
+@rake index@ does just that. It indexes.
+
+You can tell it in what order to index them by using @rake index:ordered@ and @rake index:randomly@, which will index the indexes either in the order they were defined or in a random fashion. Default is randomly, but if you're not happy with that, tell Picky explicitly.
+
+You can tell Picky to just index a single index, or even more specific, a single category inside a given index. Use @rake index:specific[books,title]@.
+It also tells you when an index or category is not there:
+<pre class="sh_bash"><code>$ rake index:specific[books,isbn]
+...
+rake aborted!
+Index category "isbn" not found. Possible categories: "id", "title", "author", "year".</code></pre>
+
+h2. rake check...
+
+@rake check:index@ checks the indexes for suspiciously small or nonexistent indexes.
+
+h2. rake start/stop
+
+One starts a Unicorn server, one stops it. I always forget which is which.
+
+It's not too webserver agnostic yet, but as soon as somebody complains, I will rewrite it to be so – if you're not faster with one of these beloved pull requests :)
+
+h2. rake spec
+
+You will be surprised by this one: Runs the specs in the spec directory.
+
+h2. Conclusion
+
+So we've seen
+# that Picky does not just @rake index@ and @rake start@.
+# that Picky gives you a few command line tools (apart from the web tools) to find bugs in your config.
+# that Picky is not just good for picking up girls in bars.
+
+Hope you learnt something new :)

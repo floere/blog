@@ -65,8 +65,8 @@
       <p>This is the task for you! It shows you how a text gets split up into tokens, in indexing and querying. Let me show you with an example project of mine:</p>
       <pre class="sh_bash"><code>$ rake 'try[flöre.hanke]'&#x000A;...&#x000A;"flöre.hanke" is saved in the index as             [:floerehanke]&#x000A;"flöre.hanke" as a query will be preprocessed into [:"floere.hanke"]&#x000A;</code></pre>
       <p>I used single quotes to remind you that you might need these to escape special characters.</p>
-      <p>So what we see is that if Picky encounters <code>flöre.hanke</code>, it will index it as one word, with the <code>.</code>
-      gone, and the umlaut <code>ö</code> replaced by <code>oe</code>, as per german rules.</p>
+      <p>So what we see is that if my specific Picky app encounters <code>flöre.hanke</code>, it will index it as one word, remove <code>.</code>
+      gone, and replaces the umlaut <code>ö</code> with <code>oe</code>, as per german rules.</p>
       <p>However, in a query, if someone searches for <code>flöre.hanke</code>, my specific Picky app will not remove the <code>.</code>
       but use it as given (with the exception of the replaced <code>ö</code>).</p>
       <p>So, in this case, nothing would be found.</p>

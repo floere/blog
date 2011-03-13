@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-13T23:38:05+01:00</updated>
+ <updated>2011-03-14T00:33:51+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -46,8 +46,8 @@ rake try[text,index,category]        # Try the given text in the indexer/query (
 &quot;flöre.hanke&quot; as a query will be preprocessed into [:&quot;floere.hanke&quot;]
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I used single quotes to remind you that you might need these to escape special characters.&lt;/p&gt;
-&lt;p&gt;So what we see is that if Picky encounters &lt;code&gt;flöre.hanke&lt;/code&gt;, it will index it as one word, with the &lt;code&gt;.&lt;/code&gt;
-gone, and the umlaut &lt;code&gt;ö&lt;/code&gt; replaced by &lt;code&gt;oe&lt;/code&gt;, as per german rules.&lt;/p&gt;
+&lt;p&gt;So what we see is that if my specific Picky app encounters &lt;code&gt;flöre.hanke&lt;/code&gt;, it will index it as one word, remove &lt;code&gt;.&lt;/code&gt;
+gone, and replaces the umlaut &lt;code&gt;ö&lt;/code&gt; with &lt;code&gt;oe&lt;/code&gt;, as per german rules.&lt;/p&gt;
 &lt;p&gt;However, in a query, if someone searches for &lt;code&gt;flöre.hanke&lt;/code&gt;, my specific Picky app will not remove the &lt;code&gt;.&lt;/code&gt;
 but use it as given (with the exception of the replaced &lt;code&gt;ö&lt;/code&gt;).&lt;/p&gt;
 &lt;p&gt;So, in this case, nothing would be found.&lt;/p&gt;

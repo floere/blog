@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-16T14:33:20+01:00</updated>
+ <updated>2011-03-16T14:39:30+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -44,6 +44,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;A &amp;#8220;live&amp;#8221; query, which is sent when typing, to update the number of results.&lt;/li&gt;
 	&lt;li&gt;A &amp;#8220;full&amp;#8221; query, which is sent when the user presses return or chooses an allocation.&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;A full query needs to be enriched with rendered results, e.g. with list entries.&lt;/p&gt;
 &lt;p&gt;This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.&lt;/p&gt;
 &lt;p&gt;Also, live and full queries were once very different. I&amp;#8217;ve tried hard to unify them, and the only difference that still exists is that live queries don&amp;#8217;t contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.&lt;/p&gt;
 &lt;p&gt;The other reason was that I needed two different &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; to have &lt;a href=&quot;http://www.varnish-cache.org/&quot;&gt;Varnish&lt;/a&gt; route the live queries directly to the server (since the id count alone didn&amp;#8217;t need to be enriched by the webapp), and the full queries were routed through the webapp, like so:&lt;/p&gt;

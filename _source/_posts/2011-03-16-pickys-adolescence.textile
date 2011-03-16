@@ -47,6 +47,8 @@ The Picky client does two different types of queries:
 * A "live" query, which is sent when typing, to update the number of results.
 * A "full" query, which is sent when the user presses return or chooses an allocation.
 
+A full query needs to be enriched with rendered results, e.g. with list entries.
+
 This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.
 
 Also, live and full queries were once very different. I've tried hard to unify them, and the only difference that still exists is that live queries don't contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.

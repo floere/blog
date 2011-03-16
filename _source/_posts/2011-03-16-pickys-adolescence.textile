@@ -1,0 +1,112 @@
+---
+layout: post
+title: Picky's Coming of Age
+categories:
+  - ruby
+  - picky
+  - api
+---
+I'm gonna talk about what bothers me in Picky's current configuration and what I'd like to propose for 2.0. Opinions or ideas for new API features are very welcome!
+
+h2. A spot of bother
+
+Since releasing 1.0, something's always bothered me about Picky's configuration.
+
+I used to think it's the abundance of class methods used in definining indexing, querying, or routing:
+
+<pre class="sh_ruby"><code>class MyBeooootifulPickySearch < Application
+
+  default_indexing removes_characters: /[^äöüa-zA-Z0-9\s\/\-\"\&\.]/
+  # etc.
+
+end</code></pre>
+
+I usually prefer instances on which I define things. In a nutshell, it's more easily testable. But this is not really the problem.
+
+So, what is it that is bothering me?
+
+h2. What is really bothering me
+
+Take a look at how routing and queries are defined:
+
+Here, we're routing @/all/full@, @/all/live@ to queries which includes three indexes, and @/contacts/full@, @/contacts/live@ to queries with just the contacts index:
+
+<pre class="sh_ruby"><code>route %r{\A/all/full\Z}      => Query::Full.new(accounts_index, users_index, contacts_index),
+      %r{\A/all/live\Z}      => Query::Live.new(accounts_index, users_index, contacts_index),
+      %r{\A/contacts/full\Z} => Query::Full.new(contacts_index),
+      %r{\A/contacts/live\Z} => Query::Live.new(contacts_index)</code></pre>
+
+In the last sentence, I mention two things that are routed – why do I need double the number of route definitions?
+
+h2. Full and Live queries. Why?
+
+Let me talk a little about the client why this is so.
+
+The Picky client does two different types of queries:
+
+* A "live" query, which is sent when typing, to update the number of results.
+* A "full" query, which is sent when the user presses return or chooses an allocation.
+
+This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.
+
+Also, live and full queries were once very different. I've tried hard to unify them, and the only difference that still exists is that live queries don't contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.
+
+The other reason was that I needed two different URL to have "Varnish":http://www.varnish-cache.org/ route the live queries directly to the server (since the id count alone didn't need to be enriched by the webapp), and the full queries were routed through the webapp, like so:
+
+!(nonfloat)/blog/images/api1.png!
+
+Isn't it a bit overkill having to define two identical routes for two queries where just the amount of ids is different?
+
+Absolutely.
+
+h2. A better solution
+
+What I'd like to have is the following
+
+<pre class="sh_ruby"><code>route %r{\A/all\Z}      => Query.new(accounts_index, users_index, contacts_index),
+      %r{\A/contacts\Z} => Query.new(contacts_index)</code></pre>
+
+This would DRY up the code immensely.
+
+h2. Problems with this solution
+
+But now we're presented two problems:
+
+* How do we tell the server that we need 0, or 20 ids, and where?
+* How can I route the queries differently?
+
+h2. Solutions to these problems
+
+I suggest that the first problem is handled by a query parameter @ids@. So a query through curl would look like this:
+
+@curl localhost:8080/contacts?query=miller&ids=20@
+
+Even if this means more typing, it is much more convenient and flexible to use. What I now can do is define default amounts in the JS client and in the Webapp Client (picky-client gem).
+
+The second problem is routing the queries differently. With the new way, you are much more flexible in this. Several solutions are possible. Say you have a Varnish:
+
+* If query param @ids@ is 0, we route directly to the server. If not, it is routed through the webapp.
+* Define two different URLs, route the live one right on to the server and send the other through the webapp.
+
+Or without Varnish (or Nginx etc.):
+* Speed is not an issue – route both through the webapp, and do different queries from there – one with 0 ids, one with 20.
+
+Or any other way that suits you best.
+
+h2. Picky 2.0
+
+Since this really irritates me, I'll start working on it ASAP.
+
+Most work is needed in the documentation – so if after the release, you see the old style anywhere, please tell me so.
+
+Yeah, Picky 2.0 – good times! :)
+
+h2. Conclusion
+
+So we've seen
+# that Picky lives in a wet environment and needs some DRYing up.
+# that Picky 2.0 is around the corner.
+
+Hope you learnt something new :)
+
+If you have some feedback on what else could be improved, comment away!

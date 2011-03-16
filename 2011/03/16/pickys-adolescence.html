@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky's Coming of Age</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Picky's Coming of Age</h1>
+      <div class="categories">ruby / picky / api</div>
+      <p>I&#8217;m gonna talk about what bothers me in Picky&#8217;s current configuration and what I&#8217;d like to propose for 2.0. Opinions or ideas for new <span class="caps">API</span> features are very welcome!</p>
+      <h2>A spot of bother</h2>
+      <p>Since releasing 1.0, something&#8217;s always bothered me about Picky&#8217;s configuration.</p>
+      <p>I used to think it&#8217;s the abundance of class methods used in definining indexing, querying, or routing:</p>
+      <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  default_indexing removes_characters: /[^äöüa-zA-Z0-9\s\/\-\"\&amp;\.]/&#x000A;  # etc.&#x000A;&#x000A;end</code></pre>
+      <p>I usually prefer instances on which I define things. In a nutshell, it&#8217;s more easily testable. But this is not really the problem.</p>
+      <p>So, what is it that is bothering me?</p>
+      <h2>What is really bothering me</h2>
+      <p>Take a look at how routing and queries are defined:</p>
+      <p>Here, we&#8217;re routing <code>/all/full</code>, <code>/all/live</code> to queries which includes three indexes, and <code>/contacts/full</code>, <code>/contacts/live</code> to queries with just the contacts index:</p>
+      <pre class="sh_ruby"><code>route %r{\A/all/full\Z}      =&gt; Query::Full.new(accounts_index, users_index, contacts_index),&#x000A;      %r{\A/all/live\Z}      =&gt; Query::Live.new(accounts_index, users_index, contacts_index),&#x000A;      %r{\A/contacts/full\Z} =&gt; Query::Full.new(contacts_index),&#x000A;      %r{\A/contacts/live\Z} =&gt; Query::Live.new(contacts_index)</code></pre>
+      <p>In the last sentence, I mention two things that are routed – why do I need double the number of route definitions?</p>
+      <h2>Full and Live queries. Why?</h2>
+      <p>Let me talk a little about the client why this is so.</p>
+      <p>The Picky client does two different types of queries:</p>
+      <ul>
+      	<li>A &#8220;live&#8221; query, which is sent when typing, to update the number of results.</li>
+      	<li>A &#8220;full&#8221; query, which is sent when the user presses return or chooses an allocation.</li>
+      </ul>
+      <p>This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.</p>
+      <p>Also, live and full queries were once very different. I&#8217;ve tried hard to unify them, and the only difference that still exists is that live queries don&#8217;t contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.</p>
+      <p>The other reason was that I needed two different <span class="caps">URL</span> to have <a href="http://www.varnish-cache.org/">Varnish</a> route the live queries directly to the server (since the id count alone didn&#8217;t need to be enriched by the webapp), and the full queries were routed through the webapp, like so:</p>
+      <p><img src="/blog/images/api1.png" class="nonfloat" alt="" /></p>
+      <p>Isn&#8217;t it a bit overkill having to define two identical routes for two queries where just the amount of ids is different?</p>
+      <p>Absolutely.</p>
+      <h2>A better solution</h2>
+      <p>What I&#8217;d like to have is the following</p>
+      <pre class="sh_ruby"><code>route %r{\A/all\Z}      =&gt; Query.new(accounts_index, users_index, contacts_index),&#x000A;      %r{\A/contacts\Z} =&gt; Query.new(contacts_index)</code></pre>
+      <p>This would <span class="caps">DRY</span> up the code immensely.</p>
+      <h2>Problems with this solution</h2>
+      <p>But now we&#8217;re presented two problems:</p>
+      <ul>
+      	<li>How do we tell the server that we need 0, or 20 ids, and where?</li>
+      	<li>How can I route the queries differently?</li>
+      </ul>
+      <h2>Solutions to these problems</h2>
+      <p>I suggest that the first problem is handled by a query parameter <code>ids</code>. So a query through curl would look like this:</p>
+      <p><code>curl localhost:8080/contacts?query=miller&amp;ids=20</code></p>
+      <p>Even if this means more typing, it is much more convenient and flexible to use. What I now can do is define default amounts in the JS client and in the Webapp Client (picky-client gem).</p>
+      <p>The second problem is routing the queries differently. With the new way, you are much more flexible in this. Several solutions are possible. Say you have a Varnish:</p>
+      <ul>
+      	<li>If query param <code>ids</code> is 0, we route directly to the server. If not, it is routed through the webapp.</li>
+      	<li>Define two different URLs, route the live one right on to the server and send the other through the webapp.</li>
+      </ul>
+      <p>Or without Varnish (or Nginx etc.):</p>
+      <ul>
+      	<li>Speed is not an issue – route both through the webapp, and do different queries from there – one with 0 ids, one with 20.</li>
+      </ul>
+      <p>Or any other way that suits you best.</p>
+      <h2>Picky 2.0</h2>
+      <p>Since this really irritates me, I&#8217;ll start working on it <span class="caps">ASAP</span>.</p>
+      <p>Most work is needed in the documentation – so if after the release, you see the old style anywhere, please tell me so.</p>
+      <p>Yeah, Picky 2.0 – good times! :)</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Picky lives in a wet environment and needs some DRYing up.</li>
+      	<li>that Picky 2.0 is around the corner.</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
+      <p>If you have some feedback on what else could be improved, comment away!</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/03/13/searching-with-picky-rake-tasks.html" title="Previous post: Searching with Picky&#58; Rake Tasks">Searching with Picky&#58; Rake Tasks</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/03/16/pickys-adolescence';
+          var disqus_url = 'http://florianhanke.com/blog/2011/03/16/pickys-adolescence.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

@@ -50,7 +50,7 @@
       %br
       - if page.previous
         Previous
-        %a{ :href => "/blog#{page.previous.url}", :title => "Previous post: #{page.previous.title}" }= page.previous.title
+        %a.previous{ :href => "/blog#{page.previous.url}", :title => "Previous post: #{page.previous.title}" }= page.previous.title
       %h2 Comments?
       - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread
@@ -59,7 +59,7 @@
         var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
         var disqus_identifier = '#{page.id}';
         var disqus_url = '#{permalink}';
-      
+
         /* * * DON'T EDIT BELOW THIS LINE * * */
         (function() {
             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

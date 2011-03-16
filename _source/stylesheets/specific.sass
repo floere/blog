@@ -4,7 +4,7 @@ h1
 pre
   :margin 5px -120px
   :padding 10px
-  
+
   code
     :background-color transparent
 
@@ -16,6 +16,9 @@ p
   :margin-top 0.6em
   :margin-bottom 0.6em
 
+img.nonfloat
+  :float none
+
 a.line
   :display block
   :padding 10px
@@ -24,7 +27,7 @@ a.line
 div.year
   :font-size 1.5em
   :margin-bottom 0.5em
-  
+
 div.month
   :font-size 1.1em
 
@@ -35,22 +38,27 @@ span.calendar
 span.categories
   :font-size 0.5em
   :color gray
-  
+
 div.post
   :font-family "lucida grande"
-  
+
   ol
     :list-style decimal
-  
+
   ul
     :list-style disc
-    
+
   a
     :background-color #eee
     :padding 1px 10px 2px
-    
+
     &:before
       :content '☛ '
+
+  a.previous
+    &:before
+      :content '☚ '
+
   a:hover
     :background-color #abcdef
 
@@ -60,7 +68,7 @@ div.post
 
 div.gist
   :font-size 0.9em
-  
+
   a:before
     :content ''
 

@@ -4,13 +4,91 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-14T00:35:08+01:00</updated>
+ <updated>2011-03-16T14:33:20+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky's Coming of Age</title>
+   <link href="http://florianhanke.com/blog/2011/03/16/pickys-adolescence.html"/>
+   <updated>2011-03-16T00:00:00+01:00</updated>
+   <id>http://florianhanke.com/blog/2011/03/16/pickys-adolescence</id>
+   <content type="html">&lt;p&gt;I&amp;#8217;m gonna talk about what bothers me in Picky&amp;#8217;s current configuration and what I&amp;#8217;d like to propose for 2.0. Opinions or ideas for new &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; features are very welcome!&lt;/p&gt;
+&lt;h2&gt;A spot of bother&lt;/h2&gt;
+&lt;p&gt;Since releasing 1.0, something&amp;#8217;s always bothered me about Picky&amp;#8217;s configuration.&lt;/p&gt;
+&lt;p&gt;I used to think it&amp;#8217;s the abundance of class methods used in definining indexing, querying, or routing:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class MyBeooootifulPickySearch &amp;lt; Application
+
+  default_indexing removes_characters: /[^äöüa-zA-Z0-9\s\/\-\&quot;\&amp;amp;\.]/
+  # etc.
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I usually prefer instances on which I define things. In a nutshell, it&amp;#8217;s more easily testable. But this is not really the problem.&lt;/p&gt;
+&lt;p&gt;So, what is it that is bothering me?&lt;/p&gt;
+&lt;h2&gt;What is really bothering me&lt;/h2&gt;
+&lt;p&gt;Take a look at how routing and queries are defined:&lt;/p&gt;
+&lt;p&gt;Here, we&amp;#8217;re routing &lt;code&gt;/all/full&lt;/code&gt;, &lt;code&gt;/all/live&lt;/code&gt; to queries which includes three indexes, and &lt;code&gt;/contacts/full&lt;/code&gt;, &lt;code&gt;/contacts/live&lt;/code&gt; to queries with just the contacts index:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;route %r{\A/all/full\Z}      =&amp;gt; Query::Full.new(accounts_index, users_index, contacts_index),
+      %r{\A/all/live\Z}      =&amp;gt; Query::Live.new(accounts_index, users_index, contacts_index),
+      %r{\A/contacts/full\Z} =&amp;gt; Query::Full.new(contacts_index),
+      %r{\A/contacts/live\Z} =&amp;gt; Query::Live.new(contacts_index)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the last sentence, I mention two things that are routed – why do I need double the number of route definitions?&lt;/p&gt;
+&lt;h2&gt;Full and Live queries. Why?&lt;/h2&gt;
+&lt;p&gt;Let me talk a little about the client why this is so.&lt;/p&gt;
+&lt;p&gt;The Picky client does two different types of queries:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;A &amp;#8220;live&amp;#8221; query, which is sent when typing, to update the number of results.&lt;/li&gt;
+	&lt;li&gt;A &amp;#8220;full&amp;#8221; query, which is sent when the user presses return or chooses an allocation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.&lt;/p&gt;
+&lt;p&gt;Also, live and full queries were once very different. I&amp;#8217;ve tried hard to unify them, and the only difference that still exists is that live queries don&amp;#8217;t contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.&lt;/p&gt;
+&lt;p&gt;The other reason was that I needed two different &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; to have &lt;a href=&quot;http://www.varnish-cache.org/&quot;&gt;Varnish&lt;/a&gt; route the live queries directly to the server (since the id count alone didn&amp;#8217;t need to be enriched by the webapp), and the full queries were routed through the webapp, like so:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/images/api1.png&quot; class=&quot;nonfloat&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Isn&amp;#8217;t it a bit overkill having to define two identical routes for two queries where just the amount of ids is different?&lt;/p&gt;
+&lt;p&gt;Absolutely.&lt;/p&gt;
+&lt;h2&gt;A better solution&lt;/h2&gt;
+&lt;p&gt;What I&amp;#8217;d like to have is the following&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;route %r{\A/all\Z}      =&amp;gt; Query.new(accounts_index, users_index, contacts_index),
+      %r{\A/contacts\Z} =&amp;gt; Query.new(contacts_index)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This would &lt;span class=&quot;caps&quot;&gt;DRY&lt;/span&gt; up the code immensely.&lt;/p&gt;
+&lt;h2&gt;Problems with this solution&lt;/h2&gt;
+&lt;p&gt;But now we&amp;#8217;re presented two problems:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;How do we tell the server that we need 0, or 20 ids, and where?&lt;/li&gt;
+	&lt;li&gt;How can I route the queries differently?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Solutions to these problems&lt;/h2&gt;
+&lt;p&gt;I suggest that the first problem is handled by a query parameter &lt;code&gt;ids&lt;/code&gt;. So a query through curl would look like this:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;curl localhost:8080/contacts?query=miller&amp;amp;ids=20&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Even if this means more typing, it is much more convenient and flexible to use. What I now can do is define default amounts in the JS client and in the Webapp Client (picky-client gem).&lt;/p&gt;
+&lt;p&gt;The second problem is routing the queries differently. With the new way, you are much more flexible in this. Several solutions are possible. Say you have a Varnish:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;If query param &lt;code&gt;ids&lt;/code&gt; is 0, we route directly to the server. If not, it is routed through the webapp.&lt;/li&gt;
+	&lt;li&gt;Define two different URLs, route the live one right on to the server and send the other through the webapp.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Or without Varnish (or Nginx etc.):&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Speed is not an issue – route both through the webapp, and do different queries from there – one with 0 ids, one with 20.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Or any other way that suits you best.&lt;/p&gt;
+&lt;h2&gt;Picky 2.0&lt;/h2&gt;
+&lt;p&gt;Since this really irritates me, I&amp;#8217;ll start working on it &lt;span class=&quot;caps&quot;&gt;ASAP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Most work is needed in the documentation – so if after the release, you see the old style anywhere, please tell me so.&lt;/p&gt;
+&lt;p&gt;Yeah, Picky 2.0 – good times! :)&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that Picky lives in a wet environment and needs some DRYing up.&lt;/li&gt;
+	&lt;li&gt;that Picky 2.0 is around the corner.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;p&gt;If you have some feedback on what else could be improved, comment away!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Searching with Picky&#58; Rake Tasks</title>

@@ -51,9 +51,9 @@ A full query needs to be enriched with rendered results, e.g. with list entries.
 
 This means that full queries need to go through the webapp to be enriched (rendered results etc.) and the live queries can go directly to the server, as no enriching is needed.
 
-Also, live and full queries were once very different. I've tried hard to unify them, and the only difference that still exists is that live queries don't contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.
+Also, live and full queries were once very different. I've worked hard to unify them, and the only difference that still exists is that live queries don't contain the result ids, or more precise: They return 0 result ids, while full queries return by default 20 ids.
 
-The other reason was that I needed two different URL to have "Varnish":http://www.varnish-cache.org/ route the live queries directly to the server (since the id count alone didn't need to be enriched by the webapp), and the full queries were routed through the webapp, like so:
+The other reason was that I needed two different URLs to have "Varnish":http://www.varnish-cache.org/ route the live queries directly to the server (since the id count alone didn't need to be enriched by the webapp), and the full queries were routed through the webapp, like so:
 
 !(nonfloat)/blog/images/api1.png!
 

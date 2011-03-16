@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-16T14:41:07+01:00</updated>
+ <updated>2011-03-16T14:44:37+01:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -73,7 +73,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;p&gt;Or without Varnish (or Nginx etc.):&lt;/p&gt;
 &lt;ul&gt;
-	&lt;li&gt;Speed is not an issue – route both through the webapp, and do different queries from there – one with 0 ids, one with 20.&lt;/li&gt;
+	&lt;li&gt;Speed is not an issue? Route both through the webapp, and do different queries from there – one with 0 ids, one with 20.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Or any other way that suits you best.&lt;/p&gt;
 &lt;h2&gt;Picky 2.0&lt;/h2&gt;

@@ -91,7 +91,7 @@ The second problem is routing the queries differently. With the new way, you are
 * Define two different URLs, route the live one right on to the server and send the other through the webapp.
 
 Or without Varnish (or Nginx etc.):
-* Speed is not an issue – route both through the webapp, and do different queries from there – one with 0 ids, one with 20.
+* Speed is not an issue? Route both through the webapp, and do different queries from there – one with 0 ids, one with 20.
 
 Or any other way that suits you best.
 

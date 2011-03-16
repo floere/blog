@@ -84,7 +84,7 @@
       <pre class="sh_ruby"><code>route %r{\A/all\Z}      =&gt; Query.new(accounts_index, users_index, contacts_index),&#x000A;      %r{\A/contacts\Z} =&gt; Query.new(contacts_index)</code></pre>
       <p>This would <span class="caps">DRY</span> up the code immensely.</p>
       <h2>Problems with this solution</h2>
-      <p>But now we&#8217;re presented two problems:</p>
+      <p>But now we&#8217;re presented with two problems:</p>
       <ul>
       	<li>How do we tell the server that we need 0, or 20 ids, and where?</li>
       	<li>How can I route the queries differently?</li>
@@ -92,7 +92,7 @@
       <h2>Solutions to these problems</h2>
       <p>I suggest that the first problem is handled by a query parameter <code>ids</code>. So a query through curl would look like this:</p>
       <p><code>curl localhost:8080/contacts?query=miller&amp;ids=20</code></p>
-      <p>Even if this means more typing, it is much more convenient and flexible to use. What I now can do is define default amounts in the JS client and in the Webapp Client (picky-client gem).</p>
+      <p>Even if this means more typing, it is much more convenient and flexible to use. What I now can do is define default amounts in the JS client and in the webapp client (picky-client gem).</p>
       <p>The second problem is routing the queries differently. With the new way, you are much more flexible in this. Several solutions are possible. Say you have a Varnish:</p>
       <ul>
       	<li>If query param <code>ids</code> is 0, we route directly to the server. If not, it is routed through the webapp.</li>

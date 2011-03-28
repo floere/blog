@@ -4,13 +4,68 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-16T14:45:32+01:00</updated>
+ <updated>2011-03-28T22:38:25+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky 2.0</title>
+   <link href="http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh.html"/>
+   <updated>2011-03-28T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh</id>
+   <content type="html">&lt;p&gt;In my previous post, I talked about what bothers me in Picky&amp;#8217;s &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;, and did a few 2.0 prerelease versions with the improvements.&lt;/p&gt;
+&lt;p&gt;After quite a bit of feedback, Picky 2.0 is released! :)&lt;/p&gt;
+&lt;p&gt;So, what&amp;#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?&lt;/p&gt;
+&lt;h2&gt;What has changed?&lt;/h2&gt;
+&lt;p&gt;Only three things. 2.0&amp;#8217;s change list is short but sweet.&lt;/p&gt;
+&lt;h3&gt;Query::Full/Live &amp;#8594; Search&lt;/h3&gt;
+&lt;p&gt;The double definitions, &lt;code&gt;Query::Full&lt;/code&gt; and &lt;code&gt;Query::Live&lt;/code&gt; are no more. Good riddance!&lt;/p&gt;
+&lt;p&gt;Instead, you simply use &lt;code&gt;Search&lt;/code&gt;. So instead of&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class MyBeooootifulPickySearch &amp;lt; Application
+
+  route %r{^/books/full} =&amp;gt; Query::Full.new(some_index),
+        %r{^/books/live} =&amp;gt; Query::Live.new(some_index)
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you use&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class MyBeooootifulPickySearch &amp;lt; Application
+
+  route %r{^/books} =&amp;gt; Search.new(some_index)
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Much more understandable and sexier! :)&lt;/p&gt;
+&lt;p&gt;To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an &lt;code&gt;ids&lt;/code&gt; query parameter:&lt;/p&gt;
+&lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ curl 'localhost:8080/books?query=meow&amp;amp;ids=15&amp;amp;offset=0'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Defaults are 20 &lt;code&gt;ids&lt;/code&gt; and &lt;code&gt;0&lt;/code&gt; offset.&lt;/p&gt;
+&lt;h3&gt;Similarity::Phonetic &amp;#8594; Similarity::DoubleMetaphone&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve renamed &lt;code&gt;Similarity::Phonetic&lt;/code&gt; to &lt;code&gt;Similarity::DoubleMetaphone&lt;/code&gt;. It&amp;#8217;s still the same algorithm. See &lt;a href=&quot;http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone&quot;&gt;the double metaphone&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Also, we&amp;#8217;ve added two default implementations, &lt;code&gt;Similarity::Metaphone&lt;/code&gt; and &lt;code&gt;Similarity::Soundex&lt;/code&gt; for your similarity pleasure :)&lt;/p&gt;
+&lt;p&gt;Picky will tell you if you still use the old &lt;code&gt;Phonetic&lt;/code&gt; definition in your &lt;code&gt;app/application.rb&lt;/code&gt;, so you don&amp;#8217;t need to learn this by heart.&lt;/p&gt;
+&lt;h3&gt;Picky::Client::Full/Live (in a client) &amp;#8594; Picky::Client&lt;/h3&gt;
+&lt;p&gt;The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;FullBooksSearch = Picky::Client::Full.new ...
+LiveBooksSearch = Picky::Client::Live.new ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you use&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;BooksSearch = Picky::Client.new ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then in your e.g. controller actions passing what amount of ids you need&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;BooksSearch.search params[:query], :ids =&amp;gt; params[:ids], :offset =&amp;gt; params[:offset]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or directly, using &lt;code&gt;:ids =&amp;gt; 20&lt;/code&gt; or however you like it.&lt;/p&gt;
+&lt;h3&gt;Various&lt;/h3&gt;
+&lt;p&gt;Leading up to 2.0, we&amp;#8217;ve removed the hashbangs in the JS client history, added &lt;code&gt;rake stats&lt;/code&gt; and &lt;code&gt;rake analyze&lt;/code&gt;. See more in the repo&amp;#8217;s top level &lt;code&gt;history.textile&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that Picky is two-dot-oh-soooome!&lt;/li&gt;
+	&lt;li&gt;what you&amp;#8217;d need to change to be 2.0 compatible.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;p&gt;Comments and feedback, as usual, are appreciated.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky's Coming of Age</title>

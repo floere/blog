@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky 2.0</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Picky 2.0</h1>
+      <div class="categories">ruby / picky / gems</div>
+      <p>In my previous post, I talked about what bothers me in Picky&#8217;s <span class="caps">API</span>, and did a few 2.0 prerelease versions with the improvements.</p>
+      <p>After quite a bit of feedback, Picky 2.0 is released! :)</p>
+      <p>So, what&#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?</p>
+      <h2>What has changed?</h2>
+      <p>Only three things. 2.0&#8217;s change list is short but sweet.</p>
+      <h3>Query::Full/Live &#8594; Search</h3>
+      <p>The double definitions, <code>Query::Full</code> and <code>Query::Live</code> are no more. Good riddance!</p>
+      <p>Instead, you simply use <code>Search</code>. So instead of</p>
+      <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books/full} =&gt; Query::Full.new(some_index),&#x000A;        %r{^/books/live} =&gt; Query::Live.new(some_index)&#x000A;&#x000A;end</code></pre>
+      <p>you use</p>
+      <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books} =&gt; Search.new(some_index)&#x000A;&#x000A;end</code></pre>
+      <p>Much more understandable and sexier! :)</p>
+      <p>To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an <code>ids</code> query parameter:</p>
+      <pre class="sh_bash"><code>$ curl 'localhost:8080/books?query=meow&amp;ids=15&amp;offset=0'</code></pre>
+      <p>Defaults are 20 <code>ids</code> and <code>0</code> offset.</p>
+      <h3>Similarity::Phonetic &#8594; Similarity::DoubleMetaphone</h3>
+      <p>We&#8217;ve renamed <code>Similarity::Phonetic</code> to <code>Similarity::DoubleMetaphone</code>. It&#8217;s still the same algorithm. See <a href="http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone">the double metaphone</a>.</p>
+      <p>Also, we&#8217;ve added two default implementations, <code>Similarity::Metaphone</code> and <code>Similarity::Soundex</code> for your similarity pleasure :)</p>
+      <p>Picky will tell you if you still use the old <code>Phonetic</code> definition in your <code>app/application.rb</code>, so you don&#8217;t need to learn this by heart.</p>
+      <h3>Picky::Client::Full/Live (in a client) &#8594; Picky::Client</h3>
+      <p>The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of</p>
+      <pre class="sh_ruby"><code>FullBooksSearch = Picky::Client::Full.new ...&#x000A;LiveBooksSearch = Picky::Client::Live.new ...</code></pre>
+      <p>you use</p>
+      <pre class="sh_ruby"><code>BooksSearch = Picky::Client.new ...</code></pre>
+      <p>Then in your e.g. controller actions passing what amount of ids you need</p>
+      <pre class="sh_ruby"><code>BooksSearch.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]</code></pre>
+      <p>or directly, using <code>:ids =&gt; 20</code> or however you like it.</p>
+      <h3>Various</h3>
+      <p>Leading up to 2.0, we&#8217;ve removed the hashbangs in the JS client history, added <code>rake stats</code> and <code>rake analyze</code>. See more in the repo&#8217;s top level <code>history.textile</code>.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Picky is two-dot-oh-soooome!</li>
+      	<li>what you&#8217;d need to change to be 2.0 compatible.</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
+      <p>Comments and feedback, as usual, are appreciated.</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/03/16/pickys-adolescence.html" title="Previous post: Picky's Coming of Age">Picky's Coming of Age</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/03/28/picky-two-dot-oh';
+          var disqus_url = 'http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

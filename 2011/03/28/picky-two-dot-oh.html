@@ -57,7 +57,14 @@
       <p>After quite a bit of feedback, Picky 2.0 is released! :)</p>
       <p>So, what&#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?</p>
       <h2>What has changed?</h2>
-      <p>Only three things. 2.0&#8217;s change list is short but sweet.</p>
+      <p>Only four things. 2.0&#8217;s change list is short but sweet.</p>
+      <h3>Index definitions</h3>
+      <p>We&#8217;ve added a nice new possibility to define categories on an index. The blocky initializer. So where you had</p>
+      <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source)&#x000A;index.define_category :a&#x000A;index.define_category :b&#x000A;index.define_category :c</code></pre>
+      <p>you now can write</p>
+      <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source) do&#x000A;  category :a&#x000A;  category :b&#x000A;  category :c&#x000A;end</code></pre>
+      <p>This helps keeping everything together a bit more tightly. Also, smoother skin by not having to type as much ;)</p>
+      <p>The old style still works, but is totally shunned by veteran Pickiers. Be the hippest Pickier in town by using the blocky initializer style. You know you want it.</p>
       <h3>Query::Full/Live &#8594; Search</h3>
       <p>The double definitions, <code>Query::Full</code> and <code>Query::Live</code> are no more. Good riddance!</p>
       <p>Instead, you simply use <code>Search</code>. So instead of</p>

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-28T22:44:11+02:00</updated>
+ <updated>2011-03-28T22:50:07+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -21,7 +21,21 @@
 &lt;p&gt;After quite a bit of feedback, Picky 2.0 is released! :)&lt;/p&gt;
 &lt;p&gt;So, what&amp;#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?&lt;/p&gt;
 &lt;h2&gt;What has changed?&lt;/h2&gt;
-&lt;p&gt;Only three things. 2.0&amp;#8217;s change list is short but sweet.&lt;/p&gt;
+&lt;p&gt;Only four things. 2.0&amp;#8217;s change list is short but sweet.&lt;/p&gt;
+&lt;h3&gt;Index definitions&lt;/h3&gt;
+&lt;p&gt;We&amp;#8217;ve added a nice new possibility to define categories on an index. The blocky initializer. So where you had&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Index::Memory.new(:name, source)
+index.define_category :a
+index.define_category :b
+index.define_category :c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you now can write&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Index::Memory.new(:name, source) do
+  category :a
+  category :b
+  category :c
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This helps keeping everything together a bit more tightly. Also, smoother skin by not having to type as much ;)&lt;/p&gt;
+&lt;p&gt;The old style still works, but is totally shunned by veteran Pickiers. Be the hippest Pickier in town by using the blocky initializer style. You know you want it.&lt;/p&gt;
 &lt;h3&gt;Query::Full/Live &amp;#8594; Search&lt;/h3&gt;
 &lt;p&gt;The double definitions, &lt;code&gt;Query::Full&lt;/code&gt; and &lt;code&gt;Query::Live&lt;/code&gt; are no more. Good riddance!&lt;/p&gt;
 &lt;p&gt;Instead, you simply use &lt;code&gt;Search&lt;/code&gt;. So instead of&lt;/p&gt;

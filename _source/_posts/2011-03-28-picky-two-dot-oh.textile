@@ -14,7 +14,28 @@ So, what's in it for you and what do you need to change in your 1.x version to u
 
 h2. What has changed?
 
-Only three things. 2.0's change list is short but sweet.
+Only four things. 2.0's change list is short but sweet.
+
+h3. Index definitions
+
+We've added a nice new possibility to define categories on an index. The blocky initializer. So where you had
+
+<pre class="sh_ruby"><code>index = Index::Memory.new(:name, source)
+index.define_category :a
+index.define_category :b
+index.define_category :c</code></pre>
+
+you now can write
+
+<pre class="sh_ruby"><code>index = Index::Memory.new(:name, source) do
+  category :a
+  category :b
+  category :c
+end</code></pre>
+
+This helps keeping everything together a bit more tightly. Also, smoother skin by not having to type as much ;)
+
+The old style still works, but is totally shunned by veteran Pickiers. Be the hippest Pickier in town by using the blocky initializer style. You know you want it.
 
 h3. Query::Full/Live -> Search
 

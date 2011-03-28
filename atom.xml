@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-28T22:38:25+02:00</updated>
+ <updated>2011-03-28T22:44:11+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -37,13 +37,15 @@ end&lt;/code&gt;&lt;/pre&gt;
   route %r{^/books} =&amp;gt; Search.new(some_index)
 
 end&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Much more understandable and sexier! :)&lt;/p&gt;
+&lt;p&gt;It says &amp;#8220;Route this &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; to that search with these indexes and options&amp;#8221;.
+Much more understandable and sexier! :)&lt;/p&gt;
 &lt;p&gt;To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an &lt;code&gt;ids&lt;/code&gt; query parameter:&lt;/p&gt;
 &lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ curl 'localhost:8080/books?query=meow&amp;amp;ids=15&amp;amp;offset=0'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Defaults are 20 &lt;code&gt;ids&lt;/code&gt; and &lt;code&gt;0&lt;/code&gt; offset.&lt;/p&gt;
 &lt;h3&gt;Similarity::Phonetic &amp;#8594; Similarity::DoubleMetaphone&lt;/h3&gt;
 &lt;p&gt;We&amp;#8217;ve renamed &lt;code&gt;Similarity::Phonetic&lt;/code&gt; to &lt;code&gt;Similarity::DoubleMetaphone&lt;/code&gt;. It&amp;#8217;s still the same algorithm. See &lt;a href=&quot;http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone&quot;&gt;the double metaphone&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Also, we&amp;#8217;ve added two default implementations, &lt;code&gt;Similarity::Metaphone&lt;/code&gt; and &lt;code&gt;Similarity::Soundex&lt;/code&gt; for your similarity pleasure :)&lt;/p&gt;
+&lt;p&gt;Since Picky is normally used by programmers, &lt;code&gt;DoubleMetaphone&lt;/code&gt; is much clearer for what it actually does.&lt;/p&gt;
 &lt;p&gt;Picky will tell you if you still use the old &lt;code&gt;Phonetic&lt;/code&gt; definition in your &lt;code&gt;app/application.rb&lt;/code&gt;, so you don&amp;#8217;t need to learn this by heart.&lt;/p&gt;
 &lt;h3&gt;Picky::Client::Full/Live (in a client) &amp;#8594; Picky::Client&lt;/h3&gt;
 &lt;p&gt;The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of&lt;/p&gt;

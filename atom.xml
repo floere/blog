@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-28T22:51:41+02:00</updated>
+ <updated>2011-03-28T22:54:49+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -59,7 +59,7 @@ Much more understandable and sexier! :)&lt;/p&gt;
 &lt;h3&gt;Similarity::Phonetic &amp;#8594; Similarity::DoubleMetaphone&lt;/h3&gt;
 &lt;p&gt;We&amp;#8217;ve renamed &lt;code&gt;Similarity::Phonetic&lt;/code&gt; to &lt;code&gt;Similarity::DoubleMetaphone&lt;/code&gt;. It&amp;#8217;s still the same algorithm. See &lt;a href=&quot;http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone&quot;&gt;the double metaphone&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Also, we&amp;#8217;ve added two default implementations, &lt;code&gt;Similarity::Metaphone&lt;/code&gt; and &lt;code&gt;Similarity::Soundex&lt;/code&gt; for your similarity pleasure :)&lt;/p&gt;
-&lt;p&gt;Since Picky is normally used by programmers, &lt;code&gt;DoubleMetaphone&lt;/code&gt; is much clearer for what it actually does.&lt;/p&gt;
+&lt;p&gt;Since Picky is normally used by programmers, &lt;code&gt;DoubleMetaphone&lt;/code&gt; is much clearer for what it actually does than &lt;code&gt;Phonetic&lt;/code&gt; – it&amp;#8217;s a bit of a mouthful, I admit.&lt;/p&gt;
 &lt;p&gt;Picky will tell you if you still use the old &lt;code&gt;Phonetic&lt;/code&gt; definition in your &lt;code&gt;app/application.rb&lt;/code&gt;, so you don&amp;#8217;t need to learn this by heart.&lt;/p&gt;
 &lt;h3&gt;Picky::Client::Full/Live (in a client) &amp;#8594; Picky::Client&lt;/h3&gt;
 &lt;p&gt;The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of&lt;/p&gt;
@@ -79,6 +79,7 @@ LiveBooksSearch = Picky::Client::Live.new ...&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;what you&amp;#8217;d need to change to be 2.0 compatible.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;p&gt;Btw, protip: Generate a client and server using &lt;code&gt;picky generate&lt;/code&gt; and see how everything is defined in 2.0 and compare.&lt;/p&gt;
 &lt;p&gt;Comments and feedback, as usual, are appreciated.&lt;/p&gt;</content>
    
  </entry>

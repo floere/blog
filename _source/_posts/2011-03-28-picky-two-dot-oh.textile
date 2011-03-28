@@ -73,7 +73,7 @@ We've renamed @Similarity::Phonetic@ to @Similarity::DoubleMetaphone@. It's stil
 
 Also, we've added two default implementations, @Similarity::Metaphone@ and @Similarity::Soundex@ for your similarity pleasure :)
 
-Since Picky is normally used by programmers, @DoubleMetaphone@ is much clearer for what it actually does.
+Since Picky is normally used by programmers, @DoubleMetaphone@ is much clearer for what it actually does than @Phonetic@ – it's a bit of a mouthful, I admit.
 
 Picky will tell you if you still use the old @Phonetic@ definition in your @app/application.rb@, so you don't need to learn this by heart.
 
@@ -105,5 +105,7 @@ So we've seen
 # what you'd need to change to be 2.0 compatible.
 
 Hope you learnt something new :)
+
+Btw, protip: Generate a client and server using @picky generate@ and see how everything is defined in 2.0 and compare.
 
 Comments and feedback, as usual, are appreciated.

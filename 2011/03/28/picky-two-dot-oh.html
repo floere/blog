@@ -79,7 +79,7 @@
       <h3>Similarity::Phonetic &#8594; Similarity::DoubleMetaphone</h3>
       <p>We&#8217;ve renamed <code>Similarity::Phonetic</code> to <code>Similarity::DoubleMetaphone</code>. It&#8217;s still the same algorithm. See <a href="http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone">the double metaphone</a>.</p>
       <p>Also, we&#8217;ve added two default implementations, <code>Similarity::Metaphone</code> and <code>Similarity::Soundex</code> for your similarity pleasure :)</p>
-      <p>Since Picky is normally used by programmers, <code>DoubleMetaphone</code> is much clearer for what it actually does.</p>
+      <p>Since Picky is normally used by programmers, <code>DoubleMetaphone</code> is much clearer for what it actually does than <code>Phonetic</code> – it&#8217;s a bit of a mouthful, I admit.</p>
       <p>Picky will tell you if you still use the old <code>Phonetic</code> definition in your <code>app/application.rb</code>, so you don&#8217;t need to learn this by heart.</p>
       <h3>Picky::Client::Full/Live (in a client) &#8594; Picky::Client</h3>
       <p>The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of</p>
@@ -98,6 +98,7 @@
       	<li>what you&#8217;d need to change to be 2.0 compatible.</li>
       </ol>
       <p>Hope you learnt something new :)</p>
+      <p>Btw, protip: Generate a client and server using <code>picky generate</code> and see how everything is defined in 2.0 and compare.</p>
       <p>Comments and feedback, as usual, are appreciated.</p>
       <br />
       Previous

@@ -65,7 +65,7 @@ To discern whether it is a full (with result ids) or live (without result ids) s
 
 <pre class="sh_bash"><code>$ curl 'localhost:8080/books?query=meow&ids=15&offset=0'</code></pre>
 
-Defaults are 20 @ids@ and @0@ offset.
+Defaults are 20 @ids@ and 0 @offset@.
 
 h3. Similarity::Phonetic -> Similarity::DoubleMetaphone
 

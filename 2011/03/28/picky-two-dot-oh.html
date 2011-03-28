@@ -75,7 +75,7 @@
       Much more understandable and sexier! :)</p>
       <p>To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an <code>ids</code> query parameter:</p>
       <pre class="sh_bash"><code>$ curl 'localhost:8080/books?query=meow&amp;ids=15&amp;offset=0'</code></pre>
-      <p>Defaults are 20 <code>ids</code> and <code>0</code> offset.</p>
+      <p>Defaults are 20 <code>ids</code> and 0 <code>offset</code>.</p>
       <h3>Similarity::Phonetic &#8594; Similarity::DoubleMetaphone</h3>
       <p>We&#8217;ve renamed <code>Similarity::Phonetic</code> to <code>Similarity::DoubleMetaphone</code>. It&#8217;s still the same algorithm. See <a href="http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone">the double metaphone</a>.</p>
       <p>Also, we&#8217;ve added two default implementations, <code>Similarity::Metaphone</code> and <code>Similarity::Soundex</code> for your similarity pleasure :)</p>

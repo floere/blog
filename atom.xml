@@ -4,13 +4,83 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-28T22:54:49+02:00</updated>
+ <updated>2011-03-31T00:44:10+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>On Searching</title>
+   <link href="http://florianhanke.com/blog/2011/03/30/on-searching.html"/>
+   <updated>2011-03-30T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/03/30/on-searching</id>
+   <content type="html">&lt;h2&gt;tl; dr&lt;/h2&gt;
+&lt;p&gt;This post is about engineers, our pride in information gathering and organizing, and how we often fail in information searching.&lt;/p&gt;
+&lt;p&gt;Also about different types of search engines.&lt;/p&gt;
+&lt;h2&gt;Engineering&lt;/h2&gt;
+&lt;p&gt;Imagine a structural engineer planning a bridge.&lt;/p&gt;
+&lt;p&gt;How do you think does he approach the problem? Does he just build a standard concrete/steel bridge?&lt;/p&gt;
+&lt;p&gt;Probably not. He analyzes the constraints put on it by various factors, monetary, environmental, political, and last but not least – time, and sets out to build the bridge that fits as many of these constraints as possible.&lt;/p&gt;
+&lt;p&gt;Similarly with software engineering: We analyze various options, plan, code, release. (In this magical dream world I am conjuring up. But bear with me.)&lt;/p&gt;
+&lt;p&gt;And most of the time, we do this well. An incredible number of blog posts, books etc. describe various options and tools in the software world that can be used as blueprints, tools, or inspiration to build our specific &amp;#8220;bridges&amp;#8221;.&lt;/p&gt;
+&lt;h2&gt;Information gathering and structuring&lt;/h2&gt;
+&lt;p&gt;When it is about collecting information, we are world masters.&lt;/p&gt;
+&lt;p&gt;There is an enormous wealth of information regarding how to structure data, which database/key-value-store/glorified-hash etc. to use, when, and how.&lt;/p&gt;
+&lt;p&gt;How to acquire users, how to aqcuire information from these users, also how to access this information through APIs and how to make information accessible and so on.&lt;/p&gt;
+&lt;p&gt;Tell me the size of your valley, the amount and color of cars expected, and I can provide you a set of blueprints in a nice price range.&lt;/p&gt;
+&lt;p&gt;This is great. But what happens when it is about making this information searchable? Not so great in my humble opinion.&lt;/p&gt;
+&lt;h2&gt;Information searching&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ve recently experienced a few cases where the analysis for which search engine to use went something like this:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&amp;#8220;Oh, we&amp;#8217;ve used it for project X, it will be great in project Y (totally different project).&amp;#8221;&lt;/li&gt;
+	&lt;li&gt;&amp;#8220;Just use the gem in ActiveRecord, and it takes care of everything.&amp;#8221;&lt;/li&gt;
+	&lt;li&gt;&amp;#8220;Search engine X is cool, Y recommended it on his blog yesterday!&amp;#8221;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;While I appreciate the strict time constraints often involved in projects, the above reasons should not be used by an engineer worth his salt.&lt;/p&gt;
+&lt;p&gt;Yes, using search engine X will not end in disaster, and yes, it will return some results to the user.&lt;/p&gt;
+&lt;p&gt;But instead of building a bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.&lt;/p&gt;
+&lt;p&gt;Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of it&amp;#8217;s money on it.&lt;/p&gt;
+&lt;p&gt;What I am saying is: While you arrived through lots of reasoning why you use e.g. Redis over MongoDB, and can and will defend it if asked for your reasons – in information searching, this is often not the case.&lt;/p&gt;
+&lt;p&gt;Or can you tell me why you used search engine X in your last project?&lt;/p&gt;
+&lt;p&gt;I know that often the first step is information acquiring, and towards the end, project managers notice that they were so busy acquiring all this information, that they totally forgot to think about making this information properly searchable. Time constraints then trash sensible search engine selection.&lt;/p&gt;
+&lt;p&gt;There are other reasons as to why searching is neglected, but this is one I most often experienced.&lt;/p&gt;
+&lt;h2&gt;The resulting problem&lt;/h2&gt;
+&lt;p&gt;Often the end result of our careless choice is that the coders are quite happy, and the end users are relatively happy. But not a good happy, more of an accepting happy. Yes, we can search, and we should be grateful for it.&lt;/p&gt;
+&lt;p&gt;But are you really happy? Did you really put your engineering savvy into it to help your users advance?&lt;/p&gt;
+&lt;p&gt;Not really, right?&lt;/p&gt;
+&lt;h2&gt;What we need to do&lt;/h2&gt;
+&lt;p&gt;Know your problem domain, your information structure. Know your options and tools too.&lt;/p&gt;
+&lt;p&gt;Do you specifically need a realtime indexing search? There&amp;#8217;s &lt;a href=&quot;http://masanjin.net/whistlepig/&quot;&gt;one written in Ruby&lt;/a&gt; (just as an example for a rather special/specific search engine – not sure how far it is yet).&lt;/p&gt;
+&lt;p&gt;Do you really need a full-text search? Do you know &lt;a href=&quot;http://en.wikipedia.org/wiki/Full_text_search&quot;&gt;what a full text search&lt;/a&gt; is? Do you know when to use one and also, when not? When is a &lt;a href=&quot;http://en.wikipedia.org/wiki/Semantic_search&quot;&gt;semantic search engine&lt;/a&gt; the better choice?&lt;/p&gt;
+&lt;p&gt;Do you know the answers?&lt;/p&gt;
+&lt;p&gt;Btw, not dissing full-text search engines to promote &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; (the semantic search engine) here ;) They&amp;#8217;re great.&lt;/p&gt;
+&lt;p&gt;What I&amp;#8217;m criticizing is the indiscriminate choice by many of my peers. I&amp;#8217;m just trying to bring the point across that one should weigh the options, and decide based on reason.&lt;/p&gt;
+&lt;h2&gt;Fallacy: Search Engines are hard&lt;/h2&gt;
+&lt;p&gt;I guess that sometimes the problem is just that search engines seem like magic. Sure you most of the time know which knob to turn, but when something unexpected happens, you feel like a wet dog out in the wind.&lt;/p&gt;
+&lt;p&gt;Search engines are easy, actually. Take some time and &lt;a href=&quot;http://en.wikipedia.org/wiki/Search_engine_(computing)&quot;&gt;read all about them&lt;/a&gt;, especially by following the links.&lt;/p&gt;
+&lt;p&gt;Mind, blown?&lt;/p&gt;
+&lt;h2&gt;Sidenote: Computer Science vs. &amp;#8220;Informatik&amp;#8221;&lt;/h2&gt;
+&lt;p&gt;&amp;#8220;We want information. In-for-mation!&amp;#8221; &lt;a href=&quot;http://en.wikipedia.org/wiki/The_Prisoner&quot;&gt;(The Prisoner)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;German speaking countries got it right: They got computer science pegged.&lt;/p&gt;
+&lt;p&gt;I love the start of this &lt;a href=&quot;http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/&quot;&gt;set of lectures&lt;/a&gt; by Abelson and Sussman. In it, one of the guys casually strikes through &amp;#8220;Computer&amp;#8221;, then &amp;#8220;Science&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Watch them and be enlightened. And they are so right.&lt;/p&gt;
+&lt;p&gt;Why? Our work is not about computers, it&amp;#8217;s about information. Acquiring, analyzing, understanding, searching, offering: Information.&lt;/p&gt;
+&lt;p&gt;In german, &lt;a href=&quot;http://de.wikipedia.org/wiki/Informatik&quot;&gt;Informatik&lt;/a&gt; is a combination of &amp;#8220;Information&amp;#8221; and &amp;#8220;Mathematik&amp;#8221;. That&amp;#8217;s calling a horse a horse!&lt;/p&gt;
+&lt;p&gt;Actually, in english the term exists as well, &lt;a href=&quot;http://en.wikipedia.org/wiki/Informatics&quot;&gt;Informatics&lt;/a&gt; – but I&amp;#8217;ve never heard it used.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that in information searching we sometimes forget we&amp;#8217;re engineers.&lt;/li&gt;
+	&lt;li&gt;that there are many different types of search engines.&lt;/li&gt;
+	&lt;li&gt;that we perhaps should be talking about &amp;#8220;informatics&amp;#8221; from now on.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new :)&lt;/p&gt;
+&lt;p&gt;Comments and feedback, as usual, are appreciated.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky 2.0</title>

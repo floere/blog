@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-31T00:44:10+02:00</updated>
+ <updated>2011-03-31T10:39:41+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -41,8 +41,8 @@
 &lt;/ul&gt;
 &lt;p&gt;While I appreciate the strict time constraints often involved in projects, the above reasons should not be used by an engineer worth his salt.&lt;/p&gt;
 &lt;p&gt;Yes, using search engine X will not end in disaster, and yes, it will return some results to the user.&lt;/p&gt;
-&lt;p&gt;But instead of building a bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.&lt;/p&gt;
-&lt;p&gt;Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of it&amp;#8217;s money on it.&lt;/p&gt;
+&lt;p&gt;But instead of building an elegant bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.&lt;/p&gt;
+&lt;p&gt;Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of its money on it.&lt;/p&gt;
 &lt;p&gt;What I am saying is: While you arrived through lots of reasoning why you use e.g. Redis over MongoDB, and can and will defend it if asked for your reasons – in information searching, this is often not the case.&lt;/p&gt;
 &lt;p&gt;Or can you tell me why you used search engine X in your last project?&lt;/p&gt;
 &lt;p&gt;I know that often the first step is information acquiring, and towards the end, project managers notice that they were so busy acquiring all this information, that they totally forgot to think about making this information properly searchable. Time constraints then trash sensible search engine selection.&lt;/p&gt;

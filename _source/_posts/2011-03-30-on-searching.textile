@@ -48,9 +48,9 @@ While I appreciate the strict time constraints often involved in projects, the a
 
 Yes, using search engine X will not end in disaster, and yes, it will return some results to the user.
 
-But instead of building a bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.
+But instead of building an elegant bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.
 
-Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of it's money on it.
+Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of its money on it.
 
 What I am saying is: While you arrived through lots of reasoning why you use e.g. Redis over MongoDB, and can and will defend it if asked for your reasons – in information searching, this is often not the case.
 

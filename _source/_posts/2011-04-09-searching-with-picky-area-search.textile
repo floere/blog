@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Searching with Picky&#58; Area&nbsp;Search
+title: Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search
 categories:
   - ruby
   - picky
@@ -20,11 +20,11 @@ Using @ranged_category@ instead of @category@ in index definition lets you searc
 
 h2. Warp Area
 
-"Area Search":#area
+"Range Search":#area
 
-"Area, how?":#areahow
+"Range, how?":#areahow
 
-"Map Search":#map
+"Area Search":#map
 
 "Volume Search":#volumetric
 
@@ -38,7 +38,7 @@ h2. Warp Area
 
 "Conclusion":#conclusion
 
-h2(#area). Area Search
+h2(#area). Range Search
 
 !/blog/images/2011-04-09-intersection.png!
 
@@ -60,7 +60,7 @@ Now, if we could pass Picky the median x value, and the median y value and get i
 
 Indeed it would, and indeed it already can. You probably just didn't know.
 
-h2(#areahow). But how can I do an area search?
+h2(#areahow). But how can I do a range search?
 
 Apart from searching exact or partial strings with the @#category@ method, Picky offers a @#ranged_category@ method for numerical values.
 
@@ -98,7 +98,7 @@ Note that – since Picky does intersections – you can also search for height 
 
 you will find all the mountains from height 250 to 350 whose name starts with "va". Nice eh?
 
-h2(#map). Nice indeed, but where can I use this?
+h2(#map). Nice indeed, but can I use this for an area search?
 
 Let's say I have a CSV file, @swiss_places.csv@, with all places, 20910 in all, in Switzerland, like so:
 

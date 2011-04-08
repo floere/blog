@@ -13,7 +13,7 @@
     <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
-    <title>Searching with Picky&#58; Area&nbsp;Search</title>
+    <title>Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search</title>
     <script type="text/javascript">
       //<![CDATA[
         var _gaq = _gaq || [];
@@ -51,7 +51,7 @@
       </li>
     </ol>
     <div class="post">
-      <h1>Searching with Picky&#58; Area&nbsp;Search</h1>
+      <h1>Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search</h1>
       <div class="categories">ruby / picky / gems</div>
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
       <p>This post is all about searching areas, volumes, space and time – and more!</p>
@@ -59,16 +59,16 @@
       <p>Using <code>ranged_category</code> instead of <code>category</code> in index definition lets you search inside numeric ranges (instead of exact or partial strings). Example:</p>
       <pre class="sh_ruby"><code>ranged_category :height,&#x000A;                50,          # units "around" the searched value, here: meters&#x000A;                precision: 5 # very high precision, 1% error</code></pre>
       <h2>Warp Area</h2>
-      <p><a href="#area">Area Search</a></p>
-      <p><a href="#areahow">Area, how?</a></p>
-      <p><a href="#map">Map Search</a></p>
+      <p><a href="#area">Range Search</a></p>
+      <p><a href="#areahow">Range, how?</a></p>
+      <p><a href="#map">Area Search</a></p>
       <p><a href="#volumetric">Volume Search</a></p>
       <p><a href="#funky">&#8220;Find all locations in a thin slice of N47.11 to N47.13, whose names start with F, that are in height 362m to 462m&#8221;</a></p>
       <p><a href="#spacetime">Space &amp; Time Search</a></p>
       <p><a href="#radiuses">Different Radiuses/Volume Sizes etc.</a></p>
       <p><a href="#caveats">Caveats</a></p>
       <p><a href="#conclusion">Conclusion</a></p>
-      <h2 id="area">Area Search</h2>
+      <h2 id="area">Range Search</h2>
       <p><img src="/blog/images/2011-04-09-intersection.png" alt="" /></p>
       <p>Picky is good at intersecting stuff – and guessing which of the intersections you actually are looking for.</p>
       <p>The pink part is where e.g. &#8220;name:eisenhower&#8221; and &#8220;title:wa&#8221;&#174; intersects in a speech database, and Picky finds it. The blue part is where &#8220;name:eisenhower&#8221; and &#8220;title:wa&#8221;(rthog) intersect. Less interesting, and Picky thinks so too.</p>
@@ -79,7 +79,7 @@
       <p>This type of diagram has been successfully used by Piet Mondrian at the beginning of last century.</p>
       <p>Now, if we could pass Picky the median x value, and the median y value and get it to return the results in the pink area, wouldn&#8217;t that be something?</p>
       <p>Indeed it would, and indeed it already can. You probably just didn&#8217;t know.</p>
-      <h2 id="areahow">But how can I do an area search?</h2>
+      <h2 id="areahow">But how can I do a range search?</h2>
       <p>Apart from searching exact or partial strings with the <code>#category</code> method, Picky offers a <code>#ranged_category</code> method for numerical values.</p>
       <p>Let me show you how it works. Let&#8217;s say that I have a <span class="caps">CSV</span> file, <code>mountains.csv</code>, with the mountains of the world, from lowest to highest, in meters:</p>
       <pre class="sh_csv"><code>1, Tokelau (NZ), 5.0&#x000A;...&#x000A;124, Vaalserberg (NL), 321.9&#x000A;...&#x000A;78513, Mount Everest (NP), 8850.0</code></pre>
@@ -94,7 +94,7 @@
       <p>Note that – since Picky does intersections – you can also search for height <span class="caps">AND</span> name at the same time. If you add a full partial search option to the name category, <code>category :name, partial: Partial::Substring.new(from: 1)</code> then when you search for example for</p>
       <pre class="sh_search"><code>300 va</code></pre>
       <p>you will find all the mountains from height 250 to 350 whose name starts with &#8220;va&#8221;. Nice eh?</p>
-      <h2 id="map">Nice indeed, but where can I use this?</h2>
+      <h2 id="map">Nice indeed, but can I use this for an area search?</h2>
       <p>Let&#8217;s say I have a <span class="caps">CSV</span> file, <code>swiss_places.csv</code>, with all places, 20910 in all, in Switzerland, like so:</p>
       <pre class="sh_csv"><code>1,Zuger See,47.11667,8.48333&#x000A;2,Zwischbergental,46.16667,8.13333&#x000A;3,Zwischbergen,46.16667,8.11667&#x000A;4,Zwingen,47.43825,7.53027&#x000A;...&#x000A;20910,Les 4 Vallées,46.17572,7.32142</code></pre>
       <p>This is the data. Then I tell Picky where to find the data (in the <span class="caps">CSV</span>) and how to index it:</p>

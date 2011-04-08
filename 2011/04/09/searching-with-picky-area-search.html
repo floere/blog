@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Searching with Picky&#58; Area&nbsp;Search</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog home</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Searching with Picky&#58; Area&nbsp;Search</h1>
+      <div class="categories">ruby / picky / gems</div>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
+      <p>This post is all about searching areas, volumes, space and time – and more!</p>
+      <h2>Area Search</h2>
+      <p><img src="/images/2011-04-09-intersection.png" alt="" /></p>
+      <p>Picky is good at intersecting stuff – and guessing which of the intersections you actually are looking for.</p>
+      <p>The pink part is where e.g. &#8220;name:eisenhower&#8221; and &#8220;title:wa&#8221;&#174; intersects in a speech database, and Picky finds it. The blue part is where &#8220;name:eisenhower&#8221; and &#8220;title:wa&#8221;(rthog) intersect. Less interesting, and Picky thinks so too.</p>
+      <p>Usually, what Picky does is intersecting these circles of words you are looking for, resulting in funky Venn diagrams that have so successfully been used in 60s style living rooms.</p>
+      <p><img src="/images/2011-04-09-area.png" alt="" /></p>
+      <p>Hey, doesn&#8217;t a map have grids that intersect somehow? What if Picky could intersect the area between the x lines (light blue) with the area between the y lines (also light blue)?</p>
+      <p>What we&#8217;d get is the results in the pinkish area.</p>
+      <p>This type of diagram has been successfully used by Piet Mondrian at the beginning of last century.</p>
+      <p>Now, if we could pass Picky the median x value, and the median y value and get it to return the results in the pink area, wouldn&#8217;t that be something?</p>
+      <p>Indeed it would, and indeed it already can. You probably just didn&#8217;t know.</p>
+      <h2>But how can I do an area search?</h2>
+      <p>Apart from searching exact or partial strings with the <code>#category</code> method, Picky offers a <code>#ranged_category</code> method for numerical values.</p>
+      <p>Let me show you how it works. Let&#8217;s say that I have a <span class="caps">CSV</span> file, <code>mountains.csv</code>, with the mountains of the world, from lowest to highest, in meters:</p>
+      <pre class="sh_csv"><code>1, Tokelau (NZ), 5.0&#x000A;...&#x000A;124, Vaalserberg (NL), 321.9&#x000A;...&#x000A;78513, Mount Everest (NP), 8850.0</code></pre>
+      <p>Now we want the user to be able to enter</p>
+      <pre class="sh_search"><code>200</code></pre>
+      <p>and get all the mountains that are +/- 50 meters in height away from 200.</p>
+      <p>For that you use <code>ranged_category(name, units_around, options = {})</code>:</p>
+      <pre class="sh_ruby"><code>data_source = Sources::CSV.new(:location, :height, file: 'data/mountains.csv')&#x000A;mountains = Index::Memory.new(:mountains, data_source) do&#x000A;  category        :name&#x000A;  ranged_category :height, 50, precision: 3 # 50 is the units around the searched height&#x000A;end</code></pre>
+      <p>So we&#8217;d have a name (that is searched with the default config, like text) and a height that is searched with a precision of 3, 50 meters around the number the user enters.</p>
+      <p>What does the precision mean?</p>
+      <p>Precision 1, the default, has 5% error and is really, really fast, and precision 5 has 1% error and is just fast. You can go up to wherever you want, but 5 is a good tradeoff if you need a precise result.</p>
+      <p>Note that – since Picky does intersections – you can also search for height <span class="caps">AND</span> name at the same time. If you add a full partial search option to the name category, <code>category :name, partial: Partial::Substring.new(from: 1)</code> then when you search for example for</p>
+      <pre class="sh_search"><code>300 va</code></pre>
+      <p>you will find all the mountains from height 250 to 350 whose name starts with &#8220;va&#8221;. Nice eh?</p>
+      <h2>Nice indeed, but where can I use this?</h2>
+      <p>Let&#8217;s say I have a <span class="caps">CSV</span> file, <code>swiss_places.csv</code>, with all places, 20910 in all, in Switzerland, like so:</p>
+      <pre class="sh_csv"><code>1,Zuger See,47.11667,8.48333&#x000A;2,Zwischbergental,46.16667,8.13333&#x000A;3,Zwischbergen,46.16667,8.11667&#x000A;4,Zwingen,47.43825,7.53027&#x000A;...&#x000A;20910,Les 4 Vallées,46.17572,7.32142</code></pre>
+      <p>This is the data. Then I&#8217;d tell Picky where to find the data (in the <span class="caps">CSV</span>) and how to index them.</p>
+      <pre class="sh_ruby"><code>data_source = Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')&#x000A;swiss_places = Index::Memory.new(:swiss_places, data_source) do&#x000A;  category     :location&#x000A;  map_location :north, 1, precision: 3&#x000A;  map_location :east,  1, precision: 3&#x000A;end</code></pre>
+      <h2>Volumetric Search</h2>
+      <h2>Space and Time</h2>
+      <h2>Combining it!</h2>
+      <h2>I want to be able to search in 1km, 10km, 100km!</h2>
+      <p>h2.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Picky can search areas.</li>
+      	<li>that Picky can search volumes.</li>
+      	<li>that Picky can search any number of dimensions.</li>
+      	<li>that you can choose any combination of areas and other features.</li>
+      	<li>that you cannot quite search on a ball, like earth.</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/03/30/on-searching.html" title="Previous post: On Searching">On Searching</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/04/09/searching-with-picky-area-search';
+          var disqus_url = 'http://florianhanke.com/blog/2011/04/09/searching-with-picky-area-search.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

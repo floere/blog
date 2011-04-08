@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-03-31T10:39:41+02:00</updated>
+ <updated>2011-04-09T02:22:54+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -13,9 +13,83 @@
 
  
  <entry>
+   <title>Searching with Picky&#58; Area&nbsp;Search</title>
+   <link href="http://florianhanke.com/blog/2011/04/09/searching-with-picky-area-search.html"/>
+   <updated>2011-04-09T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/09/searching-with-picky-area-search</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;p&gt;This post is all about searching areas, volumes, space and time – and more!&lt;/p&gt;
+&lt;h2&gt;Area Search&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-04-09-intersection.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Picky is good at intersecting stuff – and guessing which of the intersections you actually are looking for.&lt;/p&gt;
+&lt;p&gt;The pink part is where e.g. &amp;#8220;name:eisenhower&amp;#8221; and &amp;#8220;title:wa&amp;#8221;&amp;#174; intersects in a speech database, and Picky finds it. The blue part is where &amp;#8220;name:eisenhower&amp;#8221; and &amp;#8220;title:wa&amp;#8221;(rthog) intersect. Less interesting, and Picky thinks so too.&lt;/p&gt;
+&lt;p&gt;Usually, what Picky does is intersecting these circles of words you are looking for, resulting in funky Venn diagrams that have so successfully been used in 60s style living rooms.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-04-09-area.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Hey, doesn&amp;#8217;t a map have grids that intersect somehow? What if Picky could intersect the area between the x lines (light blue) with the area between the y lines (also light blue)?&lt;/p&gt;
+&lt;p&gt;What we&amp;#8217;d get is the results in the pinkish area.&lt;/p&gt;
+&lt;p&gt;This type of diagram has been successfully used by Piet Mondrian at the beginning of last century.&lt;/p&gt;
+&lt;p&gt;Now, if we could pass Picky the median x value, and the median y value and get it to return the results in the pink area, wouldn&amp;#8217;t that be something?&lt;/p&gt;
+&lt;p&gt;Indeed it would, and indeed it already can. You probably just didn&amp;#8217;t know.&lt;/p&gt;
+&lt;h2&gt;But how can I do an area search?&lt;/h2&gt;
+&lt;p&gt;Apart from searching exact or partial strings with the &lt;code&gt;#category&lt;/code&gt; method, Picky offers a &lt;code&gt;#ranged_category&lt;/code&gt; method for numerical values.&lt;/p&gt;
+&lt;p&gt;Let me show you how it works. Let&amp;#8217;s say that I have a &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; file, &lt;code&gt;mountains.csv&lt;/code&gt;, with the mountains of the world, from lowest to highest, in meters:&lt;/p&gt;
+&lt;pre class=&quot;sh_csv&quot;&gt;&lt;code&gt;1, Tokelau (NZ), 5.0
+...
+124, Vaalserberg (NL), 321.9
+...
+78513, Mount Everest (NP), 8850.0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we want the user to be able to enter&lt;/p&gt;
+&lt;pre class=&quot;sh_search&quot;&gt;&lt;code&gt;200&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and get all the mountains that are +/- 50 meters in height away from 200.&lt;/p&gt;
+&lt;p&gt;For that you use &lt;code&gt;ranged_category(name, units_around, options = {})&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data_source = Sources::CSV.new(:location, :height, file: 'data/mountains.csv')
+mountains = Index::Memory.new(:mountains, data_source) do
+  category        :name
+  ranged_category :height, 50, precision: 3 # 50 is the units around the searched height
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we&amp;#8217;d have a name (that is searched with the default config, like text) and a height that is searched with a precision of 3, 50 meters around the number the user enters.&lt;/p&gt;
+&lt;p&gt;What does the precision mean?&lt;/p&gt;
+&lt;p&gt;Precision 1, the default, has 5% error and is really, really fast, and precision 5 has 1% error and is just fast. You can go up to wherever you want, but 5 is a good tradeoff if you need a precise result.&lt;/p&gt;
+&lt;p&gt;Note that – since Picky does intersections – you can also search for height &lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt; name at the same time. If you add a full partial search option to the name category, &lt;code&gt;category :name, partial: Partial::Substring.new(from: 1)&lt;/code&gt; then when you search for example for&lt;/p&gt;
+&lt;pre class=&quot;sh_search&quot;&gt;&lt;code&gt;300 va&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;you will find all the mountains from height 250 to 350 whose name starts with &amp;#8220;va&amp;#8221;. Nice eh?&lt;/p&gt;
+&lt;h2&gt;Nice indeed, but where can I use this?&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s say I have a &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; file, &lt;code&gt;swiss_places.csv&lt;/code&gt;, with all places, 20910 in all, in Switzerland, like so:&lt;/p&gt;
+&lt;pre class=&quot;sh_csv&quot;&gt;&lt;code&gt;1,Zuger See,47.11667,8.48333
+2,Zwischbergental,46.16667,8.13333
+3,Zwischbergen,46.16667,8.11667
+4,Zwingen,47.43825,7.53027
+...
+20910,Les 4 Vallées,46.17572,7.32142&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is the data. Then I&amp;#8217;d tell Picky where to find the data (in the &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt;) and how to index them.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data_source = Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')
+swiss_places = Index::Memory.new(:swiss_places, data_source) do
+  category     :location
+  map_location :north, 1, precision: 3
+  map_location :east,  1, precision: 3
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Volumetric Search&lt;/h2&gt;
+&lt;h2&gt;Space and Time&lt;/h2&gt;
+&lt;h2&gt;Combining it!&lt;/h2&gt;
+&lt;h2&gt;I want to be able to search in 1km, 10km, 100km!&lt;/h2&gt;
+&lt;p&gt;h2.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that Picky can search areas.&lt;/li&gt;
+	&lt;li&gt;that Picky can search volumes.&lt;/li&gt;
+	&lt;li&gt;that Picky can search any number of dimensions.&lt;/li&gt;
+	&lt;li&gt;that you can choose any combination of areas and other features.&lt;/li&gt;
+	&lt;li&gt;that you cannot quite search on a ball, like earth.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
    <title>On Searching</title>
    <link href="http://florianhanke.com/blog/2011/03/30/on-searching.html"/>
-   <updated>2011-03-30T00:00:00+02:00</updated>
+   <updated>2011-03-30T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/30/on-searching</id>
    <content type="html">&lt;h2&gt;tl; dr&lt;/h2&gt;
 &lt;p&gt;This post is about engineers, our pride in information gathering and organizing, and how we often fail in information searching.&lt;/p&gt;
@@ -85,7 +159,7 @@
  <entry>
    <title>Picky 2.0</title>
    <link href="http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh.html"/>
-   <updated>2011-03-28T00:00:00+02:00</updated>
+   <updated>2011-03-28T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh</id>
    <content type="html">&lt;p&gt;In my previous post, I talked about what bothers me in Picky&amp;#8217;s &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;, and did a few 2.0 prerelease versions with the improvements.&lt;/p&gt;
 &lt;p&gt;After quite a bit of feedback, Picky 2.0 is released! :)&lt;/p&gt;
@@ -157,7 +231,7 @@ LiveBooksSearch = Picky::Client::Live.new ...&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>Picky's Coming of Age</title>
    <link href="http://florianhanke.com/blog/2011/03/16/pickys-adolescence.html"/>
-   <updated>2011-03-16T00:00:00+01:00</updated>
+   <updated>2011-03-16T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/16/pickys-adolescence</id>
    <content type="html">&lt;p&gt;I&amp;#8217;m gonna talk about what bothers me in Picky&amp;#8217;s current configuration and what I&amp;#8217;d like to propose for 2.0. Opinions or ideas for new &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; features are very welcome!&lt;/p&gt;
 &lt;h2&gt;A spot of bother&lt;/h2&gt;
@@ -236,7 +310,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>Searching with Picky&#58; Rake Tasks</title>
    <link href="http://florianhanke.com/blog/2011/03/13/searching-with-picky-rake-tasks.html"/>
-   <updated>2011-03-13T00:00:00+01:00</updated>
+   <updated>2011-03-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/13/searching-with-picky-rake-tasks</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;We&amp;#8217;ve all have used &lt;code&gt;rake index&lt;/code&gt; and &lt;code&gt;rake start&lt;/code&gt; to index and then start up a server. But did you know that Picky (and Rake, one of his best buddies) offer quite a few more?&lt;/p&gt;
@@ -409,7 +483,7 @@ Index category &quot;isbn&quot; not found. Possible categories: &quot;id&quot;, 
  <entry>
    <title>Searching with Picky&#58; Redis</title>
    <link href="http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis.html"/>
-   <updated>2011-03-02T00:00:00+01:00</updated>
+   <updated>2011-03-02T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This post will be a very short introduction on Redis index backends and Picky, and how to configure your indexes to run on Redis.&lt;/p&gt;
@@ -483,7 +557,7 @@ $ rake start&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>Searching with Picky&#58; Live&nbsp;reloading&nbsp;indexes</title>
    <link href="http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html"/>
-   <updated>2011-02-20T00:00:00+01:00</updated>
+   <updated>2011-02-20T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This post is on reloading indexes by way of signals. So, first let&amp;#8217;s talk a little about signals. Then, in the second half, I talk about reloading the memory index in Picky.&lt;/p&gt;
@@ -592,7 +666,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>A better Rubygems search</title>
    <link href="http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html"/>
-   <updated>2011-02-13T00:00:00+01:00</updated>
+   <updated>2011-02-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search</id>
    <content type="html">&lt;p&gt;Some time ago, &lt;a href=&quot;http://blog.absurd.li/&quot;&gt;Kaspar&lt;/a&gt; mentioned to me that it would be nice to have a &lt;em&gt;gem dependency search&lt;/em&gt;, i.e. where you could search in which gems a gem is used.&lt;/p&gt;
 &lt;p&gt;I thought so too, so I wrote one :)
@@ -665,7 +739,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>Running Sinatra inside a Ruby Gem</title>
    <link href="http://florianhanke.com/blog/2011/02/02/running-sinatra-inside-a-gem.html"/>
-   <updated>2011-02-02T00:00:00+01:00</updated>
+   <updated>2011-02-02T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/02/02/running-sinatra-inside-a-gem</id>
    <content type="html">&lt;p&gt;&lt;img src=&quot;/blog/images/sinatra.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
@@ -784,7 +858,7 @@ Hello, you're running your web app from a gem!&lt;/code&gt;&lt;/pre&gt;
  <entry>
    <title>Parslet Intro</title>
    <link href="http://florianhanke.com/blog/2011/02/01/parslet-intro.html"/>
-   <updated>2011-02-01T00:00:00+01:00</updated>
+   <updated>2011-02-01T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/02/01/parslet-intro</id>
    <content type="html">&lt;p&gt;Tonight I wanted to take some time off from Picky to write about &lt;a href=&quot;http://kschiess.github.com/parslet/&quot;&gt;Parslet&lt;/a&gt;, a parser construction library by my dear friend &lt;a href=&quot;http://www.absurd.li/&quot;&gt;Kaspar&amp;nbsp;Schiess&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;tl;dr&lt;/h2&gt;
@@ -949,7 +1023,7 @@ First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;
  <entry>
    <title>Searching with Picky&#58; Live Parameters Part 2</title>
    <link href="http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html"/>
-   <updated>2011-01-27T00:00:00+01:00</updated>
+   <updated>2011-01-27T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like &lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;unicorn&lt;/a&gt;.&lt;/p&gt;
@@ -1084,7 +1158,7 @@ The connection to the parent would already have been closed off by the parent it
  <entry>
    <title>Searching with Picky&#58; Live Parameters Part 1</title>
    <link href="http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1.html"/>
-   <updated>2011-01-25T00:00:00+01:00</updated>
+   <updated>2011-01-25T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;p&gt;This time I want to do a two-part post on live parameters.&lt;/p&gt;
@@ -1117,7 +1191,7 @@ The connection to the parent would already have been closed off by the parent it
  <entry>
    <title>Searching with Picky&#58; Data Sources</title>
    <link href="http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources.html"/>
-   <updated>2011-01-20T00:00:00+01:00</updated>
+   <updated>2011-01-20T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is a Data Source in Picky?&lt;/h2&gt;
@@ -1181,7 +1255,7 @@ It gets the index and the current category and should &lt;code&gt;yield(id, text
  <entry>
    <title>Searching with Picky&#58; Partial Search</title>
    <link href="http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search.html"/>
-   <updated>2011-01-17T00:00:00+01:00</updated>
+   <updated>2011-01-17T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is a Partial Search?&lt;/h2&gt;
@@ -1275,7 +1349,7 @@ This will match &lt;code&gt;picky&lt;/code&gt; if you enter just a &lt;code&gt;y
  <entry>
    <title>Searching with Picky&#58; Character&nbsp;Substitution</title>
    <link href="http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters.html"/>
-   <updated>2011-01-13T00:00:00+01:00</updated>
+   <updated>2011-01-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its configuration. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
 &lt;h2&gt;What is Character Substitution?&lt;/h2&gt;
@@ -1358,7 +1432,7 @@ end
  <entry>
    <title>Speccing methods called in initialize</title>
    <link href="http://florianhanke.com/blog/2010/10/27/speccing-methods-called-in-initialize.html"/>
-   <updated>2010-10-27T00:00:00+02:00</updated>
+   <updated>2010-10-27T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2010/10/27/speccing-methods-called-in-initialize</id>
    <content type="html">&lt;p&gt;Recently when writing &lt;a href=&quot;http://floere.github.com/picky/&quot;&gt;Picky, the clever small text search engine&lt;/a&gt;, I encountered the following problem: How do I test methods that are called in an initializer?&lt;/p&gt;
 &lt;p&gt;(Of course I could call &lt;code&gt;Testee.new&lt;/code&gt; in the spec and then just call the method again. But what if that method sets a state?)&lt;/p&gt;
@@ -1370,7 +1444,7 @@ end
  <entry>
    <title>Why open sourcing security critical software is important</title>
    <link href="http://florianhanke.com/blog/2010/10/06/why-open-sourcing-security-critical-software-is-important.html"/>
-   <updated>2010-10-06T00:00:00+02:00</updated>
+   <updated>2010-10-06T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2010/10/06/why-open-sourcing-security-critical-software-is-important</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.freedom-to-tinker.com/blog/jhalderm/hacking-dc-internet-voting-pilot&quot;&gt;Why open sourcing security critical software is important&lt;/a&gt;&lt;/p&gt;</content>
    
@@ -1379,7 +1453,7 @@ end
  <entry>
    <title>Profiling MySQL Queries</title>
    <link href="http://florianhanke.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL.html"/>
-   <updated>2010-09-27T00:00:00+02:00</updated>
+   <updated>2010-09-27T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/09/27/in-detail-performance-measurements-for-MySQL</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://dev.mysql.com/tech-resources/articles/using-new-query-profiler.html&quot;&gt;Profiling MySQL Queries&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;In-detail performance measurements for MySQL queries.&lt;/p&gt;</content>
@@ -1389,7 +1463,7 @@ end
  <entry>
    <title>Drawing in the browser</title>
    <link href="http://florianhanke.com/blog/2010/05/22/drawing-in-the-browser.html"/>
-   <updated>2010-05-22T00:00:00+02:00</updated>
+   <updated>2010-05-22T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/05/22/drawing-in-the-browser</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://mugtug.com/sketchpad/&quot;&gt;Drawing in the Browser&lt;/a&gt;&lt;/a&gt;
 &amp;#8230; using HTML5.&lt;/p&gt;</content>
@@ -1399,7 +1473,7 @@ end
  <entry>
    <title>Most important Ruby method 2010</title>
    <link href="http://florianhanke.com/blog/2010/05/21/most-important-ruby-method.html"/>
-   <updated>2010-05-21T00:00:00+02:00</updated>
+   <updated>2010-05-21T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/05/21/most-important-ruby-method</id>
    <content type="html">&lt;p&gt;It&amp;#8217;s &lt;code&gt;squeeze&lt;/code&gt;!
 &lt;script src=&quot;http://gist.github.com/408937.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
@@ -1409,7 +1483,7 @@ end
  <entry>
    <title>Programming Applied Mathematics</title>
    <link href="http://florianhanke.com/blog/2010/05/13/programming-applied-mathematics.html"/>
-   <updated>2010-05-13T00:00:00+02:00</updated>
+   <updated>2010-05-13T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/05/13/programming-applied-mathematics</id>
    <content type="html">&lt;p&gt;&lt;code&gt;Programming is one of the most difficult branches of applied mathematics / the poorer mathematicians had better remain pure mathematicians.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;– Edsger W. Dijkstra&lt;/p&gt;
@@ -1420,7 +1494,7 @@ end
  <entry>
    <title>New programming jargon</title>
    <link href="http://florianhanke.com/blog/2010/05/11/new-programming-jargon.html"/>
-   <updated>2010-05-11T00:00:00+02:00</updated>
+   <updated>2010-05-11T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/05/11/new-programming-jargon</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.globalnerdy.com/2010/05/09/new-programming-jargon/&quot;&gt;New Programming Jargon&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Need to remember Bugfoot and Shrug Report… And especially Duck!&lt;/p&gt;</content>
@@ -1430,7 +1504,7 @@ end
  <entry>
    <title>Fat slows you down</title>
    <link href="http://florianhanke.com/blog/2010/05/09/fat-slows-you-down.html"/>
-   <updated>2010-05-09T00:00:00+02:00</updated>
+   <updated>2010-05-09T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/05/09/fat-slows-you-down</id>
    <content type="html">&lt;p&gt;Fat slows you down.&lt;/p&gt;
 &lt;p&gt;If you really need speed in Ruby 1.9, consider this example:
@@ -1441,7 +1515,7 @@ end
  <entry>
    <title>You already knew that, right? (Assigning with splats)</title>
    <link href="http://florianhanke.com/blog/2010/04/30/you-already-knew-that-right.html"/>
-   <updated>2010-04-30T00:00:00+02:00</updated>
+   <updated>2010-04-30T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/30/you-already-knew-that-right</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/385121.js&quot;&gt;&lt;/script&gt;&lt;p&gt;Referring to the fact that I want to sleep with the splat operator…&lt;/p&gt;</content>
    
@@ -1450,7 +1524,7 @@ end
  <entry>
    <title>97% is as good as a 100%</title>
    <link href="http://florianhanke.com/blog/2010/04/30/if-you-re-in-a-hurry.html"/>
-   <updated>2010-04-30T00:00:00+02:00</updated>
+   <updated>2010-04-30T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/30/if-you-re-in-a-hurry</id>
    <content type="html">&lt;p&gt;&lt;code&gt;If you're in a hurry and you need to pack up your bags and go, 97% is as good as a 100%. The 100% mark does not have the same (show-stopping) magic as 0%, where the difference between 3% and 0% really is important.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;– &lt;a href=&quot;http://www.two-sdg.demon.co.uk/curbralan/papers/minimalism/OmitNeedlessCode.html&quot;&gt;Omit Needless Code&lt;/a&gt;&lt;/p&gt;</content>
@@ -1460,7 +1534,7 @@ end
  <entry>
    <title>elements.each(*p)</title>
    <link href="http://florianhanke.com/blog/2010/04/30/elements-each-p.html"/>
-   <updated>2010-04-30T00:00:00+02:00</updated>
+   <updated>2010-04-30T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/30/elements-each-p</id>
    <content type="html">&lt;p&gt;I often use&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;ary.map(&amp;amp;:upcase)&lt;/code&gt;&lt;/p&gt;
@@ -1475,7 +1549,7 @@ end
  <entry>
    <title>Strategy pattern pattern pattern pattern</title>
    <link href="http://florianhanke.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern.html"/>
-   <updated>2010-04-29T00:00:00+02:00</updated>
+   <updated>2010-04-29T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern</id>
    <content type="html">&lt;p&gt;A pattern that I often see cropping up in my &lt;a href=&quot;http://github.com/floere/gosu_extensions&quot;&gt;game framework&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It can be used for configuring subclasses that act according to an order of calls defined in the superclass. How the calls exactly work can be defined in the subclasses (or in an external configuration) using the class methods.&lt;/p&gt;
@@ -1486,7 +1560,7 @@ end
  <entry>
    <title>Mastery is a mindset</title>
    <link href="http://florianhanke.com/blog/2010/04/26/mastery-is-a-mindset.html"/>
-   <updated>2010-04-26T00:00:00+02:00</updated>
+   <updated>2010-04-26T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/26/mastery-is-a-mindset</id>
    <content type="html">&lt;p&gt;&lt;code&gt;Mastery is a mindset.&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;From the book &amp;#8220;Drive&amp;#8221;, by Pink.&lt;/p&gt;
@@ -1497,7 +1571,7 @@ end
  <entry>
    <title>Ruby 1.9 params</title>
    <link href="http://florianhanke.com/blog/2010/04/20/ruby-19-params.html"/>
-   <updated>2010-04-20T00:00:00+02:00</updated>
+   <updated>2010-04-20T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/20/ruby-19-params</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/372372.js&quot;&gt;&lt;/script&gt;</content>
    
@@ -1506,7 +1580,7 @@ end
  <entry>
    <title>Riddle</title>
    <link href="http://florianhanke.com/blog/2010/04/18/riddle.html"/>
-   <updated>2010-04-18T00:00:00+02:00</updated>
+   <updated>2010-04-18T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/18/riddle</id>
    <content type="html">&lt;p&gt;&lt;code&gt;3735928559&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Why is this number unappealing to vegetarians?&lt;/p&gt;</content>
@@ -1516,7 +1590,7 @@ end
  <entry>
    <title>A hole in the wall</title>
    <link href="http://florianhanke.com/blog/2010/04/18/a-hole-in-the-wall.html"/>
-   <updated>2010-04-18T00:00:00+02:00</updated>
+   <updated>2010-04-18T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/18/a-hole-in-the-wall</id>
    <content type="html">&lt;p&gt;His stool leaned back at a dangerous angle, he displays a pair of jamaica-colored sneakers to the public. Them sticking out of his business hole seems rather odd, considering the sober surroundings of the Niederdorf, or &amp;#8220;nether village&amp;#8221;, as this particular place in Zürich is called.&lt;/p&gt;
 &lt;p&gt;Slurping a botanic tea, idly facebooking and tumbling through the depths, no, shallows of the net, waiting for customers. It&amp;#8217;s been that way now for more than a day, and he starts to wonder if the customer specific context ads are just a fluke.&lt;/p&gt;
@@ -1538,7 +1612,7 @@ end
  <entry>
    <title>Oh yeah, Amazon?</title>
    <link href="http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark.html"/>
-   <updated>2010-04-14T00:00:00+02:00</updated>
+   <updated>2010-04-14T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark</id>
    <content type="html">&lt;p&gt;From the latest Newsletter:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;Support for Session Stickiness in Elastic Load Balancing Amazon Elastic MapReduce Introduces Custom Cluster Configuration Option&lt;/code&gt;&lt;/p&gt;
@@ -1550,7 +1624,7 @@ end
  <entry>
    <title>IE didn't get the CSS3 memo?</title>
    <link href="http://florianhanke.com/blog/2010/04/13/ie-didnt-get-the-css3-memo-question-mark.html"/>
-   <updated>2010-04-13T00:00:00+02:00</updated>
+   <updated>2010-04-13T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/13/ie-didnt-get-the-css3-memo-question-mark</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://kimblim.dk/css-tests/selectors/&quot;&gt;IE didn&amp;#8217;t get the CSS3 memo?&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Or, as is my guess: The code they based the new browsers on was fully untested, totally disorganized, and thus brutally hard to extend. IE9 though, gives one hope.&lt;/p&gt;</content>
@@ -1560,7 +1634,7 @@ end
  <entry>
    <title>Challenged</title>
    <link href="http://florianhanke.com/blog/2010/04/12/challenged.html"/>
-   <updated>2010-04-12T00:00:00+02:00</updated>
+   <updated>2010-04-12T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/12/challenged</id>
    <content type="html">&lt;p&gt;The framework looms in front of you. Clouds cover the gray sky. You plunge in. Full unit test rewrite, nothing is where it was before, but right: The mailbox is in front of the house, the bathtub is finally in the bath, the fridge contains organic food. There is a pot on the fire, full of juicy stuff.&lt;/p&gt;
 &lt;p&gt;But you are wearing glasses that let you only see 10 centimeters. You set wild eyes on the integration tests: Guests are entering the house, trying to eat from the toilet, sleeping in the oven, or jumping out of windows. It is fail, fail, fail, wherever you happen to look.&lt;/p&gt;
@@ -1573,7 +1647,7 @@ end
  <entry>
    <title>Stuttering Proc</title>
    <link href="http://florianhanke.com/blog/2010/04/07/stuttering-proc.html"/>
-   <updated>2010-04-07T00:00:00+02:00</updated>
+   <updated>2010-04-07T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/07/stuttering-proc</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/358947.js&quot;&gt;&lt;/script&gt;</content>
    
@@ -1582,7 +1656,7 @@ end
  <entry>
    <title>Reloading a running Ruby application</title>
    <link href="http://florianhanke.com/blog/2010/04/05/reloading-a-running-ruby-application.html"/>
-   <updated>2010-04-05T00:00:00+02:00</updated>
+   <updated>2010-04-05T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/05/reloading-a-running-ruby-application</id>
    <content type="html">&lt;p&gt;Here&amp;#8217;s how I do it:
 &lt;script src=&quot;http://gist.github.com/351776.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;</content>
@@ -1592,7 +1666,7 @@ end
  <entry>
    <title>Javuby?</title>
    <link href="http://florianhanke.com/blog/2010/04/05/javuby-question-mark.html"/>
-   <updated>2010-04-05T00:00:00+02:00</updated>
+   <updated>2010-04-05T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2010/04/05/javuby-question-mark</id>
    <content type="html">&lt;script src=&quot;http://gist.github.com/356227.js&quot;&gt;&lt;/script&gt;</content>
    

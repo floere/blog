@@ -10,9 +10,37 @@ This is a post in the "Picky":http://florianhanke.com/picky/index.html series on
 
 This post is all about searching areas, volumes, space and time – and more!
 
-h2. Area Search
+h2. tl;dr
 
-!/images/2011-04-09-intersection.png!
+Using @ranged_category@ instead of @category@ in index definition lets you search inside numeric ranges (instead of exact or partial strings). Example:
+
+<pre class="sh_ruby"><code>ranged_category :height,
+                50,          # units "around" the searched value, here: meters
+                precision: 5 # very high precision, 1% error</code></pre>
+
+h2. Warp Area
+
+"Area Search":#area
+
+"Area, how?":#areahow
+
+"Map Search":#map
+
+"Volume Search":#volumetric
+
+""Find all locations in a thin slice of N47.11 to N47.13, whose names start with F, that are in height 362m to 462m"":#funky
+
+"Space & Time Search":#spacetime
+
+"Different Radiuses/Volume Sizes etc.":#radiuses
+
+"Caveats":#caveats
+
+"Conclusion":#conclusion
+
+h2(#area). Area Search
+
+!/blog/images/2011-04-09-intersection.png!
 
 Picky is good at intersecting stuff – and guessing which of the intersections you actually are looking for.
 
@@ -20,7 +48,7 @@ The pink part is where e.g. "name:eisenhower" and "title:wa"(r) intersects in a 
 
 Usually, what Picky does is intersecting these circles of words you are looking for, resulting in funky Venn diagrams that have so successfully been used in 60s style living rooms.
 
-!/images/2011-04-09-area.png!
+!/blog/images/2011-04-09-area.png!
 
 Hey, doesn't a map have grids that intersect somehow? What if Picky could intersect the area between the x lines (light blue) with the area between the y lines (also light blue)?
 
@@ -32,7 +60,7 @@ Now, if we could pass Picky the median x value, and the median y value and get i
 
 Indeed it would, and indeed it already can. You probably just didn't know.
 
-h2. But how can I do an area search?
+h2(#areahow). But how can I do an area search?
 
 Apart from searching exact or partial strings with the @#category@ method, Picky offers a @#ranged_category@ method for numerical values.
 
@@ -70,7 +98,7 @@ Note that – since Picky does intersections – you can also search for height 
 
 you will find all the mountains from height 250 to 350 whose name starts with "va". Nice eh?
 
-h2. Nice indeed, but where can I use this?
+h2(#map). Nice indeed, but where can I use this?
 
 Let's say I have a CSV file, @swiss_places.csv@, with all places, 20910 in all, in Switzerland, like so:
 
@@ -81,32 +109,117 @@ Let's say I have a CSV file, @swiss_places.csv@, with all places, 20910 in all, 
 ...
 20910,Les 4 Vallées,46.17572,7.32142</code></pre>
 
-This is the data. Then I'd tell Picky where to find the data (in the CSV) and how to index them.
+This is the data. Then I tell Picky where to find the data (in the CSV) and how to index it:
 
 <pre class="sh_ruby"><code>data_source = Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')
 swiss_places = Index::Memory.new(:swiss_places, data_source) do
-  category     :location
-  map_location :north, 1, precision: 3
-  map_location :east,  1, precision: 3
+  category        :location
+  ranged_category :north, 0.01, precision: 3
+  ranged_category :east,  0.01, precision: 3
 end</code></pre>
 
-h2. Volumetric Search
+This means that we can search for the location, and the north and the east value, with 0.01 leeway around the searched number. So entering 47.12 would find numbers in the range 47.11..47.13.
 
-h2. Space and Time
+Now, if you search for
 
-h2. Combining it!
+<pre class="sh_search"><code>47.12, 8.48</code></pre>
 
-h2. I want to be able to search in 1km, 10km, 100km!
+you find the "Zuger See".
 
-h2.
+Since for Switzerland, the north and east coordinates are exclusive (one around 47, the other around 8.4), Picky knows what is what by itself.
 
-h2. Conclusion
+If your values aren't exclusive, for example both are in the range 1..3, then entering the search
+
+<pre class="sh_search"><code>1.3, 2.4</code></pre>
+
+might make Picky ask you which one is what. It's not clear if you want 1.3 from the one and 2.4 from the other, and voice versa. This can be remedied by exclusively specifying what is what:
+
+<pre class="sh_search"><code>north:1.3, east:2.4</code></pre>
+
+The best thing is that you don't need to use the Picky interface. You could whip up a Javascript interface (of some area) where you click into and run searches on Picky, then returning results that are displayed in the area.
+
+But now, let's go a little crazy!
+
+h2(#volumetric). Volumetric Search
+
+Say, the swiss data also had heights:
+
+<pre class="sh_csv"><code>1,Zuger See,47.11667,8.48333,410.0
+2,Zwischbergental,46.16667,8.13333,
+...
+20910,Les 4 Vallées,46.17572,7.32142,1205.3</code></pre>
+
+Just add the new line in the index definition, and in the source:
+
+<pre class="sh_ruby"><code>data_source = Sources::CSV.new(:location, :north, :east, :height, file: 'data/swiss_places.csv')
+swiss_places = Index::Memory.new(:swiss_places, data_source) do
+  ...
+  ranged_category :height, 50
+end</code></pre>
+
+Voilà!
+
+<pre class="sh_search"><code>47.12, 8.48, 400</code></pre>
+
+This would make you find the "Zugerberg", while using a height of 500 wouldn't.
+
+h3(#funky). Let's get funky!
+
+We don't need to use all categories:
+
+<pre class="sh_search"><code>47.12, f*, 412</code></pre>
+
+Funky search, but this would find all locations in a thin band of north 47.11..47.13, whose names start with f, and that are in height 362..462.
+
+Let's add more dimensions.
+
+h2(#spacetime). Space and Time
+
+So how would we search in space and time? Space is easy, that is just a volumetric search.
+
+Now: How would you add in time?
+
+Probably you'd index it in seconds from January 1st, 1970 or something like that, then define a ranged search with "radius" 1800. This would make Picky find things in the hour around the searched seconds since 1970.
+
+h2(#radiuses). I want to be able to search in 1m, 10m, 100m
+
+Now, as you saw, we looked for heights 50 meters around it using:
+
+<pre class="sh_ruby"><code>ranged_category :height, 50</code></pre>
+
+What if we want to search 1 meter, 10 meters, 100 meters around it, choosing as we go?
+
+This is accomplished by adding more searchable categories, like so. You name the category specifically, and tell Picky from where in the data source it should get the data, using the @from@ option.
+
+<pre class="sh_ruby"><code>ranged_category :height1,     1, from: height
+ranged_category :height10,   10, from: height
+ranged_category :height100, 100, from: height
+</code></pre>
+
+Choosing from the categories is done as usual. If you want 10 meters, search like this:
+
+<pre class="sh_search"><code>height10:412</code></pre>
+
+This will find locations of heights 402..422.
+
+h2(#caveats). Caveats
+
+Actually, if you use the @ranged_category@ on a larger area on a ball, like earth. For example in Australia – the place I am staying in, currently – what you will find is that the more south you go, towards the pole, the less square and more rectangular your search area will get. This is because Picky does not correct the ball's sphere. I'm working on it.
+
+So, Picky cannot handle your balls yet.
+
+For small countries it is still useful, and of course for lots of graph searches etc.
+
+Flat things it does marvellously. And super fast!
+
+h2(#conclusion). Conclusion
 
 So we've seen
-# that Picky can search areas.
-# that Picky can search volumes.
-# that Picky can search any number of dimensions.
-# that you can choose any combination of areas and other features.
+# how Picky can search areas.
+# how Picky can search volumes.
+# how Picky can search any number of dimensions.
+# how you can choose any combination of areas and other features.
+# how you search in different ranges on the same thing/category.
 # that you cannot quite search on a ball, like earth.
 
 Hope you learnt something new!

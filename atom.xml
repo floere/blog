@@ -4,13 +4,48 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-09T03:18:33+10:00</updated>
+ <updated>2011-04-11T12:08:29+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Searching with Picky&#58; In&nbsp;the&nbsp;Terminal</title>
+   <link href="http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search.html"/>
+   <updated>2011-04-11T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;p&gt;This post is about a fun little experimental toy I&amp;#8217;ve been working on: &lt;code&gt;rake search &amp;lt;url&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;rake search &amp;lt;url&amp;gt;?&lt;/h2&gt;
+&lt;p&gt;Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).&lt;/p&gt;
+&lt;h2&gt;How do I use it?&lt;/h2&gt;
+&lt;p&gt;See this short video (it&amp;#8217;s best to full-screen it):&lt;/p&gt;
+&lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/22216442&quot; width=&quot;600&quot; height=&quot;387&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;Start a Picky server.&lt;/li&gt;
+	&lt;li&gt;Then type &lt;code&gt;rake search /some/url&lt;/code&gt; (where &lt;code&gt;/some/url&lt;/code&gt; is a path or url if not on this server you&amp;#8217;ve defined using &lt;code&gt;route&lt;/code&gt; in &lt;code&gt;app/application.rb&lt;/code&gt;).&lt;/li&gt;
+	&lt;li&gt;Then, just type away.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The result id count will update as you type.&lt;/p&gt;
+&lt;p&gt;When pressing enter, the top 20 result ids will appear next to your search text.&lt;/p&gt;
+&lt;p&gt;If you want to exit, just &lt;code&gt;Ctrl-C&lt;/code&gt;. That&amp;#8217;s it.&lt;/p&gt;
+&lt;p&gt;Note that you need the picky-client &amp;amp; highline gem installed. But Picky will tell you so if you haven&amp;#8217;t.&lt;/p&gt;
+&lt;h2&gt;How does it work?&lt;/h2&gt;
+&lt;p&gt;I use the highline gem (by &lt;a href=&quot;http://twitter.com/jeg2&quot;&gt;@JEG2&lt;/a&gt;) to get single characters (using the appropriately named &lt;code&gt;get_character&lt;/code&gt;) from the user and then move the cursor around using &lt;code&gt;\e[#{amount}D&lt;/code&gt; (left) and &lt;code&gt;\e[#{amount}C&lt;/code&gt; (right), &lt;code&gt;print&lt;/code&gt; ing to the &lt;span class=&quot;caps&quot;&gt;STDOUT&lt;/span&gt; and &lt;code&gt;flush&lt;/code&gt; ing it a lot.&lt;/p&gt;
+&lt;p&gt;If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I&amp;#8217;d like to hear about it!&lt;/p&gt;
+&lt;h2&gt;Note&lt;/h2&gt;
+&lt;p&gt;Since this is experimental, it might not remain at &lt;code&gt;rake search&lt;/code&gt;. I might move it to &lt;code&gt;picky search&lt;/code&gt; since it doesn&amp;#8217;t actually need to be run from the project it is searching on (and simply accesses an &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;).&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;how you run a search directly in the terminal.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search</title>

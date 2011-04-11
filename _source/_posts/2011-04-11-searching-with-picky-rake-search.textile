@@ -21,7 +21,7 @@ See this short video (it's best to full-screen it):
 <iframe src="http://player.vimeo.com/video/22216442" width="600" height="387" frameborder="0"></iframe>
 
 # Start a Picky server.
-# Then type @rake search /some/url@ (where @/some/url@ is a path or url if not on this server you've defined using @route@ in @app/application.rb@).
+# Then type @rake search /some/url@ (where @/some/url@ is a path – or url if not on this server – you've defined using @route@ in @app/application.rb@).
 # Then, just type away.
 
 The result id count will update as you type.

@@ -59,7 +59,7 @@ The human readable index files are located in the Picky server directory @index/
 
 I urge you to look at them! Lots of indexing questions can be answered by just looking at @title_exact_index.json@, for example.
 
-Note that all index files are encoded in json, with the exception of the similarity indexes, which are @Marshal@ dumped. So only human readable if you load them using @Marshal.load@, I'm afraid.
+Note that all index files are encoded in json, with the exception of the similarity indexes, which are @Marshal@ dumped. So these are only human readable if you load them using @Marshal.load@, I'm afraid.
 
 h2. The problems
 
@@ -95,24 +95,104 @@ In a "parallel" indexer, Picky could load both @longitude@ and @latitude@ and do
 
 h3. Elegance
 
-This is the part where I am most unsure about. Simon from Berlin asked me about whether I had experience with Picky and MongoMapper last night. I don't, but it would certainly be cool to include it as a data source in one of the next versions of Picky.
+This is the part where I am most unsure about. But this
 
+<pre class="sh_ruby"><code>data_source = Sources::DB.new 'SELECT id, title, author, year FROM books', file: 'app/db.yml'
+Index::Memory.new :books, data_source do
+  # categories ...
+end</code></pre>
 
+just doesn't look good. Granted, you need to inject a lot of information in a few lines:
+* Type of source (@DB@)
+* Selection of data from the source (@SELECT@)
+* Configuration of source (@file: 'app/db.yml'@)
+
+But still, I'd love it to be much more elegant.
+
+For quite some time, I wasn't sure what to do. There isn't a single nice interface of all the data sources. ActiveRecord does it this way, MongoMapper another etc. etc.
+
+So Simon from Berlin asked me last night about whether I had experience with Picky and MongoMapper. I don't, but it would certainly be cool to include it as a data source in one of the next versions of Picky.
+
+I took a closer look at it. Similar to the new way in Rails 3, it uses a fluid interface, where some methods just modify the query, while some are "kicker" methods that actually do something:
+
+<pre class="sh_ruby"><code>User.where(:age.gt => 27).sort(:age).all</code></pre>
+
+More here, "http://railstips.org/blog/archives/2010/06/16/mongomapper-08-goodies-galore/":http://railstips.org/blog/archives/2010/06/16/mongomapper-08-goodies-galore/. The @all@ method at the end of a chain would be a kicker method, loading all objects.
+
+That got me thinking.
 
 h2. How I would like it to be
 
-* Why? Parallel data source for geo search.
+Wouldn't it be nice if we could just, instead of a data source, just pass any object as data source, so for example, with MongoMapper:
+
+<pre class="sh_ruby"><code>Index::Memory.new :books, User.where(:age.gt => 27).sort(:age) do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+Quite a bit sexier, imho. Since the result of the @sort(:age)@ method is a proxy that offers kicker and non-kicker methods, the Picky indexer could now call @each@ on it.
+
+The contract would then be that each object that is yielded by @#each@ must offer methods that are named like the categories (or named like the @from@ option – e.g. @category :name, from: surname@).
+
+So, in the above example, each User object would have methods @#name@ and @#age@ such that Picky could extract the data.
+
+The cool thing with that would be that I could just pass in an Array of data. So, this would work (@a@, @b@, @c@ all respond to @#name@):
+
+<pre class="sh_ruby"><code>Index::Memory.new :books, [a, b, c] do
+  category :name
+end</code></pre>
+
+What would we have to do to make this work in Picky?
 
 h2. How to get there?
 
-h2. Related problems
+First of all, Picky would need to be rewritten, or at least be partially rewritten to use a "parallel" indexer, where each category would be loaded along with the others. So loading data set 1 would load @title@, @author@, @year@ etc. at the same time. (Since some of these frameworks throw away the data after it has been yielded with @#each@)
+
+The nice side-effect of this is that it opens real geosearch (or any combined category search) possibilities in Picky.
+
+Probably, the frameworks offering the @#each@ way would need to yield lazily, i.e. @#each@ should not preload all the data before yielding as the data in question might be huge. Or maybe load it in batches.
+
+How could we migrate from the current state to the new indexer?
+
+I suggest that before instantiating the indexer, the index would first look at the source. If the source @responds_to?(:each)@, the parallel indexer would be used. And if not, the "serial" indexer would be used, doing things the old way.
+
+So the contract for parallel sources would be that they implement @#each@ in a way that would load the data in batches and only yield objects which respond to the category names.
+
+Let's see if we can get this working soon :)
+
+What I am wondering: Are we walking down a fool's path? Comment if you have an opinion about that, please.
+
+h2. Possible problems
+
+One problem could be that we lose speed since we'll be instantiating lots of objects that respond to the categories. On the other hand, the return trips would not be necessary anymore.
+
+Another problem is that since we're just depending on @#each@, we couldn't pass the source the index and category anymore. So choosing the right data would be the responsibility of the user. I do not think this to be a big problem.
+
+h2. Final remarks
+
+Although I'd like to make it more elegant, I'd still like to preserve the old way of doing things. Sure,
+
+<pre class="sh_ruby"><code>Index::Memory.new :users, User do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+might look nicer than
+
+<pre class="sh_ruby"><code>user_source = Sources::DB.new 'SELECT id, name, age FROM users', file: 'app/db.yml'
+Index::Memory.new :users, user_source do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+I'd like the old way to be available, since doing the right @SELECT@ is incredibly useful.
 
 h2. Conclusion
 
 So we've seen
 # how Picky data sources work now.
-# how they should work.
+# how they ought to work.
+# that @#each@ would be more ruby-ish.
 # how a migration path could look like.
-# what related problems are and how we could work on them.
 
 Hope you learnt something new!

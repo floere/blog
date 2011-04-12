@@ -73,12 +73,12 @@
       <p>What Picky does is instantiate an indexer for each combination of (index, category, source, tokenizer). So as an example, it is indexing the <code>title</code> category of a <code>books</code> index, with data coming from a <code>db source</code>, using the <code>indexing tokenizer</code>.</p>
       <p>What the indexer first does is call the <code>harvest(index, category)</code> method on the data source, passing it the current index and category. That&#8217;s step 1.</p>
       <p>The source can then use the index and/or category to get the data from its backend.</p>
-      <p><img src="/images/2011-04-12-data-sources.png" alt="" /></p>
+      <p><img src="/blog/images/2011-04-12-data-sources.png" alt="" /></p>
       <p>The source then gets the data from the backend and extracts the relevant parts. For the books index and title category it would do a select on the database using that information. Then, in step 2, it yields (slightly normalized) information back to the indexer, i.e. the id to index, and the data, the text to index.</p>
       <p>The indexer then, in step 3, tokenizes the data as you defined with the <code>default_indexing</code> options, and finally, after some caching, writes it to the human readable index file.</p>
       <p>The human readable index files are located in the Picky server directory <code>index/{development,test,production}/books/</code> where you&#8217;ll find lots of files named <code>category_...</code>.</p>
       <p>I urge you to look at them! Lots of indexing questions can be answered by just looking at <code>title_exact_index.json</code>, for example.</p>
-      <p>Note that all index files are encoded in json, with the exception of the similarity indexes, which are <code>Marshal</code> dumped. So only human readable if you load them using <code>Marshal.load</code>, I&#8217;m afraid.</p>
+      <p>Note that all index files are encoded in json, with the exception of the similarity indexes, which are <code>Marshal</code> dumped. So these are only human readable if you load them using <code>Marshal.load</code>, I&#8217;m afraid.</p>
       <h2>The problems</h2>
       <p>Although it all sounds nice, probably, there are three problems:</p>
       <ul>
@@ -98,20 +98,55 @@
       <pre class="sh_ruby"><code>Index::Memory.new :books, data_source do&#x000A;  geocoded_category :longitude, :latitude, 1.km&#x000A;end</code></pre>
       <p>In a &#8220;parallel&#8221; indexer, Picky could load both <code>longitude</code> and <code>latitude</code> and do corrections on the longitude/latitude to preprocess the data so it would return correctly geocoded results.</p>
       <h3>Elegance</h3>
-      <p>This is the part where I am most unsure about. Simon from Berlin asked me about whether I had experience with Picky and MongoMapper last night. I don&#8217;t, but it would certainly be cool to include it as a data source in one of the next versions of Picky.</p>
-      <h2>How I would like it to be</h2>
+      <p>This is the part where I am most unsure about. But this</p>
+      <pre class="sh_ruby"><code>data_source = Sources::DB.new 'SELECT id, title, author, year FROM books', file: 'app/db.yml'&#x000A;Index::Memory.new :books, data_source do&#x000A;  # categories ...&#x000A;end</code></pre>
+      <p>just doesn&#8217;t look good. Granted, you need to inject a lot of information in a few lines:</p>
       <ul>
-      	<li>Why? Parallel data source for geo search.</li>
+      	<li>Type of source (<code>DB</code>)</li>
+      	<li>Selection of data from the source (<code>SELECT</code>)</li>
+      	<li>Configuration of source (<code>file: 'app/db.yml'</code>)</li>
       </ul>
+      <p>But still, I&#8217;d love it to be much more elegant.</p>
+      <p>For quite some time, I wasn&#8217;t sure what to do. There isn&#8217;t a single nice interface of all the data sources. ActiveRecord does it this way, MongoMapper another etc. etc.</p>
+      <p>So Simon from Berlin asked me last night about whether I had experience with Picky and MongoMapper. I don&#8217;t, but it would certainly be cool to include it as a data source in one of the next versions of Picky.</p>
+      <p>I took a closer look at it. Similar to the new way in Rails 3, it uses a fluid interface, where some methods just modify the query, while some are &#8220;kicker&#8221; methods that actually do something:</p>
+      <pre class="sh_ruby"><code>User.where(:age.gt =&gt; 27).sort(:age).all</code></pre>
+      <p>More here, <a href="http://railstips.org/blog/archives/2010/06/16/mongomapper-08-goodies-galore/">http://railstips.org/blog/archives/2010/06/16/mongomapper-08-goodies-galore/</a>. The <code>all</code> method at the end of a chain would be a kicker method, loading all objects.</p>
+      <p>That got me thinking.</p>
+      <h2>How I would like it to be</h2>
+      <p>Wouldn&#8217;t it be nice if we could just, instead of a data source, just pass any object as data source, so for example, with MongoMapper:</p>
+      <pre class="sh_ruby"><code>Index::Memory.new :books, User.where(:age.gt =&gt; 27).sort(:age) do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;  category :age&#x000A;end</code></pre>
+      <p>Quite a bit sexier, imho. Since the result of the <code>sort(:age)</code> method is a proxy that offers kicker and non-kicker methods, the Picky indexer could now call <code>each</code> on it.</p>
+      <p>The contract would then be that each object that is yielded by <code>#each</code> must offer methods that are named like the categories (or named like the <code>from</code> option – e.g. <code>category :name, from: surname</code>).</p>
+      <p>So, in the above example, each User object would have methods <code>#name</code> and <code>#age</code> such that Picky could extract the data.</p>
+      <p>The cool thing with that would be that I could just pass in an Array of data. So, this would work (<code>a</code>, <code>b</code>, <code>c</code> all respond to <code>#name</code>):</p>
+      <pre class="sh_ruby"><code>Index::Memory.new :books, [a, b, c] do&#x000A;  category :name&#x000A;end</code></pre>
+      <p>What would we have to do to make this work in Picky?</p>
       <h2>How to get there?</h2>
-      <h2>Related problems</h2>
+      <p>First of all, Picky would need to be rewritten, or at least be partially rewritten to use a &#8220;parallel&#8221; indexer, where each category would be loaded along with the others. So loading data set 1 would load <code>title</code>, <code>author</code>, <code>year</code> etc. at the same time. (Since some of these frameworks throw away the data after it has been yielded with <code>#each</code>)</p>
+      <p>The nice side-effect of this is that it opens real geosearch (or any combined category search) possibilities in Picky.</p>
+      <p>Probably, the frameworks offering the <code>#each</code> way would need to yield lazily, i.e. <code>#each</code> should not preload all the data before yielding as the data in question might be huge. Or maybe load it in batches.</p>
+      <p>How could we migrate from the current state to the new indexer?</p>
+      <p>I suggest that before instantiating the indexer, the index would first look at the source. If the source <code>responds_to?(:each)</code>, the parallel indexer would be used. And if not, the &#8220;serial&#8221; indexer would be used, doing things the old way.</p>
+      <p>So the contract for parallel sources would be that they implement <code>#each</code> in a way that would load the data in batches and only yield objects which respond to the category names.</p>
+      <p>Let&#8217;s see if we can get this working soon :)</p>
+      <p>What I am wondering: Are we walking down a fool&#8217;s path? Comment if you have an opinion about that, please.</p>
+      <h2>Possible problems</h2>
+      <p>One problem could be that we lose speed since we&#8217;ll be instantiating lots of objects that respond to the categories. On the other hand, the return trips would not be necessary anymore.</p>
+      <p>Another problem is that since we&#8217;re just depending on <code>#each</code>, we couldn&#8217;t pass the source the index and category anymore. So choosing the right data would be the responsibility of the user. I do not think this to be a big problem.</p>
+      <h2>Final remarks</h2>
+      <p>Although I&#8217;d like to make it more elegant, I&#8217;d still like to preserve the old way of doing things. Sure,</p>
+      <pre class="sh_ruby"><code>Index::Memory.new :users, User do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;  category :age&#x000A;end</code></pre>
+      <p>might look nicer than</p>
+      <pre class="sh_ruby"><code>user_source = Sources::DB.new 'SELECT id, name, age FROM users', file: 'app/db.yml'&#x000A;Index::Memory.new :users, user_source do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;  category :age&#x000A;end</code></pre>
+      <p>I&#8217;d like the old way to be available, since doing the right <code>SELECT</code> is incredibly useful.</p>
       <h2>Conclusion</h2>
       <p>So we&#8217;ve seen</p>
       <ol>
       	<li>how Picky data sources work now.</li>
-      	<li>how they should work.</li>
+      	<li>how they ought to work.</li>
+      	<li>that <code>#each</code> would be more ruby-ish.</li>
       	<li>how a migration path could look like.</li>
-      	<li>what related problems are and how we could work on them.</li>
       </ol>
       <p>Hope you learnt something new!</p>
       <br />

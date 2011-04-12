@@ -1,0 +1,118 @@
+---
+layout: post
+title: Picky&nbsp;Data&nbsp;Sources&#58; Next&nbsp;Steps
+categories:
+  - ruby
+  - picky
+  - gems
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings.
+
+For quite some time now I have been thinking about rewriting the Picky data sources.
+
+Although the ones that Picky use now work well, they do feel unelegant and unruby-ish.
+
+But I'll let you be the judge of that in the next part: How it works currently.
+
+After that, I'll talk about the problems with the current approach, and how I'd like it to be and how this could be possible to do. Feedback welcome, as always!
+
+h2. How does it work now?
+
+At the moment, every index needs a data source. So you might write:
+
+<pre class="sh_ruby"><code>data_source = Sources::DB.new 'SELECT id, title, author, year FROM books', file: 'app/db.yml'
+Index::Memory.new :books, data_source do
+  # categories ...
+end</code></pre>
+
+In the example, the data is coming from a database which is defined in @app/db.yml@ (the @file@ option).
+
+Then, Picky's indexer takes a snapshot of the data using your query and saves it in another table. The query can be anything, with joins and conditions etc.
+
+Then, from this intermediate table, it will load batches of data, ordered in the way you ordered the results in your DB data source query.
+
+So if you happened to say
+
+<pre class="sh_sql"><code>SELECT id, titulo as title, author, year FROM books ORDER BY year DESC</code></pre>
+
+then your results would be ordered by @year@, descending.
+
+Picky is really _data driven_. If you sort the data in a certain way, it will be sorted like that in the results. (Well, inside each category combination, but let's not go into that for the moment. Just know that it will help your user.)
+
+By the way, don't hesitate to use @REGEXP@, @SUBSTRING@ or other functions in your @SELECT@ statement to preprocess your data. It's incredibly powerful to preprocess your data.
+
+h2. How does it work in the code?
+
+What Picky does is instantiate an indexer for each combination of (index, category, source, tokenizer). So as an example, it is indexing the @title@ category of a @books@ index, with data coming from a @db source@, using the @indexing tokenizer@.
+
+What the indexer first does is call the @harvest(index, category)@ method on the data source, passing it the current index and category. That's step 1.
+
+The source can then use the index and/or category to get the data from its backend.
+
+!/blog/images/2011-04-12-data-sources.png!
+
+The source then gets the data from the backend and extracts the relevant parts. For the books index and title category it would do a select on the database using that information. Then, in step 2, it yields (slightly normalized) information back to the indexer, i.e. the id to index, and the data, the text to index.
+
+The indexer then, in step 3, tokenizes the data as you defined with the @default_indexing@ options, and finally, after some caching, writes it to the human readable index file.
+
+The human readable index files are located in the Picky server directory @index/{development,test,production}/books/@ where you'll find lots of files named @category_...@.
+
+I urge you to look at them! Lots of indexing questions can be answered by just looking at @title_exact_index.json@, for example.
+
+Note that all index files are encoded in json, with the exception of the similarity indexes, which are @Marshal@ dumped. So only human readable if you load them using @Marshal.load@, I'm afraid.
+
+h2. The problems
+
+Although it all sounds nice, probably, there are three problems:
+
+* The indexer is a "serial" indexer. Meaning that for each category, it asks the database to give it the data for the current category. So for each id, it asks the database for each data category separately. So for id 1 it asks for the title, then, later, for the author etc.
+* In a similar vein, if I like to index correlated values, like geocoded data, that needs to be processed, it is simply not possible with the current indexer.
+* It is a bit unwieldy seeming for a user, imho. This could be a sign that it could be more elegant.
+
+Let's look at the problems in more detail:
+
+h3. Serial Indexer
+
+The first problem, that Picky is going to the database for each category, is of a performance nature. Although it does not have much impact (you probably haven't noticed it yet), the way it is doing it now, it is still irking me that it does several return trips per id.
+
+h3. Correlated values not possible
+
+Correlated values are not possible. What does this mean?
+
+Let's say that we have geocoded data, longitude and latitude. If you now try to do a geosearch by (ab)using the @ranged_category@ method, you will experience problems, the closer to the pole the location is. While on the equator, Picky will search around it in a nice square.
+
+But if you e.g. move to the north, since the longitudinal lines are closer and closer together, so will the ranged search distance. While 0.008 degrees might mean a kilometer on the equator, near the north pole it will be closer and closer to zero kilometers. So the square will be squished until it finally looks like a triangle.
+
+Depending on the cartographic method used, this might not be a problem for you. But it certainly is if you're looking at the whole earth. Now, if the categories were indexed together, Picky could recalculate the data for you such that the square area search (see one of the last blog posts) would be preserved.
+
+One approach to how this could look is this:
+
+<pre class="sh_ruby"><code>Index::Memory.new :books, data_source do
+  geocoded_category :longitude, :latitude, 1.km
+end</code></pre>
+
+In a "parallel" indexer, Picky could load both @longitude@ and @latitude@ and do corrections on the longitude/latitude to preprocess the data so it would return correctly geocoded results.
+
+h3. Elegance
+
+This is the part where I am most unsure about. Simon from Berlin asked me about whether I had experience with Picky and MongoMapper last night. I don't, but it would certainly be cool to include it as a data source in one of the next versions of Picky.
+
+
+
+h2. How I would like it to be
+
+* Why? Parallel data source for geo search.
+
+h2. How to get there?
+
+h2. Related problems
+
+h2. Conclusion
+
+So we've seen
+# how Picky data sources work now.
+# how they should work.
+# how a migration path could look like.
+# what related problems are and how we could work on them.
+
+Hope you learnt something new!

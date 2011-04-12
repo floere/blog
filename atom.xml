@@ -4,13 +4,87 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-11T12:12:27+10:00</updated>
+ <updated>2011-04-12T18:33:10+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&nbsp;Data&nbsp;Sources&#58; Next&nbsp;Steps</title>
+   <link href="http://florianhanke.com/blog/2011/04/12/picky-data-sources-next-steps.html"/>
+   <updated>2011-04-12T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/12/picky-data-sources-next-steps</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;For quite some time now I have been thinking about rewriting the Picky data sources.&lt;/p&gt;
+&lt;p&gt;Although the ones that Picky use now work well, they do feel unelegant and unruby-ish.&lt;/p&gt;
+&lt;p&gt;But I&amp;#8217;ll let you be the judge of that in the next part: How it works currently.&lt;/p&gt;
+&lt;p&gt;After that, I&amp;#8217;ll talk about the problems with the current approach, and how I&amp;#8217;d like it to be and how this could be possible to do. Feedback welcome, as always!&lt;/p&gt;
+&lt;h2&gt;How does it work now?&lt;/h2&gt;
+&lt;p&gt;At the moment, every index needs a data source. So you might write:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data_source = Sources::DB.new 'SELECT id, title, author, year FROM books', file: 'app/db.yml'
+Index::Memory.new :books, data_source do
+  # categories ...
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the example, the data is coming from a database which is defined in &lt;code&gt;app/db.yml&lt;/code&gt; (the &lt;code&gt;file&lt;/code&gt; option).&lt;/p&gt;
+&lt;p&gt;Then, Picky&amp;#8217;s indexer takes a snapshot of the data using your query and saves it in another table. The query can be anything, with joins and conditions etc.&lt;/p&gt;
+&lt;p&gt;Then, from this intermediate table, it will load batches of data, ordered in the way you ordered the results in your DB data source query.&lt;/p&gt;
+&lt;p&gt;So if you happened to say&lt;/p&gt;
+&lt;pre class=&quot;sh_sql&quot;&gt;&lt;code&gt;SELECT id, titulo as title, author, year FROM books ORDER BY year DESC&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;then your results would be ordered by &lt;code&gt;year&lt;/code&gt;, descending.&lt;/p&gt;
+&lt;p&gt;Picky is really &lt;em&gt;data driven&lt;/em&gt;. If you sort the data in a certain way, it will be sorted like that in the results. (Well, inside each category combination, but let&amp;#8217;s not go into that for the moment. Just know that it will help your user.)&lt;/p&gt;
+&lt;p&gt;By the way, don&amp;#8217;t hesitate to use &lt;code&gt;REGEXP&lt;/code&gt;, &lt;code&gt;SUBSTRING&lt;/code&gt; or other functions in your &lt;code&gt;SELECT&lt;/code&gt; statement to preprocess your data. It&amp;#8217;s incredibly powerful to preprocess your data.&lt;/p&gt;
+&lt;h2&gt;How does it work in the code?&lt;/h2&gt;
+&lt;p&gt;What Picky does is instantiate an indexer for each combination of (index, category, source, tokenizer). So as an example, it is indexing the &lt;code&gt;title&lt;/code&gt; category of a &lt;code&gt;books&lt;/code&gt; index, with data coming from a &lt;code&gt;db source&lt;/code&gt;, using the &lt;code&gt;indexing tokenizer&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What the indexer first does is call the &lt;code&gt;harvest(index, category)&lt;/code&gt; method on the data source, passing it the current index and category. That&amp;#8217;s step 1.&lt;/p&gt;
+&lt;p&gt;The source can then use the index and/or category to get the data from its backend.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-04-12-data-sources.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;The source then gets the data from the backend and extracts the relevant parts. For the books index and title category it would do a select on the database using that information. Then, in step 2, it yields (slightly normalized) information back to the indexer, i.e. the id to index, and the data, the text to index.&lt;/p&gt;
+&lt;p&gt;The indexer then, in step 3, tokenizes the data as you defined with the &lt;code&gt;default_indexing&lt;/code&gt; options, and finally, after some caching, writes it to the human readable index file.&lt;/p&gt;
+&lt;p&gt;The human readable index files are located in the Picky server directory &lt;code&gt;index/{development,test,production}/books/&lt;/code&gt; where you&amp;#8217;ll find lots of files named &lt;code&gt;category_...&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;I urge you to look at them! Lots of indexing questions can be answered by just looking at &lt;code&gt;title_exact_index.json&lt;/code&gt;, for example.&lt;/p&gt;
+&lt;p&gt;Note that all index files are encoded in json, with the exception of the similarity indexes, which are &lt;code&gt;Marshal&lt;/code&gt; dumped. So only human readable if you load them using &lt;code&gt;Marshal.load&lt;/code&gt;, I&amp;#8217;m afraid.&lt;/p&gt;
+&lt;h2&gt;The problems&lt;/h2&gt;
+&lt;p&gt;Although it all sounds nice, probably, there are three problems:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;The indexer is a &amp;#8220;serial&amp;#8221; indexer. Meaning that for each category, it asks the database to give it the data for the current category. So for each id, it asks the database for each data category separately. So for id 1 it asks for the title, then, later, for the author etc.&lt;/li&gt;
+	&lt;li&gt;In a similar vein, if I like to index correlated values, like geocoded data, that needs to be processed, it is simply not possible with the current indexer.&lt;/li&gt;
+	&lt;li&gt;It is a bit unwieldy seeming for a user, imho. This could be a sign that it could be more elegant.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let&amp;#8217;s look at the problems in more detail:&lt;/p&gt;
+&lt;h3&gt;Serial Indexer&lt;/h3&gt;
+&lt;p&gt;The first problem, that Picky is going to the database for each category, is of a performance nature. Although it does not have much impact (you probably haven&amp;#8217;t noticed it yet), the way it is doing it now, it is still irking me that it does several return trips per id.&lt;/p&gt;
+&lt;h3&gt;Correlated values not possible&lt;/h3&gt;
+&lt;p&gt;Correlated values are not possible. What does this mean?&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s say that we have geocoded data, longitude and latitude. If you now try to do a geosearch by (ab)using the &lt;code&gt;ranged_category&lt;/code&gt; method, you will experience problems, the closer to the pole the location is. While on the equator, Picky will search around it in a nice square.&lt;/p&gt;
+&lt;p&gt;But if you e.g. move to the north, since the longitudinal lines are closer and closer together, so will the ranged search distance. While 0.008 degrees might mean a kilometer on the equator, near the north pole it will be closer and closer to zero kilometers. So the square will be squished until it finally looks like a triangle.&lt;/p&gt;
+&lt;p&gt;Depending on the cartographic method used, this might not be a problem for you. But it certainly is if you&amp;#8217;re looking at the whole earth. Now, if the categories were indexed together, Picky could recalculate the data for you such that the square area search (see one of the last blog posts) would be preserved.&lt;/p&gt;
+&lt;p&gt;One approach to how this could look is this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new :books, data_source do
+  geocoded_category :longitude, :latitude, 1.km
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In a &amp;#8220;parallel&amp;#8221; indexer, Picky could load both &lt;code&gt;longitude&lt;/code&gt; and &lt;code&gt;latitude&lt;/code&gt; and do corrections on the longitude/latitude to preprocess the data so it would return correctly geocoded results.&lt;/p&gt;
+&lt;h3&gt;Elegance&lt;/h3&gt;
+&lt;p&gt;This is the part where I am most unsure about. Simon from Berlin asked me about whether I had experience with Picky and MongoMapper last night. I don&amp;#8217;t, but it would certainly be cool to include it as a data source in one of the next versions of Picky.&lt;/p&gt;
+&lt;h2&gt;How I would like it to be&lt;/h2&gt;
+&lt;ul&gt;
+	&lt;li&gt;Why? Parallel data source for geo search.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;How to get there?&lt;/h2&gt;
+&lt;h2&gt;Related problems&lt;/h2&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;how Picky data sources work now.&lt;/li&gt;
+	&lt;li&gt;how they should work.&lt;/li&gt;
+	&lt;li&gt;how a migration path could look like.&lt;/li&gt;
+	&lt;li&gt;what related problems are and how we could work on them.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Searching with Picky&#58; In&nbsp;the&nbsp;Terminal</title>

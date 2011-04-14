@@ -67,7 +67,7 @@ In 2.2.0, it can be any object responding to the @#each@ method, if that method 
 Let me give you an example. Let's say we have some monkeys that we'd like to index.
 
 <pre class="sh_ruby"><code>class Monkey
-  attr_reader :name, :color
+  attr_reader :id, :name, :color
   def initialize id, name, color
     @id, @name, @color = id, name, color
   end

@@ -88,16 +88,18 @@ Then, since an @Array@ has the @#each@ method, you can index it:
   category :couleur, :from => :color # The couleur category will take its data from the #color method.
 end</code></pre>
 
-Since each monkey has an @#id@, a @#name@, and a @#color@ method, Picky will happily index the monkeys for you. Not that the couleur category uses the @from@ option to define from where in the source it takes its data from.
+Since each monkey has an @#id@, a @#name@, and a @#color@ method, Picky will happily index the monkeys for you. Note that the couleur category uses the @from@ option to define from where in the source it takes its data from.
 
 Hmmmm... id method? You're probably thinking the same thing as I.
 
-MongoMapper and the new ActiveRecord both use a fluid style interface (see last post), whose proxies support @#each@, and the yielded objects support @#id@ and various methods!
+MongoMapper, the new ActiveRecord and others use a fluid style interface (see last post), whose proxies support @#each@, and the yielded objects support @#id@ and various methods!
 
 So this becomes possible:
 
-<pre class="sh_ruby"><code>class Book < ActiveRecord::Base; end
-
+<pre class="sh_ruby"><code>
+# For completeness:
+#
+class Book < ActiveRecord::Base; end
 Book.establish_connection YAML.load(File.open('app/db.yml'))
 
 Index::Memory.new :books do

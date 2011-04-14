@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-14T15:32:03+10:00</updated>
+ <updated>2011-04-14T15:34:36+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -74,12 +74,14 @@ end&lt;/code&gt;&lt;/pre&gt;
   category :name
   category :couleur, :from =&amp;gt; :color # The couleur category will take its data from the #color method.
 end&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
-&lt;p&gt;Since each monkey has an &lt;code&gt;#id&lt;/code&gt;, a &lt;code&gt;#name&lt;/code&gt;, and a &lt;code&gt;#color&lt;/code&gt; method, Picky will happily index the monkeys for you. Not that the couleur category uses the &lt;code&gt;from&lt;/code&gt; option to define from where in the source it takes its data from.&lt;/p&gt;
+&lt;p&gt;Since each monkey has an &lt;code&gt;#id&lt;/code&gt;, a &lt;code&gt;#name&lt;/code&gt;, and a &lt;code&gt;#color&lt;/code&gt; method, Picky will happily index the monkeys for you. Note that the couleur category uses the &lt;code&gt;from&lt;/code&gt; option to define from where in the source it takes its data from.&lt;/p&gt;
 &lt;p&gt;Hmmmm&amp;#8230; id method? You&amp;#8217;re probably thinking the same thing as I.&lt;/p&gt;
-&lt;p&gt;MongoMapper and the new ActiveRecord both use a fluid style interface (see last post), whose proxies support &lt;code&gt;#each&lt;/code&gt;, and the yielded objects support &lt;code&gt;#id&lt;/code&gt; and various methods!&lt;/p&gt;
+&lt;p&gt;MongoMapper, the new ActiveRecord and others use a fluid style interface (see last post), whose proxies support &lt;code&gt;#each&lt;/code&gt;, and the yielded objects support &lt;code&gt;#id&lt;/code&gt; and various methods!&lt;/p&gt;
 &lt;p&gt;So this becomes possible:&lt;/p&gt;
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Book &amp;lt; ActiveRecord::Base; end
-
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;
+# For completeness:
+#
+class Book &amp;lt; ActiveRecord::Base; end
 Book.establish_connection YAML.load(File.open('app/db.yml'))
 
 Index::Memory.new :books do

@@ -1,0 +1,148 @@
+---
+layout: post
+title: Picky&nbsp;2.2.0
+categories:
+  - ruby
+  - picky
+  - gems
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+Picky 2.2.0 will be released shortly.
+
+What is good and new?
+
+* Breaking API change (Please read this if you already have Picky running)
+* More flexible sources (This is the cool stuff)
+* @rake search@ is now @picky search@
+* Uses ActiveRecord/ActiveSupport 3.0
+
+h2. Breaking API change
+
+2.2.0 will introduce an API change that will break your existing, pre-2.2.0 server configuration.
+
+Instead of as second parameter, the data source is now passed in as an option, or called inside the configuration block.
+
+The old style:
+
+<pre class="sh_ruby"><code>Index::Memory.new :users, your_data_source do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+has now become the
+
+new style:
+
+<pre class="sh_ruby"><code>Index::Memory.new :users, source: your_data_source do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+OR
+
+<pre class="sh_ruby"><code>Index::Memory.new :users do
+  source   your_data_source
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end</code></pre>
+
+Why?
+
+The old style was actually more correct, since an index *needs* a data source. But I never really got friends with it, since it looked so unwieldy, especially when you have a "long" data source, like
+<pre class="sh_ruby"><code>Sources::CSV.new(:abra, :ca, :dabra, file: 'some/file/that/is/somewhere.csv')</code></pre>
+
+The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible. Still, sorry about the breaking change!
+
+If you use the old style config, Picky will tell you how you need to update your config on server restart.
+
+h2. Flexible sources
+
+We've completely rewritten the sources.
+
+Before 2.2.0, the data source needed to be an object that responds to the @#harvest@ method.
+
+In 2.2.0, it can be any object responding to the @#each@ method, if that method returns objects that at least respond to the @#id@ method and to any methods specified by the category method.
+
+Let me give you an example. Let's say we have some monkeys that we'd like to index.
+
+<pre class="sh_ruby"><code>class Monkey
+  attr_reader :name, :color
+  def initialize id, name, color
+    @id, @name, @color = id, name, color
+  end
+end</code></pre>
+
+We'll create three monkeys and save them in an array:
+
+<pre class="sh_ruby"><code>monkeys = [
+  Monkey.new(1, 'pete', 'red'),
+  Monkey.new(2, 'joey', 'green'),
+  Monkey.new(3, 'hans', 'blue')
+]</code></pre>
+
+Then, since an @Array@ has the @#each@ method, you can index it:
+<pre class="sh_ruby"><code>Index::Memory.new :monkeys do
+  source   monkeys
+  category :name
+  category :couleur, from: color # The couleur category will take its data from the #color method.
+end</code></pre>
+
+Since each monkey has an @#id@, a @#name@, and a @#color@ method, Picky will happily index the monkeys for you. Not that the couleur category uses the @from@ option to define from where in the source it takes its data from.
+
+Hmmmm... id method? You're probably thinking the same thing as I.
+
+MongoMapper and the new ActiveRecord both use a fluid style interface (see last post), whose proxies support @#each@, and the yielded objects support @#id@ and various methods!
+
+So this becomes possible:
+
+<pre class="sh_ruby"><code>class Book < ActiveRecord::Base; end
+
+Book.establish_connection YAML.load(File.open('app/db.yml'))
+
+Index::Memory.new :books do
+  source   Book.order('title ASC')
+  category :id
+  category :title
+  category :author
+  category :year
+end</code></pre>
+
+See the first line in the index config block?
+
+<pre class="sh_ruby"><code>Book.order('title ASC')</code></pre>
+
+This passes the AR proxy as source to the @books@ index. Since it provides a @#each@ method, and the yielded objects support @#id@ etc., Picky will index all books in a @title ASC@ order.
+
+I love it!
+
+h2. rake search -> picky search
+
+See the last post.
+
+Since @rake search@ was project specific, but its functionality is actually URL specific, I've deprecated the rake task (it will tell you so), and created @picky search@ that you can use.
+
+h2. AR 3.0 / AS 3.0
+
+In other news, Picky now uses AR 3.0 / AS 3.0.
+
+In your existing Gemfile, please update the line
+
+<pre class="sh_ruby"><code>gem 'activerecord',  '~> 2.3.8', :require => 'active_record'</code></pre>
+
+to
+
+<pre class="sh_ruby"><code>gem 'activesupport', '~> 3.0', :require => 'active_support/core_ext'
+gem 'activerecord',  '~> 3.0', :require => 'active_record'</code></pre>
+
+Thanks!
+
+h2. Conclusion
+
+So we've seen
+# that the API broke a little.
+# that a new group of data sources is available.
+# that rake search is now picky search.
+# that Picky now uses AR 3.0 / AS 3.0.
+
+Hope you learnt something new!

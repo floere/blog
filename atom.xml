@@ -4,13 +4,117 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-12T19:08:05+10:00</updated>
+ <updated>2011-04-14T15:23:59+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&nbsp;2.2.0</title>
+   <link href="http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh.html"/>
+   <updated>2011-04-14T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;Picky 2.2.0 will be released shortly.&lt;/p&gt;
+&lt;p&gt;What is good and new?&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Breaking &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; change (Please read this if you already have Picky running)&lt;/li&gt;
+	&lt;li&gt;More flexible sources (This is the cool stuff)&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;rake search&lt;/code&gt; is now &lt;code&gt;picky search&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;Uses ActiveRecord/ActiveSupport 3.0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Breaking &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; change&lt;/h2&gt;
+&lt;p&gt;2.2.0 will introduce an &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; change that will break your existing, pre-2.2.0 server configuration.&lt;/p&gt;
+&lt;p&gt;Instead of as second parameter, the data source is now passed in as an option, or called inside the configuration block.&lt;/p&gt;
+&lt;p&gt;The old style:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new :users, your_data_source do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;has now become the&lt;/p&gt;
+&lt;p&gt;new style:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new :users, source: your_data_source do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;OR&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new :users do
+  source   your_data_source
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+  category :age
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Why?&lt;/p&gt;
+&lt;p&gt;The old style was actually more correct, since an index &lt;strong&gt;needs&lt;/strong&gt; a data source. But I never really got friends with it, since it looked so unwieldy, especially when you have a &amp;#8220;long&amp;#8221; data source, like
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::CSV.new(:abra, :ca, :dabra, file: 'some/file/that/is/somewhere.csv')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible. Still, sorry about the breaking change!&lt;/p&gt;
+&lt;p&gt;If you use the old style config, Picky will tell you how you need to update your config on server restart.&lt;/p&gt;
+&lt;h2&gt;Flexible sources&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ve completely rewritten the sources.&lt;/p&gt;
+&lt;p&gt;Before 2.2.0, the data source needed to be an object that responds to the &lt;code&gt;#harvest&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;In 2.2.0, it can be any object responding to the &lt;code&gt;#each&lt;/code&gt; method, if that method returns objects that at least respond to the &lt;code&gt;#id&lt;/code&gt; method and to any methods specified by the category method.&lt;/p&gt;
+&lt;p&gt;Let me give you an example. Let&amp;#8217;s say we have some monkeys that we&amp;#8217;d like to index.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Monkey
+  attr_reader :name, :color
+  def initialize id, name, color
+    @id, @name, @color = id, name, color
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We&amp;#8217;ll create three monkeys and save them in an array:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;monkeys = [
+  Monkey.new(1, 'pete', 'red'),
+  Monkey.new(2, 'joey', 'green'),
+  Monkey.new(3, 'hans', 'blue')
+]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, since an &lt;code&gt;Array&lt;/code&gt; has the &lt;code&gt;#each&lt;/code&gt; method, you can index it:
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new :monkeys do
+  source   monkeys
+  category :name
+  category :couleur, from: color # The couleur category will take its data from the #color method.
+end&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;Since each monkey has an &lt;code&gt;#id&lt;/code&gt;, a &lt;code&gt;#name&lt;/code&gt;, and a &lt;code&gt;#color&lt;/code&gt; method, Picky will happily index the monkeys for you. Not that the couleur category uses the &lt;code&gt;from&lt;/code&gt; option to define from where in the source it takes its data from.&lt;/p&gt;
+&lt;p&gt;Hmmmm&amp;#8230; id method? You&amp;#8217;re probably thinking the same thing as I.&lt;/p&gt;
+&lt;p&gt;MongoMapper and the new ActiveRecord both use a fluid style interface (see last post), whose proxies support &lt;code&gt;#each&lt;/code&gt;, and the yielded objects support &lt;code&gt;#id&lt;/code&gt; and various methods!&lt;/p&gt;
+&lt;p&gt;So this becomes possible:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Book &amp;lt; ActiveRecord::Base; end
+
+Book.establish_connection YAML.load(File.open('app/db.yml'))
+
+Index::Memory.new :books do
+  source   Book.order('title ASC')
+  category :id
+  category :title
+  category :author
+  category :year
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;See the first line in the index config block?&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Book.order('title ASC')&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This passes the AR proxy as source to the &lt;code&gt;books&lt;/code&gt; index. Since it provides a &lt;code&gt;#each&lt;/code&gt; method, and the yielded objects support &lt;code&gt;#id&lt;/code&gt; etc., Picky will index all books in a &lt;code&gt;title ASC&lt;/code&gt; order.&lt;/p&gt;
+&lt;p&gt;I love it!&lt;/p&gt;
+&lt;h2&gt;rake search &amp;#8594; picky search&lt;/h2&gt;
+&lt;p&gt;See the last post.&lt;/p&gt;
+&lt;p&gt;Since &lt;code&gt;rake search&lt;/code&gt; was project specific, but its functionality is actually &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; specific, I&amp;#8217;ve deprecated the rake task (it will tell you so), and created &lt;code&gt;picky search&lt;/code&gt; that you can use.&lt;/p&gt;
+&lt;h2&gt;AR 3.0 / AS 3.0&lt;/h2&gt;
+&lt;p&gt;In other news, Picky now uses AR 3.0 / AS 3.0.&lt;/p&gt;
+&lt;p&gt;In your existing Gemfile, please update the line&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;gem 'activerecord',  '~&amp;gt; 2.3.8', :require =&amp;gt; 'active_record'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;to&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;gem 'activesupport', '~&amp;gt; 3.0', :require =&amp;gt; 'active_support/core_ext'
+gem 'activerecord',  '~&amp;gt; 3.0', :require =&amp;gt; 'active_record'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thanks!&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that the &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; broke a little.&lt;/li&gt;
+	&lt;li&gt;that a new group of data sources is available.&lt;/li&gt;
+	&lt;li&gt;that rake search is now picky search.&lt;/li&gt;
+	&lt;li&gt;that Picky now uses AR 3.0 / AS 3.0.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&nbsp;Data&nbsp;Sources&#58; Next&nbsp;Steps</title>
@@ -142,15 +246,17 @@ end&lt;/code&gt;&lt;/pre&gt;
    <updated>2011-04-11T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search</id>
    <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
-&lt;p&gt;This post is about a fun little experimental toy I&amp;#8217;ve been working on: &lt;code&gt;rake search &amp;lt;url&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;h2&gt;rake search &amp;lt;url&amp;gt;?&lt;/h2&gt;
+&lt;p&gt;This post is about a fun little experimental toy I&amp;#8217;ve been working on: &lt;code&gt;picky search &amp;lt;url&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Update!&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;rake search&lt;/code&gt; is &lt;code&gt;picky search&lt;/code&gt; from 2.2.0 on.&lt;/p&gt;
+&lt;h2&gt;picky search &amp;lt;url&amp;gt;?&lt;/h2&gt;
 &lt;p&gt;Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).&lt;/p&gt;
 &lt;h2&gt;How do I use it?&lt;/h2&gt;
 &lt;p&gt;See this short video (it&amp;#8217;s best to full-screen it):&lt;/p&gt;
 &lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/22216442&quot; width=&quot;600&quot; height=&quot;387&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
 &lt;ol&gt;
 	&lt;li&gt;Start a Picky server.&lt;/li&gt;
-	&lt;li&gt;Then type &lt;code&gt;rake search /some/url&lt;/code&gt; (where &lt;code&gt;/some/url&lt;/code&gt; is a path – or url if not on this server – you&amp;#8217;ve defined using &lt;code&gt;route&lt;/code&gt; in &lt;code&gt;app/application.rb&lt;/code&gt;).&lt;/li&gt;
+	&lt;li&gt;Then type &lt;code&gt;picky search /some/url&lt;/code&gt; (where &lt;code&gt;/some/url&lt;/code&gt; is a path – or url if not on this server – you&amp;#8217;ve defined using &lt;code&gt;route&lt;/code&gt; in &lt;code&gt;app/application.rb&lt;/code&gt;).&lt;/li&gt;
 	&lt;li&gt;Then, just type away.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;The result id count will update as you type.&lt;/p&gt;
@@ -160,8 +266,6 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;How does it work?&lt;/h2&gt;
 &lt;p&gt;I use the highline gem (by &lt;a href=&quot;http://twitter.com/jeg2&quot;&gt;@JEG2&lt;/a&gt;) to get single characters (using the appropriately named &lt;code&gt;get_character&lt;/code&gt;) from the user and then move the cursor around using &lt;code&gt;\e[#{amount}D&lt;/code&gt; (left) and &lt;code&gt;\e[#{amount}C&lt;/code&gt; (right), &lt;code&gt;print&lt;/code&gt; ing to the &lt;span class=&quot;caps&quot;&gt;STDOUT&lt;/span&gt; and &lt;code&gt;flush&lt;/code&gt; ing it a lot.&lt;/p&gt;
 &lt;p&gt;If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I&amp;#8217;d like to hear about it!&lt;/p&gt;
-&lt;h2&gt;Note&lt;/h2&gt;
-&lt;p&gt;Since this is experimental, it might not remain at &lt;code&gt;rake search&lt;/code&gt;. I might move it to &lt;code&gt;picky search&lt;/code&gt; since it doesn&amp;#8217;t actually need to be run from the project it is searching on (and simply accesses an &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;).&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
 &lt;ol&gt;

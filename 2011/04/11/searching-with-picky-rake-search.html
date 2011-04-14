@@ -54,15 +54,17 @@
       <h1>Searching with Picky&#58; In&nbsp;the&nbsp;Terminal</h1>
       <div class="categories">ruby / picky / gems</div>
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
-      <p>This post is about a fun little experimental toy I&#8217;ve been working on: <code>rake search &lt;url&gt;</code>.</p>
-      <h2>rake search &lt;url&gt;?</h2>
+      <p>This post is about a fun little experimental toy I&#8217;ve been working on: <code>picky search &lt;url&gt;</code>.</p>
+      <h2>Update!</h2>
+      <p><code>rake search</code> is <code>picky search</code> from 2.2.0 on.</p>
+      <h2>picky search &lt;url&gt;?</h2>
       <p>Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).</p>
       <h2>How do I use it?</h2>
       <p>See this short video (it&#8217;s best to full-screen it):</p>
       <p><iframe src="http://player.vimeo.com/video/22216442" width="600" height="387" frameborder="0"></iframe></p>
       <ol>
       	<li>Start a Picky server.</li>
-      	<li>Then type <code>rake search /some/url</code> (where <code>/some/url</code> is a path – or url if not on this server – you&#8217;ve defined using <code>route</code> in <code>app/application.rb</code>).</li>
+      	<li>Then type <code>picky search /some/url</code> (where <code>/some/url</code> is a path – or url if not on this server – you&#8217;ve defined using <code>route</code> in <code>app/application.rb</code>).</li>
       	<li>Then, just type away.</li>
       </ol>
       <p>The result id count will update as you type.</p>
@@ -72,8 +74,6 @@
       <h2>How does it work?</h2>
       <p>I use the highline gem (by <a href="http://twitter.com/jeg2">@JEG2</a>) to get single characters (using the appropriately named <code>get_character</code>) from the user and then move the cursor around using <code>\e[#{amount}D</code> (left) and <code>\e[#{amount}C</code> (right), <code>print</code> ing to the <span class="caps">STDOUT</span> and <code>flush</code> ing it a lot.</p>
       <p>If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I&#8217;d like to hear about it!</p>
-      <h2>Note</h2>
-      <p>Since this is experimental, it might not remain at <code>rake search</code>. I might move it to <code>picky search</code> since it doesn&#8217;t actually need to be run from the project it is searching on (and simply accesses an <span class="caps">URL</span>).</p>
       <h2>Conclusion</h2>
       <p>So we&#8217;ve seen</p>
       <ol>

@@ -8,9 +8,13 @@ categories:
 ---
 This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
 
-This post is about a fun little experimental toy I've been working on: @rake search <url>@.
+This post is about a fun little experimental toy I've been working on: @picky search <url>@.
 
-h2. rake search &lt;url&gt;?
+h2. Update!
+
+@rake search@ is @picky search@ from 2.2.0 on.
+
+h2. picky search &lt;url&gt;?
 
 Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).
 
@@ -21,7 +25,7 @@ See this short video (it's best to full-screen it):
 <iframe src="http://player.vimeo.com/video/22216442" width="600" height="387" frameborder="0"></iframe>
 
 # Start a Picky server.
-# Then type @rake search /some/url@ (where @/some/url@ is a path – or url if not on this server – you've defined using @route@ in @app/application.rb@).
+# Then type @picky search /some/url@ (where @/some/url@ is a path – or url if not on this server – you've defined using @route@ in @app/application.rb@).
 # Then, just type away.
 
 The result id count will update as you type.
@@ -37,10 +41,6 @@ h2. How does it work?
 I use the highline gem (by "@JEG2":http://twitter.com/jeg2) to get single characters (using the appropriately named @get_character@) from the user and then move the cursor around using @\e[#{amount}D@ (left) and @\e[#{amount}C@ (right), @print@ ing to the STDOUT and @flush@ ing it a lot.
 
 If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I'd like to hear about it!
-
-h2. Note
-
-Since this is experimental, it might not remain at @rake search@. I might move it to @picky search@ since it doesn't actually need to be run from the project it is searching on (and simply accesses an URL).
 
 h2. Conclusion
 

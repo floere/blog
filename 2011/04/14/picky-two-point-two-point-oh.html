@@ -82,7 +82,7 @@
       <p>Before 2.2.0, the data source needed to be an object that responds to the <code>#harvest</code> method.</p>
       <p>In 2.2.0, it can be any object responding to the <code>#each</code> method, if that method returns objects that at least respond to the <code>#id</code> method and to any methods specified by the category method.</p>
       <p>Let me give you an example. Let&#8217;s say we have some monkeys that we&#8217;d like to index.</p>
-      <pre class="sh_ruby"><code>class Monkey&#x000A;  attr_reader :name, :color&#x000A;  def initialize id, name, color&#x000A;    @id, @name, @color = id, name, color&#x000A;  end&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Monkey&#x000A;  attr_reader :id, :name, :color&#x000A;  def initialize id, name, color&#x000A;    @id, @name, @color = id, name, color&#x000A;  end&#x000A;end</code></pre>
       <p>We&#8217;ll create three monkeys and save them in an array:</p>
       <pre class="sh_ruby"><code>monkeys = [&#x000A;  Monkey.new(1, 'pete', 'red'),&#x000A;  Monkey.new(2, 'joey', 'green'),&#x000A;  Monkey.new(3, 'hans', 'blue')&#x000A;]</code></pre>
       <p>Then, since an <code>Array</code> has the <code>#each</code> method, you can index it:

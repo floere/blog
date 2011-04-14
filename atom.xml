@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-14T15:28:46+10:00</updated>
+ <updated>2011-04-14T15:30:43+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -57,7 +57,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In 2.2.0, it can be any object responding to the &lt;code&gt;#each&lt;/code&gt; method, if that method returns objects that at least respond to the &lt;code&gt;#id&lt;/code&gt; method and to any methods specified by the category method.&lt;/p&gt;
 &lt;p&gt;Let me give you an example. Let&amp;#8217;s say we have some monkeys that we&amp;#8217;d like to index.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Monkey
-  attr_reader :name, :color
+  attr_reader :id, :name, :color
   def initialize id, name, color
     @id, @name, @color = id, name, color
   end

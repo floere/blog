@@ -52,9 +52,9 @@ Why?
 The old style was actually more correct, since an index *needs* a data source. But I never really got friends with it, since it looked so unwieldy, especially when you have a "long" data source, like
 <pre class="sh_ruby"><code>Sources::CSV.new(:abra, :ca, :dabra, file: 'some/file/that/is/somewhere.csv')</code></pre>
 
-The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible. Still, sorry about the breaking change!
+The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible.
 
-If you use the old style config, Picky will tell you how you need to update your config on server restart.
+If you use the old style config, Picky will tell you how you need to update your config on server restart. But still, sorry about the breaking change!
 
 h2. Flexible sources
 
@@ -115,6 +115,8 @@ See the first line in the index config block?
 This passes the AR proxy as source to the @books@ index. Since it provides a @#each@ method, and the yielded objects support @#id@ etc., Picky will index all books in a @title ASC@ order.
 
 I love it!
+
+Note that the old style sources still work. And for @ranged_category@-s, it is still necessary to use the old style sources. We'll be working on that, but for the near future, use the old style sources for range/area/volume searches.
 
 h2. rake search -> picky search
 

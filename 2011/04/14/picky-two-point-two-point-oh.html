@@ -75,8 +75,8 @@
       <p>Why?</p>
       <p>The old style was actually more correct, since an index <strong>needs</strong> a data source. But I never really got friends with it, since it looked so unwieldy, especially when you have a &#8220;long&#8221; data source, like
       <pre class="sh_ruby"><code>Sources::CSV.new(:abra, :ca, :dabra, file: 'some/file/that/is/somewhere.csv')</code></pre></p>
-      <p>The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible. Still, sorry about the breaking change!</p>
-      <p>If you use the old style config, Picky will tell you how you need to update your config on server restart.</p>
+      <p>The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible.</p>
+      <p>If you use the old style config, Picky will tell you how you need to update your config on server restart. But still, sorry about the breaking change!</p>
       <h2>Flexible sources</h2>
       <p>We&#8217;ve completely rewritten the sources.</p>
       <p>Before 2.2.0, the data source needed to be an object that responds to the <code>#harvest</code> method.</p>
@@ -96,6 +96,7 @@
       <pre class="sh_ruby"><code>Book.order('title ASC')</code></pre>
       <p>This passes the AR proxy as source to the <code>books</code> index. Since it provides a <code>#each</code> method, and the yielded objects support <code>#id</code> etc., Picky will index all books in a <code>title ASC</code> order.</p>
       <p>I love it!</p>
+      <p>Note that the old style sources still work. And for <code>ranged_category</code>-s, it is still necessary to use the old style sources. We&#8217;ll be working on that, but for the near future, use the old style sources for range/area/volume searches.</p>
       <h2>rake search &#8594; picky search</h2>
       <p>See the last post.</p>
       <p>Since <code>rake search</code> was project specific, but its functionality is actually <span class="caps">URL</span> specific, I&#8217;ve deprecated the rake task (it will tell you so), and created <code>picky search</code> that you can use.</p>

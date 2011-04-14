@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-14T15:23:59+10:00</updated>
+ <updated>2011-04-14T15:28:46+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -49,8 +49,8 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Why?&lt;/p&gt;
 &lt;p&gt;The old style was actually more correct, since an index &lt;strong&gt;needs&lt;/strong&gt; a data source. But I never really got friends with it, since it looked so unwieldy, especially when you have a &amp;#8220;long&amp;#8221; data source, like
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Sources::CSV.new(:abra, :ca, :dabra, file: 'some/file/that/is/somewhere.csv')&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
-&lt;p&gt;The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible. Still, sorry about the breaking change!&lt;/p&gt;
-&lt;p&gt;If you use the old style config, Picky will tell you how you need to update your config on server restart.&lt;/p&gt;
+&lt;p&gt;The new style is much cleaner to look at. And Picky will tell you if you forgot the data source as early as possible.&lt;/p&gt;
+&lt;p&gt;If you use the old style config, Picky will tell you how you need to update your config on server restart. But still, sorry about the breaking change!&lt;/p&gt;
 &lt;h2&gt;Flexible sources&lt;/h2&gt;
 &lt;p&gt;We&amp;#8217;ve completely rewritten the sources.&lt;/p&gt;
 &lt;p&gt;Before 2.2.0, the data source needed to be an object that responds to the &lt;code&gt;#harvest&lt;/code&gt; method.&lt;/p&gt;
@@ -93,6 +93,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Book.order('title ASC')&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This passes the AR proxy as source to the &lt;code&gt;books&lt;/code&gt; index. Since it provides a &lt;code&gt;#each&lt;/code&gt; method, and the yielded objects support &lt;code&gt;#id&lt;/code&gt; etc., Picky will index all books in a &lt;code&gt;title ASC&lt;/code&gt; order.&lt;/p&gt;
 &lt;p&gt;I love it!&lt;/p&gt;
+&lt;p&gt;Note that the old style sources still work. And for &lt;code&gt;ranged_category&lt;/code&gt;-s, it is still necessary to use the old style sources. We&amp;#8217;ll be working on that, but for the near future, use the old style sources for range/area/volume searches.&lt;/p&gt;
 &lt;h2&gt;rake search &amp;#8594; picky search&lt;/h2&gt;
 &lt;p&gt;See the last post.&lt;/p&gt;
 &lt;p&gt;Since &lt;code&gt;rake search&lt;/code&gt; was project specific, but its functionality is actually &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; specific, I&amp;#8217;ve deprecated the rake task (it will tell you so), and created &lt;code&gt;picky search&lt;/code&gt; that you can use.&lt;/p&gt;

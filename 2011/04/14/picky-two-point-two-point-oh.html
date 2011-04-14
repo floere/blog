@@ -86,7 +86,7 @@
       <p>We&#8217;ll create three monkeys and save them in an array:</p>
       <pre class="sh_ruby"><code>monkeys = [&#x000A;  Monkey.new(1, 'pete', 'red'),&#x000A;  Monkey.new(2, 'joey', 'green'),&#x000A;  Monkey.new(3, 'hans', 'blue')&#x000A;]</code></pre>
       <p>Then, since an <code>Array</code> has the <code>#each</code> method, you can index it:
-      <pre class="sh_ruby"><code>Index::Memory.new :monkeys do&#x000A;  source   monkeys&#x000A;  category :name&#x000A;  category :couleur, from: color # The couleur category will take its data from the #color method.&#x000A;end</code></pre></p>
+      <pre class="sh_ruby"><code>Index::Memory.new :monkeys do&#x000A;  source   monkeys&#x000A;  category :name&#x000A;  category :couleur, :from =&gt; :color # The couleur category will take its data from the #color method.&#x000A;end</code></pre></p>
       <p>Since each monkey has an <code>#id</code>, a <code>#name</code>, and a <code>#color</code> method, Picky will happily index the monkeys for you. Not that the couleur category uses the <code>from</code> option to define from where in the source it takes its data from.</p>
       <p>Hmmmm&#8230; id method? You&#8217;re probably thinking the same thing as I.</p>
       <p>MongoMapper and the new ActiveRecord both use a fluid style interface (see last post), whose proxies support <code>#each</code>, and the yielded objects support <code>#id</code> and various methods!</p>

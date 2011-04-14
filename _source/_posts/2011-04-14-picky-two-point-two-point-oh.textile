@@ -85,7 +85,7 @@ Then, since an @Array@ has the @#each@ method, you can index it:
 <pre class="sh_ruby"><code>Index::Memory.new :monkeys do
   source   monkeys
   category :name
-  category :couleur, from: color # The couleur category will take its data from the #color method.
+  category :couleur, :from => :color # The couleur category will take its data from the #color method.
 end</code></pre>
 
 Since each monkey has an @#id@, a @#name@, and a @#color@ method, Picky will happily index the monkeys for you. Not that the couleur category uses the @from@ option to define from where in the source it takes its data from.

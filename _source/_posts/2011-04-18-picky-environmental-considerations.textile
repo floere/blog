@@ -1,0 +1,53 @@
+---
+layout: post
+title: Picky&#58;&nbsp;Environmental&nbsp;Considerations
+categories:
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+(Man, being in Australia is cool in that I can post on the 18th, while most of you are still wallowing in the 17th)
+
+This is a Google Analytics driven post. I saw recently that many people looked for "Picky environment and Rails" or similar.
+
+h2. PICKY_ENVIRONMENT and PICKY_ROOT
+
+Almost like e.g. Rails, Picky has an constant ready for your environment handling: @PICKY_ENVIRONMENT@.
+
+That's what you use to differentiate, for example, data source files from each other. So you might have a @data@ directory with population data for zimbabwe in the CSV format. It would be a good idea to have three different files, @data/development/zimbabwe.csv@, @data/test/zimbabwe.csv@, and @data/production/zimbabwe.csv@.
+
+(Since for testing you probably use only a subset of your data)
+
+Then, in your index data source definition, use @PICKY_ENVIRONMENT@:
+
+<pre class="sh_ruby"><code>Index::Memory.new(:zimbabwe) do
+  source Sources::CSV.new(file: "data/#{PICKY_ENVIRONMENT}/zimbabwe.csv")
+  # ...
+end</code></pre>
+
+Well, you're probably used to that from using Rails, right?
+
+It may be interesting how this constant is defined.
+
+<pre class="sh_ruby"><code>ENV['PICKY_ENV'] ||= ENV['RACK_ENV']
+
+PICKY_ENVIRONMENT = ENV['PICKY_ENV'] || 'development' unless defined? PICKY_ENVIRONMENT</code></pre>
+
+So, if you haven't set the @PICKY_ENV@ environment variable, Picky will use the one set by Rack. Then, if you haven't set @PICKY_ENVIRONMENT@ explicitly by hand, Picky will use the environment variable to set @PICKY_ENVIRONMENT@.
+
+So you have two overriding possibilities: Either through an env variable, or through setting a Ruby constant.
+
+@PICKY_ROOT@ is also available, and is defined like this:
+
+<pre class="sh_ruby"><code>PICKY_ROOT = Dir.pwd unless defined? PICKY_ROOT</code></pre>
+
+It just uses the current directory, unless you want it to point somewhere else, explicitly. Everywhere in Picky where a file is used (mostly in the data sources), @PICKY_ROOT@ is used.
+
+h2. Conclusion
+
+So we've seen
+# how @PICKY_ENVIRONMENT@ and @PICKY_ROOT@ are set.
+# how you can use @PICKY_ENVIRONMENT@ to your advantage.
+
+Hope you learnt something new!

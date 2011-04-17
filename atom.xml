@@ -4,13 +4,132 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-14T15:34:36+10:00</updated>
+ <updated>2011-04-17T23:38:15+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&#58;&nbsp;Environmental&nbsp;Considerations</title>
+   <link href="http://florianhanke.com/blog/2011/04/18/picky-environmental-considerations.html"/>
+   <updated>2011-04-18T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/18/picky-environmental-considerations</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;(Man, being in Australia is cool in that I can post on the 18th, while most of you are still wallowing in the 17th)&lt;/p&gt;
+&lt;p&gt;This is a Google Analytics driven post. I saw recently that many people looked for &amp;#8220;Picky environment and Rails&amp;#8221; or similar.&lt;/p&gt;
+&lt;h2&gt;PICKY_ENVIRONMENT and PICKY_ROOT&lt;/h2&gt;
+&lt;p&gt;Almost like e.g. Rails, Picky has an constant ready for your environment handling: &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s what you use to differentiate, for example, data source files from each other. So you might have a &lt;code&gt;data&lt;/code&gt; directory with population data for zimbabwe in the &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; format. It would be a good idea to have three different files, &lt;code&gt;data/development/zimbabwe.csv&lt;/code&gt;, &lt;code&gt;data/test/zimbabwe.csv&lt;/code&gt;, and &lt;code&gt;data/production/zimbabwe.csv&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;(Since for testing you probably use only a subset of your data)&lt;/p&gt;
+&lt;p&gt;Then, in your index data source definition, use &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Index::Memory.new(:zimbabwe) do
+  source Sources::CSV.new(file: &quot;data/#{PICKY_ENVIRONMENT}/zimbabwe.csv&quot;)
+  # ...
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Well, you&amp;#8217;re probably used to that from using Rails, right?&lt;/p&gt;
+&lt;p&gt;It may be interesting how this constant is defined.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;ENV['PICKY_ENV'] ||= ENV['RACK_ENV']
+
+PICKY_ENVIRONMENT = ENV['PICKY_ENV'] || 'development' unless defined? PICKY_ENVIRONMENT&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So, if you haven&amp;#8217;t set the &lt;code&gt;PICKY_ENV&lt;/code&gt; environment variable, Picky will use the one set by Rack. Then, if you haven&amp;#8217;t set &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt; explicitly by hand, Picky will use the environment variable to set &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;So you have two overriding possibilities: Either through an env variable, or through setting a Ruby constant.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;PICKY_ROOT&lt;/code&gt; is also available, and is defined like this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;PICKY_ROOT = Dir.pwd unless defined? PICKY_ROOT&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It just uses the current directory, unless you want it to point somewhere else, explicitly. Everywhere in Picky where a file is used (mostly in the data sources), &lt;code&gt;PICKY_ROOT&lt;/code&gt; is used.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;how &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt; and &lt;code&gt;PICKY_ROOT&lt;/code&gt; are set.&lt;/li&gt;
+	&lt;li&gt;how you can use &lt;code&gt;PICKY_ENVIRONMENT&lt;/code&gt; to your advantage.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title>Picky&#58;&nbsp;Integration&nbsp;Testing</title>
+   <link href="http://florianhanke.com/blog/2011/04/17/picky-integration-testing.html"/>
+   <updated>2011-04-17T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/17/picky-integration-testing</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;Let me start off by saying that it&amp;#8217;s embarrassing that this topic is discussed only as Picky 2.3.0 is released. Especially as a proponent of test driven design. (Picky has 1300 tests and 50% more spec code than normal code)&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s check out how you can write the most beautifully tested Picky servers. Oh yeah.&lt;/p&gt;
+&lt;h2&gt;Doin&amp;#8217; it&lt;/h2&gt;
+&lt;p&gt;As of 2.3.0, if you use &lt;code&gt;picky generate unicorn_server&lt;/code&gt;, you&amp;#8217;ll get a &lt;code&gt;rake spec&lt;/code&gt; for free which already runs integration specs on the example data.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s look at the example, and after that, at each separate part.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'spec_helper'
+require 'picky-client/spec'
+
+describe 'Integration Tests' do
+
+  before(:all) do
+    Indexes.index_for_tests
+    Indexes.load_from_cache
+  end
+
+  let(:books) { Picky::TestClient.new(PickySearch, :path =&amp;gt; '/books') }
+
+  # Testing a count of results.
+  #
+  it { books.search('a s').total.should == 42 }
+
+  # Testing a specific order of result ids.
+  #
+  it { books.search('alan').ids.should == [259, 307, 449] }
+
+  # Testing an order of result categories.
+  #
+  it { books.search('alan').should have_categories(['author'], ['title']) }
+  it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It starts off like any RSpec file, by requiring &lt;code&gt;spec_helper&lt;/code&gt;. Then we require the spec part of the picky client.&lt;/p&gt;
+&lt;p&gt;What does it do? It provides us with the testing counterpart of the client&amp;#8217;s &lt;code&gt;Picky::Client&lt;/code&gt;, which is &lt;code&gt;Picky::TestClient&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The test client works almost exactly like the real client, with the exception that the test client never sends &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; requests, but uses your app&amp;#8217;s Rack adapter. But more about that later.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'spec_helper'
+require 'picky-client/spec'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, we set up the environment for the tests, i.e. get the indexes up and running.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Indexes.index_for_tests&lt;/code&gt; is a special index method that does not fork and runs silently (to not disturb the deadly test bugs that trawl the area).&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;before(:all) do
+  Indexes.index_for_tests
+  Indexes.load_from_cache
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;Indexes.load_from_cache&lt;/code&gt; loads the generated index (caches) into memory (or just leaves them alone in Redis).&lt;/p&gt;
+&lt;p&gt;Now we&amp;#8217;re ready to do some testing!&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;let(:books) { Picky::TestClient.new(PickySearch, :path =&amp;gt; '/books') }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This sets up an accessor for your tests. You give the &lt;code&gt;TestClient&lt;/code&gt; your Application&amp;#8217;s constant, &lt;code&gt;PickySearch&lt;/code&gt; here, and give it the path to send queries to, here &lt;code&gt;'/books'&lt;/code&gt;. This only works if you &lt;code&gt;route&lt;/code&gt; the path &lt;code&gt;'/books'&lt;/code&gt; to a &lt;code&gt;Search&lt;/code&gt; in your &lt;code&gt;application/app.rb&lt;/code&gt;, of course.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it! Easy so far, right?&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Testing a count of results.
+#
+it { books.search('a s').total.should == 42 }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;books&lt;/code&gt; is the test client we defined with the &lt;code&gt;let&lt;/code&gt;, above. As with the normal &lt;code&gt;Picky::Client&lt;/code&gt;, it offers a &lt;code&gt;#search(text, options = {})&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;As return value, we get a hash with the result data. However, it has already been enriched through &lt;code&gt;Picky::Convenience&lt;/code&gt;, which you might know if you&amp;#8217;ve set up a client webapp already.&lt;/p&gt;
+&lt;p&gt;This means we get a &lt;code&gt;#total&lt;/code&gt; method, but also &lt;code&gt;#ids&lt;/code&gt;, &lt;code&gt;#empty?&lt;/code&gt;, &lt;code&gt;#allocations&lt;/code&gt; and more which are less useful for testing.&lt;/p&gt;
+&lt;p&gt;So to test the count of results, just use &lt;code&gt;#total&lt;/code&gt; on the result of the search.&lt;/p&gt;
+&lt;p&gt;To get a sorted array of the top ids, use &amp;#8211; surprise &amp;#8211; &lt;code&gt;#ids&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Testing a specific order of result ids.
+#
+it { books.search('alan').ids.should == [259, 307, 449] }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Also useful is to test if the category combination boosting/weights are correct. So if &lt;code&gt;author&lt;/code&gt;, like in the first example below, should be boosted, use the &lt;code&gt;have_categories&lt;/code&gt; matcher to check for that.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Testing an order of result categories.
+#
+it { books.search('alan').should have_categories(['author'], ['title']) }
+it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And that&amp;#8217;s how you do integration testing in Picky.&lt;/p&gt;
+&lt;p&gt;About time. Test away!&lt;/p&gt;
+&lt;h2&gt;Sidenote&lt;/h2&gt;
+&lt;p&gt;Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;how you do integration testing in Picky&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&nbsp;2.2.0</title>

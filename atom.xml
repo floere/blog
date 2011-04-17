@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-17T23:38:15+10:00</updated>
+ <updated>2011-04-17T23:45:03+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -120,6 +120,23 @@ it { books.search('alan').should have_categories(['author'], ['title']) }
 it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And that&amp;#8217;s how you do integration testing in Picky.&lt;/p&gt;
 &lt;p&gt;About time. Test away!&lt;/p&gt;
+&lt;h2&gt;spec_helper and Rakefile&lt;/h2&gt;
+&lt;p&gt;This is what your &lt;code&gt;spec/spec_helper.rb&lt;/code&gt; would look like:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;ENV['PICKY_ENV'] = 'test'
+
+require 'picky'
+
+SearchLog = Loggers::Search.new ::Logger.new(STDOUT)
+puts &quot;Using STDOUT as test log.&quot;
+
+Loader.load_application&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the &lt;code&gt;Rakefile&lt;/code&gt; just add&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'rspec'
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new :spec&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;if you haven&amp;#8217;t done this already.&lt;/p&gt;
+&lt;p&gt;h2.&lt;/p&gt;
 &lt;h2&gt;Sidenote&lt;/h2&gt;
 &lt;p&gt;Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;

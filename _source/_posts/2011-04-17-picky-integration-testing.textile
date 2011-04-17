@@ -102,6 +102,30 @@ And that's how you do integration testing in Picky.
 
 About time. Test away!
 
+h2. spec_helper and Rakefile
+
+This is what your @spec/spec_helper.rb@ would look like:
+
+<pre class="sh_ruby"><code>ENV['PICKY_ENV'] = 'test'
+
+require 'picky'
+
+SearchLog = Loggers::Search.new ::Logger.new(STDOUT)
+puts "Using STDOUT as test log."
+
+Loader.load_application</code></pre>
+
+In the @Rakefile@ just add
+
+<pre class="sh_ruby"><code>require 'rspec'
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new :spec</code></pre>
+
+if you haven't done this already.
+
+h2.
+
 h2. Sidenote
 
 Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)

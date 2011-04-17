@@ -83,6 +83,13 @@
       <pre class="sh_ruby"><code># Testing an order of result categories.&#x000A;#&#x000A;it { books.search('alan').should have_categories(['author'], ['title']) }&#x000A;it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }</code></pre>
       <p>And that&#8217;s how you do integration testing in Picky.</p>
       <p>About time. Test away!</p>
+      <h2>spec_helper and Rakefile</h2>
+      <p>This is what your <code>spec/spec_helper.rb</code> would look like:</p>
+      <pre class="sh_ruby"><code>ENV['PICKY_ENV'] = 'test'&#x000A;&#x000A;require 'picky'&#x000A;&#x000A;SearchLog = Loggers::Search.new ::Logger.new(STDOUT)&#x000A;puts "Using STDOUT as test log."&#x000A;&#x000A;Loader.load_application</code></pre>
+      <p>In the <code>Rakefile</code> just add</p>
+      <pre class="sh_ruby"><code>require 'rspec'&#x000A;require 'rspec/core/rake_task'&#x000A;&#x000A;RSpec::Core::RakeTask.new :spec</code></pre>
+      <p>if you haven&#8217;t done this already.</p>
+      <p>h2.</p>
       <h2>Sidenote</h2>
       <p>Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)</p>
       <h2>Conclusion</h2>

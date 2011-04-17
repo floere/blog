@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-17T23:45:03+10:00</updated>
+ <updated>2011-04-17T23:46:27+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -136,7 +136,6 @@ require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new :spec&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;if you haven&amp;#8217;t done this already.&lt;/p&gt;
-&lt;p&gt;h2.&lt;/p&gt;
 &lt;h2&gt;Sidenote&lt;/h2&gt;
 &lt;p&gt;Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;

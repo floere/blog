@@ -124,8 +124,6 @@ RSpec::Core::RakeTask.new :spec</code></pre>
 
 if you haven't done this already.
 
-h2.
-
 h2. Sidenote
 
 Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)

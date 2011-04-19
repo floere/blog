@@ -63,7 +63,7 @@ So we're using the generated code, but add a little more information to the retu
 
 We not only need the list results, but also the coordinates themselves. So we're going to add them to the results separately.
 
-We (ab)use @populate_with@, the method that makes models out of the returned ids and yields them to the block.
+We (ab)use @populate_with@, the method that makes models out of the returned ids and yields them to the block to be rendered.
 
 We then use the models to add geo coordinates to the result hash that is sent to the client.
 

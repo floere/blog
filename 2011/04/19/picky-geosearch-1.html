@@ -80,7 +80,7 @@
       <p>In this part we&#8217;re going to install the map.</p>
       <p>So we&#8217;re using the generated code, but add a little more information to the returned json hash.</p>
       <p>We not only need the list results, but also the coordinates themselves. So we&#8217;re going to add them to the results separately.</p>
-      <p>We (ab)use <code>populate_with</code>, the method that makes models out of the returned ids and yields them to the block.</p>
+      <p>We (ab)use <code>populate_with</code>, the method that makes models out of the returned ids and yields them to the block to be rendered.</p>
       <p>We then use the models to add geo coordinates to the result hash that is sent to the client.</p>
       <pre class="sh_ruby"><code>results = Geo.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]&#x000A;results.extend Picky::Convenience&#x000A;results[:geo] ||= [] # &lt;= We initialize an array of coordinates in the results hash.&#x000A;results.populate_with Location do |location|&#x000A;  results[:geo] &lt;&lt; [location.north, location.east] # &lt;- and we populate it with the coordinates.&#x000A;  location.to_s&#x000A;end</code></pre>
       <p>So essentially, our geo data piggybacks to the Javascript client. JS, here we come!</p>

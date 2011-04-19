@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-19T18:12:57+10:00</updated>
+ <updated>2011-04-19T18:33:47+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -48,7 +48,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In this part we&amp;#8217;re going to install the map.&lt;/p&gt;
 &lt;p&gt;So we&amp;#8217;re using the generated code, but add a little more information to the returned json hash.&lt;/p&gt;
 &lt;p&gt;We not only need the list results, but also the coordinates themselves. So we&amp;#8217;re going to add them to the results separately.&lt;/p&gt;
-&lt;p&gt;We (ab)use &lt;code&gt;populate_with&lt;/code&gt;, the method that makes models out of the returned ids and yields them to the block.&lt;/p&gt;
+&lt;p&gt;We (ab)use &lt;code&gt;populate_with&lt;/code&gt;, the method that makes models out of the returned ids and yields them to the block to be rendered.&lt;/p&gt;
 &lt;p&gt;We then use the models to add geo coordinates to the result hash that is sent to the client.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = Geo.search params[:query], :ids =&amp;gt; params[:ids], :offset =&amp;gt; params[:offset]
 results.extend Picky::Convenience

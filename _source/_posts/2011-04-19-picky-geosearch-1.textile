@@ -17,7 +17,7 @@ The index contains around 21'000 Swiss places, taken from Wikipedia.
 
 First, I click a little around – Picky gives me places around the clicked location.
 
-Then I show what happens if I just give Picky a latitude or a longitude. Then, finally, combined with the place text, then, just with the place text.
+After that I show what happens if I just give Picky a latitude or a longitude. Then, combined with the place text, finally, just with the place text.
 
 You'll understand when you see it :)
 

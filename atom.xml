@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-19T18:42:39+10:00</updated>
+ <updated>2011-04-19T18:51:29+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -27,7 +27,8 @@
 &lt;p&gt;You&amp;#8217;ll understand when you see it :)&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s best to switch to full-screen:&lt;/p&gt;
 &lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/22594668&quot; width=&quot;707&quot; height=&quot;726&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
-&lt;p&gt;How do you do it?&lt;/p&gt;
+&lt;p&gt;The blob in the middle is Switzerland, by the way ;)&lt;/p&gt;
+&lt;p&gt;How do we do it?&lt;/p&gt;
 &lt;h2&gt;The server code&lt;/h2&gt;
 &lt;p&gt;The server … you probably could have done sleeping if you&amp;#8217;ve been reading this blog dilligently ;)&lt;/p&gt;
 &lt;p&gt;The data comes from the &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; file &lt;code&gt;data/swiss_places.csv&lt;/code&gt;&lt;/p&gt;

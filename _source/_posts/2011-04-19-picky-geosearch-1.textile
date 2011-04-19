@@ -25,7 +25,9 @@ It's best to switch to full-screen:
 
 <iframe src="http://player.vimeo.com/video/22594668" width="707" height="726" frameborder="0"></iframe>
 
-How do you do it?
+The blob in the middle is Switzerland, by the way ;)
+
+How do we do it?
 
 h2. The server code
 

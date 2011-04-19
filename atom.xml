@@ -4,13 +4,114 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-17T23:46:27+10:00</updated>
+ <updated>2011-04-19T18:12:57+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&#58;&nbsp;Geosearch&nbsp;1</title>
+   <link href="http://florianhanke.com/blog/2011/04/19/picky-geosearch-1.html"/>
+   <updated>2011-04-19T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/19/picky-geosearch-1</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;Let me show you how to do a simple and fun geo search in Picky.&lt;/p&gt;
+&lt;p&gt;But first, lean back.&lt;/p&gt;
+&lt;h2&gt;Enjoy the show&lt;/h2&gt;
+&lt;p&gt;The index contains around 21&amp;#8217;000 Swiss places, taken from Wikipedia.&lt;/p&gt;
+&lt;p&gt;First, I click a little around – Picky gives me places around the clicked location.&lt;/p&gt;
+&lt;p&gt;Then I show what happens if I just give Picky a latitude or a longitude. Then, finally, combined with the place text, then, just with the place text.&lt;/p&gt;
+&lt;p&gt;You&amp;#8217;ll understand when you see it :)&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s best to switch to full-screen:&lt;/p&gt;
+&lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/22594668&quot; width=&quot;707&quot; height=&quot;726&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;p&gt;How do you do it?&lt;/p&gt;
+&lt;h2&gt;The server code&lt;/h2&gt;
+&lt;p&gt;The server … you probably could have done sleeping if you&amp;#8217;ve been reading this blog dilligently ;)&lt;/p&gt;
+&lt;p&gt;The data comes from the &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; file &lt;code&gt;data/swiss_places.csv&lt;/code&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;places = Index::Memory.new :geo do
+  source         Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')
+  category       :location, partial: Partial::Substring.new(from: 1)
+  geo_categories :north, :east, 1, precision: 3
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What&amp;#8217;s interesting here is the &lt;code&gt;geo_categories&lt;/code&gt; method. It takes two categories, &lt;code&gt;north&lt;/code&gt;, and &lt;code&gt;east&lt;/code&gt;, which are both in the lat/lng format, e.g. &lt;code&gt;47.2&lt;/code&gt;, &lt;code&gt;8.3&lt;/code&gt;. (It also takes options &lt;code&gt;lat_from&lt;/code&gt;, and &lt;code&gt;lng_from&lt;/code&gt; if the categories don&amp;#8217;t have the same names as in the data source)&lt;/p&gt;
+&lt;p&gt;Also, the 1 parameter in &lt;code&gt;geo_categories&lt;/code&gt; denotes that we search 1 km around the clicked location.&lt;/p&gt;
+&lt;p&gt;This is actually the simple part. It does no exact calculation, but an approximate one that&amp;#8217;s most correct in temperate zones. But as you see in the video, it works well. Especially in a &amp;#8220;what&amp;#8217;s around me&amp;#8221; type search.&lt;/p&gt;
+&lt;p&gt;Still in the server config &lt;code&gt;app/application.rb&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;route %r{\A/places\Z} =&amp;gt; Search.new(places)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Self-explanatory, eh? As regexp, you could also use &lt;code&gt;%r{^/places$}&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it for the server. Nothing special so far.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rake index; rake start&lt;/code&gt; and off we go.&lt;/p&gt;
+&lt;h2&gt;The client code&lt;/h2&gt;
+&lt;p&gt;In this part we&amp;#8217;re going to install the map.&lt;/p&gt;
+&lt;p&gt;So we&amp;#8217;re using the generated code, but add a little more information to the returned json hash.&lt;/p&gt;
+&lt;p&gt;We not only need the list results, but also the coordinates themselves. So we&amp;#8217;re going to add them to the results separately.&lt;/p&gt;
+&lt;p&gt;We (ab)use &lt;code&gt;populate_with&lt;/code&gt;, the method that makes models out of the returned ids and yields them to the block.&lt;/p&gt;
+&lt;p&gt;We then use the models to add geo coordinates to the result hash that is sent to the client.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = Geo.search params[:query], :ids =&amp;gt; params[:ids], :offset =&amp;gt; params[:offset]
+results.extend Picky::Convenience
+results[:geo] ||= [] # &amp;lt;= We initialize an array of coordinates in the results hash.
+results.populate_with Location do |location|
+  results[:geo] &amp;lt;&amp;lt; [location.north, location.east] # &amp;lt;- and we populate it with the coordinates.
+  location.to_s
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So essentially, our geo data piggybacks to the Javascript client. JS, here we come!&lt;/p&gt;
+&lt;h2&gt;The javascript client code&lt;/h2&gt;
+&lt;p&gt;The javascript client requires a bit more work. Well, the map does.&lt;/p&gt;
+&lt;p&gt;We insert this after the &lt;code&gt;PickyClient&lt;/code&gt; code. The first 6 lines are noise and map preparation.&lt;/p&gt;
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;// The map
+//
+$(document).ready(function() {
+  if (GBrowserIsCompatible()) {
+    // Map setup.
+    //
+    map = new GMap2(document.getElementById('map_div'));
+    map.addControl(new GSmallMapControl());
+    map.setCenter(new GLatLng(46.85, 8.05), 13);
+    map.setZoom(7);
+
+    // Click listener.
+    //
+    GEvent.addListener(map, &quot;click&quot;, function(overlay, latlng) {
+      if (latlng) {
+        pickyClient.insert(Math.round(latlng.lat()*1000)/1000 + ' ' + Math.round(latlng.lng()*1000)/1000);
+      }
+    });
+  }
+});&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, we add the most important part: A click &lt;code&gt;listener&lt;/code&gt; that inserts the coordinates (rounded to 3 digits) in the search field, as you have seen in the video.&lt;/p&gt;
+&lt;p&gt;Now, searches are already sent off to Picky and come back. Whoosh!&lt;/p&gt;
+&lt;p&gt;What do we need to do now? Yes, draw some markers in the map. The &lt;code&gt;PickyClient&lt;/code&gt; offers a callback that is called after Picky has updated the results (there are also &lt;code&gt;before&lt;/code&gt; and &lt;code&gt;success&lt;/code&gt;):&lt;/p&gt;
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;after: function(data, query) {
+  map.clearOverlays();
+
+  var geo = data.original_hash.geo;
+  if (geo) {
+    for (var i = 0; i &amp;lt; geo.length; i++) {
+      map.addOverlay(new GMarker(new GLatLng(geo[i][0], geo[i][1])));
+    };
+  }
+},&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;First we clear the overlays for the new results.&lt;/p&gt;
+&lt;p&gt;Then, we get the piggybacking geo data using the data object&amp;#8217;s &lt;code&gt;original_hash&lt;/code&gt; function, finally iterating over all coordinates and adding overlays as we go.&lt;/p&gt;
+&lt;p&gt;By default, the client only gets 20 results at a time. We set it to 100 using the &lt;code&gt;fullResults&lt;/code&gt; option.&lt;/p&gt;
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;fullResults: 100&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&amp;#8217;s it. It&amp;#8217;s fast and quite easy to set up.&lt;/p&gt;
+&lt;h2&gt;Sidenote&lt;/h2&gt;
+&lt;p&gt;Since for Swiss data it is clear which is the longitude and which is the latitude (no data intersection), we can just enter e.g. &lt;code&gt;47.2 8.3&lt;/code&gt;, but if your data area isn&amp;#8217;t exclusive, e.g. &lt;code&gt;33.1 33.2&lt;/code&gt;, meaning that latitude values can also be longitude values, just add &lt;code&gt;north:33.1 east:33.2&lt;/code&gt;, to denote what is what if north, east are the names of your categories.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that a geo search in Picky is quite snappy.&lt;/li&gt;
+	&lt;li&gt;that you can search for latitude and location name only, for example.&lt;/li&gt;
+	&lt;li&gt;how you can configure the server.&lt;/li&gt;
+	&lt;li&gt;how you can configure the client and the web frontend.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&#58;&nbsp;Environmental&nbsp;Considerations</title>

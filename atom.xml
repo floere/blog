@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-26T23:35:28+10:00</updated>
+ <updated>2011-04-26T23:51:51+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -68,7 +68,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The only notable addition is the HTML5 slider, which is a simple &lt;code&gt;input[type=range]&lt;/code&gt;, with a &lt;code&gt;change&lt;/code&gt; listener defined on it, which triggers the insertion of the (&amp;#8220;ts:&amp;#8221; qualified) search string.&lt;/p&gt;
 &lt;p&gt;One problem I had was that I did not know that Javascript defines months in the range (0..11), but not the years, so 1977 &lt;strong&gt;is&lt;/strong&gt; 1977, and not 1978, thankfully. But still, quite a stumbling block if you&amp;#8217;re unaware of it.&lt;/p&gt;
 &lt;p&gt;Have fun doing crazy space/time searches!&lt;/p&gt;
-&lt;p&gt;… and don&amp;#8217;t run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play electric guitar.&lt;/p&gt;
+&lt;p&gt;… and don&amp;#8217;t run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play an electric guitar.&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
 &lt;ol&gt;

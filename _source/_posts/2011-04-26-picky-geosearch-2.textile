@@ -85,7 +85,7 @@ One problem I had was that I did not know that Javascript defines months in the 
 
 Have fun doing crazy space/time searches!
 
-… and don't run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play electric guitar.
+… and don't run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play an electric guitar.
 
 h2. Conclusion
 

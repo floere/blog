@@ -16,7 +16,7 @@ h2. Enjoy the show
 
 I'll be searching time and space for my own footprints in Switzerland, Germany and Australia.
 
-Best viewed in full-screen. Warning: Safe for work with the possible exception of my voice, which has in the past triggered attacks by various animals and politicians.
+Best viewed in full-screen. Warning: Safe for work with the possible exception of my voice, which has in the past triggered attacks by various animals/politicians.
 
 <iframe src="http://player.vimeo.com/video/22889123" width="707" height="927" frameborder="0"></iframe>
 

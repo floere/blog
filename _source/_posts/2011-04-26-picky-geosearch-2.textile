@@ -83,6 +83,8 @@ The only notable addition is the HTML5 slider, which is a simple @input[type=ran
 
 One problem I had was that I did not know that Javascript defines months in the range (0..11), but not the years, so 1977 *is* 1977, and not 1978, thankfully. But still, quite a stumbling block if you're unaware of it.
 
+h2. Finally
+
 Have fun doing crazy space/time searches!
 
 … and don't run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play an electric guitar.

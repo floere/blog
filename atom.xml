@@ -4,13 +4,81 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-20T19:20:13+10:00</updated>
+ <updated>2011-04-26T23:21:26+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&#58;&nbsp;Geosearch&nbsp;2</title>
+   <link href="http://florianhanke.com/blog/2011/04/26/picky-geosearch-2.html"/>
+   <updated>2011-04-26T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/04/26/picky-geosearch-2</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;In this quick one I&amp;#8217;ll be using my own iPhone&amp;#8217;s geodata as data for a space/time Picky search.&lt;/p&gt;
+&lt;p&gt;Lean back and enjoy the screencast.&lt;/p&gt;
+&lt;h2&gt;Enjoy the show&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ll be searching time and space for my own footprints in Switzerland, Germany and Australia.&lt;/p&gt;
+&lt;p&gt;Best viewed in full-screen. Warning: Safe for work with the possible exception of my voice, which has in the past triggered attacks by various animals and politicians.&lt;/p&gt;
+&lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/22889123&quot; width=&quot;707&quot; height=&quot;927&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;p&gt;So how do you get your iPhone&amp;#8217;s geodata?&lt;/p&gt;
+&lt;h2&gt;iPhone geodata&lt;/h2&gt;
+&lt;p&gt;First of all, let me direct you to a nice &lt;span class=&quot;caps&quot;&gt;OSX&lt;/span&gt; application:
+&lt;a href=&quot;http://petewarden.github.com/iPhoneTracker/&quot;&gt;http://petewarden.github.com/iPhoneTracker/&lt;/a&gt;
+This enables you to view your data nicely.&lt;/p&gt;
+&lt;p&gt;The third question in the &lt;span class=&quot;caps&quot;&gt;FAQ&lt;/span&gt; explains how to get your data out of the phone:
+&lt;a href=&quot;http://petewarden.github.com/iPhoneTracker/#2&quot;&gt;How can I examine the data without running the application?&lt;/a&gt;
+(Also look at the updates)&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it. At the end you should have access to a SQLite database, from where I extracted &lt;span class=&quot;caps&quot;&gt;CSV&lt;/span&gt; data into the file &lt;code&gt;data/iphone_locations.csv&lt;/code&gt; (with header data removed).&lt;/p&gt;
+&lt;p&gt;What did I do with the data?&lt;/p&gt;
+&lt;h2&gt;The code&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ll first be looking at the server, then at the client.&lt;/p&gt;
+&lt;h3&gt;Server&lt;/h3&gt;
+&lt;p&gt;In the server, define an index like this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;iphone_locations = Index::Memory.new :iphone do
+  source Sources::CSV.new(
+    :mcc,
+    :mnc,
+    :lac,
+    :ci,
+    :timestamp,
+    :latitude,
+    :longitude,
+    :horizontal_accuracy,
+    :altitude,
+    :vertical_accuracy,
+    :speed,
+    :course,
+    :confidence,
+    file: 'data/iphone_locations.csv'
+  )
+  ranged_category :timestamp, 86_400, precision: 5, qualifiers: [:ts, :timestamp]
+  geo_categories  :latitude, :longitude, 25, precision: 3
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As you can see, I&amp;#8217;m only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness&amp;#8217; sake.&lt;/p&gt;
+&lt;p&gt;The timestamp uses a &amp;#8220;radius&amp;#8221; of 86&amp;#8217;400 seconds, and sets a short qualifier (&amp;#8220;ts&amp;#8221;) such that the search input field is not completely filled.&lt;/p&gt;
+&lt;p&gt;The geodata uses &lt;code&gt;geo_categories&lt;/code&gt; (see last post), with 25 km as radius and an average precision.&lt;/p&gt;
+&lt;p&gt;Now you already could search your data e.g. with &lt;code&gt;curl 'localhost:8080/iphone?query=longitude:8.2'&lt;/code&gt;. Note that the timestamp data is saved as seconds since January 1st 2001.&lt;/p&gt;
+&lt;h3&gt;Client&lt;/h3&gt;
+&lt;p&gt;The client actually stayed almost exactly the same since the last blog post, with the geo data piggybacking on the results hash.&lt;/p&gt;
+&lt;p&gt;The only notable addition is the HTML5 slider, which is a simple &lt;code&gt;input[type=range]&lt;/code&gt;, with a &lt;code&gt;change&lt;/code&gt; listener defined on it, which triggers the insertion of the (&amp;#8220;ts:&amp;#8221; qualified) search string.&lt;/p&gt;
+&lt;p&gt;One problem I had was that I did not know that Javascript defines months in the range (0..11), but not the years, so 1977 &lt;strong&gt;is&lt;/strong&gt; 1977, and not 1978, thankfully. But still, quite a stumbling block if you&amp;#8217;re unaware of it.&lt;/p&gt;
+&lt;p&gt;Have fun doing crazy space/time searches!&lt;/p&gt;
+&lt;p&gt;… and don&amp;#8217;t run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play electric guitar.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;how to extract your iPhone&amp;#8217;s geodata.&lt;/li&gt;
+	&lt;li&gt;that you can search space/time.&lt;/li&gt;
+	&lt;li&gt;how you might write your own.&lt;/li&gt;
+	&lt;li&gt;that Javascript Date handling – although lauded by many &lt;span class=&quot;caps&quot;&gt;PHP&lt;/span&gt; programmers – is crap.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&#58;&nbsp;Geosearch&nbsp;1</title>

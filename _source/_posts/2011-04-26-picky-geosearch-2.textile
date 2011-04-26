@@ -1,0 +1,96 @@
+---
+layout: post
+title: Picky&#58;&nbsp;Geosearch&nbsp;2
+categories:
+  - ruby
+  - picky
+  - iphone
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+In this quick one I'll be using my own iPhone's geodata as data for a space/time Picky search.
+
+Lean back and enjoy the screencast.
+
+h2. Enjoy the show
+
+I'll be searching time and space for my own footprints in Switzerland, Germany and Australia.
+
+Best viewed in full-screen. Warning: Safe for work with the possible exception of my voice, which has in the past triggered attacks by various animals and politicians.
+
+<iframe src="http://player.vimeo.com/video/22889123" width="707" height="927" frameborder="0"></iframe>
+
+So how do you get your iPhone's geodata?
+
+h2. iPhone geodata
+
+First of all, let me direct you to a nice OSX application:
+"http://petewarden.github.com/iPhoneTracker/":http://petewarden.github.com/iPhoneTracker/
+This enables you to view your data nicely.
+
+The third question in the FAQ explains how to get your data out of the phone:
+"How can I examine the data without running the application?":http://petewarden.github.com/iPhoneTracker/#2
+(Also look at the updates)
+
+That's it. At the end you should have access to a SQLite database, from where I extracted CSV data into the file @data/iphone_locations.csv@ (with header data removed).
+
+What did I do with the data?
+
+h2. The code
+
+We'll first be looking at the server, then at the client.
+
+h3. Server
+
+In the server, define an index like this:
+
+<pre class="sh_ruby"><code>iphone_locations = Index::Memory.new :iphone do
+  source Sources::CSV.new(
+    :mcc,
+    :mnc,
+    :lac,
+    :ci,
+    :timestamp,
+    :latitude,
+    :longitude,
+    :horizontal_accuracy,
+    :altitude,
+    :vertical_accuracy,
+    :speed,
+    :course,
+    :confidence,
+    file: 'data/iphone_locations.csv'
+  )
+  ranged_category :timestamp, 86_400, precision: 5, qualifiers: [:ts, :timestamp]
+  geo_categories  :latitude, :longitude, 25, precision: 3
+end</code></pre>
+
+As you can see, I'm only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness' sake.
+
+The timestamp uses a "radius" of 86'400 seconds, and sets a short qualifier ("ts") such that the search input field is not completely filled.
+
+The geodata uses @geo_categories@ (see last post), with 25 km as radius and an average precision.
+
+Now you already could search your data e.g. with @curl 'localhost:8080/iphone?query=longitude:8.2'@. Note that the timestamp data is saved as seconds since January 1st 2001.
+
+h3. Client
+
+The client actually stayed almost exactly the same since the last blog post, with the geo data piggybacking on the results hash.
+
+The only notable addition is the HTML5 slider, which is a simple @input[type=range]@, with a @change@ listener defined on it, which triggers the insertion of the ("ts:" qualified) search string.
+
+One problem I had was that I did not know that Javascript defines months in the range (0..11), but not the years, so 1977 *is* 1977, and not 1978, thankfully. But still, quite a stumbling block if you're unaware of it.
+
+Have fun doing crazy space/time searches!
+
+… and don't run into time paradoxes. Those are nasty. Watch Back to the Future 1 for tips and tricks. First one is free: Learn to play electric guitar.
+
+h2. Conclusion
+
+So we've seen
+# how to extract your iPhone's geodata.
+# that you can search space/time.
+# how you might write your own.
+# that Javascript Date handling – although lauded by many PHP programmers – is crap.
+
+Hope you learnt something new!

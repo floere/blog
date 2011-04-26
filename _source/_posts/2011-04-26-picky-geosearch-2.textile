@@ -20,6 +20,8 @@ Best viewed in full-screen. Warning: Safe for work with the possible exception o
 
 <iframe src="http://player.vimeo.com/video/22889123" width="707" height="927" frameborder="0"></iframe>
 
+(When I say "Apple is collecting", I mean "'Apple' is collecting" – the phone)
+
 So how do you get your iPhone's geodata?
 
 h2. iPhone geodata

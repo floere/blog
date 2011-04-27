@@ -67,13 +67,15 @@ In the server, define an index like this:
   geo_categories  :latitude, :longitude, 25, precision: 3
 end</code></pre>
 
-As you can see, I'm only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness' sake.
+As you can see, I'm only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness' sake if I need to refer to one of these later on.
 
-The timestamp uses a "radius" of 86'400 seconds, and sets a short qualifier ("ts") such that the search input field is not completely filled.
+The timestamp uses a "radius" of 86'400 seconds (a day). That means it includes all results around the given timestamp in a range of ts-1.day..ts+1.day.
 
-The geodata uses @geo_categories@ (see last post), with 25 km as radius and an average precision.
+It also sets a short qualifier ("ts") such that the search input field is not completely filled, i.e. searching for "ts:..." is equivalent to searching for "timestamp:...".
 
-Now you already could search your data e.g. with @curl 'localhost:8080/iphone?query=longitude:8.2'@. Note that the timestamp data is saved as seconds since January 1st 2001.
+The geodata uses @geo_categories@ (see last post), with 25 km as radius and an average precision of 3 (1 = low, 5 = high).
+
+Now you already could search your data e.g. with @curl 'localhost:8080/iphone?query=longitude:8.2'@. Note that the timestamp data is saved as seconds since January 1st 2001 (as per the Apple data).
 
 h3. Client
 

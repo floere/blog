@@ -80,10 +80,11 @@
       <h3>Server</h3>
       <p>In the server, define an index like this:</p>
       <pre class="sh_ruby"><code>iphone_locations = Index::Memory.new :iphone do&#x000A;  source Sources::CSV.new(&#x000A;    :mcc,&#x000A;    :mnc,&#x000A;    :lac,&#x000A;    :ci,&#x000A;    :timestamp,&#x000A;    :latitude,&#x000A;    :longitude,&#x000A;    :horizontal_accuracy,&#x000A;    :altitude,&#x000A;    :vertical_accuracy,&#x000A;    :speed,&#x000A;    :course,&#x000A;    :confidence,&#x000A;    file: 'data/iphone_locations.csv'&#x000A;  )&#x000A;  ranged_category :timestamp, 86_400, precision: 5, qualifiers: [:ts, :timestamp]&#x000A;  geo_categories  :latitude, :longitude, 25, precision: 3&#x000A;end</code></pre>
-      <p>As you can see, I&#8217;m only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness&#8217; sake.</p>
-      <p>The timestamp uses a &#8220;radius&#8221; of 86&#8217;400 seconds, and sets a short qualifier (&#8220;ts&#8221;) such that the search input field is not completely filled.</p>
-      <p>The geodata uses <code>geo_categories</code> (see last post), with 25 km as radius and an average precision.</p>
-      <p>Now you already could search your data e.g. with <code>curl 'localhost:8080/iphone?query=longitude:8.2'</code>. Note that the timestamp data is saved as seconds since January 1st 2001.</p>
+      <p>As you can see, I&#8217;m only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness&#8217; sake if I need to refer to one of these later on.</p>
+      <p>The timestamp uses a &#8220;radius&#8221; of 86&#8217;400 seconds (a day). That means it includes all results around the given timestamp in a range of ts-1.day..ts+1.day.</p>
+      <p>It also sets a short qualifier (&#8220;ts&#8221;) such that the search input field is not completely filled, i.e. searching for &#8220;ts:&#8230;&#8221; is equivalent to searching for &#8220;timestamp:&#8230;&#8221;.</p>
+      <p>The geodata uses <code>geo_categories</code> (see last post), with 25 km as radius and an average precision of 3 (1 = low, 5 = high).</p>
+      <p>Now you already could search your data e.g. with <code>curl 'localhost:8080/iphone?query=longitude:8.2'</code>. Note that the timestamp data is saved as seconds since January 1st 2001 (as per the Apple data).</p>
       <h3>Client</h3>
       <p>The client actually stayed almost exactly the same since the last blog post, with the geo data piggybacking on the results hash.</p>
       <p>The only notable addition is the HTML5 slider, which is a simple <code>input[type=range]</code>, with a <code>change</code> listener defined on it, which triggers the insertion of the (&#8220;ts:&#8221; qualified) search string.</p>

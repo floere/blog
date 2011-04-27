@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-04-26T23:56:54+10:00</updated>
+ <updated>2011-04-27T16:57:28+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -59,10 +59,11 @@ This enables you to view your data nicely.&lt;/p&gt;
   ranged_category :timestamp, 86_400, precision: 5, qualifiers: [:ts, :timestamp]
   geo_categories  :latitude, :longitude, 25, precision: 3
 end&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;As you can see, I&amp;#8217;m only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness&amp;#8217; sake.&lt;/p&gt;
-&lt;p&gt;The timestamp uses a &amp;#8220;radius&amp;#8221; of 86&amp;#8217;400 seconds, and sets a short qualifier (&amp;#8220;ts&amp;#8221;) such that the search input field is not completely filled.&lt;/p&gt;
-&lt;p&gt;The geodata uses &lt;code&gt;geo_categories&lt;/code&gt; (see last post), with 25 km as radius and an average precision.&lt;/p&gt;
-&lt;p&gt;Now you already could search your data e.g. with &lt;code&gt;curl 'localhost:8080/iphone?query=longitude:8.2'&lt;/code&gt;. Note that the timestamp data is saved as seconds since January 1st 2001.&lt;/p&gt;
+&lt;p&gt;As you can see, I&amp;#8217;m only using timestamp, latitude and longitude. And wrote all the possible data fields for completeness&amp;#8217; sake if I need to refer to one of these later on.&lt;/p&gt;
+&lt;p&gt;The timestamp uses a &amp;#8220;radius&amp;#8221; of 86&amp;#8217;400 seconds (a day). That means it includes all results around the given timestamp in a range of ts-1.day..ts+1.day.&lt;/p&gt;
+&lt;p&gt;It also sets a short qualifier (&amp;#8220;ts&amp;#8221;) such that the search input field is not completely filled, i.e. searching for &amp;#8220;ts:&amp;#8230;&amp;#8221; is equivalent to searching for &amp;#8220;timestamp:&amp;#8230;&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;The geodata uses &lt;code&gt;geo_categories&lt;/code&gt; (see last post), with 25 km as radius and an average precision of 3 (1 = low, 5 = high).&lt;/p&gt;
+&lt;p&gt;Now you already could search your data e.g. with &lt;code&gt;curl 'localhost:8080/iphone?query=longitude:8.2'&lt;/code&gt;. Note that the timestamp data is saved as seconds since January 1st 2001 (as per the Apple data).&lt;/p&gt;
 &lt;h3&gt;Client&lt;/h3&gt;
 &lt;p&gt;The client actually stayed almost exactly the same since the last blog post, with the geo data piggybacking on the results hash.&lt;/p&gt;
 &lt;p&gt;The only notable addition is the HTML5 slider, which is a simple &lt;code&gt;input[type=range]&lt;/code&gt;, with a &lt;code&gt;change&lt;/code&gt; listener defined on it, which triggers the insertion of the (&amp;#8220;ts:&amp;#8221; qualified) search string.&lt;/p&gt;

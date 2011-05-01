@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-01T23:38:27+10:00</updated>
+ <updated>2011-05-02T00:52:10+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,7 @@
    <link href="http://florianhanke.com/blog/2011/05/01/phony-phone-numbers.html"/>
    <updated>2011-05-01T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/05/01/phony-phone-numbers</id>
-   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/phony/&quot;&gt;Phony&lt;/a&gt;.&lt;/p&gt;
+   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/phony/&quot;&gt;Phony 1.4+&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;Imagine…&lt;/p&gt;
 &lt;p&gt;You own a little startup, which has created apps that were only relevant for the domestic market. Until now.&lt;/p&gt;
@@ -36,7 +36,7 @@
 &lt;p&gt;Phony does the ugly and dirty work of correctly formatting international phone numbers for you.&lt;/p&gt;
 &lt;p&gt;It can format, split, and normalize:&lt;/p&gt;
 &lt;ul&gt;
-	&lt;li&gt;Austria: &lt;code&gt;Phony.formatted('43198110', :format =&amp;gt; :international, :spaces =&amp;gt; :-) # =&amp;gt; '+43-1-98110'&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;Austria: &lt;code&gt;Phony.format('43198110', :format =&amp;gt; :international, :spaces =&amp;gt; :-) # =&amp;gt; '+43-1-98110'&lt;/code&gt;&lt;/li&gt;
 	&lt;li&gt;France: &lt;code&gt;Phony.split('33112345678') # =&amp;gt; ['33', '1', '12','34','56','78']&lt;/code&gt;&lt;/li&gt;
 	&lt;li&gt;North America: &lt;code&gt;Phony.normalize('1 (703) 451-5115') # =&amp;gt; '17034515115'&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -51,7 +51,7 @@ and special spaces, if you need them (&lt;code&gt;&quot; &quot;&lt;/code&gt; is 
 &lt;p&gt;Then,&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'phony'
 
-p Phony.formatted('43198110', :format =&amp;gt; :international, :spaces =&amp;gt; :-) # =&amp;gt; '+43-1-98110'
+p Phony.format('43198110', :format =&amp;gt; :international, :spaces =&amp;gt; :-) # =&amp;gt; '+43-1-98110'
 p Phony.split('33112345678') # =&amp;gt; ['33', '1', '12','34','56','78']
 p Phony.normalize('1 (703) 451-5115') # =&amp;gt; '17034515115'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;My country is not formatted correctly! What do I do?&lt;/p&gt;
@@ -95,10 +95,10 @@ digits. If not, go and check if the &lt;span class=&quot;caps&quot;&gt;NDC&lt;/s
   read_attribute(:specific_phone) || read_attribute(:normalized_phone)
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, in the view, use e.g.:&lt;/p&gt;
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;= Phony.formatted(user.phone)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;= Phony.format(user.phone)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Even better to use representers/&lt;a href=&quot;https://github.com/floere/view_models&quot;&gt;view models&lt;/a&gt;, in which you just define a method:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def phone
-  Phony.formatted(model.phone)
+  Phony.format(model.phone)
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, in the view it becomes:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;= user.phone&lt;/code&gt;&lt;/pre&gt;

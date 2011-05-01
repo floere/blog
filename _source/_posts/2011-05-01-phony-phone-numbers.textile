@@ -6,7 +6,7 @@ categories:
   - phony
   - e164
 ---
-This is a post about "Phony":http://florianhanke.com/phony/.
+This is a post about "Phony 1.4+":http://florianhanke.com/phony/.
 
 h2. Intro
 
@@ -41,7 +41,7 @@ h2. Phony
 Phony does the ugly and dirty work of correctly formatting international phone numbers for you.
 
 It can format, split, and normalize:
-* Austria: @Phony.formatted('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'@
+* Austria: @Phony.format('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'@
 * France: @Phony.split('33112345678') # => ['33', '1', '12','34','56','78']@
 * North America: @Phony.normalize('1 (703) 451-5115') # => '17034515115'@
 
@@ -64,7 +64,7 @@ Then,
 
 <pre class="sh_ruby"><code>require 'phony'
 
-p Phony.formatted('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'
+p Phony.format('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'
 p Phony.split('33112345678') # => ['33', '1', '12','34','56','78']
 p Phony.normalize('1 (703) 451-5115') # => '17034515115'</code></pre>
 
@@ -128,12 +128,12 @@ end</code></pre>
 
 Then, in the view, use e.g.:
 
-<pre class="sh_ruby"><code>= Phony.formatted(user.phone)</code></pre>
+<pre class="sh_ruby"><code>= Phony.format(user.phone)</code></pre>
 
 Even better to use representers/"view models":https://github.com/floere/view_models, in which you just define a method:
 
 <pre class="sh_ruby"><code>def phone
-  Phony.formatted(model.phone)
+  Phony.format(model.phone)
 end</code></pre>
 
 Then, in the view it becomes:

@@ -79,7 +79,8 @@ To add your "missing" country, fork Phony and look at the "lib/phony/countries.r
 The internal API uses a little DSL to make managing and coding all the different formats easier.
 
 The phone numbers of France, for example, have a very elegant structure:
-@country '33', fixed(1) >> split(2,2,2,2)@
+
+<pre class="sh_ruby"><code>country '33', fixed(1) >> split(2,2,2,2)</code></pre>
 
 This says, that the country with country code @33@ should have an NDC of @fixed@ length @1@,
 followed (@>>@) by a national code that is @split@ in groups of @2@.

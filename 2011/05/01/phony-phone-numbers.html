@@ -95,8 +95,8 @@
       <p>Sometimes I have a nice document to go on, most of the time I don&#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!</p>
       <p>To add your &#8220;missing&#8221; country, fork Phony and look at the <a href="http://github.com/floere/phony/blob/master/lib/phony/countries.rb">lib/phony/countries.rb file</a>. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.</p>
       <p>The internal <span class="caps">API</span> uses a little <span class="caps">DSL</span> to make managing and coding all the different formats easier.</p>
-      <p>The phone numbers of France, for example, have a very elegant structure:
-      <code>country '33', fixed(1) &gt;&gt; split(2,2,2,2)</code></p>
+      <p>The phone numbers of France, for example, have a very elegant structure:</p>
+      <pre class="sh_ruby"><code>country '33', fixed(1) &gt;&gt; split(2,2,2,2)</code></pre>
       <p>This says, that the country with country code <code>33</code> should have an <span class="caps">NDC</span> of <code>fixed</code> length <code>1</code>,
       followed (<code>&gt;&gt;</code>) by a national code that is <code>split</code> in groups of <code>2</code>.</p>
       <p>As another quick example, the freshly added Slovakia:

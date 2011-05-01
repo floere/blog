@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-02T08:59:06+10:00</updated>
+ <updated>2011-05-02T09:01:54+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -59,8 +59,8 @@ p Phony.normalize('1 (703) 451-5115') # =&amp;gt; '17034515115'&lt;/code&gt;&lt;
 &lt;p&gt;Sometimes I have a nice document to go on, most of the time I don&amp;#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!&lt;/p&gt;
 &lt;p&gt;To add your &amp;#8220;missing&amp;#8221; country, fork Phony and look at the &lt;a href=&quot;http://github.com/floere/phony/blob/master/lib/phony/countries.rb&quot;&gt;lib/phony/countries.rb file&lt;/a&gt;. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.&lt;/p&gt;
 &lt;p&gt;The internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; uses a little &lt;span class=&quot;caps&quot;&gt;DSL&lt;/span&gt; to make managing and coding all the different formats easier.&lt;/p&gt;
-&lt;p&gt;The phone numbers of France, for example, have a very elegant structure:
-&lt;code&gt;country '33', fixed(1) &amp;gt;&amp;gt; split(2,2,2,2)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The phone numbers of France, for example, have a very elegant structure:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;country '33', fixed(1) &amp;gt;&amp;gt; split(2,2,2,2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This says, that the country with country code &lt;code&gt;33&lt;/code&gt; should have an &lt;span class=&quot;caps&quot;&gt;NDC&lt;/span&gt; of &lt;code&gt;fixed&lt;/code&gt; length &lt;code&gt;1&lt;/code&gt;,
 followed (&lt;code&gt;&amp;gt;&amp;gt;&lt;/code&gt;) by a national code that is &lt;code&gt;split&lt;/code&gt; in groups of &lt;code&gt;2&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;As another quick example, the freshly added Slovakia:

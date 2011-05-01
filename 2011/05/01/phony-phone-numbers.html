@@ -86,6 +86,10 @@
       <p>Although that is probably not needed, as Phony can take care of that for you: Formatting render a number in international/national/local form, with zeroes, <code>00</code>, plus <code>+</code>
       and special spaces, if you need them (<code>" "</code> is default).</p>
       <p>Look at <a href="http://florianhanke.com/phony/examples.html">a few more examples</a>.</p>
+      <h2>Try it</h2>
+      <p>First, get the gem: <code>gem install phony</code></p>
+      <p>Then,</p>
+      <pre class="sh_ruby"><code>require 'phony'&#x000A;&#x000A;p Phony.formatted('43198110', :format =&gt; :international, :spaces =&gt; :-) # =&gt; '+43-1-98110'&#x000A;p Phony.split('33112345678') # =&gt; ['33', '1', '12','34','56','78']&#x000A;p Phony.normalize('1 (703) 451-5115') # =&gt; '17034515115'</code></pre>
       <p>My country is not formatted correctly! What do I do?</p>
       <h2>Internal <span class="caps">API</span></h2>
       <p>Sometimes I have a nice document to go on, most of the time I don&#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!</p>

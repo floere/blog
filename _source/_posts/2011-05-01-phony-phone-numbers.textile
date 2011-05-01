@@ -56,6 +56,18 @@ and special spaces, if you need them (@" "@ is default).
 
 Look at "a few more examples":http://florianhanke.com/phony/examples.html.
 
+h2. Try it
+
+First, get the gem: @gem install phony@
+
+Then,
+
+<pre class="sh_ruby"><code>require 'phony'
+
+p Phony.formatted('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'
+p Phony.split('33112345678') # => ['33', '1', '12','34','56','78']
+p Phony.normalize('1 (703) 451-5115') # => '17034515115'</code></pre>
+
 My country is not formatted correctly! What do I do?
 
 h2. Internal API

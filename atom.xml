@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-01T10:39:14+10:00</updated>
+ <updated>2011-05-01T23:38:27+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -46,6 +46,14 @@
 &lt;p&gt;Although that is probably not needed, as Phony can take care of that for you: Formatting render a number in international/national/local form, with zeroes, &lt;code&gt;00&lt;/code&gt;, plus &lt;code&gt;+&lt;/code&gt;
 and special spaces, if you need them (&lt;code&gt;&quot; &quot;&lt;/code&gt; is default).&lt;/p&gt;
 &lt;p&gt;Look at &lt;a href=&quot;http://florianhanke.com/phony/examples.html&quot;&gt;a few more examples&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Try it&lt;/h2&gt;
+&lt;p&gt;First, get the gem: &lt;code&gt;gem install phony&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Then,&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'phony'
+
+p Phony.formatted('43198110', :format =&amp;gt; :international, :spaces =&amp;gt; :-) # =&amp;gt; '+43-1-98110'
+p Phony.split('33112345678') # =&amp;gt; ['33', '1', '12','34','56','78']
+p Phony.normalize('1 (703) 451-5115') # =&amp;gt; '17034515115'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;My country is not formatted correctly! What do I do?&lt;/p&gt;
 &lt;h2&gt;Internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/h2&gt;
 &lt;p&gt;Sometimes I have a nice document to go on, most of the time I don&amp;#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!&lt;/p&gt;

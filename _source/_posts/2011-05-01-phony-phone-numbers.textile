@@ -104,13 +104,29 @@ So, in e.g. ActiveRecord you can exploit fact #1 like this:
 
 Fact #2 is harder to exploit, and this is what Phony is here for.
 
+h2. Model/Representation Aside
+
 Btw, if you have customers who want to enter specific phone numbers, you could code it up like this in ActiveRecord:
+
+Before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.
 
 <pre class="sh_ruby"><code>def phone
   read_attribute(:specific_phone) || read_attribute(:normalized_phone)
 end</code></pre>
 
-And before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.
+Then, in the view, use e.g.:
+
+<pre class="sh_ruby"><code>= Phony.formatted(phone, :format => :international)</code></pre>
+
+Even better to use representers/"view models":https://github.com/floere/view_models, in which you just define a method:
+
+<pre class="sh_ruby"><code>def phone
+  Phony.formatted(model.phone)
+end</code></pre>
+
+Then, in the view it becomes:
+
+<pre class="sh_ruby"><code>= phone</code></pre>
 
 h2. Status
 

@@ -6,7 +6,7 @@ categories:
   - phony
   - e164
 ---
-This is a post about "Phony 1.4+":http://florianhanke.com/phony/.
+This is a post about "Phony 1.4.1+":http://florianhanke.com/phony/.
 
 h2. Intro
 

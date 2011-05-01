@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-02T09:17:11+10:00</updated>
+ <updated>2011-05-02T09:18:23+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -90,7 +90,7 @@ digits. If not, go and check if the &lt;span class=&quot;caps&quot;&gt;NDC&lt;/s
 &lt;p&gt;Fact #2 is harder to exploit, and this is what Phony is here for.&lt;/p&gt;
 &lt;h2&gt;Model/Representation Aside&lt;/h2&gt;
 &lt;p&gt;Btw, if you have customers who want to enter specific phone numbers (like &amp;#8220;+34/123-(555)001!&amp;#8221;), you could code it up like this in ActiveRecord:&lt;/p&gt;
-&lt;p&gt;Before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.&lt;/p&gt;
+&lt;p&gt;Before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute (if normalized != given_specific). This just off the top of my head.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def phone
   read_attribute(:specific_phone) || read_attribute(:normalized_phone)
 end&lt;/code&gt;&lt;/pre&gt;

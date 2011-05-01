@@ -116,7 +116,7 @@ end</code></pre>
 
 Then, in the view, use e.g.:
 
-<pre class="sh_ruby"><code>= Phony.formatted(user.phone, :format => :international)</code></pre>
+<pre class="sh_ruby"><code>= Phony.formatted(user.phone)</code></pre>
 
 Even better to use representers/"view models":https://github.com/floere/view_models, in which you just define a method:
 

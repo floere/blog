@@ -123,7 +123,7 @@
       <p>Before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.</p>
       <pre class="sh_ruby"><code>def phone&#x000A;  read_attribute(:specific_phone) || read_attribute(:normalized_phone)&#x000A;end</code></pre>
       <p>Then, in the view, use e.g.:</p>
-      <pre class="sh_ruby"><code>= Phony.formatted(user.phone, :format =&gt; :international)</code></pre>
+      <pre class="sh_ruby"><code>= Phony.formatted(user.phone)</code></pre>
       <p>Even better to use representers/<a href="https://github.com/floere/view_models">view models</a>, in which you just define a method:</p>
       <pre class="sh_ruby"><code>def phone&#x000A;  Phony.formatted(model.phone)&#x000A;end</code></pre>
       <p>Then, in the view it becomes:</p>

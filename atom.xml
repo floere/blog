@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-01T10:38:24+10:00</updated>
+ <updated>2011-05-01T10:39:14+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -87,7 +87,7 @@ digits. If not, go and check if the &lt;span class=&quot;caps&quot;&gt;NDC&lt;/s
   read_attribute(:specific_phone) || read_attribute(:normalized_phone)
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, in the view, use e.g.:&lt;/p&gt;
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;= Phony.formatted(user.phone, :format =&amp;gt; :international)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;= Phony.formatted(user.phone)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Even better to use representers/&lt;a href=&quot;https://github.com/floere/view_models&quot;&gt;view models&lt;/a&gt;, in which you just define a method:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def phone
   Phony.formatted(model.phone)

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Phony&#58;&nbsp;Phone&nbsp;Numbers</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Phony&#58;&nbsp;Phone&nbsp;Numbers</h1>
+      <div class="categories">ruby / phony / e164</div>
+      <p>This is a post about <a href="http://florianhanke.com/phony/">Phony</a>.</p>
+      <h2>Intro</h2>
+      <p>Imagine…</p>
+      <p>You own a little startup, which has created apps that were only relevant for the domestic market. Until now.</p>
+      <p>Suddenly, the big breakthrough – your online car/music/housing/pet/houseboatlover&#8217;s website has been an overnight (5+ yrs) success, and people demand it be available all over the world, including customers from all over the world.</p>
+      <p>Coding goes very well, until suddenly one of your customers notices that their phone number is all awry. Instead of the melodious french 2-digit grouping <code>33 1 12 34 56 78</code>, it is a horrible jumble of north american clumping: <code>3 (311) 234-5678</code>. This is an outrage! Sacrebleu!</p>
+      <p>France invades the US on the very next day. Freedom fries are forbidden and … well, you know how the story goes.</p>
+      <p>This could all have been avoided if you had used <a href="http://florianhanke.com/phony/">Phony</a>.</p>
+      <h2>The problem</h2>
+      <p>The big problem is that countries all over the world have different ways of splitting and formatting their phone numbers.</p>
+      <p>For example, Switzerland uses a 2-digit national destination code, like <code>+41 44 123 12 12</code> – the <code>44</code> is the national destination code, which originally was geographic in nature, but isn&#8217;t anymore.</p>
+      <p>Germany is different in that it has a variable length <span class="caps">NDC</span>, from 1 to 5, for example Freiburg im Breisgau uses 3: <code>+49 761 476 7676</code>, and Berlin uses 2: <code>+49 30 386 25454</code>.</p>
+      <p>Denmark on the other hand has no <span class="caps">NDC</span> at all. And let&#8217;s not talk about Italy. No, let&#8217;s not.</p>
+      <p>You see? Big mess.</p>
+      <p>Well, there is some standardization called <a href="http://florianhanke.com/phony/e164.html">E164</a>, and I&#8217;ll talk about it below. But first, Phony.</p>
+      <h2>Phony</h2>
+      <p>Phony does the ugly and dirty work of correctly formatting international phone numbers for you.</p>
+      <p>It can format, split, and normalize:</p>
+      <ul>
+      	<li>Austria: <code>Phony.formatted('43198110', :format =&gt; :international, :spaces =&gt; :-) # =&gt; '+43-1-98110'</code></li>
+      	<li>France: <code>Phony.split('33112345678') # =&gt; ['33', '1', '12','34','56','78']</code></li>
+      	<li>North America: <code>Phony.normalize('1 (703) 451-5115') # =&gt; '17034515115'</code></li>
+      </ul>
+      <p>And it does it very fast. Each of these ops for 5 numbers is <a href="http://github.com/floere/phony/blob/master/spec/lib/phony_spec.rb#L178-215">around 1 10&#8217;000th of a second</a> on my <span class="caps">MBP</span> using Ruby 1.9.2.</p>
+      <p>Normalizing you use before saving a phone number into a database etc.</p>
+      <p>Splitting is helpful if you want to do your own special formatting, or remove certain parts.</p>
+      <p>Although that is probably not needed, as Phony can take care of that for you: Formatting render a number in international/national/local form, with zeroes, <code>00</code>, plus <code>+</code>
+      and special spaces, if you need them (<code>" "</code> is default).</p>
+      <p>Look at <a href="http://florianhanke.com/phony/examples.html">a few more examples</a>.</p>
+      <p>My country is not formatted correctly! What do I do?</p>
+      <h2>Internal <span class="caps">API</span></h2>
+      <p>Sometimes I have a nice document to go on, most of the time I don&#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!</p>
+      <p>To add your &#8220;missing&#8221; country, fork Phony and look at the <a href="http://github.com/floere/phony/blob/master/lib/countries.rb">lib/countries.rb file</a>. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.</p>
+      <p>The internal <span class="caps">API</span> uses a little <span class="caps">DSL</span> to make managing and coding all the different formats easier.</p>
+      <p>The phone numbers of France, for example, have a very elegant structure:
+      <code>country '33', fixed(1) &gt;&gt; split(2,2,2,2)</code></p>
+      <p>This says, that the country with country code <code>33</code> should have an <span class="caps">NDC</span> of <code>fixed</code> length <code>1</code>,
+      followed (<code>&gt;&gt;</code>) by a national code that is <code>split</code> in groups of <code>2</code>.</p>
+      <p>As another quick example, the freshly added Slovakia:
+      <pre class="sh_ruby"><code>country '421', match(/^(9\d\d).+$/) &gt;&gt; split(6) | # Mobile&#x000A;               one_of('2')          &gt;&gt; split(8) | # Bratislava&#x000A;               fixed(2)             &gt;&gt; split(7)</code></pre></p>
+      <p>This says that Slovakia uses <code>421</code> as country code. If a phone number with <span class="caps">NDC</span> <code>9xx</code> is found, <code>split</code> the national part into one big part with <code>6</code>
+      digits. If not, go and check if the <span class="caps">NDC</span> is a <code>2</code>, if yes, <code>split</code> it into a thing with <code>8</code> digits as national. If not, it must be a 2-digit <span class="caps">NDC</span>, with 7 digits following.</p>
+      <p>So:</p>
+      <ul>
+      	<li><code>421912123456 # =&gt; 421 912 123456</code></li>
+      	<li><code>421212345678 # =&gt; 421 2 12345678</code></li>
+      	<li><code>421371234567 # =&gt; 421 37 1234567</code></li>
+      </ul>
+      <p>The description of what is available is at the top of the file.</p>
+      <p>First, add specs with a few example numbers, then fix, and send me a pull request. Get big thanks in <a href="http://github.com/floere/phony/wiki/Contributors">the contributors entries</a>. Try to beat Keith Bingman! :)</p>
+      <p>But let&#8217;s get back to phone numbers.</p>
+      <h2>E.164</h2>
+      <p>Or E164 for short is a recommendation which defines a numbering scheme and phone number formats. The <a href="http://en.wikipedia.org/wiki/E.164">Wikipedia entry</a> is very helpful.</p>
+      <p>For coders, there are 2 important facts to be gleamed:</p>
+      <ul>
+      	<li>Length is maximally = 15.</li>
+      	<li>Country code is a 1-3 digits <a href="http://en.wikipedia.org/wiki/Prefix_code">prefix code</a>. This is defined in E164. After that it is a horrible mess.</li>
+      </ul>
+      <p>So, in e.g. ActiveRecord you can exploit fact #1 like this:
+      <code>t.string "normalized_phone", :limit =&gt; 15</code></p>
+      <p>Fact #2 is harder to exploit, and this is what Phony is here for.</p>
+      <p>Btw, if you have customers who want to enter specific phone numbers, you could code it up like this in ActiveRecord:</p>
+      <pre class="sh_ruby"><code>def phone&#x000A;  read_attribute(:specific_phone) || read_attribute(:normalized_phone)&#x000A;end</code></pre>
+      <p>And before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.</p>
+      <h2>Status</h2>
+      <p>At the time of this writing, we include 44 countries, and counting. See <a href="http://github.com/floere/phony/blob/master/README.textile">the <span class="caps">README</span></a> for a list.</p>
+      <h2>Endnote 1</h2>
+      <p>Q: Why are this dude&#8217;s libraries named after negative attributes?</p>
+      <p>A: No.</p>
+      <h2>Endnote 2</h2>
+      <p>If I&#8217;ve found out just one thing about phone numbers then it is this formula:</p>
+      <p><code>1 / (standardization + well-oiled-bureaucracy) = phone-number-structure-mess-quantifier</code></p>
+      <p>Switzerland has a well oiled bureaucracy, 1, but not a big drive for standardization, 0, = 1.</p>
+      <p>France does not have a well oiled bureaucracy, 0, but a big drive for standardization, 1, = 1.</p>
+      <p>For Italy, the result is around 1.825&#215;10e7. Booo.</p>
+      <p>A special thank you goes to Belgium which uses 4xx as its mobile phone prefix, but has a region, Liège, which uses 4 as its land line prefix. Belgium, do you know what a bloody prefix code is? <span class="caps">OTOH</span>, this led me to rewrite Phony a second time, and all is much better.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Phony can normalize a phone number.</li>
+      	<li>that Phony can split a phone number into its constituent parts.</li>
+      	<li>that Phony can format a phone number for you.</li>
+      	<li>that it does all this very fast.</li>
+      	<li>what E164 is.</li>
+      	<li>what the status is.</li>
+      	<li>that some countries <span class="caps">ARE</span> better than others ;)</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/04/26/picky-geosearch-2.html" title="Previous post: Picky&#58;&nbsp;Geosearch&nbsp;2">Picky&#58;&nbsp;Geosearch&nbsp;2</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/05/01/phony-phone-numbers';
+          var disqus_url = 'http://florianhanke.com/blog/2011/05/01/phony-phone-numbers.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

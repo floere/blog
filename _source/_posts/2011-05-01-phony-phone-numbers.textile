@@ -1,0 +1,150 @@
+---
+layout: post
+title: Phony&#58;&nbsp;Phone&nbsp;Numbers
+categories:
+  - ruby
+  - phony
+  - e164
+---
+This is a post about "Phony":http://florianhanke.com/phony/.
+
+h2. Intro
+
+Imagine…
+
+You own a little startup, which has created apps that were only relevant for the domestic market. Until now.
+
+Suddenly, the big breakthrough – your online car/music/housing/pet/houseboatlover's website has been an overnight (5+ yrs) success, and people demand it be available all over the world, including customers from all over the world.
+
+Coding goes very well, until suddenly one of your customers notices that their phone number is all awry. Instead of the melodious french 2-digit grouping @33 1 12 34 56 78@, it is a horrible jumble of north american clumping: @3 (311) 234-5678@. This is an outrage! Sacrebleu!
+
+France invades the US on the very next day. Freedom fries are forbidden and … well, you know how the story goes.
+
+This could all have been avoided if you had used "Phony":http://florianhanke.com/phony/.
+
+h2. The problem
+
+The big problem is that countries all over the world have different ways of splitting and formatting their phone numbers.
+
+For example, Switzerland uses a 2-digit national destination code, like @+41 44 123 12 12@ – the @44@ is the national destination code, which originally was geographic in nature, but isn't anymore.
+
+Germany is different in that it has a variable length NDC, from 1 to 5, for example Freiburg im Breisgau uses 3: @+49 761 476 7676@, and Berlin uses 2: @+49 30 386 25454@.
+
+Denmark on the other hand has no NDC at all. And let's not talk about Italy. No, let's not.
+
+You see? Big mess.
+
+Well, there is some standardization called "E164":http://florianhanke.com/phony/e164.html, and I'll talk about it below. But first, Phony.
+
+h2. Phony
+
+Phony does the ugly and dirty work of correctly formatting international phone numbers for you.
+
+It can format, split, and normalize:
+* Austria: @Phony.formatted('43198110', :format => :international, :spaces => :-) # => '+43-1-98110'@
+* France: @Phony.split('33112345678') # => ['33', '1', '12','34','56','78']@
+* North America: @Phony.normalize('1 (703) 451-5115') # => '17034515115'@
+
+And it does it very fast. Each of these ops for 5 numbers is "around 1 10'000th of a second":http://github.com/floere/phony/blob/master/spec/lib/phony_spec.rb#L178-215 on my MBP using Ruby 1.9.2.
+
+Normalizing you use before saving a phone number into a database etc.
+
+Splitting is helpful if you want to do your own special formatting, or remove certain parts.
+
+Although that is probably not needed, as Phony can take care of that for you: Formatting render a number in international/national/local form, with zeroes, @00@, plus @+@
+and special spaces, if you need them (@" "@ is default).
+
+Look at "a few more examples":http://florianhanke.com/phony/examples.html.
+
+My country is not formatted correctly! What do I do?
+
+h2. Internal API
+
+Sometimes I have a nice document to go on, most of the time I don't, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!
+
+To add your "missing" country, fork Phony and look at the "lib/countries.rb file":http://github.com/floere/phony/blob/master/lib/countries.rb. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.
+
+The internal API uses a little DSL to make managing and coding all the different formats easier.
+
+The phone numbers of France, for example, have a very elegant structure:
+@country '33', fixed(1) >> split(2,2,2,2)@
+
+This says, that the country with country code @33@ should have an NDC of @fixed@ length @1@,
+followed (@>>@) by a national code that is @split@ in groups of @2@.
+
+As another quick example, the freshly added Slovakia:
+<pre class="sh_ruby"><code>country '421', match(/^(9\d\d).+$/) >> split(6) | # Mobile
+               one_of('2')          >> split(8) | # Bratislava
+               fixed(2)             >> split(7)</code></pre>
+
+This says that Slovakia uses @421@ as country code. If a phone number with NDC @9xx@ is found, @split@ the national part into one big part with @6@
+digits. If not, go and check if the NDC is a @2@, if yes, @split@ it into a thing with @8@ digits as national. If not, it must be a 2-digit NDC, with 7 digits following.
+
+So:
+* @421912123456 # => 421 912 123456@
+* @421212345678 # => 421 2 12345678@
+* @421371234567 # => 421 37 1234567@
+
+The description of what is available is at the top of the file.
+
+First, add specs with a few example numbers, then fix, and send me a pull request. Get big thanks in "the contributors entries":http://github.com/floere/phony/wiki/Contributors. Try to beat Keith Bingman! :)
+
+But let's get back to phone numbers.
+
+h2. E.164
+
+Or E164 for short is a recommendation which defines a numbering scheme and phone number formats. The "Wikipedia entry":http://en.wikipedia.org/wiki/E.164 is very helpful.
+
+For coders, there are 2 important facts to be gleamed:
+* Length is maximally = 15.
+* Country code is a 1-3 digits "prefix code":http://en.wikipedia.org/wiki/Prefix_code. This is defined in E164. After that it is a horrible mess.
+
+So, in e.g. ActiveRecord you can exploit fact #1 like this:
+@t.string "normalized_phone", :limit => 15@
+
+Fact #2 is harder to exploit, and this is what Phony is here for.
+
+Btw, if you have customers who want to enter specific phone numbers, you could code it up like this in ActiveRecord:
+
+<pre class="sh_ruby"><code>def phone
+  read_attribute(:specific_phone) || read_attribute(:normalized_phone)
+end</code></pre>
+
+And before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.
+
+h2. Status
+
+At the time of this writing, we include 44 countries, and counting. See "the README":http://github.com/floere/phony/blob/master/README.textile for a list.
+
+h2. Endnote 1
+
+Q: Why are this dude's libraries named after negative attributes?
+
+A: No.
+
+h2. Endnote 2
+
+If I've found out just one thing about phone numbers then it is this formula:
+
+@1 / (standardization + well-oiled-bureaucracy) = phone-number-structure-mess-quantifier@
+
+Switzerland has a well oiled bureaucracy, 1, but not a big drive for standardization, 0, = 1.
+
+France does not have a well oiled bureaucracy, 0, but a big drive for standardization, 1, = 1.
+
+For Italy, the result is around 1.825x10e7. Booo.
+
+A special thank you goes to Belgium which uses 4xx as its mobile phone prefix, but has a region, Liège, which uses 4 as its land line prefix. Belgium, do you know what a bloody prefix code is? OTOH, this led me to rewrite Phony a second time, and all is much better.
+
+h2. Conclusion
+
+So we've seen
+# that Phony can normalize a phone number.
+# that Phony can split a phone number into its constituent parts.
+# that Phony can format a phone number for you.
+# that it does all this very fast.
+# what E164 is.
+# what the status is.
+# that some countries ARE better than others ;)
+
+Hope you learnt something new!

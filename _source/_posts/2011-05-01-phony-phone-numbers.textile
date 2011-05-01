@@ -175,7 +175,7 @@ So we've seen
 # that Phony can format a phone number for you.
 # that it does all this very fast.
 # what E164 is.
-# what the status is.
+# what the lib status is.
 # that some countries ARE better than others ;)
 
 Hope you learnt something new!

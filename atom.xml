@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-02T09:21:15+10:00</updated>
+ <updated>2011-05-02T09:22:42+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -123,7 +123,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;that Phony can format a phone number for you.&lt;/li&gt;
 	&lt;li&gt;that it does all this very fast.&lt;/li&gt;
 	&lt;li&gt;what E164 is.&lt;/li&gt;
-	&lt;li&gt;what the status is.&lt;/li&gt;
+	&lt;li&gt;what the lib status is.&lt;/li&gt;
 	&lt;li&gt;that some countries &lt;span class=&quot;caps&quot;&gt;ARE&lt;/span&gt; better than others ;)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>

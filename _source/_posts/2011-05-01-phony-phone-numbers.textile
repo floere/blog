@@ -113,7 +113,7 @@ For coders, there are 2 important facts to be gleamed:
 * Country code is a 1-3 digits "prefix code":http://en.wikipedia.org/wiki/Prefix_code. This is defined in E164. After that it is a horrible mess.
 
 So, in e.g. ActiveRecord you can exploit fact #1 like this:
-@t.string "normalized_phone", :limit => 15@
+<pre class="sh_ruby"><code>t.string "normalized_phone", :limit => 15</code></pre>
 
 Fact #2 is harder to exploit, and this is what Phony is here for.
 

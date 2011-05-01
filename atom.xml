@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-02T09:04:09+10:00</updated>
+ <updated>2011-05-02T09:11:15+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,7 @@
    <link href="http://florianhanke.com/blog/2011/05/01/phony-phone-numbers.html"/>
    <updated>2011-05-01T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/05/01/phony-phone-numbers</id>
-   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/phony/&quot;&gt;Phony 1.4+&lt;/a&gt;.&lt;/p&gt;
+   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/phony/&quot;&gt;Phony 1.4.1+&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;Imagine…&lt;/p&gt;
 &lt;p&gt;You own a little startup, which has created apps that were only relevant for the domestic market. Until now.&lt;/p&gt;

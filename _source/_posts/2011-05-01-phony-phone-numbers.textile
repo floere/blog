@@ -85,7 +85,7 @@ So:
 * @421212345678 # => 421 2 12345678@
 * @421371234567 # => 421 37 1234567@
 
-The description of what is available is at the top of the file.
+The description of what matching/splitting is available is at the top of the file.
 
 First, add specs with a few example numbers, then fix, and send me a pull request. Get big thanks in "the contributors entries":http://github.com/floere/phony/wiki/Contributors. Try to beat Keith Bingman! :)
 

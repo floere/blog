@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-01T10:26:28+10:00</updated>
+ <updated>2011-05-01T10:31:41+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -67,7 +67,7 @@ digits. If not, go and check if the &lt;span class=&quot;caps&quot;&gt;NDC&lt;/s
 	&lt;li&gt;&lt;code&gt;421212345678 # =&amp;gt; 421 2 12345678&lt;/code&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;code&gt;421371234567 # =&amp;gt; 421 37 1234567&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The description of what is available is at the top of the file.&lt;/p&gt;
+&lt;p&gt;The description of what matching/splitting is available is at the top of the file.&lt;/p&gt;
 &lt;p&gt;First, add specs with a few example numbers, then fix, and send me a pull request. Get big thanks in &lt;a href=&quot;http://github.com/floere/phony/wiki/Contributors&quot;&gt;the contributors entries&lt;/a&gt;. Try to beat Keith Bingman! :)&lt;/p&gt;
 &lt;p&gt;But let&amp;#8217;s get back to phone numbers.&lt;/p&gt;
 &lt;h2&gt;E.164&lt;/h2&gt;

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-02T00:52:10+10:00</updated>
+ <updated>2011-05-02T08:47:18+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -57,7 +57,7 @@ p Phony.normalize('1 (703) 451-5115') # =&amp;gt; '17034515115'&lt;/code&gt;&lt;
 &lt;p&gt;My country is not formatted correctly! What do I do?&lt;/p&gt;
 &lt;h2&gt;Internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/h2&gt;
 &lt;p&gt;Sometimes I have a nice document to go on, most of the time I don&amp;#8217;t, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!&lt;/p&gt;
-&lt;p&gt;To add your &amp;#8220;missing&amp;#8221; country, fork Phony and look at the &lt;a href=&quot;http://github.com/floere/phony/blob/master/lib/countries.rb&quot;&gt;lib/countries.rb file&lt;/a&gt;. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.&lt;/p&gt;
+&lt;p&gt;To add your &amp;#8220;missing&amp;#8221; country, fork Phony and look at the &lt;a href=&quot;http://github.com/floere/phony/blob/master/lib/phony/countries.rb&quot;&gt;lib/countries.rb file&lt;/a&gt;. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.&lt;/p&gt;
 &lt;p&gt;The internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; uses a little &lt;span class=&quot;caps&quot;&gt;DSL&lt;/span&gt; to make managing and coding all the different formats easier.&lt;/p&gt;
 &lt;p&gt;The phone numbers of France, for example, have a very elegant structure:
 &lt;code&gt;country '33', fixed(1) &amp;gt;&amp;gt; split(2,2,2,2)&lt;/code&gt;&lt;/p&gt;

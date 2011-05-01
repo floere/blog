@@ -74,7 +74,7 @@ h2. Internal API
 
 Sometimes I have a nice document to go on, most of the time I don't, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!
 
-To add your "missing" country, fork Phony and look at the "lib/countries.rb file":http://github.com/floere/phony/blob/master/lib/countries.rb. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.
+To add your "missing" country, fork Phony and look at the "lib/countries.rb file":http://github.com/floere/phony/blob/master/lib/phony/countries.rb. It contains (almost) all the definitions. The more complicated ones – like Germany, Italy, etc. – are in their own files.
 
 The internal API uses a little DSL to make managing and coding all the different formats easier.
 

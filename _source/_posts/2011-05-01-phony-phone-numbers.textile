@@ -119,7 +119,7 @@ Fact #2 is harder to exploit, and this is what Phony is here for.
 
 h2. Model/Representation Aside
 
-Btw, if you have customers who want to enter specific phone numbers, you could code it up like this in ActiveRecord:
+Btw, if you have customers who want to enter specific phone numbers (like "+34/123-(555)001!"), you could code it up like this in ActiveRecord:
 
 Before saving, you could normalize it quickly if it is dirty, to see if it needs to be saved in the specific_phone attribute. This just off the top of my head.
 

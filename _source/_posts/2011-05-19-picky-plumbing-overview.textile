@@ -71,7 +71,7 @@ Then again, you might not care about all these edge cases or having a really goo
 
 h4. BIG *BUT*
 
-Let me say though that I see the appeal of having an ORM integration, and the next few months may see our efforts shifted towards having a Picky ORM integration. This is a result of a long discussion with "Karel Minařik":http://github.com/karmi, aka Mr. Tire.
+Let me say though that I see the appeal of having an ORM integration, and the next few months may see our efforts shifted towards having a Picky ORM integration. This is a result of a long discussion with "Karel Minařik":http://github.com/karmi, aka "Mr. Tire":http://github.com/karmi/tire.
 
 It will probably take place first in the form of having a flexible external interface in the server through which data is sent and indexed.
 

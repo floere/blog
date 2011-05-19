@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-19T20:15:34+10:00</updated>
+ <updated>2011-05-19T20:22:25+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -57,7 +57,7 @@
 &lt;p&gt;Although it might be enticing to have a search set up really fast, it is most of the time paid later: When all is about making the search work really well and edge cases crop up (due to the fact that most data is rather freeform).&lt;/p&gt;
 &lt;p&gt;Then again, you might not care about all these edge cases or having a really good search. Then again, why are you reading this exactly?&lt;/p&gt;
 &lt;h4&gt;&lt;span class=&quot;caps&quot;&gt;BIG&lt;/span&gt; &lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;BUT&lt;/span&gt;&lt;/strong&gt;&lt;/h4&gt;
-&lt;p&gt;Let me say though that I see the appeal of having an &lt;span class=&quot;caps&quot;&gt;ORM&lt;/span&gt; integration, and the next few months may see our efforts shifted towards having a Picky &lt;span class=&quot;caps&quot;&gt;ORM&lt;/span&gt; integration. This is a result of a long discussion with &lt;a href=&quot;http://github.com/karmi&quot;&gt;Karel Minařik&lt;/a&gt;, aka Mr. Tire.&lt;/p&gt;
+&lt;p&gt;Let me say though that I see the appeal of having an &lt;span class=&quot;caps&quot;&gt;ORM&lt;/span&gt; integration, and the next few months may see our efforts shifted towards having a Picky &lt;span class=&quot;caps&quot;&gt;ORM&lt;/span&gt; integration. This is a result of a long discussion with &lt;a href=&quot;http://github.com/karmi&quot;&gt;Karel Minařik&lt;/a&gt;, aka &lt;a href=&quot;http://github.com/karmi/tire&quot;&gt;Mr. Tire&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;It will probably take place first in the form of having a flexible external interface in the server through which data is sent and indexed.&lt;/p&gt;
 &lt;p&gt;The indexing definition would still be in the server, but the selection and sorting of data would be in the Rails / Sinatra etc. application.&lt;/p&gt;
 &lt;p&gt;In short:&lt;/p&gt;

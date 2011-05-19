@@ -23,8 +23,7 @@ There is also the "best practices setup":http://github.com/floere/picky/wiki/Bes
 
 So, let me clear up a few things. This is the current state of how Picky is used:
 
-/blog
-!/images/2011-05-19-overview.png!
+!/blog/images/2011-05-19-overview.png!
 
 We have multiple areas:
 

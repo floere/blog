@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-19T20:12:30+10:00</updated>
+ <updated>2011-05-19T20:15:34+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -26,8 +26,7 @@
 &lt;p&gt;There is the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;overview image&lt;/a&gt; on the &lt;em&gt;getting started&lt;/em&gt; page, but it isn&amp;#8217;t very clear on how everything fits together.&lt;/p&gt;
 &lt;p&gt;There is also the &lt;a href=&quot;http://github.com/floere/picky/wiki/Best-Practices-Setup&quot;&gt;best practices setup&lt;/a&gt; in &lt;a href=&quot;http://github.com/floere/picky/wiki/&quot;&gt;the Wiki&lt;/a&gt;, but that does not really show any code, just how it is connected on an abstract level.&lt;/p&gt;
 &lt;p&gt;So, let me clear up a few things. This is the current state of how Picky is used:&lt;/p&gt;
-&lt;p&gt;/blog
-&lt;img src=&quot;/images/2011-05-19-overview.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/images/2011-05-19-overview.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 &lt;p&gt;We have multiple areas:&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;The Picky server (gem &lt;code&gt;picky&lt;/code&gt;) is a &lt;em&gt;standalone&lt;/em&gt; server. You can send it &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; requests and it will return &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; responses with a &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; body.&lt;/li&gt;

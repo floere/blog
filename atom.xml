@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-31T00:43:01+10:00</updated>
+ <updated>2011-05-31T00:48:13+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -23,7 +23,7 @@
 &lt;p&gt;Picky needs to be more accessible. How can we do this? We provide a simple &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; to be used in an ActiveModel which provides indexing and searching.&lt;/p&gt;
 &lt;p&gt;The result: A possible Picky &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;.&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
-&lt;p&gt;Now Picky is cool and all that, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that &amp;#8220;Generic Search Engine X&amp;#8221; and &amp;#8220;Hyperfast Russian Text Looker-Througher&amp;#8221; (I write this lovingly) do not address. Yadda yadda.&lt;/p&gt;
+&lt;p&gt;Now Picky is cool, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that &amp;#8220;Generic Search Engine X&amp;#8221; and &amp;#8220;Hyperfast Russian Text Looker-Througher&amp;#8221; (I write this lovingly) do not address. Etc etc, yadda yadda.&lt;/p&gt;
 &lt;p&gt;So what is the problem I&amp;#8217;m addressing?&lt;/p&gt;
 &lt;p&gt;El problemo: Picky is not as &lt;strong&gt;accessible&lt;/strong&gt; as other search engines.&lt;/p&gt;
 &lt;p&gt;What do I mean by accessible?&lt;/p&gt;
@@ -213,6 +213,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;reads quite ok.&lt;/p&gt;
 &lt;p&gt;One idea might be to call it &lt;code&gt;picky_search&lt;/code&gt;, but not too partial to that.&lt;/p&gt;
 &lt;p&gt;So yeah, hope you enjoyed looking over my shoulder. There&amp;#8217;s a lot to do still, but this looks like a hopeful start :)&lt;/p&gt;
+&lt;p&gt;If you find any problems or have ideas, let me know in the comments!&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
 &lt;ol&gt;

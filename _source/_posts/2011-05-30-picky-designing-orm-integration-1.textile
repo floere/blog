@@ -18,7 +18,7 @@ The result: A possible Picky API.
 
 h2. Intro
 
-Now Picky is cool and all that, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that "Generic Search Engine X" and "Hyperfast Russian Text Looker-Througher" (I write this lovingly) do not address. Yadda yadda.
+Now Picky is cool, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that "Generic Search Engine X" and "Hyperfast Russian Text Looker-Througher" (I write this lovingly) do not address. Etc etc, yadda yadda.
 
 So what is the problem I'm addressing?
 
@@ -298,6 +298,8 @@ reads quite ok.
 One idea might be to call it @picky_search@, but not too partial to that.
 
 So yeah, hope you enjoyed looking over my shoulder. There's a lot to do still, but this looks like a hopeful start :)
+
+If you find any problems or have ideas, let me know in the comments!
 
 h2. Conclusion
 

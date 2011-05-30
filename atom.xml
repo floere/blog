@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-31T00:26:00+10:00</updated>
+ <updated>2011-05-31T00:43:01+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -87,7 +87,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Person
   include Picky
 
-  index_split_on /[\s]/
+  index.split_on /[\s]/
 
   index do
     split_on /\W/
@@ -117,7 +117,7 @@ Person.index!&lt;/code&gt;&lt;/pre&gt;
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;There&amp;#8217;s an interesting question there: Should it be&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;partial :substring, 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;using a weak symbol/string/number parameter based config or a more powerful&lt;/p&gt;
+&lt;p&gt;using a weak symbol/number parameter based config or a more powerful&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;partial Picky::Partial::Substring.new(1)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;with the problem that we now need the Substring class defined not only in Picky, but also in the &lt;code&gt;picky-activemodel&lt;/code&gt; gem.&lt;/p&gt;
 &lt;p&gt;Not too easy indeed. I&amp;#8217;m not a big fan of String definitions. It&amp;#8217;s just so incredibly weak.&lt;/p&gt;
@@ -177,6 +177,23 @@ Person.simple_splitting_search.with(&quot;Bond, James&quot;)&lt;/code&gt;&lt;/pr
 &lt;p&gt;I think we can work with something like that.&lt;/p&gt;
 &lt;p&gt;But the case where we just index a Person is the easy case. What if we also want to index its addresses, which are saved as a separate model, together in a single index?&lt;/p&gt;
 &lt;h3&gt;Indexing relations&lt;/h3&gt;
+&lt;p&gt;The best way in my humble opinion would be to define a very specific model, just for searching – to avoid cluttering the normal model, obey the &lt;acronym title=&quot;Single Responsibility Principle&quot;&gt;&lt;span class=&quot;caps&quot;&gt;SRP&lt;/span&gt;&lt;/acronym&gt;.&lt;/p&gt;
+&lt;p&gt;But probably this is not what many people would want.&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s give it a go with the abovementioned addresses relation:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Person
+  include Picky
+
+  index do
+    category :first_name do
+      # ...
+    end
+    category :street do
+      from { addresses.map(&amp;amp;:street).join(&quot; &quot;) }
+    end
+  end
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Yep. I wouldn&amp;#8217;t conjure up a complicated &lt;span class=&quot;caps&quot;&gt;DSL&lt;/span&gt;, but use the trusty &lt;code&gt;from&lt;/code&gt; method, and then just give it a block which is evaluated in each model instance, just taking the data the block returns.&lt;/p&gt;
 &lt;h3&gt;Possible problems&lt;/h3&gt;
 &lt;p&gt;The &lt;code&gt;search&lt;/code&gt; and &lt;code&gt;index&lt;/code&gt; methods could already have been installed by other libraries. So what could we do in this case?&lt;/p&gt;
 &lt;p&gt;The Picky way of doing things would be to play nice:&lt;/p&gt;
@@ -191,6 +208,11 @@ Person.simple_splitting_search.with(&quot;Bond, James&quot;)&lt;/code&gt;&lt;/pr
 
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;So if the &lt;code&gt;index&lt;/code&gt;, &lt;code&gt;index!&lt;/code&gt; or &lt;code&gt;search&lt;/code&gt; method was already installed, it would just install a – presumably yet uninstalled method named &lt;code&gt;picky&lt;/code&gt; that acts as a proxy.&lt;/p&gt;
+&lt;p&gt;Also in searching,&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Person.picky.search(&quot;Bond, James&quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;reads quite ok.&lt;/p&gt;
+&lt;p&gt;One idea might be to call it &lt;code&gt;picky_search&lt;/code&gt;, but not too partial to that.&lt;/p&gt;
+&lt;p&gt;So yeah, hope you enjoyed looking over my shoulder. There&amp;#8217;s a lot to do still, but this looks like a hopeful start :)&lt;/p&gt;
 &lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
 &lt;ol&gt;

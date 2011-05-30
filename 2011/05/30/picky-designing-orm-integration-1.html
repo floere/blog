@@ -120,12 +120,12 @@
       <pre class="sh_ruby"><code>Person.index!</code></pre>
       <p>But how would we define the indexing? In Picky you can define index text preparation for all indexes, for each index separately, even for each category separately.</p>
       <p>Let&#8217;s see. (Using just split_on in the example)</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index_split_on /[\s]/&#x000A;&#x000A;  index do&#x000A;    split_on /\W/&#x000A;&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;      partial :substring, 1&#x000A;    end&#x000A;    category :name do&#x000A;      from :last_name&#x000A;    end&#x000A;  end&#x000A;&#x000A;  index :advertisements do&#x000A;    split_on /\s/&#x000A;    category :last_name do&#x000A;      qualifiers [:ad_name, :an]&#x000A;    end&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.index!</code></pre>
+      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index.split_on /[\s]/&#x000A;&#x000A;  index do&#x000A;    split_on /\W/&#x000A;&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;      partial :substring, 1&#x000A;    end&#x000A;    category :name do&#x000A;      from :last_name&#x000A;    end&#x000A;  end&#x000A;&#x000A;  index :advertisements do&#x000A;    split_on /\s/&#x000A;    category :last_name do&#x000A;      qualifiers [:ad_name, :an]&#x000A;    end&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.index!</code></pre>
       <p>That means that generally, index text is split on <code>/\s/</code>. Then, make an index with the implicitly pluralized name <code>"persons"</code>, which splits on <code>/\W/</code>. It indexes two categories, the first name which is specially split, and indexed for partial searching.</p>
       <pre class="sh_ruby"><code>category :first_name do&#x000A;  split_on /\s/&#x000A;  partial :substring, 1&#x000A;end</code></pre>
       <p>There&#8217;s an interesting question there: Should it be</p>
       <pre class="sh_ruby"><code>partial :substring, 1</code></pre>
-      <p>using a weak symbol/string/number parameter based config or a more powerful</p>
+      <p>using a weak symbol/number parameter based config or a more powerful</p>
       <pre class="sh_ruby"><code>partial Picky::Partial::Substring.new(1)</code></pre>
       <p>with the problem that we now need the Substring class defined not only in Picky, but also in the <code>picky-activemodel</code> gem.</p>
       <p>Not too easy indeed. I&#8217;m not a big fan of String definitions. It&#8217;s just so incredibly weak.</p>
@@ -163,11 +163,21 @@
       <p>I think we can work with something like that.</p>
       <p>But the case where we just index a Person is the easy case. What if we also want to index its addresses, which are saved as a separate model, together in a single index?</p>
       <h3>Indexing relations</h3>
+      <p>The best way in my humble opinion would be to define a very specific model, just for searching – to avoid cluttering the normal model, obey the <acronym title="Single Responsibility Principle"><span class="caps">SRP</span></acronym>.</p>
+      <p>But probably this is not what many people would want.</p>
+      <p>So let&#8217;s give it a go with the abovementioned addresses relation:</p>
+      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index do&#x000A;    category :first_name do&#x000A;      # ...&#x000A;    end&#x000A;    category :street do&#x000A;      from { addresses.map(&amp;:street).join(" ") }&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
+      <p>Yep. I wouldn&#8217;t conjure up a complicated <span class="caps">DSL</span>, but use the trusty <code>from</code> method, and then just give it a block which is evaluated in each model instance, just taking the data the block returns.</p>
       <h3>Possible problems</h3>
       <p>The <code>search</code> and <code>index</code> methods could already have been installed by other libraries. So what could we do in this case?</p>
       <p>The Picky way of doing things would be to play nice:</p>
       <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  picky.index do&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
       <p>So if the <code>index</code>, <code>index!</code> or <code>search</code> method was already installed, it would just install a – presumably yet uninstalled method named <code>picky</code> that acts as a proxy.</p>
+      <p>Also in searching,</p>
+      <pre class="sh_ruby"><code>Person.picky.search("Bond, James")</code></pre>
+      <p>reads quite ok.</p>
+      <p>One idea might be to call it <code>picky_search</code>, but not too partial to that.</p>
+      <p>So yeah, hope you enjoyed looking over my shoulder. There&#8217;s a lot to do still, but this looks like a hopeful start :)</p>
       <h2>Conclusion</h2>
       <p>So we&#8217;ve seen</p>
       <ol>

@@ -115,7 +115,7 @@ Let's see. (Using just split_on in the example)
 <pre class="sh_ruby"><code>class Person
   include Picky
 
-  index_split_on /[\s]/
+  index.split_on /[\s]/
 
   index do
     split_on /\W/
@@ -150,7 +150,7 @@ There's an interesting question there: Should it be
 
 <pre class="sh_ruby"><code>partial :substring, 1</code></pre>
 
-using a weak symbol/string/number parameter based config or a more powerful
+using a weak symbol/number parameter based config or a more powerful
 
 <pre class="sh_ruby"><code>partial Picky::Partial::Substring.new(1)</code></pre>
 
@@ -248,6 +248,28 @@ But the case where we just index a Person is the easy case. What if we also want
 
 h3. Indexing relations
 
+The best way in my humble opinion would be to define a very specific model, just for searching – to avoid cluttering the normal model, obey the SRP(Single Responsibility Principle).
+
+But probably this is not what many people would want.
+
+So let's give it a go with the abovementioned addresses relation:
+
+<pre class="sh_ruby"><code>class Person
+  include Picky
+
+  index do
+    category :first_name do
+      # ...
+    end
+    category :street do
+      from { addresses.map(&:street).join(" ") }
+    end
+  end
+
+end</code></pre>
+
+Yep. I wouldn't conjure up a complicated DSL, but use the trusty @from@ method, and then just give it a block which is evaluated in each model instance, just taking the data the block returns.
+
 h3. Possible problems
 
 The @search@ and @index@ methods could already have been installed by other libraries. So what could we do in this case?
@@ -267,6 +289,15 @@ end</code></pre>
 
 So if the @index@, @index!@ or @search@ method was already installed, it would just install a – presumably yet uninstalled method named @picky@ that acts as a proxy.
 
+Also in searching,
+
+<pre class="sh_ruby"><code>Person.picky.search("Bond, James")</code></pre>
+
+reads quite ok.
+
+One idea might be to call it @picky_search@, but not too partial to that.
+
+So yeah, hope you enjoyed looking over my shoulder. There's a lot to do still, but this looks like a hopeful start :)
 
 h2. Conclusion
 

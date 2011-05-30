@@ -1,0 +1,276 @@
+---
+layout: post
+title: Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1
+categories:
+  - ruby
+  - picky
+  - orm
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+In this post, I want you to peek over my shoulder as I go through some of my thoughts regarding Picky ORM integration.
+
+h2. tl;dr
+
+Picky needs to be more accessible. How can we do this? We provide a simple API to be used in an ActiveModel which provides indexing and searching.
+
+The result: A possible Picky API.
+
+h2. Intro
+
+Now Picky is cool and all that, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that "Generic Search Engine X" and "Hyperfast Russian Text Looker-Througher" (I write this lovingly) do not address. Yadda yadda.
+
+So what is the problem I'm addressing?
+
+El problemo: Picky is not as *accessible* as other search engines.
+
+What do I mean by accessible?
+
+h2. Accessibility?
+
+One example for accessibility is "Karel Minařik's":http://karmi.cz "Tire frontend":http://github.com/karmi/tire for ElasticSearch.
+
+He did a great job in making it accessible through "this script":http://gist.github.com/951343. The gist installs Rails & ElasticSearch in one fell swoop.
+Let's call this kind of accessibility the "Boom" factor.
+
+Remember Steve Jobs? "Boom" this and "Boom" that. Magique!
+
+Now, sure, Picky does have a "Getting Started":http://florianhanke.com/picky/getting_started.html that does exactly that in 5 minutes, including an in-site manual. And to be fair, it _also_ generates the views including a full search interface.
+
+But still. The question remains: If I have an existing Rails app, how does this work? Can't I just add Picky to my model and have a search?
+
+<pre class="sh_ruby"><code>class Person
+  pickify
+end</code></pre>
+
+and then
+
+<pre class="sh_ruby"><code>Person.indexes(:mi5, :cia, :kgb).offset(30).search 'bond, james'</code></pre>
+
+Not yet. I do have my reservations about this approach (see last post), but I see its appeal: People have a nice starting point to get into the finer details of searching (which is exactly what I want people to do – build better searches!).
+
+In short: Picky needs to up its Boom Factor!
+
+h2. The Boom Factor
+
+Between us and going to Boom Factor 11 stands a lot of code.
+
+But before the code, a lot of thinking of how the code is supposed to look.
+
+And before we can even begin to think, we should know what we want, and what information we need in the API.
+
+h2. What do we want?
+
+A few things:
+* We want a nice API, which "helps the user find what he wants" (The sacred Picky design goal).
+* We want it to interact nicely with "ActiveModel":http://yehudakatz.com/2010/01/10/activemodel-make-any-ruby-object-feel-like-activerecord/.
+* We also want to make it easy in a controller to interact with the Picky Javascript interface.
+* We'd also like to have the juiciest food the whole of France has to offer, but this is another story completely.
+
+That is what we want. What information do we need?
+
+h2. What do we need?
+
+We need different things for searching and for indexing.
+
+For searching, we need to be able to tell Picky:
+* how to prepare the search text.
+* which indexes to search.
+* the offset the results should have.
+* what to search (obviously).
+
+Quite a bit of information!
+
+For indexing, we need to be able to tell Picky:
+* how to prepare the text to be indexed.
+* which index(es) to save it to.
+* how to categorize the data.
+
+Not bad either…
+
+Let's try a few variations!
+
+h2. API Designs
+
+All this goes into a special gem called @picky-activemodel@.
+
+Let's say we start with the obvious, telling the class that it can be pickified.
+
+<pre class="sh_ruby"><code>class Person
+  include Picky
+end</code></pre>
+
+This is snappy and short. Maybe too short? Let's take a look at indexing.
+
+h3. Indexing
+
+Since Picky does not yet offer incremental indexing (most people don't need it even if they think so), we'd have to provide an explicit @index!@ method of sorts.
+
+<pre class="sh_ruby"><code>Person.index!</code></pre>
+
+But how would we define the indexing? In Picky you can define index text preparation for all indexes, for each index separately, even for each category separately.
+
+Let's see. (Using just split_on in the example)
+
+<pre class="sh_ruby"><code>class Person
+  include Picky
+
+  index_split_on /[\s]/
+
+  index do
+    split_on /\W/
+
+    category :first_name do
+      split_on /\s/
+      partial :substring, 1
+    end
+    category :name do
+      from :last_name
+    end
+  end
+
+  index :advertisements do
+    split_on /\s/
+    category :last_name do
+      qualifiers [:ad_name, :an]
+    end
+  end
+end
+
+Person.index!</code></pre>
+
+That means that generally, index text is split on @/\s/@. Then, make an index with the implicitly pluralized name @"persons"@, which splits on @/\W/@. It indexes two categories, the first name which is specially split, and indexed for partial searching.
+
+<pre class="sh_ruby"><code>category :first_name do
+  split_on /\s/
+  partial :substring, 1
+end</code></pre>
+
+There's an interesting question there: Should it be
+
+<pre class="sh_ruby"><code>partial :substring, 1</code></pre>
+
+using a weak symbol/string/number parameter based config or a more powerful
+
+<pre class="sh_ruby"><code>partial Picky::Partial::Substring.new(1)</code></pre>
+
+with the problem that we now need the Substring class defined not only in Picky, but also in the @picky-activemodel@ gem.
+
+Not too easy indeed. I'm not a big fan of String definitions. It's just so incredibly weak.
+
+Anyway, back to the example.
+
+<pre class="sh_ruby"><code>category :name do
+  from :last_name
+end</code></pre>
+
+What does this mean? It means that the data for category @:name@ is taken from the attribute @:last_name@.
+
+Further down, we have another index definition, @:advertisements@, which is explicitly named.
+
+<pre class="sh_ruby"><code>index :advertisements do</code></pre>
+
+Last but not least, we index explicitly using <pre class="sh_ruby"><code>Person.index!</code></pre>
+
+h3. Searching
+
+Searching is quite interesting.
+
+On the one hand, we could have a fluent interface for which indexes to search, and with what parameters. Let's look at it:
+
+<pre class="sh_ruby"><code>Person.search.indexes(:advertisements).offset(30).ids(20).with("Bond, James")</code></pre>
+
+to search with text "Bond, James" in index :advertisements, getting 20 result ids starting after the first 30.
+
+The short form
+
+<pre class="sh_ruby"><code>Person.search("Bond, James")</code></pre>
+
+would be much more crisp, searching in the default, unnamed index with offset 0 and 20 result ids.
+
+This would not return an array of ids, but the Picky result hash, which contains weights, categories, totals, search duration.
+
+An alternative would be
+
+<pre class="sh_ruby"><code>Person.search do
+  indexes :advertisements
+  offset  30
+  ids     20
+  with    "Bond, James"
+end</code></pre>
+
+or any combination thereof. I'm inclined to allow both, or a combination of all.
+
+This was the easy part. But where do I tell Picky how to prepare the search text? (How to split and so on?)
+
+One idea is to put this in the model as well.
+
+<pre class="sh_ruby"><code>class Person
+  include Picky
+
+  searching do
+    split_on /\s/
+  end
+
+end</code></pre>
+
+Sound good, but is the way we prepare the search text really model-specific?
+
+Not really. Let's try the search request:
+
+<pre class="sh_ruby"><code>Person.search("Bond, James") do
+  split_on /\s/
+end</code></pre>
+
+Not too sexy either. Perhaps also chained?
+
+<pre class="sh_ruby"><code>Person.search.split_on(/\s/).with("Bond, James")</code></pre>
+
+Could work but is too wordy.
+
+How about we use a simple method?
+
+<pre class="sh_ruby"><code>class Person
+  def self.simple_splitting_search
+    @simple_splitting_search ||= search.split_on(/\s/).removes_characters(/[\&\-]/)
+  end
+end
+
+Person.simple_splitting_search.with("Bond, James")</code></pre>
+
+Now this would be Ruby-esque! Methods and stuff. Who needs scopes? :)
+
+Also, the truly dynamic part would be exposed, the semi-fixed part would be summarized in the method name. Also one could decide to memoize it, as above.
+
+I think we can work with something like that.
+
+But the case where we just index a Person is the easy case. What if we also want to index its addresses, which are saved as a separate model, together in a single index?
+
+h3. Indexing relations
+
+h3. Possible problems
+
+The @search@ and @index@ methods could already have been installed by other libraries. So what could we do in this case?
+
+The Picky way of doing things would be to play nice:
+
+<pre class="sh_ruby"><code>class Person
+  include Picky
+
+  picky.index do
+    category :first_name do
+      split_on /\s/
+    end
+  end
+
+end</code></pre>
+
+So if the @index@, @index!@ or @search@ method was already installed, it would just install a – presumably yet uninstalled method named @picky@ that acts as a proxy.
+
+
+h2. Conclusion
+
+So we've seen
+# how you might go about designing an API.
+
+Hope you learnt something new!

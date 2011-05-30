@@ -297,7 +297,7 @@ reads quite ok.
 
 One idea might be to call it @picky_search@, but not too partial to that.
 
-So yeah, hope you enjoyed looking over my shoulder. There's a lot to do still, but this looks like a hopeful start :)
+So yeah, hope you enjoyed looking over my shoulder. There's a lot to do still, but this looks like a hopeful start. I'd give it a Boom Factor of 10 :)
 
 If you find any problems or have ideas, let me know in the comments!
 

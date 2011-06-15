@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-06-15T11:48:32+10:00</updated>
+ <updated>2011-06-15T13:34:26+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -41,7 +41,7 @@
 &lt;p&gt;Why isn&amp;#8217;t it much better these days? &lt;a href=&quot;http://en.wikipedia.org/wiki/Speech_synthesis&quot;&gt;Speech Synthesis&lt;/a&gt; is hard.&lt;/p&gt;
 &lt;p&gt;Not only that, but it needs to be done for each language separately. Chinese intonation is complicated, for example, and real people don&amp;#8217;t pronounce the four pitched tones in the same way. They&amp;#8217;re pronounced differently or not at all, depending which tone went before, and which came after, also depending on mood and health of the speaker.&lt;/p&gt;
 &lt;p&gt;On &lt;span class=&quot;caps&quot;&gt;OSX&lt;/span&gt;, there&amp;#8217;s two possibilities to improve the existing voices. Try the demos:
-&lt;a href=&quot;http://www.assistiveware.com/ivoxsamples.php&quot;&gt;AssistiveWare iVox Samples&lt;/a&gt; and &lt;a href=&quot;https://www.cepstral.com/demos/&quot;&gt;Cepstral Demos&lt;/a&gt;. I prefer iVox for european voices (Love the french &amp;amp; swedish women).&lt;/p&gt;
+&lt;a href=&quot;http://www.assistiveware.com/ivoxsamples.php&quot;&gt;AssistiveWare iVox Samples&lt;/a&gt; and &lt;a href=&quot;https://www.cepstral.com/demos/&quot;&gt;Cepstral Demos&lt;/a&gt;. I prefer iVox for european voices. Love the french &amp;amp; swedish women. … voices, I mean.&lt;/p&gt;
 &lt;p&gt;But still, even if it has a long way to go, you can already use this in clever ways:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://imgs.xkcd.com/comics/im_an_idiot.png&quot; width=&quot;600px&quot;&gt;&lt;/img&gt;&lt;/p&gt;
 &lt;p&gt;But apart from playful applications, speech synthesis is very important. Many people &lt;a href=&quot;http://www.assistiveware.com/videos.php&quot;&gt;rely on it&lt;/a&gt; every day.&lt;/p&gt;

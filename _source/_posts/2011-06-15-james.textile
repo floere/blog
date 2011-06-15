@@ -42,7 +42,7 @@ Why isn't it much better these days? "Speech Synthesis":http://en.wikipedia.org/
 Not only that, but it needs to be done for each language separately. Chinese intonation is complicated, for example, and real people don't pronounce the four pitched tones in the same way. They're pronounced differently or not at all, depending which tone went before, and which came after, also depending on mood and health of the speaker.
 
 On OSX, there's two possibilities to improve the existing voices. Try the demos:
-"AssistiveWare iVox Samples":http://www.assistiveware.com/ivoxsamples.php and "Cepstral Demos":https://www.cepstral.com/demos/. I prefer iVox for european voices (Love the french & swedish women).
+"AssistiveWare iVox Samples":http://www.assistiveware.com/ivoxsamples.php and "Cepstral Demos":https://www.cepstral.com/demos/. I prefer iVox for european voices. Love the french & swedish women. … voices, I mean.
 
 But still, even if it has a long way to go, you can already use this in clever ways:
 

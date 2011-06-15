@@ -4,13 +4,90 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-05-31T00:56:35+10:00</updated>
+ <updated>2011-06-15T11:48:32+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>James</title>
+   <link href="http://florianhanke.com/blog/2011/06/15/james.html"/>
+   <updated>2011-06-15T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/06/15/james</id>
+   <content type="html">&lt;h2&gt;tl;dr&lt;/h2&gt;
+&lt;p&gt;This article contains stuff related to speech synthesis:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;What the Amiga 1000 could do.&lt;/li&gt;
+	&lt;li&gt;The &lt;a href=&quot;http://www.youtube.com/watch?v=Hh3C0vyyttk&quot;&gt;famous Scotty scene&lt;/a&gt; where he talks into a mouse.&lt;/li&gt;
+	&lt;li&gt;Speech Synthesis is hard.&lt;/li&gt;
+	&lt;li&gt;Have your Mac say something.&lt;/li&gt;
+	&lt;li&gt;Better voices for your Mac.&lt;/li&gt;
+	&lt;li&gt;James, a non-walking, talking butler, a dialog system, a MacRuby gem.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;As far back as I can remember, I always wanted to be a gangster.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cough&lt;/strong&gt; Let&amp;#8217;s try that again…&lt;/p&gt;
+&lt;p&gt;When I was around 8, my dad and I went shopping for an Amiga 1000.&lt;/p&gt;
+&lt;p&gt;Here it is in its full glory:&lt;/p&gt;
+&lt;p&gt;&lt;iframe width=&quot;600&quot; height=&quot;493&quot; src=&quot;http://www.youtube.com/embed/ovi4KC-PkRE&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m pretty sure I heard these synthesized organs when unwrapping it! :)&lt;/p&gt;
+&lt;p&gt;Now, apart from the incredible bouncing ball and the amazing 4096 colors it had (8-year old me is writing this), it could synthesize speech. Skip to 0:35 to see the guy enter some text for the Amiga to speak.&lt;/p&gt;
+&lt;p&gt;&lt;iframe width=&quot;600&quot; height=&quot;493&quot; src=&quot;http://www.youtube.com/embed/6cyZ99W9QL0&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;p&gt;Doesn&amp;#8217;t sound much worse than what you get on a Mac these days. Run this in a Terminal:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;say 'Hello there, sexy!'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Why isn&amp;#8217;t it much better these days? &lt;a href=&quot;http://en.wikipedia.org/wiki/Speech_synthesis&quot;&gt;Speech Synthesis&lt;/a&gt; is hard.&lt;/p&gt;
+&lt;p&gt;Not only that, but it needs to be done for each language separately. Chinese intonation is complicated, for example, and real people don&amp;#8217;t pronounce the four pitched tones in the same way. They&amp;#8217;re pronounced differently or not at all, depending which tone went before, and which came after, also depending on mood and health of the speaker.&lt;/p&gt;
+&lt;p&gt;On &lt;span class=&quot;caps&quot;&gt;OSX&lt;/span&gt;, there&amp;#8217;s two possibilities to improve the existing voices. Try the demos:
+&lt;a href=&quot;http://www.assistiveware.com/ivoxsamples.php&quot;&gt;AssistiveWare iVox Samples&lt;/a&gt; and &lt;a href=&quot;https://www.cepstral.com/demos/&quot;&gt;Cepstral Demos&lt;/a&gt;. I prefer iVox for european voices (Love the french &amp;amp; swedish women).&lt;/p&gt;
+&lt;p&gt;But still, even if it has a long way to go, you can already use this in clever ways:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://imgs.xkcd.com/comics/im_an_idiot.png&quot; width=&quot;600px&quot;&gt;&lt;/img&gt;&lt;/p&gt;
+&lt;p&gt;But apart from playful applications, speech synthesis is very important. Many people &lt;a href=&quot;http://www.assistiveware.com/videos.php&quot;&gt;rely on it&lt;/a&gt; every day.&lt;/p&gt;
+&lt;h2&gt;James&lt;/h2&gt;
+&lt;p&gt;Imagine you are either an 8-year old boy wanting to control a computer using only his voice – or imagine being in pain, and need to sit down often, and don&amp;#8217;t always have a device with you.&lt;/p&gt;
+&lt;p&gt;For this, I wrote &lt;a href=&quot;http://github.com/floere/james&quot;&gt;James&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Get the gem for &lt;a href=&quot;http://www.macruby.org/&quot;&gt;MacRuby&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;$ rvm use macruby
+$ gem install james&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Create a file called &lt;code&gt;time_dialog.rb&lt;/code&gt; and copy this code into it:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;James.dialog do
+
+  hear 'What time is it?' =&amp;gt; :time
+
+  state :time do
+    hear ['What time is it?', 'And now?'] =&amp;gt; :time
+    into { time = Time.now; &quot;It is currently #{time.hour} #{time.min}.&quot; }
+    exit {} # Optional, listed for completeness.
+  end
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;then run it using&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;james time_dialog.rb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The Terminal will show you the available options.&lt;/p&gt;
+&lt;p&gt;This is a dialog consisting only of one state, &lt;code&gt;time&lt;/code&gt;. The dialog (and &lt;code&gt;time&lt;/code&gt; state) is entered when saying &amp;#8220;What time is it?&amp;#8221;. When it enters, it will say the current time, or whatever is returned by the &lt;code&gt;into&lt;/code&gt; block.&lt;/p&gt;
+&lt;p&gt;James already provides a simple entry dialog to control where you are. &amp;#8220;Thanks, James&amp;#8221; for example will exit the current dialog.&lt;/p&gt;
+&lt;p&gt;Easy, isn&amp;#8217;t it?&lt;/p&gt;
+&lt;p&gt;If you want more dialogs, just load more:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;james {time,twitter,stocks}_dialog.rb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&amp;#8217;s it! You can write more complex dialogs, but this is out of scope for this article.&lt;/p&gt;
+&lt;p&gt;More &lt;a href=&quot;http://github.com/floere/james/tree/master/examples&quot;&gt;examples&lt;/a&gt; and &lt;a href=&quot;http://github.com/floere/james/wiki&quot;&gt;ideas for examples&lt;/a&gt;. Just add your own, if you want :)&lt;/p&gt;
+&lt;h2&gt;How about…?&lt;/h2&gt;
+&lt;p&gt;So if you&amp;#8217;ve written up a few nice James dialogs, why not take that old MacMini, install MacRuby and James, attach a few microphones, and distribute them around the house?&lt;/p&gt;
+&lt;h2&gt;Closing&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;m looking forward to the day where I can perform basic operations like looking up the weather etc. while eating breakfast and not having to context switch.&lt;/p&gt;
+&lt;p&gt;&amp;#8220;James?&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Yes?&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;What is the weather going to be like today?&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Warm and sunny.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Great! I&amp;#8217;ll be outside, doing some cycling then.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;doors slam one by one&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;I&amp;#8217;m sorry Dave, I&amp;#8217;m afraid I can&amp;#8217;t allow that.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Not again! You #$&amp;amp;@@^%!&amp;#8221;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;James keeps silent&lt;/strong&gt;&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1</title>

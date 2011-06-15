@@ -1,0 +1,122 @@
+---
+layout: post
+title: James
+categories:
+  - macruby
+  - james
+---
+h2. tl;dr
+
+This article contains stuff related to speech synthesis:
+* What the Amiga 1000 could do.
+* The "famous Scotty scene":http://www.youtube.com/watch?v=Hh3C0vyyttk where he talks into a mouse.
+* Speech Synthesis is hard.
+* Have your Mac say something.
+* Better voices for your Mac.
+* James, a non-walking, talking butler, a dialog system, a MacRuby gem.
+
+h2. Intro
+
+As far back as I can remember, I always wanted to be a gangster.
+
+*cough* Let's try that again…
+
+When I was around 8, my dad and I went shopping for an Amiga 1000.
+
+Here it is in its full glory:
+
+<iframe width="600" height="493" src="http://www.youtube.com/embed/ovi4KC-PkRE" frameborder="0" allowfullscreen></iframe>
+
+I'm pretty sure I heard these synthesized organs when unwrapping it! :)
+
+Now, apart from the incredible bouncing ball and the amazing 4096 colors it had (8-year old me is writing this), it could synthesize speech. Skip to 0:35 to see the guy enter some text for the Amiga to speak.
+
+<iframe width="600" height="493" src="http://www.youtube.com/embed/6cyZ99W9QL0" frameborder="0" allowfullscreen></iframe>
+
+Doesn't sound much worse than what you get on a Mac these days. Run this in a Terminal:
+
+<pre class="sh_shell"><code>say 'Hello there, sexy!'</code></pre>
+
+Why isn't it much better these days? "Speech Synthesis":http://en.wikipedia.org/wiki/Speech_synthesis is hard.
+
+Not only that, but it needs to be done for each language separately. Chinese intonation is complicated, for example, and real people don't pronounce the four pitched tones in the same way. They're pronounced differently or not at all, depending which tone went before, and which came after, also depending on mood and health of the speaker.
+
+On OSX, there's two possibilities to improve the existing voices. Try the demos:
+"AssistiveWare iVox Samples":http://www.assistiveware.com/ivoxsamples.php and "Cepstral Demos":https://www.cepstral.com/demos/. I prefer iVox for european voices (Love the french & swedish women).
+
+But still, even if it has a long way to go, you can already use this in clever ways:
+
+<img src="http://imgs.xkcd.com/comics/im_an_idiot.png" width="600px"></img>
+
+But apart from playful applications, speech synthesis is very important. Many people "rely on it":http://www.assistiveware.com/videos.php every day.
+
+h2. James
+
+Imagine you are either an 8-year old boy wanting to control a computer using only his voice – or imagine being in pain, and need to sit down often, and don't always have a device with you.
+
+For this, I wrote "James":http://github.com/floere/james.
+
+Get the gem for "MacRuby":http://www.macruby.org/.
+
+<pre class="sh_shell"><code>$ rvm use macruby
+$ gem install james</code></pre>
+
+Create a file called @time_dialog.rb@ and copy this code into it:
+
+<pre class="sh_ruby"><code>James.dialog do
+
+  hear 'What time is it?' => :time
+
+  state :time do
+    hear ['What time is it?', 'And now?'] => :time
+    into { time = Time.now; "It is currently #{time.hour} #{time.min}." }
+    exit {} # Optional, listed for completeness.
+  end
+
+end</code></pre>
+
+then run it using
+
+<pre class="sh_shell"><code>james time_dialog.rb</code></pre>
+
+The Terminal will show you the available options.
+
+This is a dialog consisting only of one state, @time@. The dialog (and @time@ state) is entered when saying "What time is it?". When it enters, it will say the current time, or whatever is returned by the @into@ block.
+
+James already provides a simple entry dialog to control where you are. "Thanks, James" for example will exit the current dialog.
+
+Easy, isn't it?
+
+If you want more dialogs, just load more:
+
+<pre class="sh_shell"><code>james {time,twitter,stocks}_dialog.rb</code></pre>
+
+That's it! You can write more complex dialogs, but this is out of scope for this article.
+
+More "examples":http://github.com/floere/james/tree/master/examples and "ideas for examples":http://github.com/floere/james/wiki. Just add your own, if you want :)
+
+h2. How about…?
+
+So if you've written up a few nice James dialogs, why not take that old MacMini, install MacRuby and James, attach a few microphones, and distribute them around the house?
+
+h2. Closing
+
+I'm looking forward to the day where I can perform basic operations like looking up the weather etc. while eating breakfast and not having to context switch.
+
+"James?"
+
+"Yes?"
+
+"What is the weather going to be like today?"
+
+"Warm and sunny."
+
+"Great! I'll be outside, doing some cycling then."
+
+*doors slam one by one*
+
+"I'm sorry Dave, I'm afraid I can't allow that."
+
+"Not again! You #$&@@^%!"
+
+*James keeps silent*

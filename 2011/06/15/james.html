@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>James</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>James</h1>
+      <div class="categories">macruby / james</div>
+      <h2>tl;dr</h2>
+      <p>This article contains stuff related to speech synthesis:</p>
+      <ul>
+      	<li>What the Amiga 1000 could do.</li>
+      	<li>The <a href="http://www.youtube.com/watch?v=Hh3C0vyyttk">famous Scotty scene</a> where he talks into a mouse.</li>
+      	<li>Speech Synthesis is hard.</li>
+      	<li>Have your Mac say something.</li>
+      	<li>Better voices for your Mac.</li>
+      	<li>James, a non-walking, talking butler, a dialog system, a MacRuby gem.</li>
+      </ul>
+      <h2>Intro</h2>
+      <p>As far back as I can remember, I always wanted to be a gangster.</p>
+      <p><strong>cough</strong> Let&#8217;s try that again…</p>
+      <p>When I was around 8, my dad and I went shopping for an Amiga 1000.</p>
+      <p>Here it is in its full glory:</p>
+      <p><iframe width="600" height="493" src="http://www.youtube.com/embed/ovi4KC-PkRE" frameborder="0" allowfullscreen></iframe></p>
+      <p>I&#8217;m pretty sure I heard these synthesized organs when unwrapping it! :)</p>
+      <p>Now, apart from the incredible bouncing ball and the amazing 4096 colors it had (8-year old me is writing this), it could synthesize speech. Skip to 0:35 to see the guy enter some text for the Amiga to speak.</p>
+      <p><iframe width="600" height="493" src="http://www.youtube.com/embed/6cyZ99W9QL0" frameborder="0" allowfullscreen></iframe></p>
+      <p>Doesn&#8217;t sound much worse than what you get on a Mac these days. Run this in a Terminal:</p>
+      <pre class="sh_shell"><code>say 'Hello there, sexy!'</code></pre>
+      <p>Why isn&#8217;t it much better these days? <a href="http://en.wikipedia.org/wiki/Speech_synthesis">Speech Synthesis</a> is hard.</p>
+      <p>Not only that, but it needs to be done for each language separately. Chinese intonation is complicated, for example, and real people don&#8217;t pronounce the four pitched tones in the same way. They&#8217;re pronounced differently or not at all, depending which tone went before, and which came after, also depending on mood and health of the speaker.</p>
+      <p>On <span class="caps">OSX</span>, there&#8217;s two possibilities to improve the existing voices. Try the demos:
+      <a href="http://www.assistiveware.com/ivoxsamples.php">AssistiveWare iVox Samples</a> and <a href="https://www.cepstral.com/demos/">Cepstral Demos</a>. I prefer iVox for european voices (Love the french &amp; swedish women).</p>
+      <p>But still, even if it has a long way to go, you can already use this in clever ways:</p>
+      <p><img src="http://imgs.xkcd.com/comics/im_an_idiot.png" width="600px"></img></p>
+      <p>But apart from playful applications, speech synthesis is very important. Many people <a href="http://www.assistiveware.com/videos.php">rely on it</a> every day.</p>
+      <h2>James</h2>
+      <p>Imagine you are either an 8-year old boy wanting to control a computer using only his voice – or imagine being in pain, and need to sit down often, and don&#8217;t always have a device with you.</p>
+      <p>For this, I wrote <a href="http://github.com/floere/james">James</a>.</p>
+      <p>Get the gem for <a href="http://www.macruby.org/">MacRuby</a>.</p>
+      <pre class="sh_shell"><code>$ rvm use macruby&#x000A;$ gem install james</code></pre>
+      <p>Create a file called <code>time_dialog.rb</code> and copy this code into it:</p>
+      <pre class="sh_ruby"><code>James.dialog do&#x000A;&#x000A;  hear 'What time is it?' =&gt; :time&#x000A;&#x000A;  state :time do&#x000A;    hear ['What time is it?', 'And now?'] =&gt; :time&#x000A;    into { time = Time.now; "It is currently #{time.hour} #{time.min}." }&#x000A;    exit {} # Optional, listed for completeness.&#x000A;  end&#x000A;&#x000A;end</code></pre>
+      <p>then run it using</p>
+      <pre class="sh_shell"><code>james time_dialog.rb</code></pre>
+      <p>The Terminal will show you the available options.</p>
+      <p>This is a dialog consisting only of one state, <code>time</code>. The dialog (and <code>time</code> state) is entered when saying &#8220;What time is it?&#8221;. When it enters, it will say the current time, or whatever is returned by the <code>into</code> block.</p>
+      <p>James already provides a simple entry dialog to control where you are. &#8220;Thanks, James&#8221; for example will exit the current dialog.</p>
+      <p>Easy, isn&#8217;t it?</p>
+      <p>If you want more dialogs, just load more:</p>
+      <pre class="sh_shell"><code>james {time,twitter,stocks}_dialog.rb</code></pre>
+      <p>That&#8217;s it! You can write more complex dialogs, but this is out of scope for this article.</p>
+      <p>More <a href="http://github.com/floere/james/tree/master/examples">examples</a> and <a href="http://github.com/floere/james/wiki">ideas for examples</a>. Just add your own, if you want :)</p>
+      <h2>How about…?</h2>
+      <p>So if you&#8217;ve written up a few nice James dialogs, why not take that old MacMini, install MacRuby and James, attach a few microphones, and distribute them around the house?</p>
+      <h2>Closing</h2>
+      <p>I&#8217;m looking forward to the day where I can perform basic operations like looking up the weather etc. while eating breakfast and not having to context switch.</p>
+      <p>&#8220;James?&#8221;</p>
+      <p>&#8220;Yes?&#8221;</p>
+      <p>&#8220;What is the weather going to be like today?&#8221;</p>
+      <p>&#8220;Warm and sunny.&#8221;</p>
+      <p>&#8220;Great! I&#8217;ll be outside, doing some cycling then.&#8221;</p>
+      <p><strong>doors slam one by one</strong></p>
+      <p>&#8220;I&#8217;m sorry Dave, I&#8217;m afraid I can&#8217;t allow that.&#8221;</p>
+      <p>&#8220;Not again! You #$&amp;@@^%!&#8221;</p>
+      <p><strong>James keeps silent</strong></p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/05/30/picky-designing-orm-integration-1.html" title="Previous post: Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1">Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/06/15/james';
+          var disqus_url = 'http://florianhanke.com/blog/2011/06/15/james.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

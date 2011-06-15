@@ -48,6 +48,8 @@ But still, even if it has a long way to go, you can already use this in clever w
 
 <img src="http://imgs.xkcd.com/comics/im_an_idiot.png" width="600px"></img>
 
+Best "xkcd":http://xkcd.com ever!
+
 But apart from playful applications, speech synthesis is very important. Many people "rely on it":http://www.assistiveware.com/videos.php every day.
 
 h2. James

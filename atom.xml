@@ -4,13 +4,37 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-06-15T13:45:41+10:00</updated>
+ <updated>2011-07-13T15:14:43+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>James&#58;&nbsp;Code&nbsp;Brawl</title>
+   <link href="http://florianhanke.com/blog/2011/07/13/james-code-brawl.html"/>
+   <updated>2011-07-13T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/07/13/james-code-brawl</id>
+   <content type="html">&lt;h2&gt;First Rule: You do not talk about Code Brawl&lt;/h2&gt;
+&lt;p&gt;Mischief. Mayhem. Ruby.&lt;/p&gt;
+&lt;p&gt;You might have read all about James in the previous post…
+Thanks to &lt;a href=&quot;http://jeffkreeftmeijer.com/&quot;&gt;Jeff Kreeftmeier&lt;/a&gt;,
+now is your chance to show off with whatever crazy dialog you can come up with!&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s only after we&amp;#8217;ve lost everything that we&amp;#8217;re free to do anything.&lt;/p&gt;
+&lt;p&gt;Will you install an Asterisk phone system that will make you able to call James at home where he will
+do various things for you, like switch lights on/off, feed the hamster, or yell at the kids?&lt;/p&gt;
+&lt;p&gt;Or will you go the way of the informative, connecting it to your local train information system,
+so that James can say &amp;#8220;Dude, you should run!&amp;#8221; if you ask him &amp;#8220;When does my train go&amp;#8221;?&lt;/p&gt;
+&lt;p&gt;OR will you program some sort of voice based text adventure like &lt;a href=&quot;http://en.wikipedia.org/wiki/Zork&quot;&gt;Zork&lt;/a&gt;,
+where you control the main character by the powers of your voice only?&lt;/p&gt;
+&lt;p&gt;Go here and fulfil your wildest dreams of &lt;a href=&quot;http://codebrawl.com/contests/james-your-very-own-voice-commanded-servant&quot;&gt;talking to a computer&lt;/a&gt;.
+Or here, and &lt;a href=&quot;http://github.com/floere/james/wiki&quot;&gt;enter some ideas&lt;/a&gt; if you only feel like thinking, but not typing.&lt;/p&gt;
+&lt;p&gt;Without pain, without sacrifice, we would have nothing.&lt;/p&gt;
+&lt;p&gt;No shirts, no shoes. If this is your first night at Code Brawl, &lt;a href=&quot;http://codebrawl.com/contests/james-your-very-own-voice-commanded-servant&quot;&gt;you have to brawl&lt;/a&gt;!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>James</title>

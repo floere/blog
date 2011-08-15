@@ -1,10 +1,9 @@
-@charset "UTF-8";
 h1 { margin-bottom: 10px; }
 
 pre { margin: 5px -120px; padding: 10px; }
 pre code { background-color: transparent; }
 
-code { padding: 0px 0px; background-color: #eeeeee; }
+code { padding: 0px 0px; background-color: #eee; }
 
 p { margin-top: 0.6em; margin-bottom: 0.6em; }
 
@@ -24,16 +23,16 @@ div.post { font-family: "lucida grande"; }
 div.post ol { list-style: decimal; }
 div.post ul { list-style: disc; }
 div.post ul ul { margin-left: 1.1em; list-style: circle; }
-div.post a { background-color: #eeeeee; padding: 1px 10px 2px; }
-div.post a:before { content: "☛ "; }
-div.post a.previous:before { content: "☚ "; }
+div.post a { background-color: #eee; padding: 1px 10px 2px; }
+div.post a:before { content: '☛ '; }
+div.post a.previous:before { content: '☚ '; }
 div.post a:hover { background-color: #abcdef; }
 
-#disqus_thread a:before { content: ""; }
+#disqus_thread a:before { content: ''; }
 
 div.gist { font-size: 0.9em; }
-div.gist a:before { content: ""; }
+div.gist a:before { content: ''; }
 
-div.categories { font-size: 0.9em; color: #777777; }
+div.categories { font-size: 0.9em; color: #777; }
 
 pre.sh_sourceCode { background-color: #efefef; }

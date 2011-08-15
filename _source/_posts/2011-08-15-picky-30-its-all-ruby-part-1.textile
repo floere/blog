@@ -1,0 +1,242 @@
+---
+layout: post
+title: Picky&nbsp;3.0&#58;&nbsp;It's&nbsp;all&nbsp;Ruby!&nbsp;(Part&nbsp;1)
+categories:
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+This is a quick look at the customizability of Picky in the upcoming 3.0 release.
+
+"Too much intro? Jump down to the code!":#part1
+
+"Even too much code? Jump down to the summary!":#summary
+
+h2(#intro). Intro
+
+Remember when you wrote your first Ruby code?
+
+<pre class="sh_ruby"><code>bananas.each do { |banana| banana.peel }</code></pre>
+
+!http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/wizard.jpg!
+
+You probably felt more powerful that the freakish wizard at the beginning of "Structure & Interpretation of Computer Programs":http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/ by Abelson and Sussman
+
+Finally, no more initializing an anonymous class and overriding its methods just to traverse an array like a mere acolyte.
+
+Accusatorily, you shake your magic wand at me. Yes, we can even write
+
+<pre class="sh_ruby"><code>bananas.each &:peel</code></pre>
+
+The point here is:
+Ruby is powerful. Or more importantly: Ruby does not take away the possibilities. There is a way, always, whereas with other, more restrictive languages I usually hit a wall and then have a feeling of powerlessness wash over me.
+
+I don't know you, but chances are, you feel the same.
+
+h2(#power). Powerlessness and the Power of Ruby
+
+A quick story:
+Back when I still worked with Java Lucene servers, I found myself often deep in rather big XML files.
+
+The way it worked is that you wrote down a string on what tokenizer you'd like to use. For example, @"whitespace"@.
+
+Lo and behold, the beast roared and duly split search text on whitespaces.
+
+Sometimes a typo creeped in: @"whitspace"@. The beast just lifted an eyebrow and continued doing… nothing.
+
+This is bad. Why?
+
+Strings are the weakest of command words. If you have to step down from a type down to a String you have already lost.
+
+You have just lost a lot of information that only a type can carry.
+
+More often than not – since you usually needed a very specific sort of tokenizer for that given project – I was not quite happy with any of the tokenizers.
+
+It was time to leave the world of XML to the world of Java classes. This was not acolyte school anymore. This was the "Dark Forest", with creepy trees and bugs lurking left and right.
+
+After valiantly capturing a tokenizer you dragged your ungodly creation out of the forest back to the acolyte school to then proudly write its name down on the XML scroll: @"com.florianhanke.tokenizers.NotQuiteAWhitespaceTokenizer"@.
+
+Beautiful ==*cough*==
+
+Of course, now that you know Ruby, you'd rather use objects than Strings.
+
+Let's leave the world of wizards and beasts and enter the land of rainbows and rubies.
+
+h2(#part1). Part I: Derived Indexes.
+
+Indexing is very customizable in Picky.
+
+Most search engines use some sort of "inverted index":http://en.wikipedia.org/wiki/Inverted_index. Picky also does that. In addition, it generates 3 other derived indexes from that inverted index.
+
+These generators can be passed into a
+
+<pre class="sh_ruby"><code>category   :title,
+           weights:    Picky::Weights::Logarithmic.new,            # Default
+           partial:    Picky::Partial::Substring.new(:from => -3), # Default
+           similarity: Picky::Similarity::DoubleMetaphone.new(2)   # Default is ::None.</code></pre>
+
+Let's look at the inverted index first:
+
+h2(#inverted). Inverted Index
+
+An "inverted index":http://en.wikipedia.org/wiki/Inverted_index in Picky is simply a Hash that consists of @:symbols => [ids]@. For example if we have things like
+
+<pre class="sh_ruby"><code>Thing(id: 1, text: "Hello Picky")
+Thing(id: 2, text: "Hello!")
+Thing(id: 3, text: "Hello, hello.")
+Thing(id: 5, text: "PICKY")
+Thing(id: 11, text: "Picky, hello.")</code></pre>
+
+an inverted index would probably look like this
+
+<pre class="sh_ruby"><code>{
+  :hello => [1, 3, 2, 11],
+  :picky => [1, 5, 11]
+}</code></pre>
+
+In this case, the things we indexed had "Hello" and "Picky" in the texts. Some had both, some only one of these.
+
+If you search for @"picky"@, you will get @[1, 5, 11]@, since – simplified – Picky does a hash lookup.
+That means when you search for just @"pic"@, Picky will not find anything.
+
+For that it needs a partial index.
+
+h2(#partial). Partial Index
+
+A partial index is an index where we also find pieces of the words above. Say, we want to also find @[1, 5, 11]@
+when looking for @"pic"@.
+
+What you need to to is provide Picky with a generator that generates a new inverted index just for partial matches.
+
+Picky already provides one:
+
+<pre class="sh_ruby"><code>partial: Picky::Partial::Substring.new(:from => -3)</code></pre>
+
+This one generates the following index from the above one:
+
+<pre class="sh_ruby"><code>{
+  :hello => [1, 3, 2, 11],
+  :hell => [1, 3, 2, 11],
+  :hel => [1, 3, 2, 11],
+  :picky => [1, 5, 11],
+  :pick => [1, 5, 11],
+  :pic => [1, 5, 11]
+}</code></pre>
+
+Incidentally, this @(from: -3)@ is the default one.
+
+If you don't want a partial index, use @partial: Picky::Partial::None.new@.
+
+Now, this might not be what you want. How do you write your own?
+
+h3. Your own?
+
+All derived indexes implement the method @#generate_from(inverted_index)@.
+
+A partial generator should return an inverted index with @Symbols@ as keys and id arrays as values.
+
+Read more about it in "Searching with Picky Partial Search":/2011/01/17/searching-with-picky-partial-search.html.
+
+Also, who said they need to be actual partials? Go wild!
+(And remember that Picky looks in the partial indexes when a @*@
+is used in the queries or on the last word of a query, the implicit @*@ at the end)
+
+Next up is weighing symbols.
+
+h2(#weights). Weight Index
+
+Weights are assigned to all the symbols and are used to weigh the results.
+
+A weight generator also implements @#generate_from(inverted_index)@, but should not return id arrays as values of the inverted index, but weights.
+
+So, a weight index derived from the above inverted index might look like this:
+
+<pre class="sh_ruby"><code>{
+  :hello => 0.6,
+  :picky => 0.48
+}</code></pre>
+
+The default weight index generator is @Picky::Weights::Default@, which is equal to the @Picky::Weights::Logarithmic@.
+
+If you don't want all indexed words to be equally treated, you'd pass in something like this:
+
+<pre class="sh_ruby"><code>class EqualWeightsForAll
+
+  def generate_from inverted_index
+    equality = {}
+    inverted_index.each do |sym, ids|
+      equality[sym] = 0
+    end
+    equality
+  end
+
+end</code></pre>
+
+That's it!
+
+h2(#similarity). Similarity Index
+
+The similarity index should have the structure @:encoded_symbol => :original_symbol_from_inverted_index@. For example, the original could have been encoded with the metaphone algorithm.
+
+<pre class="sh_ruby"><code>{
+  :HL => [:hello]
+  :PK => [:picky]
+}</code></pre>
+
+@:HL@ is the encoded symbol for @:hello@
+
+To generate this index, just offer a @generate_from(inverted_index)@ and a @encoded(original_symbol) # => encoded_symbol@ method.
+
+If you have a phonetic encoding, you could just implement @encoded(original_symbol)@ and derive from @Picky::Generators::Similarity::Phonetic@, like in "this example":http://github.com/floere/picky/blob/master/server/lib/picky/generators/similarity/metaphone.rb.
+
+What can I do again?
+
+h2(#summary). In short
+
+Picky offers you to inject your own functionality.
+
+You pass options @partial@, @weights@, and @similarity@ to the @category@ method inside an index block. You give it an instance either of the built-in types or create your own.
+
+Like so:
+
+<pre class="sh_ruby"><code>category   :title,
+           weights:    Picky::Weights::Logarithmic.new,            # Default
+           partial:    Picky::Partial::Substring.new(:from => -3), # Default
+           similarity: Picky::Similarity::DoubleMetaphone.new(2)   # Default is ::None.</code></pre>
+
+Or with your own:
+
+<pre class="sh_ruby"><code>category   :title,
+           weights:    AllWeightsAreOne.new,            # Default
+           partial:    StarInFrontSubstringPartial.new, # Default
+           similarity: JapaneseSimilarity.new           # Default is ::None.</code></pre>
+
+h3. Creating your own. How?
+
+h4. Partial
+
+Implement method @#generate_from(inverted_index)@ which returns an inverted index with @{ :partial_symbol => [ids array] }@.
+
+h4. Weights
+
+Implement method @#generate_from(inverted_index)@ which returns an inverted index with @{ :original_symbol => some_weight_number }@.
+
+h4. Similarity
+
+Implement method @#generate_from(inverted_index)@ which returns an inverted index with @{ :encoded_symbol => [:original_sym1, :original_sym2] }@
+and also implements @encoded(original_symbol)@ returning an encoded symbol. The encoded symbol should correspond to the one in the returned inverted index.
+
+h2(#nextup). Next up?
+
+This is how you customize the derived indexes.
+
+There's much more. Next time we will be writing about tokenizing and character substituters!
+
+h2(#conclusion). Conclusion
+
+So we've seen
+# that Picky is all Ruby, all the time.
+# that you can customize the indexes a lot.
+
+Hope you learnt something new!

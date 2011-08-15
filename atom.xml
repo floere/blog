@@ -4,13 +4,165 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-07-13T15:14:43+10:00</updated>
+ <updated>2011-08-15T19:50:08+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&nbsp;3.0&#58;&nbsp;It's&nbsp;all&nbsp;Ruby!&nbsp;(Part&nbsp;1)</title>
+   <link href="http://florianhanke.com/blog/2011/08/15/picky-30-its-all-ruby-part-1.html"/>
+   <updated>2011-08-15T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/08/15/picky-30-its-all-ruby-part-1</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;This is a quick look at the customizability of Picky in the upcoming 3.0 release.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;#part1&quot;&gt;Too much intro? Jump down to the code!&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;#summary&quot;&gt;Even too much code? Jump down to the summary!&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Remember when you wrote your first Ruby code?&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;bananas.each do { |banana| banana.peel }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/wizard.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;You probably felt more powerful that the freakish wizard at the beginning of &lt;a href=&quot;http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/&quot;&gt;Structure &amp;amp; Interpretation of Computer Programs&lt;/a&gt; by Abelson and Sussman&lt;/p&gt;
+&lt;p&gt;Finally, no more initializing an anonymous class and overriding its methods just to traverse an array like a mere acolyte.&lt;/p&gt;
+&lt;p&gt;Accusatorily, you shake your magic wand at me. Yes, we can even write&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;bananas.each &amp;amp;:peel&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The point here is:
+Ruby is powerful. Or more importantly: Ruby does not take away the possibilities. There is a way, always, whereas with other, more restrictive languages I usually hit a wall and then have a feeling of powerlessness wash over me.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t know you, but chances are, you feel the same.&lt;/p&gt;
+&lt;h2 id=&quot;power&quot;&gt;Powerlessness and the Power of Ruby&lt;/h2&gt;
+&lt;p&gt;A quick story:
+Back when I still worked with Java Lucene servers, I found myself often deep in rather big &lt;span class=&quot;caps&quot;&gt;XML&lt;/span&gt; files.&lt;/p&gt;
+&lt;p&gt;The way it worked is that you wrote down a string on what tokenizer you&amp;#8217;d like to use. For example, &lt;code&gt;&quot;whitespace&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Lo and behold, the beast roared and duly split search text on whitespaces.&lt;/p&gt;
+&lt;p&gt;Sometimes a typo creeped in: &lt;code&gt;&quot;whitspace&quot;&lt;/code&gt;. The beast just lifted an eyebrow and continued doing… nothing.&lt;/p&gt;
+&lt;p&gt;This is bad. Why?&lt;/p&gt;
+&lt;p&gt;Strings are the weakest of command words. If you have to step down from a type down to a String you have already lost.&lt;/p&gt;
+&lt;p&gt;You have just lost a lot of information that only a type can carry.&lt;/p&gt;
+&lt;p&gt;More often than not – since you usually needed a very specific sort of tokenizer for that given project – I was not quite happy with any of the tokenizers.&lt;/p&gt;
+&lt;p&gt;It was time to leave the world of &lt;span class=&quot;caps&quot;&gt;XML&lt;/span&gt; to the world of Java classes. This was not acolyte school anymore. This was the &amp;#8220;Dark Forest&amp;#8221;, with creepy trees and bugs lurking left and right.&lt;/p&gt;
+&lt;p&gt;After valiantly capturing a tokenizer you dragged your ungodly creation out of the forest back to the acolyte school to then proudly write its name down on the &lt;span class=&quot;caps&quot;&gt;XML&lt;/span&gt; scroll: &lt;code&gt;&quot;com.florianhanke.tokenizers.NotQuiteAWhitespaceTokenizer&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Beautiful *cough*&lt;/p&gt;
+&lt;p&gt;Of course, now that you know Ruby, you&amp;#8217;d rather use objects than Strings.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s leave the world of wizards and beasts and enter the land of rainbows and rubies.&lt;/p&gt;
+&lt;h2 id=&quot;part1&quot;&gt;Part I: Derived Indexes.&lt;/h2&gt;
+&lt;p&gt;Indexing is very customizable in Picky.&lt;/p&gt;
+&lt;p&gt;Most search engines use some sort of &lt;a href=&quot;http://en.wikipedia.org/wiki/Inverted_index&quot;&gt;inverted index&lt;/a&gt;. Picky also does that. In addition, it generates 3 other derived indexes from that inverted index.&lt;/p&gt;
+&lt;p&gt;These generators can be passed into a&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category   :title,
+           weights:    Picky::Weights::Logarithmic.new,            # Default
+           partial:    Picky::Partial::Substring.new(:from =&amp;gt; -3), # Default
+           similarity: Picky::Similarity::DoubleMetaphone.new(2)   # Default is ::None.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s look at the inverted index first:&lt;/p&gt;
+&lt;h2 id=&quot;inverted&quot;&gt;Inverted Index&lt;/h2&gt;
+&lt;p&gt;An &lt;a href=&quot;http://en.wikipedia.org/wiki/Inverted_index&quot;&gt;inverted index&lt;/a&gt; in Picky is simply a Hash that consists of &lt;code&gt;:symbols =&amp;gt; [ids]&lt;/code&gt;. For example if we have things like&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Thing(id: 1, text: &quot;Hello Picky&quot;)
+Thing(id: 2, text: &quot;Hello!&quot;)
+Thing(id: 3, text: &quot;Hello, hello.&quot;)
+Thing(id: 5, text: &quot;PICKY&quot;)
+Thing(id: 11, text: &quot;Picky, hello.&quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;an inverted index would probably look like this&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;{
+  :hello =&amp;gt; [1, 3, 2, 11],
+  :picky =&amp;gt; [1, 5, 11]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this case, the things we indexed had &amp;#8220;Hello&amp;#8221; and &amp;#8220;Picky&amp;#8221; in the texts. Some had both, some only one of these.&lt;/p&gt;
+&lt;p&gt;If you search for &lt;code&gt;&quot;picky&quot;&lt;/code&gt;, you will get &lt;code&gt;[1, 5, 11]&lt;/code&gt;, since – simplified – Picky does a hash lookup.
+That means when you search for just &lt;code&gt;&quot;pic&quot;&lt;/code&gt;, Picky will not find anything.&lt;/p&gt;
+&lt;p&gt;For that it needs a partial index.&lt;/p&gt;
+&lt;h2 id=&quot;partial&quot;&gt;Partial Index&lt;/h2&gt;
+&lt;p&gt;A partial index is an index where we also find pieces of the words above. Say, we want to also find &lt;code&gt;[1, 5, 11]&lt;/code&gt;
+when looking for &lt;code&gt;&quot;pic&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What you need to to is provide Picky with a generator that generates a new inverted index just for partial matches.&lt;/p&gt;
+&lt;p&gt;Picky already provides one:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;partial: Picky::Partial::Substring.new(:from =&amp;gt; -3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This one generates the following index from the above one:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;{
+  :hello =&amp;gt; [1, 3, 2, 11],
+  :hell =&amp;gt; [1, 3, 2, 11],
+  :hel =&amp;gt; [1, 3, 2, 11],
+  :picky =&amp;gt; [1, 5, 11],
+  :pick =&amp;gt; [1, 5, 11],
+  :pic =&amp;gt; [1, 5, 11]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Incidentally, this &lt;code&gt;(from: -3)&lt;/code&gt; is the default one.&lt;/p&gt;
+&lt;p&gt;If you don&amp;#8217;t want a partial index, use &lt;code&gt;partial: Picky::Partial::None.new&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now, this might not be what you want. How do you write your own?&lt;/p&gt;
+&lt;h3&gt;Your own?&lt;/h3&gt;
+&lt;p&gt;All derived indexes implement the method &lt;code&gt;#generate_from(inverted_index)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;A partial generator should return an inverted index with &lt;code&gt;Symbols&lt;/code&gt; as keys and id arrays as values.&lt;/p&gt;
+&lt;p&gt;Read more about it in &lt;a href=&quot;/2011/01/17/searching-with-picky-partial-search.html&quot;&gt;Searching with Picky Partial Search&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Also, who said they need to be actual partials? Go wild!
+(And remember that Picky looks in the partial indexes when a &lt;code&gt;*&lt;/code&gt;
+is used in the queries or on the last word of a query, the implicit &lt;code&gt;*&lt;/code&gt; at the end)&lt;/p&gt;
+&lt;p&gt;Next up is weighing symbols.&lt;/p&gt;
+&lt;h2 id=&quot;weights&quot;&gt;Weight Index&lt;/h2&gt;
+&lt;p&gt;Weights are assigned to all the symbols and are used to weigh the results.&lt;/p&gt;
+&lt;p&gt;A weight generator also implements &lt;code&gt;#generate_from(inverted_index)&lt;/code&gt;, but should not return id arrays as values of the inverted index, but weights.&lt;/p&gt;
+&lt;p&gt;So, a weight index derived from the above inverted index might look like this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;{
+  :hello =&amp;gt; 0.6,
+  :picky =&amp;gt; 0.48
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The default weight index generator is &lt;code&gt;Picky::Weights::Default&lt;/code&gt;, which is equal to the &lt;code&gt;Picky::Weights::Logarithmic&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you don&amp;#8217;t want all indexed words to be equally treated, you&amp;#8217;d pass in something like this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class EqualWeightsForAll
+
+  def generate_from inverted_index
+    equality = {}
+    inverted_index.each do |sym, ids|
+      equality[sym] = 0
+    end
+    equality
+  end
+
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&amp;#8217;s it!&lt;/p&gt;
+&lt;h2 id=&quot;similarity&quot;&gt;Similarity Index&lt;/h2&gt;
+&lt;p&gt;The similarity index should have the structure &lt;code&gt;:encoded_symbol =&amp;gt; :original_symbol_from_inverted_index&lt;/code&gt;. For example, the original could have been encoded with the metaphone algorithm.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;{
+  :HL =&amp;gt; [:hello]
+  :PK =&amp;gt; [:picky]
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;:HL&lt;/code&gt; is the encoded symbol for &lt;code&gt;:hello&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;To generate this index, just offer a &lt;code&gt;generate_from(inverted_index)&lt;/code&gt; and a &lt;code&gt;encoded(original_symbol) # =&amp;gt; encoded_symbol&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;If you have a phonetic encoding, you could just implement &lt;code&gt;encoded(original_symbol)&lt;/code&gt; and derive from &lt;code&gt;Picky::Generators::Similarity::Phonetic&lt;/code&gt;, like in &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/generators/similarity/metaphone.rb&quot;&gt;this example&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;What can I do again?&lt;/p&gt;
+&lt;h2 id=&quot;summary&quot;&gt;In short&lt;/h2&gt;
+&lt;p&gt;Picky offers you to inject your own functionality.&lt;/p&gt;
+&lt;p&gt;You pass options &lt;code&gt;partial&lt;/code&gt;, &lt;code&gt;weights&lt;/code&gt;, and &lt;code&gt;similarity&lt;/code&gt; to the &lt;code&gt;category&lt;/code&gt; method inside an index block. You give it an instance either of the built-in types or create your own.&lt;/p&gt;
+&lt;p&gt;Like so:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category   :title,
+           weights:    Picky::Weights::Logarithmic.new,            # Default
+           partial:    Picky::Partial::Substring.new(:from =&amp;gt; -3), # Default
+           similarity: Picky::Similarity::DoubleMetaphone.new(2)   # Default is ::None.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or with your own:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category   :title,
+           weights:    AllWeightsAreOne.new,            # Default
+           partial:    StarInFrontSubstringPartial.new, # Default
+           similarity: JapaneseSimilarity.new           # Default is ::None.&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;Creating your own. How?&lt;/h3&gt;
+&lt;h4&gt;Partial&lt;/h4&gt;
+&lt;p&gt;Implement method &lt;code&gt;#generate_from(inverted_index)&lt;/code&gt; which returns an inverted index with &lt;code&gt;{ :partial_symbol =&amp;gt; [ids array] }&lt;/code&gt;.&lt;/p&gt;
+&lt;h4&gt;Weights&lt;/h4&gt;
+&lt;p&gt;Implement method &lt;code&gt;#generate_from(inverted_index)&lt;/code&gt; which returns an inverted index with &lt;code&gt;{ :original_symbol =&amp;gt; some_weight_number }&lt;/code&gt;.&lt;/p&gt;
+&lt;h4&gt;Similarity&lt;/h4&gt;
+&lt;p&gt;Implement method &lt;code&gt;#generate_from(inverted_index)&lt;/code&gt; which returns an inverted index with &lt;code&gt;{ :encoded_symbol =&amp;gt; [:original_sym1, :original_sym2] }&lt;/code&gt;
+and also implements &lt;code&gt;encoded(original_symbol)&lt;/code&gt; returning an encoded symbol. The encoded symbol should correspond to the one in the returned inverted index.&lt;/p&gt;
+&lt;h2 id=&quot;nextup&quot;&gt;Next up?&lt;/h2&gt;
+&lt;p&gt;This is how you customize the derived indexes.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s much more. Next time we will be writing about tokenizing and character substituters!&lt;/p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So we&amp;#8217;ve seen&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;that Picky is all Ruby, all the time.&lt;/li&gt;
+	&lt;li&gt;that you can customize the indexes a lot.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hope you learnt something new!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>James&#58;&nbsp;Code&nbsp;Brawl</title>

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-15T19:50:08+10:00</updated>
+ <updated>2011-08-15T23:40:22+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -97,6 +97,7 @@ when looking for &lt;code&gt;&quot;pic&quot;&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Also, who said they need to be actual partials? Go wild!
 (And remember that Picky looks in the partial indexes when a &lt;code&gt;*&lt;/code&gt;
 is used in the queries or on the last word of a query, the implicit &lt;code&gt;*&lt;/code&gt; at the end)&lt;/p&gt;
+&lt;p&gt;When would you use this? For example, you&amp;#8217;d like to have partial searches, but from the front. So, &lt;code&gt;picky&lt;/code&gt;, &lt;code&gt;icky&lt;/code&gt;, &lt;code&gt;cky&lt;/code&gt;, &lt;code&gt;ky&lt;/code&gt; and &lt;code&gt;y&lt;/code&gt; would match.&lt;/p&gt;
 &lt;p&gt;Next up is weighing symbols.&lt;/p&gt;
 &lt;h2 id=&quot;weights&quot;&gt;Weight Index&lt;/h2&gt;
 &lt;p&gt;Weights are assigned to all the symbols and are used to weigh the results.&lt;/p&gt;
@@ -119,6 +120,7 @@ is used in the queries or on the last word of a query, the implicit &lt;code&gt;
   end
 
 end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;When would you use this? For example, you&amp;#8217;d like to have words that are used more often be more important. You could implement a &lt;code&gt;LinearWeight&lt;/code&gt; – the weight is equal to the size of the ids array.&lt;/p&gt;
 &lt;p&gt;That&amp;#8217;s it!&lt;/p&gt;
 &lt;h2 id=&quot;similarity&quot;&gt;Similarity Index&lt;/h2&gt;
 &lt;p&gt;The similarity index should have the structure &lt;code&gt;:encoded_symbol =&amp;gt; :original_symbol_from_inverted_index&lt;/code&gt;. For example, the original could have been encoded with the metaphone algorithm.&lt;/p&gt;
@@ -129,6 +131,8 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;code&gt;:HL&lt;/code&gt; is the encoded symbol for &lt;code&gt;:hello&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;To generate this index, just offer a &lt;code&gt;generate_from(inverted_index)&lt;/code&gt; and a &lt;code&gt;encoded(original_symbol) # =&amp;gt; encoded_symbol&lt;/code&gt; method.&lt;/p&gt;
 &lt;p&gt;If you have a phonetic encoding, you could just implement &lt;code&gt;encoded(original_symbol)&lt;/code&gt; and derive from &lt;code&gt;Picky::Generators::Similarity::Phonetic&lt;/code&gt;, like in &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/generators/similarity/metaphone.rb&quot;&gt;this example&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When would you use this? For example, you&amp;#8217;d like to implement a chinese tone similarity algorithm instead of the more western oriented ones that come with Picky.&lt;/p&gt;
+&lt;p&gt;(If you do, please send us a pull request)&lt;/p&gt;
 &lt;p&gt;What can I do again?&lt;/p&gt;
 &lt;h2 id=&quot;summary&quot;&gt;In short&lt;/h2&gt;
 &lt;p&gt;Picky offers you to inject your own functionality.&lt;/p&gt;

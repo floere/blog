@@ -120,6 +120,7 @@
       <p>Also, who said they need to be actual partials? Go wild!
       (And remember that Picky looks in the partial indexes when a <code>*</code>
       is used in the queries or on the last word of a query, the implicit <code>*</code> at the end)</p>
+      <p>When would you use this? For example, you&#8217;d like to have partial searches, but from the front. So, <code>picky</code>, <code>icky</code>, <code>cky</code>, <code>ky</code> and <code>y</code> would match.</p>
       <p>Next up is weighing symbols.</p>
       <h2 id="weights">Weight Index</h2>
       <p>Weights are assigned to all the symbols and are used to weigh the results.</p>
@@ -129,6 +130,7 @@
       <p>The default weight index generator is <code>Picky::Weights::Default</code>, which is equal to the <code>Picky::Weights::Logarithmic</code>.</p>
       <p>If you don&#8217;t want all indexed words to be equally treated, you&#8217;d pass in something like this:</p>
       <pre class="sh_ruby"><code>class EqualWeightsForAll&#x000A;&#x000A;  def generate_from inverted_index&#x000A;    equality = {}&#x000A;    inverted_index.each do |sym, ids|&#x000A;      equality[sym] = 0&#x000A;    end&#x000A;    equality&#x000A;  end&#x000A;&#x000A;end</code></pre>
+      <p>When would you use this? For example, you&#8217;d like to have words that are used more often be more important. You could implement a <code>LinearWeight</code> – the weight is equal to the size of the ids array.</p>
       <p>That&#8217;s it!</p>
       <h2 id="similarity">Similarity Index</h2>
       <p>The similarity index should have the structure <code>:encoded_symbol =&gt; :original_symbol_from_inverted_index</code>. For example, the original could have been encoded with the metaphone algorithm.</p>
@@ -136,6 +138,8 @@
       <p><code>:HL</code> is the encoded symbol for <code>:hello</code></p>
       <p>To generate this index, just offer a <code>generate_from(inverted_index)</code> and a <code>encoded(original_symbol) # =&gt; encoded_symbol</code> method.</p>
       <p>If you have a phonetic encoding, you could just implement <code>encoded(original_symbol)</code> and derive from <code>Picky::Generators::Similarity::Phonetic</code>, like in <a href="http://github.com/floere/picky/blob/master/server/lib/picky/generators/similarity/metaphone.rb">this example</a>.</p>
+      <p>When would you use this? For example, you&#8217;d like to implement a chinese tone similarity algorithm instead of the more western oriented ones that come with Picky.</p>
+      <p>(If you do, please send us a pull request)</p>
       <p>What can I do again?</p>
       <h2 id="summary">In short</h2>
       <p>Picky offers you to inject your own functionality.</p>

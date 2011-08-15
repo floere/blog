@@ -142,6 +142,8 @@ Also, who said they need to be actual partials? Go wild!
 (And remember that Picky looks in the partial indexes when a @*@
 is used in the queries or on the last word of a query, the implicit @*@ at the end)
 
+When would you use this? For example, you'd like to have partial searches, but from the front. So, @picky@, @icky@, @cky@, @ky@ and @y@ would match.
+
 Next up is weighing symbols.
 
 h2(#weights). Weight Index
@@ -173,6 +175,8 @@ If you don't want all indexed words to be equally treated, you'd pass in somethi
 
 end</code></pre>
 
+When would you use this? For example, you'd like to have words that are used more often be more important. You could implement a @LinearWeight@ – the weight is equal to the size of the ids array.
+
 That's it!
 
 h2(#similarity). Similarity Index
@@ -189,6 +193,10 @@ The similarity index should have the structure @:encoded_symbol => :original_sym
 To generate this index, just offer a @generate_from(inverted_index)@ and a @encoded(original_symbol) # => encoded_symbol@ method.
 
 If you have a phonetic encoding, you could just implement @encoded(original_symbol)@ and derive from @Picky::Generators::Similarity::Phonetic@, like in "this example":http://github.com/floere/picky/blob/master/server/lib/picky/generators/similarity/metaphone.rb.
+
+When would you use this? For example, you'd like to implement a chinese tone similarity algorithm instead of the more western oriented ones that come with Picky.
+
+(If you do, please send us a pull request)
 
 What can I do again?
 

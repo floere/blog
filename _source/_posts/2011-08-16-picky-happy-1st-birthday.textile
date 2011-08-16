@@ -1,0 +1,28 @@
+---
+layout: post
+title: Picky&#58;&nbsp;Happy&nbsp;1st&nbsp;Birthday!
+categories:
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+h2. A big fat 1. Congratulations!
+
+Unbelievably, a whole year has passed since the small pink octopus has left the private womb for the big world of wide open source.
+
+Since then, it has seen almost any type of project, mastered almost all challenges and helped quite a few people, many of whom seem to be very glad to be his buddies.
+
+It also has grown in experience, but has lost a lot of its baby fat at the same time.
+
+As a gift to Picky, the team gave him a "Sinatra":http://sinatrarb.com collection. A new tune that you can play on release 3.0 that came out today! Picky could sing Sinatra songs all day in the rain. Man, he loves that stuff. So much Ruby goodness!
+
+Also, he got a spanking new "Single Page Help":http://florianhanke.com/picky/documentation.html inspired by the "Sinatra README":http://www.sinatrarb.com/intro, which the team just loves.
+
+So, congratulations Picky! He and "the team":http://github.com/floere/picky/wiki/Contributions-and-contributors will be "partying":http://florianhanke.com/picky/ (see logo) and going out for Sushi and other fishy goods all night!
+
+We probably won't be answering any issues or pull requests until the sake is out of our system. Also, any blog posts on the new goodness that is 3.0 will have to wait a little.
+
+Picky would especially like to thank the "whole team":http://github.com/floere/picky/wiki/Contributions-and-contributors. He wouldn't be what he is without their guidance and support. Thanks!
+
+What? Not "tried it yet":http://florianhanke.com/picky/getting_started.html?

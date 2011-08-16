@@ -4,13 +4,32 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-15T23:40:22+10:00</updated>
+ <updated>2011-08-16T19:56:58+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Picky&#58;&nbsp;Happy&nbsp;1st&nbsp;Birthday!</title>
+   <link href="http://florianhanke.com/blog/2011/08/16/picky-happy-1st-birthday.html"/>
+   <updated>2011-08-16T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2011/08/16/picky-happy-1st-birthday</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;h2&gt;A big fat 1. Congratulations!&lt;/h2&gt;
+&lt;p&gt;Unbelievably, a whole year has passed since the small pink octopus has left the private womb for the big world of wide open source.&lt;/p&gt;
+&lt;p&gt;Since then, it has seen almost any type of project, mastered almost all challenges and helped quite a few people, many of whom seem to be very glad to be his buddies.&lt;/p&gt;
+&lt;p&gt;It also has grown in experience, but has lost a lot of its baby fat at the same time.&lt;/p&gt;
+&lt;p&gt;As a gift to Picky, the team gave him a &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; collection. A new tune that you can play on release 3.0 that came out today! Picky could sing Sinatra songs all day in the rain. Man, he loves that stuff. So much Ruby goodness!&lt;/p&gt;
+&lt;p&gt;Also, he got a spanking new &lt;a href=&quot;http://florianhanke.com/picky/documentation.html&quot;&gt;Single Page Help&lt;/a&gt; inspired by the &lt;a href=&quot;http://www.sinatrarb.com/intro&quot;&gt;Sinatra &lt;span class=&quot;caps&quot;&gt;README&lt;/span&gt;&lt;/a&gt;, which the team just loves.&lt;/p&gt;
+&lt;p&gt;So, congratulations Picky! He and &lt;a href=&quot;http://github.com/floere/picky/wiki/Contributions-and-contributors&quot;&gt;the team&lt;/a&gt; will be &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;partying&lt;/a&gt; (see logo) and going out for Sushi and other fishy goods all night!&lt;/p&gt;
+&lt;p&gt;We probably won&amp;#8217;t be answering any issues or pull requests until the sake is out of our system. Also, any blog posts on the new goodness that is 3.0 will have to wait a little.&lt;/p&gt;
+&lt;p&gt;Picky would especially like to thank the &lt;a href=&quot;http://github.com/floere/picky/wiki/Contributions-and-contributors&quot;&gt;whole team&lt;/a&gt;. He wouldn&amp;#8217;t be what he is without their guidance and support. Thanks!&lt;/p&gt;
+&lt;p&gt;What? Not &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;tried it yet&lt;/a&gt;?&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title>Picky&nbsp;3.0&#58;&nbsp;It's&nbsp;all&nbsp;Ruby!&nbsp;(Part&nbsp;1)</title>

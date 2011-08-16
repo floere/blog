@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-17T09:13:39+10:00</updated>
+ <updated>2011-08-17T09:23:21+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -18,20 +18,27 @@
    <updated>2011-08-17T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/17/ego-trippin</id>
    <content type="html">&lt;p&gt;During the last year, I started noticing a surge in &lt;em&gt;ego tripping&lt;/em&gt; in the Ruby community.&lt;/p&gt;
-&lt;p&gt;Discussions started to be about egos^1^, not projects, the work being done.&lt;/p&gt;
 &lt;p&gt;Some open source projects come with a big ego attached. And if a project is released that fills a niche next to that project, that ego feels threatened.&lt;/p&gt;
 &lt;p&gt;I get that a project can be like one&amp;#8217;s baby. And you may cherish it. But you are not your baby.&lt;/p&gt;
 &lt;p&gt;If you feel personally attacked by someone releasing a project similar to yours, that&amp;#8217;s a signal to lean back for a few days. Yes, your project will lose some users. But they might come back.
 Despite all the early hype and enthusiasm: In the long run, people use what&amp;#8217;s good.&lt;/p&gt;
-&lt;p&gt;And what&amp;#8217;s good usually went at least through some pressure and inspiration from other projects.^1^&lt;/p&gt;
+&lt;p&gt;And what&amp;#8217;s good usually went at least through some pressure and inspiration from other projects. &lt;sup&gt;1&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;Conversely, I noticed that, instead of contributing to existing projects, some egos needed to have their own.&lt;/p&gt;
 &lt;p&gt;Yes, &amp;#8220;I saw that the core method didn&amp;#8217;t work the way I wanted&amp;#8221; etc., but did you really try and discuss it with the owner, or send a pull request?&lt;/p&gt;
 &lt;p&gt;Now, this is not about not having a voice of one&amp;#8217;s own. This is not about you wanting a bit of recognition for your hard learned skills. This is simply a call for a bit of humility and respect for the work of others. And a call to learn from what others might do better in their projects, and what you can learn from it. And also a call to try to teach and improve someone else&amp;#8217;s project.&lt;/p&gt;
+&lt;p&gt;Discuss the thing, and not the egos.&lt;/p&gt;
 &lt;p&gt;Since in the end, giving (and receiving) the gift of knowledge and respect is one of the greatest you can give.&lt;/p&gt;
 &lt;p&gt;So try to be humble.&lt;/p&gt;
-&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Picky got good pressure from Tyre. Very thankful for that.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://blog.nodejitsu.com/getting-refunds-on-open-source-projects&quot;&gt;http://blog.nodejitsu.com/getting-refunds-on-open-source-projects&lt;/a&gt;
-&lt;a href=&quot;http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html&quot;&gt;http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html&lt;/a&gt;&lt;/p&gt;</content>
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;I wanted to thank two guys especially who recently gave and are giving me great feedback on Picky: &lt;a href=&quot;http://github.com/rogerbraun&quot;&gt;http://github.com/rogerbraun&lt;/a&gt; and &lt;a href=&quot;http://github.com/clintkrollwood&quot;&gt;http://github.com/clintkrollwood&lt;/a&gt;. They, like &lt;a href=&quot;http://github.com/floere/picky/wiki/Contributions-and-contributors&quot;&gt;all contributors&lt;/a&gt;, continue to give great feedback and code. All these people are the real, unsung heroes. So, thanks!&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Some good further reads:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;a href=&quot;http://blog.nodejitsu.com/getting-refunds-on-open-source-projects&quot;&gt;http://blog.nodejitsu.com/getting-refunds-on-open-source-projects&lt;/a&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;a href=&quot;http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html&quot;&gt;http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Picky got positive pressure from &lt;a href=&quot;http://github.com/karmi/tire&quot;&gt;Tire&lt;/a&gt;. Very thankful for that.&lt;/p&gt;</content>
    
  </entry>
  

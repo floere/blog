@@ -7,8 +7,6 @@ categories:
 ---
 During the last year, I started noticing a surge in _ego tripping_ in the Ruby community.
 
-Discussions started to be about egos^1^, not projects, the work being done.
-
 Some open source projects come with a big ego attached. And if a project is released that fills a niche next to that project, that ego feels threatened.
 
 I get that a project can be like one's baby. And you may cherish it. But you are not your baby.
@@ -16,7 +14,7 @@ I get that a project can be like one's baby. And you may cherish it. But you are
 If you feel personally attacked by someone releasing a project similar to yours, that's a signal to lean back for a few days. Yes, your project will lose some users. But they might come back.
 Despite all the early hype and enthusiasm: In the long run, people use what's good.
 
-And what's good usually went at least through some pressure and inspiration from other projects.^1^
+And what's good usually went at least through some pressure and inspiration from other projects. ^1^
 
 Conversely, I noticed that, instead of contributing to existing projects, some egos needed to have their own.
 
@@ -24,12 +22,22 @@ Yes, "I saw that the core method didn't work the way I wanted" etc., but did you
 
 Now, this is not about not having a voice of one's own. This is not about you wanting a bit of recognition for your hard learned skills. This is simply a call for a bit of humility and respect for the work of others. And a call to learn from what others might do better in their projects, and what you can learn from it. And also a call to try to teach and improve someone else's project.
 
+Discuss the thing, and not the egos.
+
 Since in the end, giving (and receiving) the gift of knowledge and respect is one of the greatest you can give.
 
 So try to be humble.
 
+&nbsp;
 
-^1^ Picky got good pressure from Tyre. Very thankful for that.
+I wanted to thank two guys especially who recently gave and are giving me great feedback on Picky: "http://github.com/rogerbraun":http://github.com/rogerbraun and "http://github.com/clintkrollwood":http://github.com/clintkrollwood. They, like "all contributors":http://github.com/floere/picky/wiki/Contributions-and-contributors, continue to give great feedback and code. All these people are the real, unsung heroes. So, thanks!
 
-"http://blog.nodejitsu.com/getting-refunds-on-open-source-projects":http://blog.nodejitsu.com/getting-refunds-on-open-source-projects
-"http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html":http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html
+&nbsp;
+
+Some good further reads:
+* "http://blog.nodejitsu.com/getting-refunds-on-open-source-projects":http://blog.nodejitsu.com/getting-refunds-on-open-source-projects
+* "http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html":http://blog.steveklabnik.com/2011/08/12/we-forget-that-open-source-is-made-of-people.html
+
+&nbsp;
+
+^1^ Picky got positive pressure from "Tire":http://github.com/karmi/tire. Very thankful for that.

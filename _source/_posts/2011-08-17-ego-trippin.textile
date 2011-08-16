@@ -11,7 +11,7 @@ Some open source projects come with a big ego attached. And if a project is rele
 
 I get that a project can be like one's baby. And you may cherish it. But you are not your baby.
 
-If you feel personally attacked by someone releasing a project similar to yours, that's a signal to lean back for a few days. Yes, your project will lose some users. But they might come back.
+If you feel personally attacked by someone releasing a project similar to yours, that's a signal to take it easy for a few days. Yes, your project will lose some users. But they might come back.
 Despite all the early hype and enthusiasm: In the long run, people use what's good.
 
 And what's good usually went at least through some pressure and inspiration from other projects. ^1^

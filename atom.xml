@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-17T09:23:21+10:00</updated>
+ <updated>2011-08-17T09:28:51+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -20,7 +20,7 @@
    <content type="html">&lt;p&gt;During the last year, I started noticing a surge in &lt;em&gt;ego tripping&lt;/em&gt; in the Ruby community.&lt;/p&gt;
 &lt;p&gt;Some open source projects come with a big ego attached. And if a project is released that fills a niche next to that project, that ego feels threatened.&lt;/p&gt;
 &lt;p&gt;I get that a project can be like one&amp;#8217;s baby. And you may cherish it. But you are not your baby.&lt;/p&gt;
-&lt;p&gt;If you feel personally attacked by someone releasing a project similar to yours, that&amp;#8217;s a signal to lean back for a few days. Yes, your project will lose some users. But they might come back.
+&lt;p&gt;If you feel personally attacked by someone releasing a project similar to yours, that&amp;#8217;s a signal to take it easy for a few days. Yes, your project will lose some users. But they might come back.
 Despite all the early hype and enthusiasm: In the long run, people use what&amp;#8217;s good.&lt;/p&gt;
 &lt;p&gt;And what&amp;#8217;s good usually went at least through some pressure and inspiration from other projects. &lt;sup&gt;1&lt;/sup&gt;&lt;/p&gt;
 &lt;p&gt;Conversely, I noticed that, instead of contributing to existing projects, some egos needed to have their own.&lt;/p&gt;

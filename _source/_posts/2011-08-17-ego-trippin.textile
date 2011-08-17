@@ -5,7 +5,7 @@ categories:
   - ruby
   - picky
 ---
-During the last year, I started noticing a surge in _ego tripping_ in the Ruby community.
+During the last year, I started noticing a surge in "_ego tripping_":http://www.urbandictionary.com/define.php?term=ego%20trip in the Ruby community.
 
 Some open source projects come with a big ego attached. And if a project is released that fills a niche next to that project, that ego feels threatened.
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Ego&nbsp;Trippin&apos;
+title: Ego&nbsp;Trippin&#8217;
 categories:
   - ruby
   - picky

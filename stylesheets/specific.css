@@ -3,7 +3,7 @@ h1 { margin-bottom: 10px; }
 pre { margin: 5px -120px; padding: 10px; }
 pre code { background-color: transparent; }
 
-code { padding: 0px 0px; background-color: #eee; }
+code { padding: 0px 0px; background-color: #eee; font-family: 'Droid Sans Mono', sans-serif; font-size: 0.88em; }
 
 p { margin-top: 0.6em; margin-bottom: 0.6em; }
 

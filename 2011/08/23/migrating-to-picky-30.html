@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</h1>
+      <div class="categories">ruby / picky</div>
+      <p>This post is intended for <a href="http://florianhanke.com/picky/">Picky</a> users that are at version 2.7 (or near) and would like to move to version 3.0.</p>
+      <p>An update recipe:</p>
+      <ol>
+      	<li>Rakefile: Rewrite <code>require 'picky-tasks'</code> =&gt; <code>require 'picky/tasks'</code></li>
+      	<li><code>Index::Memory</code> has been renamed to <code>Indexes::Memory</code>, same with <code>Index::Redis</code></li>
+      	<li>If you pass in options into the index initializer: They have been removed. Options now can only be set in the initializer block.</li>
+      	<li>If you have already been using Sinatra as a server, please do not call <code>#search_with_text</code> anymore. Instead call <code>#search(text, ids, offset)</code>, the new <span class="caps">API</span> method. It still returns a <code>Result</code>.</li>
+      	<li>The <code>logging.rb</code> file is not <code>load</code> ed anymore, so you can load whatever you want (being less opinionated). If you still want to load the <code>logging.rb</code> file, please <code>require</code> or <code>load</code> it in the application file, for example. If you <code>load</code> it in the application file, it will be reloaded if you call <code>Picky::Application.reload</code>.</li>
+      	<li>If you&#8217;ve been using the generated example <code>logging.rb</code>, rewrite <code>PickyLog =</code> to <code>Picky.logger =</code> and do not wrap the <code>::Logger.new</code> in a <code>Loggers::Search.new</code>, but just pass the <code>=</code> the logger.</li>
+      	<li>Note that the generator for a Picky project is now called the &#8220;classic&#8221; generator, as opposed to the Sinatra generator.</li>
+      	<li>Note that a &#8220;All In One&#8221; generator has been added, which generates a combined server/client for use mainly on e.g. Heroku.</li>
+      	<li>If you use <code>Results#to_log</code>, note that it has been renamed to <code>Results#to_s</code>.</li>
+      	<li>In the client, using <code>#allocations_size</code> does not work anymore on results (that have been extended by <code>Picky::Convenience</code>). Replace with <code>results.allocations.size</code>.</li>
+      </ol>
+      <p>These are the main <span class="caps">API</span> changes in 3.0.</p>
+      <p>Thanks for reading and have fun!</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/08/17/ego-trippin.html" title="Previous post: Ego&nbsp;Trippin&#8217;">Ego&nbsp;Trippin&#8217;</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/08/23/migrating-to-picky-30';
+          var disqus_url = 'http://florianhanke.com/blog/2011/08/23/migrating-to-picky-30.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+layout: post
+title: Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)
+categories:
+  - ruby
+  - picky
+---
+This post is intended for "Picky":http://florianhanke.com/picky/ users that are at version 2.7 (or near) and would like to move to version 3.0.
+
+An update recipe:
+# Rakefile: Rewrite @require 'picky-tasks'@ => @require 'picky/tasks'@
+# @Index::Memory@ has been renamed to @Indexes::Memory@, same with @Index::Redis@
+# If you pass in options into the index initializer: They have been removed. Options now can only be set in the initializer block.
+# If you have already been using Sinatra as a server, please do not call @#search_with_text@ anymore. Instead call @#search(text, ids, offset)@, the new API method. It still returns a @Result@.
+# The @logging.rb@ file is not @load@ ed anymore, so you can load whatever you want (being less opinionated). If you still want to load the @logging.rb@ file, please @require@ or @load@ it in the application file, for example. If you @load@ it in the application file, it will be reloaded if you call @Picky::Application.reload@.
+# If you've been using the generated example @logging.rb@, rewrite @PickyLog =@ to @Picky.logger =@ and do not wrap the @::Logger.new@ in a @Loggers::Search.new@, but just pass the @=@ the logger.
+# Note that the generator for a Picky project is now called the "classic" generator, as opposed to the Sinatra generator.
+# Note that a "All In One" generator has been added, which generates a combined server/client for use mainly on e.g. Heroku.
+# If you use @Results#to_log@, note that it has been renamed to @Results#to_s@.
+# In the client, using @#allocations_size@ does not work anymore on results (that have been extended by @Picky::Convenience@). Replace with @results.allocations.size@.
+
+These are the main API changes in 3.0.
+
+Thanks for reading and have fun!

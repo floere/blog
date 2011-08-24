@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-24T16:34:04+10:00</updated>
+ <updated>2011-08-24T17:09:44+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -13,7 +13,7 @@
 
  
  <entry>
-   <title type="html">Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</title>
+   <title type="html">Migrating&amp;nbsp;to&amp;nbsp;Picky&amp;nbsp;3.0&amp;nbsp;(from&amp;nbsp;2.7)</title>
    <link href="http://florianhanke.com/blog/2011/08/23/migrating-to-picky-30.html"/>
    <updated>2011-08-23T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/23/migrating-to-picky-30</id>
@@ -37,7 +37,7 @@
  </entry>
  
  <entry>
-   <title type="html">Ego&nbsp;Trippin&#8217;</title>
+   <title type="html">Ego&amp;nbsp;Trippin&amp;#8217;</title>
    <link href="http://florianhanke.com/blog/2011/08/17/ego-trippin.html"/>
    <updated>2011-08-17T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/17/ego-trippin</id>
@@ -67,7 +67,7 @@ Despite all the early hype and enthusiasm: In the long run, people use what&amp;
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Happy&nbsp;1st&nbsp;Birthday!</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Happy&amp;nbsp;1st&amp;nbsp;Birthday!</title>
    <link href="http://florianhanke.com/blog/2011/08/16/picky-happy-1st-birthday.html"/>
    <updated>2011-08-16T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/16/picky-happy-1st-birthday</id>
@@ -86,7 +86,7 @@ Despite all the early hype and enthusiasm: In the long run, people use what&amp;
  </entry>
  
  <entry>
-   <title type="html">Picky&nbsp;3.0&#58;&nbsp;It's&nbsp;all&nbsp;Ruby!&nbsp;(Part&nbsp;1)</title>
+   <title type="html">Picky&amp;nbsp;3.0&amp;#58;&amp;nbsp;It's&amp;nbsp;all&amp;nbsp;Ruby!&amp;nbsp;(Part&amp;nbsp;1)</title>
    <link href="http://florianhanke.com/blog/2011/08/15/picky-30-its-all-ruby-part-1.html"/>
    <updated>2011-08-15T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/15/picky-30-its-all-ruby-part-1</id>
@@ -242,7 +242,7 @@ and also implements &lt;code&gt;encoded(original_symbol)&lt;/code&gt; returning 
  </entry>
  
  <entry>
-   <title type="html">James&#58;&nbsp;Code&nbsp;Brawl</title>
+   <title type="html">James&amp;#58;&amp;nbsp;Code&amp;nbsp;Brawl</title>
    <link href="http://florianhanke.com/blog/2011/07/13/james-code-brawl.html"/>
    <updated>2011-07-13T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/07/13/james-code-brawl</id>
@@ -344,7 +344,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Designing&amp;nbsp;an ORM&amp;nbsp;Integration&amp;nbsp;1</title>
    <link href="http://florianhanke.com/blog/2011/05/30/picky-designing-orm-integration-1.html"/>
    <updated>2011-05-30T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/05/30/picky-designing-orm-integration-1</id>
@@ -555,7 +555,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Plumbing&nbsp;Overview</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Plumbing&amp;nbsp;Overview</title>
    <link href="http://florianhanke.com/blog/2011/05/19/picky-plumbing-overview.html"/>
    <updated>2011-05-19T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/05/19/picky-plumbing-overview</id>
@@ -711,7 +711,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Phony&#58;&nbsp;Phone&nbsp;Numbers</title>
+   <title type="html">Phony&amp;#58;&amp;nbsp;Phone&amp;nbsp;Numbers</title>
    <link href="http://florianhanke.com/blog/2011/05/01/phony-phone-numbers.html"/>
    <updated>2011-05-01T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/05/01/phony-phone-numbers</id>
@@ -829,7 +829,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Geosearch&nbsp;2</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Geosearch&amp;nbsp;2</title>
    <link href="http://florianhanke.com/blog/2011/04/26/picky-geosearch-2.html"/>
    <updated>2011-04-26T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/26/picky-geosearch-2</id>
@@ -901,7 +901,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Geosearch&nbsp;1</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Geosearch&amp;nbsp;1</title>
    <link href="http://florianhanke.com/blog/2011/04/19/picky-geosearch-1.html"/>
    <updated>2011-04-19T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/19/picky-geosearch-1</id>
@@ -1003,7 +1003,7 @@ $(document).ready(function() {
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Environmental&nbsp;Considerations</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Environmental&amp;nbsp;Considerations</title>
    <link href="http://florianhanke.com/blog/2011/04/18/picky-environmental-considerations.html"/>
    <updated>2011-04-18T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/18/picky-environmental-considerations</id>
@@ -1040,7 +1040,7 @@ PICKY_ENVIRONMENT = ENV['PICKY_ENV'] || 'development' unless defined? PICKY_ENVI
  </entry>
  
  <entry>
-   <title type="html">Picky&#58;&nbsp;Integration&nbsp;Testing</title>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Integration&amp;nbsp;Testing</title>
    <link href="http://florianhanke.com/blog/2011/04/17/picky-integration-testing.html"/>
    <updated>2011-04-17T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/17/picky-integration-testing</id>
@@ -1138,7 +1138,7 @@ RSpec::Core::RakeTask.new :spec&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&nbsp;2.2.0</title>
+   <title type="html">Picky&amp;nbsp;2.2.0</title>
    <link href="http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh.html"/>
    <updated>2011-04-14T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh</id>
@@ -1245,7 +1245,7 @@ gem 'activerecord',  '~&amp;gt; 3.0', :require =&amp;gt; 'active_record'&lt;/cod
  </entry>
  
  <entry>
-   <title type="html">Picky&nbsp;Data&nbsp;Sources&#58; Next&nbsp;Steps</title>
+   <title type="html">Picky&amp;nbsp;Data&amp;nbsp;Sources&amp;#58; Next&amp;nbsp;Steps</title>
    <link href="http://florianhanke.com/blog/2011/04/12/picky-data-sources-next-steps.html"/>
    <updated>2011-04-12T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/12/picky-data-sources-next-steps</id>
@@ -1369,7 +1369,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; In&nbsp;the&nbsp;Terminal</title>
+   <title type="html">Searching with Picky&amp;#58; In&amp;nbsp;the&amp;nbsp;Terminal</title>
    <link href="http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search.html"/>
    <updated>2011-04-11T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search</id>
@@ -1404,7 +1404,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search</title>
+   <title type="html">Searching with Picky&amp;#58; Range/Area/Volume&amp;nbsp;etc.&amp;nbsp;Search</title>
    <link href="http://florianhanke.com/blog/2011/04/09/searching-with-picky-area-search.html"/>
    <updated>2011-04-09T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/04/09/searching-with-picky-area-search</id>
@@ -1762,7 +1762,7 @@ end&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Rake Tasks</title>
+   <title type="html">Searching with Picky&amp;#58; Rake Tasks</title>
    <link href="http://florianhanke.com/blog/2011/03/13/searching-with-picky-rake-tasks.html"/>
    <updated>2011-03-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/13/searching-with-picky-rake-tasks</id>
@@ -1935,7 +1935,7 @@ Index category &quot;isbn&quot; not found. Possible categories: &quot;id&quot;, 
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Redis</title>
+   <title type="html">Searching with Picky&amp;#58; Redis</title>
    <link href="http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis.html"/>
    <updated>2011-03-02T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/03/02/searching-with-picky-redis</id>
@@ -2009,7 +2009,7 @@ $ rake start&lt;/code&gt;&lt;/pre&gt;
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Live&nbsp;reloading&nbsp;indexes</title>
+   <title type="html">Searching with Picky&amp;#58; Live&amp;nbsp;reloading&amp;nbsp;indexes</title>
    <link href="http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html"/>
    <updated>2011-02-20T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes</id>
@@ -2475,7 +2475,7 @@ First, I assign the binding of the block to &lt;code&gt;erb_binding&lt;/code&gt;
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Live Parameters Part 2</title>
+   <title type="html">Searching with Picky&amp;#58; Live Parameters Part 2</title>
    <link href="http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html"/>
    <updated>2011-01-27T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2</id>
@@ -2610,7 +2610,7 @@ The connection to the parent would already have been closed off by the parent it
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Live Parameters Part 1</title>
+   <title type="html">Searching with Picky&amp;#58; Live Parameters Part 1</title>
    <link href="http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1.html"/>
    <updated>2011-01-25T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1</id>
@@ -2643,7 +2643,7 @@ The connection to the parent would already have been closed off by the parent it
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Data Sources</title>
+   <title type="html">Searching with Picky&amp;#58; Data Sources</title>
    <link href="http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources.html"/>
    <updated>2011-01-20T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/20/searching-with-picky-data-sources</id>
@@ -2707,7 +2707,7 @@ It gets the index and the current category and should &lt;code&gt;yield(id, text
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Partial Search</title>
+   <title type="html">Searching with Picky&amp;#58; Partial Search</title>
    <link href="http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search.html"/>
    <updated>2011-01-17T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/17/searching-with-picky-partial-search</id>
@@ -2801,7 +2801,7 @@ This will match &lt;code&gt;picky&lt;/code&gt; if you enter just a &lt;code&gt;y
  </entry>
  
  <entry>
-   <title type="html">Searching with Picky&#58; Character&nbsp;Substitution</title>
+   <title type="html">Searching with Picky&amp;#58; Character&amp;nbsp;Substitution</title>
    <link href="http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters.html"/>
    <updated>2011-01-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/01/13/searching-with-picky-character-substituters</id>

@@ -14,7 +14,7 @@
     <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
-    <title>Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</title>
+    <title>Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)</title>
     <script type="text/javascript">
       //<![CDATA[
         var _gaq = _gaq || [];
@@ -56,37 +56,42 @@
       </li>
     </ol>
     <div class="post">
-      <h1>Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</h1>
+      <h1>Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)</h1>
       <div class="categories">ruby / picky</div>
-      <p>This post is intended for <a href="http://florianhanke.com/picky/">Picky</a> users that are at version 2.7 (or near) and would like to move to version 3.0.</p>
-      <p>An update recipe:</p>
-      <ol>
-      	<li>Rakefile: Rewrite <code>require 'picky-tasks'</code> =&gt; <code>require 'picky/tasks'</code></li>
-      	<li><code>Index::Memory</code> has been renamed to <code>Indexes::Memory</code>, same with <code>Index::Redis</code></li>
-      	<li>If you pass in options into the index initializer: They have been removed. Options now can only be set in the initializer block.</li>
-      	<li>If you have already been using Sinatra as a server, please do not call <code>#search_with_text</code> anymore. Instead call <code>#search(text, ids, offset)</code>, the new <span class="caps">API</span> method. It still returns a <code>Result</code>.</li>
-      	<li>The <code>logging.rb</code> file is not <code>load</code> ed anymore, so you can load whatever you want (being less opinionated). If you still want to load the <code>logging.rb</code> file, please <code>require</code> or <code>load</code> it in the application file, for example. If you <code>load</code> it in the application file, it will be reloaded if you call <code>Picky::Application.reload</code>.</li>
-      	<li>If you&#8217;ve been using the generated example <code>logging.rb</code>, rewrite <code>PickyLog =</code> to <code>Picky.logger =</code> and do not wrap the <code>::Logger.new</code> in a <code>Loggers::Search.new</code>, but just pass the <code>=</code> the logger.</li>
-      	<li>Note that the generator for a Picky project is now called the &#8220;classic&#8221; generator, as opposed to the Sinatra generator.</li>
-      	<li>Note that a &#8220;All In One&#8221; generator has been added, which generates a combined server/client for use mainly on e.g. Heroku.</li>
-      	<li>If you use <code>Results#to_log</code>, note that it has been renamed to <code>Results#to_s</code>.</li>
-      	<li>In the client, using <code>#allocations_size</code> does not work anymore on results (that have been extended by <code>Picky::Convenience</code>). Replace with <code>results.allocations.size</code>.</li>
-      </ol>
-      <p>These are the main <span class="caps">API</span> changes in 3.0.</p>
-      <p>Thanks for reading and have fun!</p>
-      Next
-      <a href="/blog/2011/08/26/migrating-to-picky-31.html" title="Next post: Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)">Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)</a>
+      <p>This post is intended for <a href="http://florianhanke.com/picky/">Picky</a> users that are at version 3.0 (or near) and would like to move to version 3.1.</p>
+      <p>You&#8217;re probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?</p>
+      <p>First of all, let me say sorry for the quick succession of upgrades. Picky will tell you what to do, though.</p>
+      <p>Secondly, Picky&#8217;s goal is to be very <strong>modular</strong> and have <strong>exchangeable modules</strong>, while <strong>not being more complicated</strong> to read or use.</p>
+      <h2>What has changed?</h2>
+      <p>Instead of defining your memory/redis indexes like so</p>
+      <pre class="sh_ruby"><code>memory_index = Picky::Indexes::Memory.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Indexes::Redis.new :name do&#x000A;  # definition&#x000A;end</code></pre>
+      <p>you now only use <code>Picky::Index.new</code> and pass in the appropriate index backend. Since the memory backend is the default, you don&#8217;t need to pass it in. For the Redis backend, you use <code>Picky::Backends::Redis.new</code>:</p>
+      <pre class="sh_ruby"><code>memory_index = Picky::Index.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Index.new :name do&#x000A;  backend Picky::Backends::Redis.new&#x000A;  # definition&#x000A;end</code></pre>
+      <p>Two reasons:</p>
+      <ul>
+      	<li>Exchangeable backends</li>
+      	<li>Inheritance is overrated</li>
+      </ul>
+      <h2>Double Index. What does it meeeean?</h2>
+      <p>This means that from now on you can pass in your own backend!</p>
+      <p>We would be quite happy if someone decided to do a purely file-based backend :) Got one? Please contribute!
+      (As an example, see <a href="http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb">http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb</a>, explanations will follow. Stay tuned!)</p>
+      <p>This is the main <span class="caps">API</span> change in 3.1.</p>
+      <h2>ちわ, WaDoku!</h2>
+      <p>In other news, Picky now can index and search Japanese.
+      (Mainly due to <a href="http://wadoku.eu/">this project</a> and the combined efforts of <a href="http://twitter.com/rogerbraun">Roger Braun</a> and <a href="http://twitter.com/brianmario">Brian Lopez</a>)</p>
+      <p>Thanks for reading and have fun! さよなら!!!</p>
       <br />
       Previous
-      <a class="previous" href="/blog/2011/08/17/ego-trippin.html" title="Previous post: Ego&nbsp;Trippin&#8217;">Ego&nbsp;Trippin&#8217;</a>
+      <a class="previous" href="/blog/2011/08/23/migrating-to-picky-30.html" title="Previous post: Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)">Migrating&nbsp;to&nbsp;Picky&nbsp;3.0&nbsp;(from&nbsp;2.7)</a>
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         //<![CDATA[
           var disqus_shortname = 'florianhanke';
           var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-          var disqus_identifier = '/2011/08/23/migrating-to-picky-30';
-          var disqus_url = 'http://florianhanke.com/blog/2011/08/23/migrating-to-picky-30.html';
+          var disqus_identifier = '/2011/08/26/migrating-to-picky-31';
+          var disqus_url = 'http://florianhanke.com/blog/2011/08/26/migrating-to-picky-31.html';
           
           /* * * DON'T EDIT BELOW THIS LINE * * */
           (function() {

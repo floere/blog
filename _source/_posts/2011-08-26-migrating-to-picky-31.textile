@@ -1,0 +1,57 @@
+---
+layout: post
+title: Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)
+categories:
+  - ruby
+  - picky
+---
+This post is intended for "Picky":http://florianhanke.com/picky/ users that are at version 3.0 (or near) and would like to move to version 3.1.
+
+You're probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?
+
+First of all, let me say sorry for the quick succession of upgrades. Picky will tell you what to do, though.
+
+Secondly, Picky's goal is to be very *modular* and have *exchangeable modules*, while *not being more complicated* to read or use.
+
+h2. What has changed?
+
+Instead of defining your memory/redis indexes like so
+
+<pre class="sh_ruby"><code>memory_index = Picky::Indexes::Memory.new :name do
+  # definition
+end
+
+redis_index = Picky::Indexes::Redis.new :name do
+  # definition
+end</code></pre>
+
+you now only use @Picky::Index.new@ and pass in the appropriate index backend. Since the memory backend is the default, you don't need to pass it in. For the Redis backend, you use @Picky::Backends::Redis.new@:
+
+<pre class="sh_ruby"><code>memory_index = Picky::Index.new :name do
+  # definition
+end
+
+redis_index = Picky::Index.new :name do
+  backend Picky::Backends::Redis.new
+  # definition
+end</code></pre>
+
+Two reasons:
+* Exchangeable backends
+* Inheritance is overrated
+
+h2. Double Index. What does it meeeean?
+
+This means that from now on you can pass in your own backend!
+
+We would be quite happy if someone decided to do a purely file-based backend :) Got one? Please contribute!
+(As an example, see "http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb":http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb, explanations will follow. Stay tuned!)
+
+This is the main API change in 3.1.
+
+h2. ちわ, WaDoku!
+
+In other news, Picky now can index and search Japanese.
+(Mainly due to "this project":http://wadoku.eu/ and the combined efforts of "Roger Braun":http://twitter.com/rogerbraun and "Brian Lopez":http://twitter.com/brianmario)
+
+Thanks for reading and have fun! さよなら!!!

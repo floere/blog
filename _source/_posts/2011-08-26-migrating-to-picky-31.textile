@@ -7,11 +7,15 @@ categories:
 ---
 This post is intended for "Picky":http://florianhanke.com/picky/ users that are at version 3.0 (or near) and would like to move to version 3.1.
 
+h2. Picky 3.1 is released!
+
 You're probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?
 
-First of all, let me say sorry for the quick succession of upgrades. Picky will tell you what to do, though.
+First of all, let me say sorry for the quick succession of upgrades. Picky will help you and tell you what to do, as good as it can.
 
 Secondly, Picky's goal is to be very *modular* and have *exchangeable modules*, while *not being more complicated* to read or use.
+
+What does this have to do with this update?
 
 h2. What has changed?
 

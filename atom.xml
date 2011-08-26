@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-26T13:51:49+10:00</updated>
+ <updated>2011-08-26T14:10:23+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -18,9 +18,11 @@
    <updated>2011-08-26T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2011/08/26/migrating-to-picky-31</id>
    <content type="html">&lt;p&gt;This post is intended for &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; users that are at version 3.0 (or near) and would like to move to version 3.1.&lt;/p&gt;
+&lt;h2&gt;Picky 3.1 is released!&lt;/h2&gt;
 &lt;p&gt;You&amp;#8217;re probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?&lt;/p&gt;
-&lt;p&gt;First of all, let me say sorry for the quick succession of upgrades. Picky will tell you what to do, though.&lt;/p&gt;
+&lt;p&gt;First of all, let me say sorry for the quick succession of upgrades. Picky will help you and tell you what to do, as good as it can.&lt;/p&gt;
 &lt;p&gt;Secondly, Picky&amp;#8217;s goal is to be very &lt;strong&gt;modular&lt;/strong&gt; and have &lt;strong&gt;exchangeable modules&lt;/strong&gt;, while &lt;strong&gt;not being more complicated&lt;/strong&gt; to read or use.&lt;/p&gt;
+&lt;p&gt;What does this have to do with this update?&lt;/p&gt;
 &lt;h2&gt;What has changed?&lt;/h2&gt;
 &lt;p&gt;Instead of defining your memory/redis indexes like so&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;memory_index = Picky::Indexes::Memory.new :name do

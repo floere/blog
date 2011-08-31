@@ -91,6 +91,9 @@
       <p>In the Sinatra server, search the main search, but at the same time, search the ads. Then, stick the results for the ads onto the main results.</p>
       <pre class="sh_ruby"><code>get '/stores' do&#x000A;  query = params[:query]&#x000A;&#x000A;  main_results = main_search.search query # etc.&#x000A;  ads_results  = ads_search.search query # etc.&#x000A;&#x000A;  results_hash = main_results.to_hash&#x000A;  results_hash[:ads] = ads_results.to_hash&#x000A;&#x000A;  results_hash.to_json&#x000A;end</code></pre>
       <p>Then, in the app server, de-piggyback the ad results and render separately. As usual, it&#8217;s all Ruby.</p>
+      <h2>Note</h2>
+      <p>You could of course use a real geosearch instead of the simple location above. But it&#8217;s just more understandable like this.</p>
+      <p>Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.</p>
       <br />
       Previous
       <a class="previous" href="/blog/2011/08/31/picky-case-study-restricting-results.html" title="Previous post: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results</a>

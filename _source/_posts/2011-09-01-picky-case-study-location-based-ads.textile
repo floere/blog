@@ -94,3 +94,9 @@ In the Sinatra server, search the main search, but at the same time, search the 
 end</code></pre>
 
 Then, in the app server, de-piggyback the ad results and render separately. As usual, it's all Ruby.
+
+h2. Note
+
+You could of course use a real geosearch instead of the simple location above. But it's just more understandable like this.
+
+Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.

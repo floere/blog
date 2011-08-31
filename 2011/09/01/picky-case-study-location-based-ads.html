@@ -71,6 +71,7 @@
       <h2>Picky 3.1.3</h2>
       <p>Version 3.1.3 introduces the <code>ignore</code> option in the search definition block:</p>
       <pre class="sh_ruby"><code>stores = Index.new :stores do&#x000A;  source { Store.order('name DESC') }&#x000A;  category :name&#x000A;  category :location&#x000A;end&#x000A;&#x000A;search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
+      <p>The <code>ignore :name</code> makes that search throw away (ignore) any tokens that map to that category. So if Picky finds that the word &#8220;barbershop&#8221; in &#8220;barbershop brooklyn&#8221; maps to the name category, such that both would map to [:name, :location], then Picky throws away the &#8220;barbershop&#8221;, such that only location brooklyn remains.</p>
       <h2>Location-based Ads</h2>
       <p>For our example, we would define the main search like this</p>
       <pre class="sh_ruby"><code>main_search = Search.new stores</code></pre>

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T21:04:36+02:00</updated>
+ <updated>2011-08-31T21:07:32+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -42,6 +42,7 @@ end
 search = Search.new stores do
   ignore :name
 end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;ignore :name&lt;/code&gt; makes that search throw away (ignore) any tokens that map to that category. So if Picky finds that the word &amp;#8220;barbershop&amp;#8221; in &amp;#8220;barbershop brooklyn&amp;#8221; maps to the name category, such that both would map to [:name, :location], then Picky throws away the &amp;#8220;barbershop&amp;#8221;, such that only location brooklyn remains.&lt;/p&gt;
 &lt;h2&gt;Location-based Ads&lt;/h2&gt;
 &lt;p&gt;For our example, we would define the main search like this&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;main_search = Search.new stores&lt;/code&gt;&lt;/pre&gt;

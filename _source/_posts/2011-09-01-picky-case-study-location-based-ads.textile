@@ -44,6 +44,8 @@ search = Search.new stores do
   ignore :name
 end</code></pre>
 
+The @ignore :name@ makes that search throw away (ignore) any tokens that map to that category. So if Picky finds that the word "barbershop" in "barbershop brooklyn" maps to the name category, such that both would map to [:name, :location], then Picky throws away the "barbershop", such that only location brooklyn remains.
+
 h2. Location-based Ads
 
 For our example, we would define the main search like this

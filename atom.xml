@@ -4,13 +4,91 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T21:15:52+02:00</updated>
+ <updated>2011-08-31T22:58:48+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Not&amp;nbsp;Always&amp;nbsp;Singing&amp;nbsp;In&amp;nbsp;The&amp;nbsp;Rain</title>
+   <link href="http://florianhanke.com/blog/2011/09/01/picky-case-study-not-singing-in-the-rain.html"/>
+   <updated>2011-09-01T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/09/01/picky-case-study-not-singing-in-the-rain</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;The picky generators, for example &lt;code&gt;picky generate server &amp;lt;dirname&amp;gt;&lt;/code&gt; only generate web server examples, like the &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; server.&lt;/p&gt;
+&lt;p&gt;However, who tells you to always sing in the rain? Sometimes it is much more prudent to just use a &lt;a href=&quot;http://segment7.net/projects/ruby/drb/introduction.html&quot;&gt;DRb (Distributed Ruby) Server&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;How can we have one run our searches? Not much different than in the Sinatra server. Or the classic server.
+(With the exception on how the access is defined. In the classic server, it&amp;#8217;s &lt;code&gt;route&lt;/code&gt;, in Sinatra it&amp;#8217;s probably &lt;code&gt;get&lt;/code&gt;, and here it&amp;#8217;s starting the service)&lt;/p&gt;
+&lt;h2&gt;Server&lt;/h2&gt;
+&lt;p&gt;So, copy-and-paste away, into a file called &lt;code&gt;app.rb&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'activesupport'
+require 'yajl'
+require 'picky'
+require 'drb/drb'
+
+# &quot;Model&quot;.
+#
+class Item
+  attr_reader :id, :name
+  def initialize id, name
+    @id, @name = id, name
+  end
+end
+
+# Server.
+#
+class Server
+
+  items = [
+    Item.new(1, 'picky'),
+    Item.new(2, 'drb'),
+    Item.new(3, 'test'),
+  ]
+
+  drb_index = Picky::Index.new(:drb) do
+    source   items
+    category :name
+  end
+  drb_index.reindex
+
+  drb_search = Picky::Search.new drb_index
+
+  define_method :search do |*args|
+    drb_search.search(*args).to_json
+  end
+
+end
+
+DRb.start_service 'druby://localhost:8787', Server.new
+DRb.thread.join&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And that&amp;#8217;s it for the server. Note that you don&amp;#8217;t need to index right in the server. I only do that for your copy-paste convenience.&lt;/p&gt;
+&lt;p&gt;You could, for example, add a&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Signal.trap('USR1') do
+  drb_index.reindex
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;to have the server index on receiving the &lt;code&gt;USR1&lt;/code&gt; signal (&lt;code&gt;kill -USR1 &amp;lt;pid&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+&lt;h2&gt;Client&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;client.rb&lt;/code&gt; is much easier:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'drb/drb'
+
+search_server = DRbObject.new_with_uri 'druby://localhost:8787'
+1_000.times do
+  puts search_server.search 'test'
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And that&amp;#8217;s it.&lt;/p&gt;
+&lt;h2&gt;Running it&lt;/h2&gt;
+&lt;p&gt;Start the server&lt;/p&gt;
+&lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ ruby app.rb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and in another Terminal window you enter&lt;/p&gt;
+&lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ ruby client.rb&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;to see the queries fly!&lt;/p&gt;
+&lt;p&gt;… perhaps it could even be faster using &lt;a href=&quot;http://msgpack.org/&quot;&gt;http://msgpack.org/&lt;/a&gt;?&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Location&amp;nbsp;Based&amp;nbsp;Ads</title>

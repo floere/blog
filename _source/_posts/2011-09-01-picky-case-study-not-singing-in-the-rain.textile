@@ -1,0 +1,100 @@
+---
+layout: post
+title: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Not&nbsp;Always&nbsp;Singing&nbsp;In&nbsp;The&nbsp;Rain
+categories:
+  - ruby
+  - picky
+  - "case study"
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+h2. Intro
+
+The picky generators, for example @picky generate server <dirname>@ only generate web server examples, like the "Sinatra":http://sinatrarb.com server.
+
+However, who tells you to always sing in the rain? Sometimes it is much more prudent to just use a "DRb (Distributed Ruby) Server":http://segment7.net/projects/ruby/drb/introduction.html.
+
+How can we have one run our searches? Not much different than in the Sinatra server. Or the classic server.
+(With the exception on how the access is defined. In the classic server, it's @route@, in Sinatra it's probably @get@, and here it's starting the service)
+
+h2. Server
+
+So, copy-and-paste away, into a file called @app.rb@:
+
+<pre class="sh_ruby"><code>require 'activesupport'
+require 'yajl'
+require 'picky'
+require 'drb/drb'
+
+# "Model".
+#
+class Item
+  attr_reader :id, :name
+  def initialize id, name
+    @id, @name = id, name
+  end
+end
+
+# Server.
+#
+class Server
+
+  items = [
+    Item.new(1, 'picky'),
+    Item.new(2, 'drb'),
+    Item.new(3, 'test'),
+  ]
+
+  drb_index = Picky::Index.new(:drb) do
+    source   items
+    category :name
+  end
+  drb_index.reindex
+
+  drb_search = Picky::Search.new drb_index
+
+  define_method :search do |*args|
+    drb_search.search(*args).to_json
+  end
+
+end
+
+DRb.start_service 'druby://localhost:8787', Server.new
+DRb.thread.join</code></pre>
+
+And that's it for the server. Note that you don't need to index right in the server. I only do that for your copy-paste convenience.
+
+You could, for example, add a
+
+<pre class="sh_ruby"><code>Signal.trap('USR1') do
+  drb_index.reindex
+end</code></pre>
+
+to have the server index on receiving the @USR1@ signal (@kill -USR1 <pid>@).
+
+h2. Client
+
+The @client.rb@ is much easier:
+
+<pre class="sh_ruby"><code>require 'drb/drb'
+
+search_server = DRbObject.new_with_uri 'druby://localhost:8787'
+1_000.times do
+  puts search_server.search 'test'
+end</code></pre>
+
+And that's it.
+
+h2. Running it
+
+Start the server
+
+<pre class="sh_bash"><code>$ ruby app.rb</code></pre>
+
+and in another Terminal window you enter
+
+<pre class="sh_bash"><code>$ ruby client.rb</code></pre>
+
+to see the queries fly!
+
+… perhaps it could even be faster using "http://msgpack.org/":http://msgpack.org/?

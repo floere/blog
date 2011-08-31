@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T21:11:15+02:00</updated>
+ <updated>2011-08-31T21:14:59+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -76,7 +76,11 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, in the app server, de-piggyback the ad results and render separately. As usual, it&amp;#8217;s all Ruby.&lt;/p&gt;
 &lt;h2&gt;Note&lt;/h2&gt;
 &lt;p&gt;You could of course use a real geosearch instead of the simple location above. But it&amp;#8217;s just more understandable like this.&lt;/p&gt;
-&lt;p&gt;Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.&lt;/p&gt;</content>
+&lt;p&gt;Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.&lt;/p&gt;
+&lt;h2&gt;Note 2&lt;/h2&gt;
+&lt;p&gt;I recommend not to use this in the normal search. It&amp;#8217;s just too surprising for users to have their precious search words thrown away like this.&lt;/p&gt;
+&lt;p&gt;As if they were just mere strings. To be tentacled away.&lt;/p&gt;
+&lt;p&gt;That reminds me… one of the next blog posts really &lt;strong&gt;has to be&lt;/strong&gt; called &amp;#8220;Day of the Tentacle&amp;#8221;!&lt;/p&gt;</content>
    
  </entry>
  

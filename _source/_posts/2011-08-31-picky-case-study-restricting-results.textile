@@ -1,0 +1,89 @@
+---
+layout: post
+title: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results
+categories:
+  - ruby
+  - picky
+  - "case study"
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+h2. Intro
+
+Recently a Picky user contacted me with an intriguing question.
+*Items have restricted visibility*. Some items can only be seen by Mr. Black (user id 5), but others only by Mr. Pink (user id 42). All items can each only be seen by a small number of users.
+
+The question: "How can we do it?"
+
+It turns out, Picky can do this already quite easily.
+
+h2. Here goes
+
+Let's say we have items that have a method @#restricted_to_user_ids@ that returns an array of user ids which can "see" this item in results:
+
+<pre class="sh_ruby"><code>class Item
+ attr_reader :id # e.g. 42
+ attr_reader :name # e.g. "Dan"
+ attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]
+end</code></pre>
+
+Quite nice.
+
+But how can we ask Picky to just return results that the current user can see?
+
+Since Picky is good at filtering, we could prefix each query by, say,
+
+@restricted:5@
+
+which would create queries like
+
+@restricted:5 my cool query@
+
+(how we do this we'll see later). This means we'd only search for items which have 5 in their restricted user ids list.
+
+Now. Since Picky cannot yet directly index the array returned by @#restricted_to_user_ids@, we have to use a technique, which in german would be called "_from behind through the breast into the eye_":
+
+We create a reader, which simply joins the array from @#restricted_to_user_ids@ into a string with space-separated user id values.
+
+<pre class="sh_ruby"><code>class Item
+ attr_reader :id # e.g. 42
+ attr_reader :name # e.g. "Dan"
+ attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]
+ def restricted
+   restricted_to_user_ids.join(' ') # e.g. "2 3 5 7 11"
+ end
+end</code></pre>
+
+Assuming we split the data on spaces, Picky indexes the ids nicely for each item.
+
+Then, all we have to do is add the category @:restricted@ (which uses the reader we just defined) to the index.
+
+<pre class="sh_ruby"><code>items = Picky::Index.new :items do
+ source { Item.order('name DESC') }
+ category :name
+ category :restricted
+end</code></pre>
+
+h2. The JS frontend
+
+Finally, to add the @restricted:<user_id>@ text in front of each query, we use the Javascript callback available in the generated client, @before@. Since version 3.1.2, before gets the query and the params.
+
+Whatever you return is used as the new query.
+
+<pre class="sh_javascript"><code>before: function(query, params) { return query.replace(/^/, 'restricted:' + user_id + ' ') }</code></pre>
+
+This code replaces @"my beautiful query" => "restricted:5 my beautiful query"@ (Please note that the JS function @#replace@ leaves the original string alone).
+
+h2. One little problem
+
+Did you notice? There's one little problem with solving it in JavaScript.
+
+If the visibility restriction is not crucial, but only helpful to your users, we would be finished.
+
+However, if Mr. Pink cannot ever see results that only Mr. Black should have access to, we'd now have a big problem.
+
+h2. The solution?
+
+The solution is to route the full and live requests through our web server, and adding the @restricted:<user_id>@ there. So in the server you'd prepend your query with @"restricted:#{current_user.id} #{params[:query]}"@ and send it off to the Picky server.
+
+And that's it already. Nobody loses an ear. Quite easy, don't you think?

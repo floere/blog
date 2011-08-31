@@ -60,6 +60,7 @@ Then, all we have to do is add the category @:restricted@ (which uses the reader
 
 <pre class="sh_ruby"><code>items = Picky::Index.new :items do
  source { Item.order('name DESC') }
+ indexing splits_text_on: /\s/
  category :name
  category :restricted
 end</code></pre>

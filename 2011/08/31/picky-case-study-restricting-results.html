@@ -79,7 +79,7 @@
       <pre class="sh_ruby"><code>class Item&#x000A; attr_reader :id # e.g. 42&#x000A; attr_reader :name # e.g. "Dan"&#x000A; attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]&#x000A; def restricted&#x000A;   restricted_to_user_ids.join(' ') # e.g. "2 3 5 7 11"&#x000A; end&#x000A;end</code></pre>
       <p>Assuming we split the data on spaces, Picky indexes the ids nicely for each item.</p>
       <p>Then, all we have to do is add the category <code>:restricted</code> (which uses the reader we just defined) to the index.</p>
-      <pre class="sh_ruby"><code>items = Picky::Index.new :items do&#x000A; source { Item.order('name DESC') }&#x000A; category :name&#x000A; category :restricted&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>items = Picky::Index.new :items do&#x000A; source { Item.order('name DESC') }&#x000A; indexing splits_text_on: /\s/&#x000A; category :name&#x000A; category :restricted&#x000A;end</code></pre>
       <h2>The JS frontend</h2>
       <p>Finally, to add the <code>restricted:&lt;user_id&gt;</code> text in front of each query, we use the Javascript callback available in the generated client, <code>before</code>. Since version 3.1.2, before gets the query and the params.</p>
       <p>Whatever you return is used as the new query.</p>

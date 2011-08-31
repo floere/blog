@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T16:53:18+02:00</updated>
+ <updated>2011-08-31T16:56:10+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -51,6 +51,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, all we have to do is add the category &lt;code&gt;:restricted&lt;/code&gt; (which uses the reader we just defined) to the index.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;items = Picky::Index.new :items do
  source { Item.order('name DESC') }
+ indexing splits_text_on: /\s/
  category :name
  category :restricted
 end&lt;/code&gt;&lt;/pre&gt;

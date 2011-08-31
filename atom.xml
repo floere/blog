@@ -4,13 +4,76 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T16:56:10+02:00</updated>
+ <updated>2011-08-31T21:04:36+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Location&amp;nbsp;Based&amp;nbsp;Ads</title>
+   <link href="http://florianhanke.com/blog/2011/09/01/picky-case-study-location-based-ads.html"/>
+   <updated>2011-09-01T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/09/01/picky-case-study-location-based-ads</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s say we offered a search engine where we could search stores using a name and/or location. A location could be a zipcode or suburb.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Store
+ attr_reader :id,
+             :name,
+             :location
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, when users search a store using a name and location, it should also show us what other stores are there, in a sidebar, to help with exploration and show the user what else is there.&lt;/p&gt;
+&lt;p&gt;So, when you&amp;#8217;d look for &amp;#8220;Barbershop Brooklyn&amp;#8221;, you&amp;#8217;d also get other nice stores that are located in &amp;#8220;Brooklyn&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s tricky. Without Picky.&lt;/p&gt;
+&lt;p&gt;We could define two indexes. Both index all stores. But one just has the &lt;code&gt;location&lt;/code&gt; category, and the other has &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;location&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;But that is a waste of precious memory space.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s what the new Picky version can help with.&lt;/p&gt;
+&lt;h2&gt;Picky 3.1.3&lt;/h2&gt;
+&lt;p&gt;Version 3.1.3 introduces the &lt;code&gt;ignore&lt;/code&gt; option in the search definition block:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;stores = Index.new :stores do
+  source { Store.order('name DESC') }
+  category :name
+  category :location
+end
+
+search = Search.new stores do
+  ignore :name
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Location-based Ads&lt;/h2&gt;
+&lt;p&gt;For our example, we would define the main search like this&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;main_search = Search.new stores&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;because we want it to not ignore anything. If the user enters &amp;#8220;barbershop brooklyn&amp;#8221;, it must be found in the name (barbershop) and location (brooklyn), or Picky won&amp;#8217;t return it.&lt;/p&gt;
+&lt;p&gt;Now, the ads search works a little differently. Whatever search word maps to name, we ignore it. We are only interested in words matching the location&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;ads_search = Search.new stores do
+  ignore :name
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the webapp, we would then search twice: Once for the &amp;#8220;real&amp;#8221; search, and once just for the ads to show on the side, using the same search.*&lt;/p&gt;
+&lt;p&gt;Because wouldn&amp;#8217;t you just love to try Vinnie&amp;#8217;s Pizza after Uncle Joe&amp;#8217;s Barbershop? I would.&lt;/p&gt;
+&lt;h2&gt;Examples&lt;/h2&gt;
+&lt;p&gt;Not following? Let me give you a few examples:&lt;/p&gt;
+&lt;p&gt;Searching for &amp;#8220;Barbershop&amp;#8221; will yield results in the main search, but none in the ads, since &amp;#8220;Barbershop&amp;#8221; does not match any location.&lt;/p&gt;
+&lt;p&gt;Searching for &amp;#8220;Santa Barbara&amp;#8221; will probably yield something like &amp;#8220;Santa Lucia Pizzeria, Santa Barbara&amp;#8221; for the main results, and return ads from Santa Barbara, since &amp;#8220;Santa&amp;#8221; or &amp;#8220;Barbara&amp;#8221; matching as names is ignored.&lt;/p&gt;
+&lt;p&gt;Searching for &amp;#8220;Chicago&amp;#8221; will return basically the same for the main result and the ads. But who searches just for &amp;#8220;Chicago&amp;#8221;?&lt;/p&gt;
+&lt;h2&gt;Advanced*&lt;/h2&gt;
+&lt;p&gt;If you think calling the Picky server a second time just for the ads is too much, you can use the &lt;em&gt;piggybacking&lt;/em&gt; technique:&lt;/p&gt;
+&lt;p&gt;In the Sinatra server, search the main search, but at the same time, search the ads. Then, stick the results for the ads onto the main results.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;get '/stores' do
+  query = params[:query]
+
+  main_results = main_search.search query # etc.
+  ads_results  = ads_search.search query # etc.
+
+  results_hash = main_results.to_hash
+  results_hash[:ads] = ads_results.to_hash
+
+  results_hash.to_json
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, in the app server, de-piggyback the ad results and render separately. As usual, it&amp;#8217;s all Ruby.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Restricting&amp;nbsp;Results</title>

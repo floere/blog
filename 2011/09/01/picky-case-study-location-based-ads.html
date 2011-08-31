@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Location&nbsp;Based&nbsp;Ads</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Location&nbsp;Based&nbsp;Ads</h1>
+      <div class="categories">ruby / picky / case study</div>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
+      <h2>Intro</h2>
+      <p>Let&#8217;s say we offered a search engine where we could search stores using a name and/or location. A location could be a zipcode or suburb.</p>
+      <pre class="sh_ruby"><code>class Store&#x000A; attr_reader :id,&#x000A;             :name,&#x000A;             :location&#x000A;end</code></pre>
+      <p>Now, when users search a store using a name and location, it should also show us what other stores are there, in a sidebar, to help with exploration and show the user what else is there.</p>
+      <p>So, when you&#8217;d look for &#8220;Barbershop Brooklyn&#8221;, you&#8217;d also get other nice stores that are located in &#8220;Brooklyn&#8221;.</p>
+      <p>It&#8217;s tricky. Without Picky.</p>
+      <p>We could define two indexes. Both index all stores. But one just has the <code>location</code> category, and the other has <code>name</code> and <code>location</code>.</p>
+      <p>But that is a waste of precious memory space.</p>
+      <p>That&#8217;s what the new Picky version can help with.</p>
+      <h2>Picky 3.1.3</h2>
+      <p>Version 3.1.3 introduces the <code>ignore</code> option in the search definition block:</p>
+      <pre class="sh_ruby"><code>stores = Index.new :stores do&#x000A;  source { Store.order('name DESC') }&#x000A;  category :name&#x000A;  category :location&#x000A;end&#x000A;&#x000A;search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
+      <h2>Location-based Ads</h2>
+      <p>For our example, we would define the main search like this</p>
+      <pre class="sh_ruby"><code>main_search = Search.new stores</code></pre>
+      <p>because we want it to not ignore anything. If the user enters &#8220;barbershop brooklyn&#8221;, it must be found in the name (barbershop) and location (brooklyn), or Picky won&#8217;t return it.</p>
+      <p>Now, the ads search works a little differently. Whatever search word maps to name, we ignore it. We are only interested in words matching the location</p>
+      <pre class="sh_ruby"><code>ads_search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
+      <p>In the webapp, we would then search twice: Once for the &#8220;real&#8221; search, and once just for the ads to show on the side, using the same search.*</p>
+      <p>Because wouldn&#8217;t you just love to try Vinnie&#8217;s Pizza after Uncle Joe&#8217;s Barbershop? I would.</p>
+      <h2>Examples</h2>
+      <p>Not following? Let me give you a few examples:</p>
+      <p>Searching for &#8220;Barbershop&#8221; will yield results in the main search, but none in the ads, since &#8220;Barbershop&#8221; does not match any location.</p>
+      <p>Searching for &#8220;Santa Barbara&#8221; will probably yield something like &#8220;Santa Lucia Pizzeria, Santa Barbara&#8221; for the main results, and return ads from Santa Barbara, since &#8220;Santa&#8221; or &#8220;Barbara&#8221; matching as names is ignored.</p>
+      <p>Searching for &#8220;Chicago&#8221; will return basically the same for the main result and the ads. But who searches just for &#8220;Chicago&#8221;?</p>
+      <h2>Advanced*</h2>
+      <p>If you think calling the Picky server a second time just for the ads is too much, you can use the <em>piggybacking</em> technique:</p>
+      <p>In the Sinatra server, search the main search, but at the same time, search the ads. Then, stick the results for the ads onto the main results.</p>
+      <pre class="sh_ruby"><code>get '/stores' do&#x000A;  query = params[:query]&#x000A;&#x000A;  main_results = main_search.search query # etc.&#x000A;  ads_results  = ads_search.search query # etc.&#x000A;&#x000A;  results_hash = main_results.to_hash&#x000A;  results_hash[:ads] = ads_results.to_hash&#x000A;&#x000A;  results_hash.to_json&#x000A;end</code></pre>
+      <p>Then, in the app server, de-piggyback the ad results and render separately. As usual, it&#8217;s all Ruby.</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/08/31/picky-case-study-restricting-results.html" title="Previous post: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/09/01/picky-case-study-location-based-ads';
+          var disqus_url = 'http://florianhanke.com/blog/2011/09/01/picky-case-study-location-based-ads.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

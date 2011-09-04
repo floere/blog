@@ -4,13 +4,95 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-08-31T22:58:48+02:00</updated>
+ <updated>2011-09-04T21:43:18+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;#58;&amp;nbsp;Ignoring&amp;nbsp;Unassigned&amp;nbsp;Tokens</title>
+   <link href="http://florianhanke.com/blog/2011/09/05/picky-ignoring-unassigned-tokens.html"/>
+   <updated>2011-09-05T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/09/05/picky-ignoring-unassigned-tokens</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; series on its workings.&lt;/p&gt;
+&lt;p&gt;It is about a new &lt;code&gt;Search&lt;/code&gt; object option &lt;code&gt;ignore_unassigned_tokens&lt;/code&gt; that is exposed from version 3.1.5 onwards. It allows you to tell Picky that it should just ignore any tokens which cannot be found in an index.&lt;/p&gt;
+&lt;p&gt;This is how you set it:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Search.new my_index do
+  ignore_unassigned_tokens true
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The option was buried in an internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; but slowly made its way out to the &lt;code&gt;Search&lt;/code&gt; object (see last post).&lt;/p&gt;
+&lt;h2&gt;Ignoring unassigned tokens&lt;/h2&gt;
+&lt;p&gt;What do I mean by this?&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s say you are searching for &lt;code&gt;&quot;Chicken Cajun Style&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Picky only has &amp;#8220;Chicken&amp;#8221; and &amp;#8220;Cajun&amp;#8221; indexed, as a recipe title.&lt;/p&gt;
+&lt;p&gt;What happens is: Picky will find the token &amp;#8220;Chicken&amp;#8221; in the title category, and the token &amp;#8220;Cajun&amp;#8221;, also in the title category. But it won&amp;#8217;t find &amp;#8220;Style&amp;#8221; anywhere in the index. It might, but not for the same indexed object.&lt;/p&gt;
+&lt;p&gt;So Picky will return an empty result set.&lt;/p&gt;
+&lt;p&gt;So maybe you want to make Picky more forgiving.&lt;/p&gt;
+&lt;p&gt;One way to do this is to tell it to ignore unassignable/unassigned tokens. This means that if a token cannot be matched to any category, it will be thrown away.&lt;/p&gt;
+&lt;p&gt;So, in the example above, Picky would return the results for &lt;code&gt;&quot;Chicken Cajun&quot;&lt;/code&gt;. It&amp;#8217;s as if the &amp;#8220;Style&amp;#8221; had never existed.&lt;/p&gt;
+&lt;h2&gt;An idea on how to use this&lt;/h2&gt;
+&lt;p&gt;One idea on how to use this is in an implicit search, separate from the main search.&lt;/p&gt;
+&lt;p&gt;So you have a main search, using the Picky interface, but also a space where you show relevant ads.&lt;/p&gt;
+&lt;p&gt;Say you have a &lt;code&gt;Car&lt;/code&gt; model, with advertisements attached. If someone searches for a car, it will show relevant ads.&lt;/p&gt;
+&lt;p&gt;In the code you&amp;#8217;d have:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;cars_search = Search.new cars_index
+
+ads_search = Search.new cars_index do
+  ignore_unassigned_tokens true
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And then you&amp;#8217;d do two searches. The idea here is – even if there is no exact result in the main search – to show anything that is in any way related to the query. (See the case study on location based ads three posts back on how to fine-tune this)&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it – hope it inspires you to try Picky be more lenient, or perhaps this was exactly what you were looking for!&lt;/p&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title type="html">A&amp;nbsp;quick&amp;nbsp;note&amp;nbsp;on&amp;nbsp;APIs</title>
+   <link href="http://florianhanke.com/blog/2011/09/04/a-quick-note-on-apis.html"/>
+   <updated>2011-09-04T00:00:00+02:00</updated>
+   <id>http://florianhanke.com/blog/2011/09/04/a-quick-note-on-apis</id>
+   <content type="html">&lt;p&gt;While writing Picky, one thing occurred to me:
+If you have an (external) &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;, it will exert pressure on the internal APIs, or the design, the structure of your code.&lt;/p&gt;
+&lt;h2&gt;Lowest energy state&lt;/h2&gt;
+&lt;p&gt;If your internal structure is too complicated, it takes more energy from you – in maintaining, coding, testing.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;A system will always push towards the lowest energy state.&lt;/strong&gt;*&lt;/p&gt;
+&lt;p&gt;And I believe, this is true even for your code structure, even though it is actually something that is not alive when writing code.
+But invoking it periodically, by running tests, or the program itself, pressure will be exerted.&lt;/p&gt;
+&lt;p&gt;If information is not in the right place, the information needs to be passed around, adding more parameters, or more ugly looking method signatures.&lt;/p&gt;
+&lt;p&gt;You can try to package the parameters in a capsule object, to make it look neater, but by doing this you are merely &amp;#8220;pushing the bubble in the carpet around&amp;#8221;, which I will explain later.&lt;/p&gt;
+&lt;p&gt;Assuming you are running the code quite often, and looking at it, a system under your care will tend to become more beautiful, as a more ugly system will take up more energy.*&lt;/p&gt;
+&lt;h2&gt;Simple illustration&lt;/h2&gt;
+&lt;p&gt;Say you have an external &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; on class A, and this class calls B, which in turn calls a method in C, which then calls a method in B.&lt;/p&gt;
+&lt;p&gt;So, A &amp;#8594; B &amp;#8594; C &amp;#8594; B&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s also say you use tests, integration or otherwise: It will be hard to set up nice tests.&lt;/p&gt;
+&lt;p&gt;Such a system will (most probably) tend to move towards this:&lt;/p&gt;
+&lt;p&gt;A &amp;#8594; B &amp;#8594; C&lt;/p&gt;
+&lt;p&gt;Yes, you could argue that C calls a callback on B, but then it would look most likely like this:&lt;/p&gt;
+&lt;p&gt;A &amp;#8594; C &amp;#8594; B&lt;/p&gt;
+&lt;p&gt;(Where B is passed into C by A)&lt;/p&gt;
+&lt;p&gt;What I am trying to say is: If the information makes detours, if it needs to be passed around, i.e. is not in the right place, it will gravitate towards the right place.&lt;/p&gt;
+&lt;h2&gt;Pushing the bubble in the carpet.&lt;/h2&gt;
+&lt;p&gt;One image I always get when working on APIs is the one where &lt;strong&gt;I push around bubbles in a carpet&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Picky for example is littered with TODOs. This does not mean that Picky is buggy, or parts of it cannot be used. A &lt;span class=&quot;caps&quot;&gt;TODO&lt;/span&gt; is very often a location where I spotted a bubble in the carpet of Picky code.&lt;/p&gt;
+&lt;p&gt;It works, but somehow it&amp;#8217;s a parameter that needs to passed through, and hasn&amp;#8217;t yet found its rightful place.&lt;/p&gt;
+&lt;h2&gt;From ball to snowflake&lt;/h2&gt;
+&lt;p&gt;In the beginning, many systems tend to look like a clump, a ball of code.&lt;/p&gt;
+&lt;p&gt;Maybe you start with a more complex structure, but relative to the end, the beginning looks clumpy.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;There are bubbles everywhere in the thing.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As they are pushed out – and by &amp;#8220;pushed out&amp;#8221; I mean, towards the edges, and hopefully removed – as they are pushed out, the ball-like structure tends to look more and more like a snowflake.
+A snowflake with an external &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; in the middle. A single or more method calls that tend to call multiple other methods, which use other methods, resulting in smaller, more detailed, fine-grained code.&lt;/p&gt;
+&lt;h2&gt;The beauty&lt;/h2&gt;
+&lt;p&gt;The beautiful thing about all of it is:&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t feel I am the conscious writer of all of it. It feels like it is the system itself that wishes I push the bubbles out.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The system is designing itself.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Like a statue under a chiseler&amp;#8217;s care, yearning to escape the block of marble.&lt;/p&gt;
+&lt;h2&gt;*Disclaimer&lt;/h2&gt;
+&lt;p&gt;This assumes you want your code to use up the &lt;strong&gt;least amount of energy from you&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;If you are somebody who pushes overly complicated code systems for job security reasons, all of the above does not apply.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Not&amp;nbsp;Always&amp;nbsp;Singing&amp;nbsp;In&amp;nbsp;The&amp;nbsp;Rain</title>

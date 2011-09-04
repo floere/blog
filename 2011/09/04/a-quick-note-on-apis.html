@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>A&nbsp;quick&nbsp;note&nbsp;on&nbsp;APIs</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>A&nbsp;quick&nbsp;note&nbsp;on&nbsp;APIs</h1>
+      <div class="categories">apis</div>
+      <p>While writing Picky, one thing occurred to me:
+      If you have an (external) <span class="caps">API</span>, it will exert pressure on the internal APIs, or the design, the structure of your code.</p>
+      <h2>Lowest energy state</h2>
+      <p>If your internal structure is too complicated, it takes more energy from you – in maintaining, coding, testing.</p>
+      <p><strong>A system will always push towards the lowest energy state.</strong>*</p>
+      <p>And I believe, this is true even for your code structure, even though it is actually something that is not alive when writing code.
+      But invoking it periodically, by running tests, or the program itself, pressure will be exerted.</p>
+      <p>If information is not in the right place, the information needs to be passed around, adding more parameters, or more ugly looking method signatures.</p>
+      <p>You can try to package the parameters in a capsule object, to make it look neater, but by doing this you are merely &#8220;pushing the bubble in the carpet around&#8221;, which I will explain later.</p>
+      <p>Assuming you are running the code quite often, and looking at it, a system under your care will tend to become more beautiful, as a more ugly system will take up more energy.*</p>
+      <h2>Simple illustration</h2>
+      <p>Say you have an external <span class="caps">API</span> on class A, and this class calls B, which in turn calls a method in C, which then calls a method in B.</p>
+      <p>So, A &#8594; B &#8594; C &#8594; B</p>
+      <p>Let&#8217;s also say you use tests, integration or otherwise: It will be hard to set up nice tests.</p>
+      <p>Such a system will (most probably) tend to move towards this:</p>
+      <p>A &#8594; B &#8594; C</p>
+      <p>Yes, you could argue that C calls a callback on B, but then it would look most likely like this:</p>
+      <p>A &#8594; C &#8594; B</p>
+      <p>(Where B is passed into C by A)</p>
+      <p>What I am trying to say is: If the information makes detours, if it needs to be passed around, i.e. is not in the right place, it will gravitate towards the right place.</p>
+      <h2>Pushing the bubble in the carpet.</h2>
+      <p>One image I always get when working on APIs is the one where <strong>I push around bubbles in a carpet</strong>.</p>
+      <p>Picky for example is littered with TODOs. This does not mean that Picky is buggy, or parts of it cannot be used. A <span class="caps">TODO</span> is very often a location where I spotted a bubble in the carpet of Picky code.</p>
+      <p>It works, but somehow it&#8217;s a parameter that needs to passed through, and hasn&#8217;t yet found its rightful place.</p>
+      <h2>From ball to snowflake</h2>
+      <p>In the beginning, many systems tend to look like a clump, a ball of code.</p>
+      <p>Maybe you start with a more complex structure, but relative to the end, the beginning looks clumpy.</p>
+      <p><strong>There are bubbles everywhere in the thing.</strong></p>
+      <p>As they are pushed out – and by &#8220;pushed out&#8221; I mean, towards the edges, and hopefully removed – as they are pushed out, the ball-like structure tends to look more and more like a snowflake.
+      A snowflake with an external <span class="caps">API</span> in the middle. A single or more method calls that tend to call multiple other methods, which use other methods, resulting in smaller, more detailed, fine-grained code.</p>
+      <h2>The beauty</h2>
+      <p>The beautiful thing about all of it is:</p>
+      <p>I don&#8217;t feel I am the conscious writer of all of it. It feels like it is the system itself that wishes I push the bubbles out.</p>
+      <p><strong>The system is designing itself.</strong></p>
+      <p>Like a statue under a chiseler&#8217;s care, yearning to escape the block of marble.</p>
+      <h2>*Disclaimer</h2>
+      <p>This assumes you want your code to use up the <strong>least amount of energy from you</strong>.</p>
+      <p>If you are somebody who pushes overly complicated code systems for job security reasons, all of the above does not apply.</p>
+      Next
+      <a href="/blog/2011/09/05/picky-ignoring-unassigned-tokens.html" title="Next post: Picky&#58;&nbsp;Ignoring&nbsp;Unassigned&nbsp;Tokens">Picky&#58;&nbsp;Ignoring&nbsp;Unassigned&nbsp;Tokens</a>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/09/01/picky-case-study-not-singing-in-the-rain.html" title="Previous post: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Not&nbsp;Always&nbsp;Singing&nbsp;In&nbsp;The&nbsp;Rain">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Not&nbsp;Always&nbsp;Singing&nbsp;In&nbsp;The&nbsp;Rain</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/09/04/a-quick-note-on-apis';
+          var disqus_url = 'http://florianhanke.com/blog/2011/09/04/a-quick-note-on-apis.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

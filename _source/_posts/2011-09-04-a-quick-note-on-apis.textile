@@ -1,0 +1,79 @@
+---
+layout: post
+title: A&nbsp;quick&nbsp;note&nbsp;on&nbsp;APIs
+categories:
+  - apis
+---
+
+While writing Picky, one thing occurred to me:
+If you have an (external) API, it will exert pressure on the internal APIs, or the design, the structure of your code.
+
+h2. Lowest energy state
+
+If your internal structure is too complicated, it takes more energy from you – in maintaining, coding, testing.
+
+*A system will always push towards the lowest energy state.**
+
+And I believe, this is true even for your code structure, even though it is actually something that is not alive when writing code.
+But invoking it periodically, by running tests, or the program itself, pressure will be exerted.
+
+If information is not in the right place, the information needs to be passed around, adding more parameters, or more ugly looking method signatures.
+
+You can try to package the parameters in a capsule object, to make it look neater, but by doing this you are merely "pushing the bubble in the carpet around", which I will explain later.
+
+Assuming you are running the code quite often, and looking at it, a system under your care will tend to become more beautiful, as a more ugly system will take up more energy.*
+
+h2. Simple illustration
+
+Say you have an external API on class A, and this class calls B, which in turn calls a method in C, which then calls a method in B.
+
+So, A -> B -> C -> B
+
+Let's also say you use tests, integration or otherwise: It will be hard to set up nice tests.
+
+Such a system will (most probably) tend to move towards this:
+
+A -> B -> C
+
+Yes, you could argue that C calls a callback on B, but then it would look most likely like this:
+
+A -> C -> B
+
+(Where B is passed into C by A)
+
+What I am trying to say is: If the information makes detours, if it needs to be passed around, i.e. is not in the right place, it will gravitate towards the right place.
+
+h2. Pushing the bubble in the carpet.
+
+One image I always get when working on APIs is the one where *I push around bubbles in a carpet*.
+
+Picky for example is littered with TODOs. This does not mean that Picky is buggy, or parts of it cannot be used. A TODO is very often a location where I spotted a bubble in the carpet of Picky code.
+
+It works, but somehow it's a parameter that needs to passed through, and hasn't yet found its rightful place.
+
+h2. From ball to snowflake
+
+In the beginning, many systems tend to look like a clump, a ball of code.
+
+Maybe you start with a more complex structure, but relative to the end, the beginning looks clumpy.
+
+*There are bubbles everywhere in the thing.*
+
+As they are pushed out – and by "pushed out" I mean, towards the edges, and hopefully removed – as they are pushed out, the ball-like structure tends to look more and more like a snowflake.
+A snowflake with an external API in the middle. A single or more method calls that tend to call multiple other methods, which use other methods, resulting in smaller, more detailed, fine-grained code.
+
+h2. The beauty
+
+The beautiful thing about all of it is:
+
+I don't feel I am the conscious writer of all of it. It feels like it is the system itself that wishes I push the bubbles out.
+
+*The system is designing itself.*
+
+Like a statue under a chiseler's care, yearning to escape the block of marble.
+
+h2. *Disclaimer
+
+This assumes you want your code to use up the *least amount of energy from you*.
+
+If you are somebody who pushes overly complicated code systems for job security reasons, all of the above does not apply.

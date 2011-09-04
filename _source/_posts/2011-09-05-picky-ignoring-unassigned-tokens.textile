@@ -1,0 +1,56 @@
+---
+layout: post
+title: Picky&#58;&nbsp;Ignoring&nbsp;Unassigned&nbsp;Tokens
+categories:
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/ series on its workings.
+
+It is about a new @Search@ object option @ignore_unassigned_tokens@ that is exposed from version 3.1.5 onwards. It allows you to tell Picky that it should just ignore any tokens which cannot be found in an index.
+
+This is how you set it:
+
+<pre class="sh_ruby"><code>Search.new my_index do
+  ignore_unassigned_tokens true
+end</code></pre>
+
+The option was buried in an internal API but slowly made its way out to the @Search@ object (see last post).
+
+h2. Ignoring unassigned tokens
+
+What do I mean by this?
+
+Let's say you are searching for @"Chicken Cajun Style"@.
+
+Picky only has "Chicken" and "Cajun" indexed, as a recipe title.
+
+What happens is: Picky will find the token "Chicken" in the title category, and the token "Cajun", also in the title category. But it won't find "Style" anywhere in the index. It might, but not for the same indexed object.
+
+So Picky will return an empty result set.
+
+So maybe you want to make Picky more forgiving.
+
+One way to do this is to tell it to ignore unassignable/unassigned tokens. This means that if a token cannot be matched to any category, it will be thrown away.
+
+So, in the example above, Picky would return the results for @"Chicken Cajun"@. It's as if the "Style" had never existed.
+
+h2. An idea on how to use this
+
+One idea on how to use this is in an implicit search, separate from the main search.
+
+So you have a main search, using the Picky interface, but also a space where you show relevant ads.
+
+Say you have a @Car@ model, with advertisements attached. If someone searches for a car, it will show relevant ads.
+
+In the code you'd have:
+
+<pre class="sh_ruby"><code>cars_search = Search.new cars_index
+
+ads_search = Search.new cars_index do
+  ignore_unassigned_tokens true
+end</code></pre>
+
+And then you'd do two searches. The idea here is – even if there is no exact result in the main search – to show anything that is in any way related to the query. (See the case study on location based ads three posts back on how to fine-tune this)
+
+That's it – hope it inspires you to try Picky be more lenient, or perhaps this was exactly what you were looking for!

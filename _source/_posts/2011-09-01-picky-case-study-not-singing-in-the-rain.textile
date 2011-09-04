@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Not&nbsp;Always&nbsp;Singing&nbsp;In&nbsp;The&nbsp;Rain
+title: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Running&nbsp;it&nbsp;in&nbsp;a&nbsp;DRb&nbsp;Server
 categories:
   - ruby
   - picky

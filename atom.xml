@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-09-04T21:43:18+02:00</updated>
+ <updated>2011-09-04T21:48:18+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -95,7 +95,7 @@ A snowflake with an external &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;
  </entry>
  
  <entry>
-   <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Not&amp;nbsp;Always&amp;nbsp;Singing&amp;nbsp;In&amp;nbsp;The&amp;nbsp;Rain</title>
+   <title type="html">Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Running&amp;nbsp;it&amp;nbsp;in&amp;nbsp;a&amp;nbsp;DRb&amp;nbsp;Server</title>
    <link href="http://florianhanke.com/blog/2011/09/01/picky-case-study-not-singing-in-the-rain.html"/>
    <updated>2011-09-01T00:00:00+02:00</updated>
    <id>http://florianhanke.com/blog/2011/09/01/picky-case-study-not-singing-in-the-rain</id>

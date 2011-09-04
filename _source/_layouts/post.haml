@@ -46,7 +46,10 @@
         %a{ :href => '/../view_models/' } view models
     %div.post
       %h1= page.title
-      .categories= page.categories.join(' / ')
+      .categories
+        = page.categories.join(" / ")
+      //  - page.categories.each do |category|
+      //    %a{ :href => "/blog/category/#{category}" }= category
       ~ content
       - if page.next
         Next

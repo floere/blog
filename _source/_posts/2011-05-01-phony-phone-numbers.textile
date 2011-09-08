@@ -16,7 +16,7 @@ h2. Overview
 # "Try it":#try
 # "Internal API":#api
 # "E.164":#e164
-# "Model/Representation Aside (ActiveRecord)":#model
+# "Model/Representation Aside – in ActiveRecord":#model
 # "Status":#status
 # "Endnote 1":#endnote1
 # "Endnote 2":#endnote2

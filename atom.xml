@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-09-08T11:23:39+02:00</updated>
+ <updated>2011-09-08T11:25:18+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -1060,7 +1060,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;&lt;a href=&quot;#try&quot;&gt;Try it&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#api&quot;&gt;Internal &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#e164&quot;&gt;E.164&lt;/a&gt;&lt;/li&gt;
-	&lt;li&gt;&lt;a href=&quot;#model&quot; title=&quot;ActiveRecord&quot;&gt;Model/Representation Aside&lt;/a&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;a href=&quot;#model&quot;&gt;Model/Representation Aside – in ActiveRecord&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#status&quot;&gt;Status&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#endnote1&quot;&gt;Endnote 1&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#endnote2&quot;&gt;Endnote 2&lt;/a&gt;&lt;/li&gt;

@@ -8,7 +8,21 @@ categories:
 ---
 This is a post about "Phony 1.4.1+":http://florianhanke.com/phony/.
 
-h2. Intro
+h2. Overview
+
+# "Intro":#intro
+# "The Problem":#problem
+# "Phony":#phony
+# "Try it":#try
+# "Internal API":#api
+# "E.164":#e164
+# "Model/Representation Aside (ActiveRecord)":#model
+# "Status":#status
+# "Endnote 1":#endnote1
+# "Endnote 2":#endnote2
+# "Conclusion":#conclusion
+
+h2(#intro). Intro
 
 Imagine…
 
@@ -22,7 +36,7 @@ France invades the US on the very next day. Freedom fries are forbidden and … 
 
 This could all have been avoided if you had used "Phony":http://florianhanke.com/phony/.
 
-h2. The problem
+h2(#problem). The problem
 
 The big problem is that countries all over the world have different ways of splitting and formatting their phone numbers.
 
@@ -36,7 +50,7 @@ You see? Big mess.
 
 Well, there is some standardization called "E164":http://florianhanke.com/phony/e164.html, and I'll talk about it below. But first, Phony.
 
-h2. Phony
+h2(#phony). Phony
 
 Phony does the ugly and dirty work of correctly formatting international phone numbers for you.
 
@@ -56,7 +70,7 @@ and special spaces, if you need them (@" "@ is default).
 
 Look at "a few more examples":http://florianhanke.com/phony/examples.html.
 
-h2. Try it
+h2(#try). Try it
 
 First, get the gem: @gem install phony@
 
@@ -70,7 +84,7 @@ p Phony.normalize('1 (703) 451-5115') # => '17034515115'</code></pre>
 
 My country is not formatted correctly! What do I do?
 
-h2. Internal API
+h2(#api). Internal API
 
 Sometimes I have a nice document to go on, most of the time I don't, and not even in any of the languages or writing systems I know. Sometimes I simply made a mistake. This is where you can help Phony!
 
@@ -104,7 +118,7 @@ First, add specs with a few example numbers, then fix, and send me a pull reques
 
 But let's get back to phone numbers.
 
-h2. E.164
+h2(#e164). E.164
 
 Or E164 for short is a recommendation which defines a numbering scheme and phone number formats. The "Wikipedia entry":http://en.wikipedia.org/wiki/E.164 is very helpful.
 
@@ -117,7 +131,7 @@ So, in e.g. ActiveRecord you can exploit fact #1 like this:
 
 Fact #2 is harder to exploit, and this is what Phony is here for.
 
-h2. Model/Representation Aside
+h2(#model). Model/Representation Aside
 
 Btw, if you have customers who want to enter specific phone numbers (like "+34/123-(555)001!"), you could code it up like this in ActiveRecord:
 
@@ -143,17 +157,17 @@ Then, in the view it becomes:
 
 I really like that last line.
 
-h2. Status
+h2(#status). Status
 
 At the time of this writing, we include 44 countries, and counting. See "the README":http://github.com/floere/phony/blob/master/README.textile for a list.
 
-h2. Endnote 1
+h2(#endnote1). Endnote 1
 
 Q: Why are this dude's libraries named after negative attributes?
 
 A: No.
 
-h2. Endnote 2
+h2(#endnote2). Endnote 2
 
 If I've found out just one thing about phone numbers then it is this formula:
 
@@ -167,7 +181,7 @@ For Italy, the result is around 1.825x10e7. Booo.
 
 A special thank you goes to Belgium which uses 4xx as its mobile phone prefix, but has a region, Liège, which uses 4 as its land line prefix. Belgium, do you know what a bloody prefix code is? OTOH, this led me to rewrite Phony a second time, and all is much better.
 
-h2. Conclusion
+h2(#conclusion). Conclusion
 
 So we've seen
 # that Phony can normalize a phone number.

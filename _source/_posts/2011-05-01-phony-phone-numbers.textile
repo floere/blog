@@ -108,7 +108,7 @@ h2. E.164
 
 Or E164 for short is a recommendation which defines a numbering scheme and phone number formats. The "Wikipedia entry":http://en.wikipedia.org/wiki/E.164 is very helpful.
 
-For coders, there are 2 important facts to be gleamed:
+For coders, there are 2 important facts to be gleaned:
 * Length is maximally = 15.
 * Country code is a 1-3 digits "prefix code":http://en.wikipedia.org/wiki/Prefix_code. This is defined in E164. After that it is a horrible mess.
 

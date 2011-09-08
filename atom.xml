@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-09-04T23:38:59+02:00</updated>
+ <updated>2011-09-08T11:18:04+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -1114,7 +1114,7 @@ digits. If not, go and check if the &lt;span class=&quot;caps&quot;&gt;NDC&lt;/s
 &lt;p&gt;But let&amp;#8217;s get back to phone numbers.&lt;/p&gt;
 &lt;h2&gt;E.164&lt;/h2&gt;
 &lt;p&gt;Or E164 for short is a recommendation which defines a numbering scheme and phone number formats. The &lt;a href=&quot;http://en.wikipedia.org/wiki/E.164&quot;&gt;Wikipedia entry&lt;/a&gt; is very helpful.&lt;/p&gt;
-&lt;p&gt;For coders, there are 2 important facts to be gleamed:&lt;/p&gt;
+&lt;p&gt;For coders, there are 2 important facts to be gleaned:&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;Length is maximally = 15.&lt;/li&gt;
 	&lt;li&gt;Country code is a 1-3 digits &lt;a href=&quot;http://en.wikipedia.org/wiki/Prefix_code&quot;&gt;prefix code&lt;/a&gt;. This is defined in E164. After that it is a horrible mess.&lt;/li&gt;

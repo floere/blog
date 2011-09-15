@@ -95,6 +95,8 @@ and in another Terminal window you enter
 
 <pre class="sh_bash"><code>$ ruby client.rb</code></pre>
 
-to see the queries fly!
+to see the queries fly.
+
+On my MacBook Pro I get 1600 "requests" per second. An that is on a single core!
 
 … perhaps it could even be faster using "http://msgpack.org/":http://msgpack.org/?

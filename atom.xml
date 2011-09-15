@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-09-11T23:04:53+02:00</updated>
+ <updated>2011-09-15T23:54:24+02:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -229,7 +229,8 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ ruby app.rb&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;and in another Terminal window you enter&lt;/p&gt;
 &lt;pre class=&quot;sh_bash&quot;&gt;&lt;code&gt;$ ruby client.rb&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;to see the queries fly!&lt;/p&gt;
+&lt;p&gt;to see the queries fly.&lt;/p&gt;
+&lt;p&gt;On my MacBook Pro I get 1600 &amp;#8220;requests&amp;#8221; per second. An that is on a single core!&lt;/p&gt;
 &lt;p&gt;… perhaps it could even be faster using &lt;a href=&quot;http://msgpack.org/&quot;&gt;http://msgpack.org/&lt;/a&gt;?&lt;/p&gt;</content>
    
  </entry>

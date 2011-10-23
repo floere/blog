@@ -1,5 +1,5 @@
 ---
-draft: true
+published: false
 layout: post
 title: Designing&nbsp;Realtime&nbsp;Indexes
 categories:

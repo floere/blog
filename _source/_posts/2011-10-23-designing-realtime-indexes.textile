@@ -1,0 +1,46 @@
+---
+draft: true
+layout: post
+title: Designing&nbsp;Realtime&nbsp;Indexes
+categories:
+  - ruby
+  - picky
+  - indexing
+---
+This is a post about designing realtime indexes for  "Picky":http://florianhanke.com/picky/.
+
+Realtime indexes are an exciting thing! The possibility of inserting something into a search engine, then having the thing pop up in results is fantastic. Wouldn't you love that in Picky? Man, me too!
+
+Too bad that I yet have to implement it. Heh.
+
+On the other hand, some good TDD should do it. "TDD" you ask? TDD of course, is the noble activity of Thought Driven Development. Also known as QDD, Question Driven Development.
+
+Let's fire up the cranial engines and get the gray matter bubbling.
+
+Specifically, I'd like to talk about the API, and how to implement it in Picky. Along the way I will touch on the inverted index, necessary bookkeeping, how I will implement it, how to use it and how *not* to use it, the latter being more important than the former.
+
+h2. What is a realtime index?
+
+A realtime index is an index that has the ability to have e.g. text indexed at runtime, and returning results for that text *immediately* after
+
+One example for a Ruby realtime search engine is "Whistlepig":http://todo by "William Morgan":http://twitter.com/wm.
+
+h2. What I want
+
+h2. The inverted index
+
+h2. How not to implement it
+
+(the naive approach)
+
+h2. How to implement it
+
+(the fast approach that needs some bookkeeping (TM))
+
+h2. Note: Ignoring other constraints
+
+h2. Note: TDD/QDD (Pen & Paper)
+
+h2. Caveats
+
+(no Unicorn, single server – crossing that bridge when I get to it)

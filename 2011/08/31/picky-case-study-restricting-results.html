@@ -63,61 +63,61 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <h2>Intro</h2>
-      <p>Recently a Picky user contacted me with an intriguing question.
-      <strong>Items have restricted visibility</strong>. Some items can only be seen by Mr. Black (user id 5), but others only by Mr. Pink (user id 42). All items can each only be seen by a small number of users.</p>
-      <p>The question: &#8220;How can we do it?&#8221;</p>
-      <p>It turns out, Picky can do this already quite easily.</p>
-      <h2>Here goes</h2>
-      <p>Let&#8217;s say we have items that have a method <code>#restricted_to_user_ids</code> that returns an array of user ids which can &#8220;see&#8221; this item in results:</p>
-      <pre class="sh_ruby"><code>class Item&#x000A; attr_reader :id # e.g. 42&#x000A; attr_reader :name # e.g. "Dan"&#x000A; attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]&#x000A;end</code></pre>
-      <p>Quite nice.</p>
-      <p>But how can we ask Picky to just return results that the current user can see?</p>
-      <p>Since Picky is good at filtering, we could prefix each query by, say,</p>
-      <p><code>restricted:5</code></p>
-      <p>which would create queries like</p>
-      <p><code>restricted:5 my cool query</code></p>
-      <p>(how we do this we&#8217;ll see later). This means we&#8217;d only search for items which have 5 in their restricted user ids list.</p>
-      <p>Now. Since Picky cannot yet directly index the array returned by <code>#restricted_to_user_ids</code>, we have to use a technique, which in german would be called &#8220;<em>from behind through the breast into the eye</em>&#8221;:</p>
-      <p>We create a reader, which simply joins the array from <code>#restricted_to_user_ids</code> into a string with space-separated user id values.</p>
-      <pre class="sh_ruby"><code>class Item&#x000A; attr_reader :id # e.g. 42&#x000A; attr_reader :name # e.g. "Dan"&#x000A; attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]&#x000A; def restricted&#x000A;   restricted_to_user_ids.join(' ') # e.g. "2 3 5 7 11"&#x000A; end&#x000A;end</code></pre>
-      <p>Assuming we split the data on spaces, Picky indexes the ids nicely for each item.</p>
-      <p>Then, all we have to do is add the category <code>:restricted</code> (which uses the reader we just defined) to the index.</p>
-      <pre class="sh_ruby"><code>items = Picky::Index.new :items do&#x000A; source { Item.order('name DESC') }&#x000A; indexing splits_text_on: /\s/&#x000A; category :name&#x000A; category :restricted&#x000A;end</code></pre>
-      <h2>The JS frontend</h2>
-      <p>Finally, to add the <code>restricted:&lt;user_id&gt;</code> text in front of each query, we use the Javascript callback available in the generated client, <code>before</code>. Since version 3.1.2, before gets the query and the params.</p>
-      <p>Whatever you return is used as the new query.</p>
-      <pre class="sh_javascript"><code>before: function(query, params) { return query.replace(/^/, 'restricted:' + user_id + ' ') }</code></pre>
-      <p>This code replaces <code>"my beautiful query" =&gt; "restricted:5 my beautiful query"</code> (Please note that the JS function <code>#replace</code> leaves the original string alone).</p>
-      <h2>One little problem</h2>
-      <p>Did you notice? There&#8217;s one little problem with solving it in JavaScript.</p>
-      <p>If the visibility restriction is not crucial, but only helpful to your users, we would be finished.</p>
-      <p>However, if Mr. Pink cannot ever see results that only Mr. Black should have access to, we&#8217;d now have a big problem.</p>
-      <h2>The solution?</h2>
-      <p>The solution is to route the full and live requests through our web server, and adding the <code>restricted:&lt;user_id&gt;</code> there. So in the server you&#8217;d prepend your query with <code>"restricted:#{current_user.id} #{params[:query]}"</code> and send it off to the Picky server.</p>
-      <p>And that&#8217;s it already. Nobody loses an ear. Quite easy, don&#8217;t you think?</p>
+        <h2>Intro</h2>
+        <p>Recently a Picky user contacted me with an intriguing question.
+        <strong>Items have restricted visibility</strong>. Some items can only be seen by Mr. Black (user id 5), but others only by Mr. Pink (user id 42). All items can each only be seen by a small number of users.</p>
+        <p>The question: &#8220;How can we do it?&#8221;</p>
+        <p>It turns out, Picky can do this already quite easily.</p>
+        <h2>Here goes</h2>
+        <p>Let&#8217;s say we have items that have a method <code>#restricted_to_user_ids</code> that returns an array of user ids which can &#8220;see&#8221; this item in results:</p>
+        <pre class="sh_ruby"><code>class Item&#x000A; attr_reader :id # e.g. 42&#x000A; attr_reader :name # e.g. "Dan"&#x000A; attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]&#x000A;end</code></pre>
+        <p>Quite nice.</p>
+        <p>But how can we ask Picky to just return results that the current user can see?</p>
+        <p>Since Picky is good at filtering, we could prefix each query by, say,</p>
+        <p><code>restricted:5</code></p>
+        <p>which would create queries like</p>
+        <p><code>restricted:5 my cool query</code></p>
+        <p>(how we do this we&#8217;ll see later). This means we&#8217;d only search for items which have 5 in their restricted user ids list.</p>
+        <p>Now. Since Picky cannot yet directly index the array returned by <code>#restricted_to_user_ids</code>, we have to use a technique, which in german would be called &#8220;<em>from behind through the breast into the eye</em>&#8221;:</p>
+        <p>We create a reader, which simply joins the array from <code>#restricted_to_user_ids</code> into a string with space-separated user id values.</p>
+        <pre class="sh_ruby"><code>class Item&#x000A; attr_reader :id # e.g. 42&#x000A; attr_reader :name # e.g. "Dan"&#x000A; attr_reader :restricted_to_user_ids # e.g. [2,3,5,7,11]&#x000A; def restricted&#x000A;   restricted_to_user_ids.join(' ') # e.g. "2 3 5 7 11"&#x000A; end&#x000A;end</code></pre>
+        <p>Assuming we split the data on spaces, Picky indexes the ids nicely for each item.</p>
+        <p>Then, all we have to do is add the category <code>:restricted</code> (which uses the reader we just defined) to the index.</p>
+        <pre class="sh_ruby"><code>items = Picky::Index.new :items do&#x000A; source { Item.order('name DESC') }&#x000A; indexing splits_text_on: /\s/&#x000A; category :name&#x000A; category :restricted&#x000A;end</code></pre>
+        <h2>The JS frontend</h2>
+        <p>Finally, to add the <code>restricted:&lt;user_id&gt;</code> text in front of each query, we use the Javascript callback available in the generated client, <code>before</code>. Since version 3.1.2, before gets the query and the params.</p>
+        <p>Whatever you return is used as the new query.</p>
+        <pre class="sh_javascript"><code>before: function(query, params) { return query.replace(/^/, 'restricted:' + user_id + ' ') }</code></pre>
+        <p>This code replaces <code>"my beautiful query" =&gt; "restricted:5 my beautiful query"</code> (Please note that the JS function <code>#replace</code> leaves the original string alone).</p>
+        <h2>One little problem</h2>
+        <p>Did you notice? There&#8217;s one little problem with solving it in JavaScript.</p>
+        <p>If the visibility restriction is not crucial, but only helpful to your users, we would be finished.</p>
+        <p>However, if Mr. Pink cannot ever see results that only Mr. Black should have access to, we&#8217;d now have a big problem.</p>
+        <h2>The solution?</h2>
+        <p>The solution is to route the full and live requests through our web server, and adding the <code>restricted:&lt;user_id&gt;</code> there. So in the server you&#8217;d prepend your query with <code>"restricted:#{current_user.id} #{params[:query]}"</code> and send it off to the Picky server.</p>
+        <p>And that&#8217;s it already. Nobody loses an ear. Quite easy, don&#8217;t you think?</p>
       Next
-      <a href="/blog/2011/09/01/picky-case-study-location-based-ads.html" title="Next post: Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Location&nbsp;Based&nbsp;Ads">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Location&nbsp;Based&nbsp;Ads</a>
+      <a href="/blog/2011/09/01/picky-case-study-location-based-ads.html" title="Next post: Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Location&amp;nbsp;Based&amp;nbsp;Ads">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Location&nbsp;Based&nbsp;Ads</a>
       <br />
       Previous
-      <a class="previous" href="/blog/2011/08/26/migrating-to-picky-31.html" title="Previous post: Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)">Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)</a>
+      <a class="previous" href="/blog/2011/08/26/migrating-to-picky-31.html" title="Previous post: Migrating&amp;nbsp;to&amp;nbsp;Picky&amp;nbsp;3.1&amp;nbsp;(from&amp;nbsp;3.0)">Migrating&nbsp;to&nbsp;Picky&nbsp;3.1&nbsp;(from&nbsp;3.0)</a>
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-        //<![CDATA[
-          var disqus_shortname = 'florianhanke';
-          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-          var disqus_identifier = '/2011/08/31/picky-case-study-restricting-results';
-          var disqus_url = 'http://florianhanke.com/blog/2011/08/31/picky-case-study-restricting-results.html';
-          
-          /* * * DON'T EDIT BELOW THIS LINE * * */
-          (function() {
-              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-          })();
-        //]]>
-      </script>
+          //<![CDATA[
+            var disqus_shortname = 'florianhanke';
+            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+            var disqus_identifier = '/2011/08/31/picky-case-study-restricting-results';
+            var disqus_url = 'http://florianhanke.com/blog/2011/08/31/picky-case-study-restricting-results.html';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+          //]]>
+        </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

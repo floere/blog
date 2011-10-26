@@ -4,13 +4,52 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-10-23T12:54:55+11:00</updated>
+ <updated>2011-10-27T00:02:10+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Search&amp;nbsp;Engine&amp;nbsp;in&amp;nbsp;a&amp;nbsp;Script</title>
+   <link href="http://florianhanke.com/blog/2011/10/26/search-engine-in-a-script.html"/>
+   <updated>2011-10-26T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/10/26/search-engine-in-a-script</id>
+   <content type="html">&lt;p&gt;This is a post about running &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; in a small script.&lt;/p&gt;
+&lt;h2&gt;Design Philosopy&lt;/h2&gt;
+&lt;p&gt;You all know that with Picky we want the full flexibility of Ruby.&lt;/p&gt;
+&lt;p&gt;What we also want is a search engine that runs with a minimal setup. Small and sweet. Portable, lightweight, bam!&lt;/p&gt;
+&lt;p&gt;In short: Picky wants to be the &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; of search engines. Did we achieve this? Not yet, but we are very close indeed.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s have a quick dance in the rain.&lt;/p&gt;
+&lt;h2&gt;The code&lt;/h2&gt;
+&lt;p&gt;Copy and run this!&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Possible since Picky 3.2.0.
+#
+require 'picky'
+
+include Picky
+
+Thing = Struct.new :id, :name
+
+index = Index.new :test do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+end
+
+index.replace Thing.new(1, 'Picky')
+index.replace Thing.new(2, 'Parslet')
+
+things = Search.new(index) do
+  boost [:name] =&amp;gt; +3
+end
+
+p things.search(&quot;Pick&quot;).ids
+p things.search(&quot;Pic&quot;).to_hash
+p things.search(&quot;Parsley~&quot;).allocations&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&amp;#8217;s it. Easy to just try something, and later evolve into a fully fleshed, super-powerful search engine.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Twitter&amp;nbsp;Account</title>

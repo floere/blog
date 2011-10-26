@@ -1,0 +1,48 @@
+---
+layout: post
+title: Search&nbsp;Engine&nbsp;in&nbsp;a&nbsp;Script
+categories:
+  - ruby
+  - picky
+  - sinatra
+---
+This is a post about running "Picky":http://florianhanke.com/picky/ in a small script.
+
+h2. Design Philosopy
+
+You all know that with Picky we want the full flexibility of Ruby.
+
+What we also want is a search engine that runs with a minimal setup. Small and sweet. Portable, lightweight, bam!
+
+In short: Picky wants to be the "Sinatra":http://sinatrarb.com of search engines. Did we achieve this? Not yet, but we are very close indeed.
+
+Let's have a quick dance in the rain.
+
+h2. The code
+
+Copy and run this!
+
+<pre class="sh_ruby"><code># Possible since Picky 3.2.0.
+#
+require 'picky'
+
+include Picky
+
+Thing = Struct.new :id, :name
+
+index = Index.new :test do
+  category :name, similarity: Similarity::DoubleMetaphone.new(3)
+end
+
+index.replace Thing.new(1, 'Picky')
+index.replace Thing.new(2, 'Parslet')
+
+things = Search.new(index) do
+  boost [:name] => +3
+end
+
+p things.search("Pick").ids
+p things.search("Pic").to_hash
+p things.search("Parsley~").allocations</code></pre>
+
+That's it. Easy to just try something, and later evolve into a fully fleshed, super-powerful search engine.

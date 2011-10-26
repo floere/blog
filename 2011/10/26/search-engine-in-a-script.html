@@ -14,7 +14,7 @@
     <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
     <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
-    <title>Strategy pattern pattern pattern pattern</title>
+    <title>Search&nbsp;Engine&nbsp;in&nbsp;a&nbsp;Script</title>
     <script type="text/javascript">
       //<![CDATA[
         var _gaq = _gaq || [];
@@ -56,28 +56,33 @@
       </li>
     </ol>
     <div class="post">
-      <h1>Strategy pattern pattern pattern pattern</h1>
+      <h1>Search&nbsp;Engine&nbsp;in&nbsp;a&nbsp;Script</h1>
       <div class="categories">
-        ruby / patterns
+        ruby / picky / sinatra
       </div>
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
-      <p>A pattern that I often see cropping up in my <a href="http://github.com/floere/gosu_extensions">game framework</a>.</p>
-        <p>It can be used for configuring subclasses that act according to an order of calls defined in the superclass. How the calls exactly work can be defined in the subclasses (or in an external configuration) using the class methods.</p>
-        <script src="http://gist.github.com/383325.js"></script>
-      Next
-      <a href="/blog/2010/04/30/elements-each-p.html" title="Next post: elements.each(*p)">elements.each(*p)</a>
+      <p>This is a post about running <a href="http://florianhanke.com/picky/">Picky</a> in a small script.</p>
+        <h2>Design Philosopy</h2>
+        <p>You all know that with Picky we want the full flexibility of Ruby.</p>
+        <p>What we also want is a search engine that runs with a minimal setup. Small and sweet. Portable, lightweight, bam!</p>
+        <p>In short: Picky wants to be the <a href="http://sinatrarb.com">Sinatra</a> of search engines. Did we achieve this? Not yet, but we are very close indeed.</p>
+        <p>Let&#8217;s have a quick dance in the rain.</p>
+        <h2>The code</h2>
+        <p>Copy and run this!</p>
+        <pre class="sh_ruby"><code># Possible since Picky 3.2.0.&#x000A;#&#x000A;require 'picky'&#x000A;&#x000A;include Picky&#x000A;&#x000A;Thing = Struct.new :id, :name&#x000A;&#x000A;index = Index.new :test do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;end&#x000A;&#x000A;index.replace Thing.new(1, 'Picky')&#x000A;index.replace Thing.new(2, 'Parslet')&#x000A;&#x000A;things = Search.new(index) do&#x000A;  boost [:name] =&gt; +3&#x000A;end&#x000A;&#x000A;p things.search("Pick").ids&#x000A;p things.search("Pic").to_hash&#x000A;p things.search("Parsley~").allocations</code></pre>
+        <p>That&#8217;s it. Easy to just try something, and later evolve into a fully fleshed, super-powerful search engine.</p>
       <br />
       Previous
-      <a class="previous" href="/blog/2010/04/26/mastery-is-a-mindset.html" title="Previous post: Mastery is a mindset">Mastery is a mindset</a>
+      <a class="previous" href="/blog/2011/10/23/twitter.html" title="Previous post: Twitter&amp;nbsp;Account">Twitter&nbsp;Account</a>
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
           //<![CDATA[
             var disqus_shortname = 'florianhanke';
             var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2010/04/29/strategy-pattern-pattern-pattern-pattern';
-            var disqus_url = 'http://florianhanke.com/blog/2010/04/29/strategy-pattern-pattern-pattern-pattern.html';
+            var disqus_identifier = '/2011/10/26/search-engine-in-a-script';
+            var disqus_url = 'http://florianhanke.com/blog/2011/10/26/search-engine-in-a-script.html';
             
             /* * * DON'T EDIT BELOW THIS LINE * * */
             (function() {

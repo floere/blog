@@ -63,52 +63,52 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>In my previous post, I talked about what bothers me in Picky&#8217;s <span class="caps">API</span>, and did a few 2.0 prerelease versions with the improvements.</p>
-      <p>After quite a bit of feedback, Picky 2.0 is released! :)</p>
-      <p>So, what&#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?</p>
-      <h2>What has changed?</h2>
-      <p>Only four things. 2.0&#8217;s change list is short but sweet.</p>
-      <h3>Index definitions</h3>
-      <p>We&#8217;ve added a nice new possibility to define categories on an index. The blocky initializer. So where you had</p>
-      <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source)&#x000A;index.define_category :a&#x000A;index.define_category :b&#x000A;index.define_category :c</code></pre>
-      <p>you now can write</p>
-      <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source) do&#x000A;  category :a&#x000A;  category :b&#x000A;  category :c&#x000A;end</code></pre>
-      <p>This helps keeping everything together a bit more tightly. Also, smoother skin by not having to type as much ;)</p>
-      <p>The old style still works, but is totally shunned by veteran Pickiers. Be the hippest Pickier in town by using the blocky initializer style. You know you want it.</p>
-      <h3>Query::Full/Live &#8594; Search</h3>
-      <p>The double definitions, <code>Query::Full</code> and <code>Query::Live</code> are no more. Good riddance!</p>
-      <p>Instead, you simply use <code>Search</code>. So instead of</p>
-      <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books/full} =&gt; Query::Full.new(some_index),&#x000A;        %r{^/books/live} =&gt; Query::Live.new(some_index)&#x000A;&#x000A;end</code></pre>
-      <p>you use</p>
-      <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books} =&gt; Search.new(some_index)&#x000A;&#x000A;end</code></pre>
-      <p>It says &#8220;Route this <span class="caps">URL</span> to that search with these indexes and options&#8221;.
-      Much more understandable and sexier! :)</p>
-      <p>To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an <code>ids</code> query parameter:</p>
-      <pre class="sh_bash"><code>$ curl 'localhost:8080/books?query=meow&amp;ids=15&amp;offset=0'</code></pre>
-      <p>Defaults are 20 <code>ids</code> and 0 <code>offset</code>.</p>
-      <h3>Similarity::Phonetic &#8594; Similarity::DoubleMetaphone</h3>
-      <p>We&#8217;ve renamed <code>Similarity::Phonetic</code> to <code>Similarity::DoubleMetaphone</code>. It&#8217;s still the same algorithm. See <a href="http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone">the double metaphone</a>.</p>
-      <p>Also, we&#8217;ve added two default implementations, <code>Similarity::Metaphone</code> and <code>Similarity::Soundex</code> for your similarity pleasure :)</p>
-      <p>Since Picky is normally used by programmers, <code>DoubleMetaphone</code> is much clearer for what it actually does than <code>Phonetic</code> – it&#8217;s a bit of a mouthful, I admit.</p>
-      <p>Picky will tell you if you still use the old <code>Phonetic</code> definition in your <code>app/application.rb</code>, so you don&#8217;t need to learn this by heart.</p>
-      <h3>Picky::Client::Full/Live (in a client) &#8594; Picky::Client</h3>
-      <p>The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of</p>
-      <pre class="sh_ruby"><code>FullBooksSearch = Picky::Client::Full.new ...&#x000A;LiveBooksSearch = Picky::Client::Live.new ...</code></pre>
-      <p>you use</p>
-      <pre class="sh_ruby"><code>BooksSearch = Picky::Client.new ...</code></pre>
-      <p>Then in your e.g. controller actions passing what amount of ids you need</p>
-      <pre class="sh_ruby"><code>BooksSearch.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]</code></pre>
-      <p>or directly, using <code>:ids =&gt; 20</code> or however you like it.</p>
-      <h3>Various</h3>
-      <p>Leading up to 2.0, we&#8217;ve removed the hashbangs in the JS client history, added <code>rake stats</code> and <code>rake analyze</code>. See more in the repo&#8217;s top level <code>history.textile</code>.</p>
-      <h2>Conclusion</h2>
-      <p>So we&#8217;ve seen</p>
-      <ol>
-      	<li>that Picky is two-dot-oh-soooome!</li>
-      	<li>what you&#8217;d need to change to be 2.0 compatible.</li>
-      </ol>
-      <p>Hope you learnt something new :)</p>
-      <p>Btw, protip: Generate a client and server using <code>picky generate</code> and see how everything is defined in 2.0 and compare.</p>
-      <p>Comments and feedback, as usual, are appreciated.</p>
+        <p>After quite a bit of feedback, Picky 2.0 is released! :)</p>
+        <p>So, what&#8217;s in it for you and what do you need to change in your 1.x version to use the spankingly new gem?</p>
+        <h2>What has changed?</h2>
+        <p>Only four things. 2.0&#8217;s change list is short but sweet.</p>
+        <h3>Index definitions</h3>
+        <p>We&#8217;ve added a nice new possibility to define categories on an index. The blocky initializer. So where you had</p>
+        <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source)&#x000A;index.define_category :a&#x000A;index.define_category :b&#x000A;index.define_category :c</code></pre>
+        <p>you now can write</p>
+        <pre class="sh_ruby"><code>index = Index::Memory.new(:name, source) do&#x000A;  category :a&#x000A;  category :b&#x000A;  category :c&#x000A;end</code></pre>
+        <p>This helps keeping everything together a bit more tightly. Also, smoother skin by not having to type as much ;)</p>
+        <p>The old style still works, but is totally shunned by veteran Pickiers. Be the hippest Pickier in town by using the blocky initializer style. You know you want it.</p>
+        <h3>Query::Full/Live &#8594; Search</h3>
+        <p>The double definitions, <code>Query::Full</code> and <code>Query::Live</code> are no more. Good riddance!</p>
+        <p>Instead, you simply use <code>Search</code>. So instead of</p>
+        <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books/full} =&gt; Query::Full.new(some_index),&#x000A;        %r{^/books/live} =&gt; Query::Live.new(some_index)&#x000A;&#x000A;end</code></pre>
+        <p>you use</p>
+        <pre class="sh_ruby"><code>class MyBeooootifulPickySearch &lt; Application&#x000A;&#x000A;  route %r{^/books} =&gt; Search.new(some_index)&#x000A;&#x000A;end</code></pre>
+        <p>It says &#8220;Route this <span class="caps">URL</span> to that search with these indexes and options&#8221;.
+        Much more understandable and sexier! :)</p>
+        <p>To discern whether it is a full (with result ids) or live (without result ids) search, you pass e.g. curl an <code>ids</code> query parameter:</p>
+        <pre class="sh_bash"><code>$ curl 'localhost:8080/books?query=meow&amp;ids=15&amp;offset=0'</code></pre>
+        <p>Defaults are 20 <code>ids</code> and 0 <code>offset</code>.</p>
+        <h3>Similarity::Phonetic &#8594; Similarity::DoubleMetaphone</h3>
+        <p>We&#8217;ve renamed <code>Similarity::Phonetic</code> to <code>Similarity::DoubleMetaphone</code>. It&#8217;s still the same algorithm. See <a href="http://en.wikipedia.org/wiki/Metaphone#Double_Metaphone">the double metaphone</a>.</p>
+        <p>Also, we&#8217;ve added two default implementations, <code>Similarity::Metaphone</code> and <code>Similarity::Soundex</code> for your similarity pleasure :)</p>
+        <p>Since Picky is normally used by programmers, <code>DoubleMetaphone</code> is much clearer for what it actually does than <code>Phonetic</code> – it&#8217;s a bit of a mouthful, I admit.</p>
+        <p>Picky will tell you if you still use the old <code>Phonetic</code> definition in your <code>app/application.rb</code>, so you don&#8217;t need to learn this by heart.</p>
+        <h3>Picky::Client::Full/Live (in a client) &#8594; Picky::Client</h3>
+        <p>The Picky client in your application needs a few changes. Only a single client is needed anymore. So instead of</p>
+        <pre class="sh_ruby"><code>FullBooksSearch = Picky::Client::Full.new ...&#x000A;LiveBooksSearch = Picky::Client::Live.new ...</code></pre>
+        <p>you use</p>
+        <pre class="sh_ruby"><code>BooksSearch = Picky::Client.new ...</code></pre>
+        <p>Then in your e.g. controller actions passing what amount of ids you need</p>
+        <pre class="sh_ruby"><code>BooksSearch.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]</code></pre>
+        <p>or directly, using <code>:ids =&gt; 20</code> or however you like it.</p>
+        <h3>Various</h3>
+        <p>Leading up to 2.0, we&#8217;ve removed the hashbangs in the JS client history, added <code>rake stats</code> and <code>rake analyze</code>. See more in the repo&#8217;s top level <code>history.textile</code>.</p>
+        <h2>Conclusion</h2>
+        <p>So we&#8217;ve seen</p>
+        <ol>
+        	<li>that Picky is two-dot-oh-soooome!</li>
+        	<li>what you&#8217;d need to change to be 2.0 compatible.</li>
+        </ol>
+        <p>Hope you learnt something new :)</p>
+        <p>Btw, protip: Generate a client and server using <code>picky generate</code> and see how everything is defined in 2.0 and compare.</p>
+        <p>Comments and feedback, as usual, are appreciated.</p>
       Next
       <a href="/blog/2011/03/30/on-searching.html" title="Next post: On Searching">On Searching</a>
       <br />
@@ -117,20 +117,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-        //<![CDATA[
-          var disqus_shortname = 'florianhanke';
-          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-          var disqus_identifier = '/2011/03/28/picky-two-dot-oh';
-          var disqus_url = 'http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh.html';
-          
-          /* * * DON'T EDIT BELOW THIS LINE * * */
-          (function() {
-              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-          })();
-        //]]>
-      </script>
+          //<![CDATA[
+            var disqus_shortname = 'florianhanke';
+            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+            var disqus_identifier = '/2011/03/28/picky-two-dot-oh';
+            var disqus_url = 'http://florianhanke.com/blog/2011/03/28/picky-two-dot-oh.html';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+          //]]>
+        </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-10-27T00:02:10+11:00</updated>
+ <updated>2011-10-27T00:05:43+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -24,7 +24,7 @@
 &lt;p&gt;In short: Picky wants to be the &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; of search engines. Did we achieve this? Not yet, but we are very close indeed.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s have a quick dance in the rain.&lt;/p&gt;
 &lt;h2&gt;The code&lt;/h2&gt;
-&lt;p&gt;Copy and run this!&lt;/p&gt;
+&lt;p&gt;Go ahead and replace Picky with a very small script! You can copy, right? And paste? Ok. Go.&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Possible since Picky 3.2.0.
 #
 require 'picky'

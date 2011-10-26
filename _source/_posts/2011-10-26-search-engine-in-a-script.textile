@@ -20,7 +20,7 @@ Let's have a quick dance in the rain.
 
 h2. The code
 
-Copy and run this!
+Go ahead and replace Picky with a very small script! You can copy, right? And paste? Ok. Go.
 
 <pre class="sh_ruby"><code># Possible since Picky 3.2.0.
 #

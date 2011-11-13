@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky&nbsp;Update&nbsp;Performance</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Picky&nbsp;Update&nbsp;Performance</h1>
+      <div class="categories">
+        ruby / picky / performance
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>This is a post about measuring <a href="http://florianhanke.com/picky/">Picky</a> performance when updating realtime indexes.</p>
+        <h2>tl;dr</h2>
+        <p>In the single-process/single-threaded case on one core of a 2.66 GHz i7 Macbook Pro, Picky realtime index update performance ranges from 500 updates/s to 25&#8217;700 updates/s. Around 2&#8217;300 to 5&#8217;100 updates/s for a default case.</p>
+        <h2>Quick realtime index refresher</h2>
+        <p>If you didn&#8217;t know, since 3.2.0, you can add/remove/replace (update) objects from and to a Picky index. In realtime.</p>
+        <p>For example,</p>
+        <pre class="sh_ruby"><code>index = Index.new :things do&#x000A;  category :text&#x000A;end&#x000A;&#x000A;index.replace thing_with_text_method</code></pre>
+        <p>would replace the index data for the <code>thing_with_text_method</code>.</p>
+        <p>If you added a search interface for the index,</p>
+        <pre class="sh_ruby"><code>things = Search.new index</code></pre>
+        <p>you could also search for it and it would return different things if you changed the index in between.</p>
+        <pre class="sh_ruby"><code>things.search "some thing" # =&gt; Finds the thing.&#x000A;&#x000A;index.remove thing_with_text_method.id&#x000A;&#x000A;things.search "some thing" # =&gt; Finds it no more.</code></pre>
+        <h2>The Setup</h2>
+        <p>All numbers are valid for a 2.66 GHz i7 Macbook Pro (one core of it) with 4GB 1067 MHz DDR3 <span class="caps">RAM</span>, using Picky 3.5.3 on ruby 1.9.3p0 (2011-10-30 revision 33570) [x86_64-darwin11.2.0].</p>
+        <p>For testing performance, we randomly pregenerated a large set of objects with methods <code>id</code>, <code>user</code> (8 random characters), <code>text1</code> (20 random characters, 26 from the alphabet, 5 spaces), and <code>text2</code>, <code>text3</code>, <code>text4</code> (see generation of text1).</p>
+        <p>Then, we used the following index. To make everything easier, we used a config variable to enable/disable categories.</p>
+        <pre class="sh_ruby"><code>include Picky&#x000A;&#x000A;config = 0 # 1, 2, 3, 4.&#x000A;&#x000A;index = Index.new :things do&#x000A;&#x000A;  weights    = Weights::Default    # These configurations were changed.&#x000A;  partial    = Partial::Default    #&#x000A;  similarity = Similarity::Default #&#x000A;&#x000A;  if config &gt;= 0&#x000A;    category :user,&#x000A;             weights:    weights,&#x000A;             partial:    partial,&#x000A;             similarity: similarity&#x000A;  end&#x000A;  if config &gt;= 1&#x000A;    category :text1,&#x000A;             weights:    weights,&#x000A;             partial:    partial,&#x000A;             similarity: similarity&#x000A;  end&#x000A;  if config &gt;= 2&#x000A;    category :text2,&#x000A;             weights:    weights,&#x000A;             partial:    partial,&#x000A;             similarity: similarity&#x000A;  end&#x000A;  if config &gt;= 3&#x000A;    category :text3,&#x000A;             weights:    weights,&#x000A;             partial:    partial,&#x000A;             similarity: similarity&#x000A;  end&#x000A;  if config &gt;= 4&#x000A;    category :text4,&#x000A;             weights:    weights,&#x000A;             partial:    partial,&#x000A;             similarity: similarity&#x000A;  end&#x000A;end</code></pre>
+        <p>If <code>config</code> was for example <code>3</code>, Picky used categories <code>:user</code>, <code>:text1</code>, <code>:text2</code> and <code>:text3</code>.</p>
+        <p>We then varied the configurations for <code>weights</code>, <code>partial</code>, <code>similarity</code>. Weights control how the categories are weighed. Partial how you can search partially (like just for the first character or only for the exact word). And similarity defines if you can search for similar words to the one you entered.</p>
+        <p>We indexed until the average update/s value stabilized.</p>
+        <h2>The Chart</h2>
+        <p>A quick explanation of the legend: It is ordered weights/partial/similarity. From fastest to slowest, the options were…</p>
+        <p>Weights (2): Constant, Default/Logarithmic.</p>
+        <p>Partial (3): None, Default/Postfix(from: -3), Postfix(from: 1).</p>
+        <p>Similarity (3): Default/None, Soundex(3), DoubleMetaphone(3).</p>
+        <p>We did not explore all combinations. The numbers were rounded down to the nearest hundreds.</p>
+        <p><img src="/blog/images/2011-11-13-updating-chart.png" alt="" /></p>
+        <p>From left to right, we first indexed just the user category, then successively added text1, text2, text3, and text4.</p>
+        <p>The baseline (not shown), when no category was defined, was <code>212'000</code> updates/s.</p>
+        <p>The absolute winner is indexing just the 8 character user category, with a constant weight, no partial indexing, and no similarity, at <code>25'700</code> u/s.</p>
+        <p>Usually though, you&#8217;d want Picky&#8217;s weighing and scoring to be used. So, the same scenario, with no partial/no similarity yields a speed of <code>22'000</code> u/s. In a more realistic case with 3 text categories and 1 user category, it is <code>5'400</code> u/s.</p>
+        <p>For added convenience, you&#8217;d use the default partial algorithm, which also includes parts of words, from the 3rd last character of a word to the last. With default weighing, and no similarity, this yields <code>1'600</code> up to <code>10'400</code> u/s. This is with all settings to default (Default/Default/Default), as if you had defined nothing:</p>
+        <pre class="sh_ruby"><code>category :text1 # etc.</code></pre>
+        <p>If you are interested in similarity, but not partial, the numbers range from <code>900</code> to <code>6'200</code> u/s.</p>
+        <p>The most brutal case, standard weighing, full partial, and best similarity costs dearly: Only <code>500</code> up to <code>4'700</code> updates per second.</p>
+        <p>If you like pure numbers better than a graph, here&#8217;s a table for you:</p>
+        <p><img src="/blog/images/2011-11-13-updating-table.png" alt="" /></p>
+        <p>Now, let&#8217;s all &#8220;jump&#8221; to conclusions! ;)</p>
+        <h2>Conclusions</h2>
+        <p>First of all, we are very happy with the numbers. We did expect a much lower performance. (Sorry, Picky)</p>
+        <p>How Picky weighs and scores the data didn&#8217;t impact the results much. This is no surprise, as no string manipulation is done.</p>
+        <p>Partial indexing impact was what we expected. Around a 40% to 60% reduction from (Default/None/Default) to (Default/Default/Default) in speed depending on how many text categories were indexed. The jump to (Default/Postfix(from: 1)/Default) – an all inclusive partial – is around 50% to around 70%.</p>
+        <p>The worst impact comes from similarity indexing: Using similarity brings down indexing speed to about 25% (no partial) to 50% (also using partial).</p>
+        <p>The big takeaway: Text categories with much content are most important, followed by whether you do similarity, followed by whether you do partial searches. Weighing almost plays no role.</p>
+        <p>The bigger takeaway: Picky is fast when updating indexes. And does it in realtime. On Ruby.</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/10/26/search-engine-in-a-script.html" title="Previous post: Search&amp;nbsp;Engine&amp;nbsp;in&amp;nbsp;a&amp;nbsp;Script">Search&nbsp;Engine&nbsp;in&nbsp;a&nbsp;Script</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+          //<![CDATA[
+            var disqus_shortname = 'florianhanke';
+            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+            var disqus_identifier = '/2011/11/13/picky-update-performance';
+            var disqus_url = 'http://florianhanke.com/blog/2011/11/13/picky-update-performance.html';
+            
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+          //]]>
+        </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

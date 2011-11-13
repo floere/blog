@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-11-13T19:46:24+11:00</updated>
+ <updated>2011-11-13T19:51:31+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,7 @@
    <link href="http://florianhanke.com/blog/2011/11/13/picky-update-performance.html"/>
    <updated>2011-11-13T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2011/11/13/picky-update-performance</id>
-   <content type="html">&lt;p&gt;This is a post about measuring &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; performance when updating realtime indexes.&lt;/p&gt;
+   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; performance when updating realtime indexes.&lt;/p&gt;
 &lt;h2&gt;tl;dr&lt;/h2&gt;
 &lt;p&gt;In the single-process/single-threaded case on one core of a 2.66 GHz i7 Macbook Pro, Picky realtime index update performance ranges from 500 updates/s to 25&amp;#8217;700 updates/s. Around 2&amp;#8217;300 to 5&amp;#8217;100 updates/s for a default case.&lt;/p&gt;
 &lt;h2&gt;Quick realtime index refresher&lt;/h2&gt;

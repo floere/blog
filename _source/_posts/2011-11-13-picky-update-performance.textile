@@ -6,7 +6,7 @@ categories:
   - picky
   - performance
 ---
-This is a post about measuring "Picky":http://florianhanke.com/picky/ performance when updating realtime indexes.
+This is a post about "Picky":http://florianhanke.com/picky/ performance when updating realtime indexes.
 
 h2. tl;dr
 

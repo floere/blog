@@ -10,7 +10,7 @@ This is a post about "Picky":http://florianhanke.com/picky/ performance when sea
 
 But first, a picture that was taken during the performance tests:
 
-!/images/2011-11-20-picky-runs.png!
+!/blog/images/2011-11-20-picky-runs.png!
 
 How is taking this picture possible you ask? I am writing this from a hospital.
 
@@ -30,7 +30,7 @@ h2. The raw data
 
 In descending order of performance, we evaluated four backends that are available: @Memory@, @File@, @SQLite@ (graciously donated by "Roger Braun":http://twitter.com/rogerbraun) and the @Redis@ backend.
 
-!/images/2011-11-20-table.png!
+!/blog/images/2011-11-20-table.png!
 
 The 10 - 100000 show the number of objects in the database. The columns 1-3 denote the complexity. 1 is just using one word, and 3 means we looked for three words.
 
@@ -40,7 +40,7 @@ h2. Expectations
 
 All of the following charts show the three different complexity levels in various index sizes (objects indexed).
 
-!/images/2011-11-20-memory-file.png!
+!/blog/images/2011-11-20-memory-file.png!
 
 Since the memory backend runs fully in memory (duh), we get the best performance there. It's all fully in memory, so none of the dirty slow stuff even gets touched.
 
@@ -50,7 +50,7 @@ The file backend (very naïve, "see here":http://github.com/floere/picky/blob/ma
 
 However, seeking in Ruby and decoding with Yajl @Yajl::Parser.parse IO.read(cache_path, length, offset)@ is apparently quite fast.
 
-!/images/2011-11-20-sqlite-redis.png!
+!/blog/images/2011-11-20-sqlite-redis.png!
 
 Tests of a first draft of a SQLite database (by "Roger Braun":http://twitter.com/rogerbraun) show lots of promise as well.
 
@@ -66,7 +66,7 @@ One Redis behaviour that surprised us a lot was that for the "complexity 3" case
 
 Turns out, the curve does exactly the same, but is squished, because the complexity tends to make a large difference to the baseline.
 
-!/images/2011-11-20-redis-detail.png!
+!/blog/images/2011-11-20-redis-detail.png!
 
 If you look at just the "complexity 3" case (here in blue instead of yellow), we can see the same behaviour.
 
@@ -80,7 +80,7 @@ h2. Comparisons
 
 Comparing each of the complexity cases (1 word, 2 words, 3 words) for the backends, they are nicely evenly spaced apart.
 
-!/images/2011-11-20-complexity.png!
+!/blog/images/2011-11-20-complexity.png!
 
 That is, on a log scale. From @Memory@ to @File@, from @File@ to @SQLite@, from @SQLite@ to @Redis@ we each have about a 2x query time increase. Comparing @Memory@ and @Redis@, we thus get about a 8x increase (actually, more like 10x).
 

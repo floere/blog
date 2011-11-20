@@ -4,13 +4,85 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-11-13T19:51:31+11:00</updated>
+ <updated>2011-11-20T23:12:15+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Search&amp;nbsp;Performance&amp;nbsp;(Backends)</title>
+   <link href="http://florianhanke.com/blog/2011/11/20/picky-search-performance.html"/>
+   <updated>2011-11-20T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/11/20/picky-search-performance</id>
+   <content type="html">&lt;p&gt;This is a post about &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; performance when searching in various backends.&lt;/p&gt;
+&lt;p&gt;But first, a picture that was taken during the performance tests:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-picky-runs.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;How is taking this picture possible you ask? I am writing this from a hospital.&lt;/p&gt;
+&lt;p&gt;Heh, no. Not really.&lt;/p&gt;
+&lt;h2&gt;tl;dr&lt;/h2&gt;
+&lt;p&gt;In the single-process/single-threaded case on one core of a 2.66 GHz i7 Macbook Pro, Picky&amp;#8217;s search performance ranges from 0.0001s for a single-word query on the memory backend to 0.01s for a three word query on the Redis backend. Around 0.0003s per query on the memory backend for a more realistic case.&lt;/p&gt;
+&lt;h2&gt;Why?&lt;/h2&gt;
+&lt;p&gt;We are currently working on designing the Picky backends, amongst other ideas, to enable realtime indexing.&lt;/p&gt;
+&lt;p&gt;If you want to contribute a backend, please do!&lt;/p&gt;
+&lt;h2&gt;The raw data&lt;/h2&gt;
+&lt;p&gt;In descending order of performance, we evaluated four backends that are available: &lt;code&gt;Memory&lt;/code&gt;, &lt;code&gt;File&lt;/code&gt;, &lt;code&gt;SQLite&lt;/code&gt; (graciously donated by &lt;a href=&quot;http://twitter.com/rogerbraun&quot;&gt;Roger Braun&lt;/a&gt;) and the &lt;code&gt;Redis&lt;/code&gt; backend.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-table.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;The 10 &amp;#8211; 100000 show the number of objects in the database. The columns 1-3 denote the complexity. 1 is just using one word, and 3 means we looked for three words.&lt;/p&gt;
+&lt;p&gt;We were wondering about the Redis backend a bit, and also the file backend (see below). Memory and SQLite are as expected. What did we expect?&lt;/p&gt;
+&lt;h2&gt;Expectations&lt;/h2&gt;
+&lt;p&gt;All of the following charts show the three different complexity levels in various index sizes (objects indexed).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-memory-file.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Since the memory backend runs fully in memory (duh), we get the best performance there. It&amp;#8217;s all fully in memory, so none of the dirty slow stuff even gets touched.&lt;/p&gt;
+&lt;p&gt;With the exception of that dirty old man that touches everything, the Ruby Garbage Collector.&lt;/p&gt;
+&lt;p&gt;The file backend (very naïve, &lt;a href=&quot;http://github.com/floere/picky/blob/master/server/lib/picky/backends/file/json.rb&quot;&gt;see here&lt;/a&gt;) surprised us a bit, since we are actually loading &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; encoded data from a file.&lt;/p&gt;
+&lt;p&gt;However, seeking in Ruby and decoding with Yajl &lt;code&gt;Yajl::Parser.parse IO.read(cache_path, length, offset)&lt;/code&gt; is apparently quite fast.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-sqlite-redis.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Tests of a first draft of a SQLite database (by &lt;a href=&quot;http://twitter.com/rogerbraun&quot;&gt;Roger Braun&lt;/a&gt;) show lots of promise as well.&lt;/p&gt;
+&lt;p&gt;Redis is rather slow, as expected. However, this is not just Redis&amp;#8217; fault. The current implementation does three roundtrips per simple internal query.&lt;/p&gt;
+&lt;p&gt;For example, in the three words case, and having four different categories each word can be in results in 36 up to 72 roundtrips. And for that, the Redis backend performs very well.&lt;/p&gt;
+&lt;p&gt;With the arrival of Redis 2.6.0, we will make use of the &lt;a href=&quot;http://antirez.com/post/scripting-branch-released.html&quot;&gt;Lua scripting&lt;/a&gt; and the &lt;a href=&quot;http://redis.io/commands/eval&quot;&gt;&lt;span class=&quot;caps&quot;&gt;EVALSHA&lt;/span&gt; command&lt;/a&gt; to divide the number of roundtrips by 3.&lt;/p&gt;
+&lt;p&gt;That will, for a four category, three word query result in only 12 up to 24 roundtrips. Still a lot, but this should prove to be much faster.&lt;/p&gt;
+&lt;p&gt;One Redis behaviour that surprised us a lot was that for the &amp;#8220;complexity 3&amp;#8221; case where we looked for three words, the performance of Redis in the graph remains constant. Why does it remain constant, and why doesn&amp;#8217;t it show the same behaviour?&lt;/p&gt;
+&lt;p&gt;Turns out, the curve does exactly the same, but is squished, because the complexity tends to make a large difference to the baseline.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-redis-detail.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;If you look at just the &amp;#8220;complexity 3&amp;#8221; case (here in blue instead of yellow), we can see the same behaviour.&lt;/p&gt;
+&lt;p&gt;What happens is that for the multi-word case, the amount of expensive roundtrips shoots up. The amount of combinatorics and calculations that Picky does is just the cherry on top of a large roundtrip cake.&lt;/p&gt;
+&lt;p&gt;For four words, this would be even worse: We would have to search for the line around 0.02s.&lt;/p&gt;
+&lt;p&gt;We hope to reduce this greatly with Redis 2.6.0 and expect a 3-4x speed increase.&lt;/p&gt;
+&lt;h2&gt;Comparisons&lt;/h2&gt;
+&lt;p&gt;Comparing each of the complexity cases (1 word, 2 words, 3 words) for the backends, they are nicely evenly spaced apart.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/2011-11-20-complexity.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;That is, on a log scale. From &lt;code&gt;Memory&lt;/code&gt; to &lt;code&gt;File&lt;/code&gt;, from &lt;code&gt;File&lt;/code&gt; to &lt;code&gt;SQLite&lt;/code&gt;, from &lt;code&gt;SQLite&lt;/code&gt; to &lt;code&gt;Redis&lt;/code&gt; we each have about a 2x query time increase. Comparing &lt;code&gt;Memory&lt;/code&gt; and &lt;code&gt;Redis&lt;/code&gt;, we thus get about a 8x increase (actually, more like 10x).&lt;/p&gt;
+&lt;p&gt;While for the one word case, the data remains quite flat as the index size increases, the impact on performance is very noticeable in the three word cases.&lt;/p&gt;
+&lt;p&gt;A note on the index sizes:
+Yes, 100&amp;#8217;000 entries is not a very realistic size (we do not have access to large servers yet). But it is enough to see Picky&amp;#8217;s behaviour regarding speed. However, the curves behaviour is quite predictable and can be extrapolated from the curves seen above.&lt;/p&gt;
+&lt;p&gt;For example, if you extend the curve of the memory case to 1000 times the size (to 100&amp;#8217;000&amp;#8217;000 entries): The complexity case 1 it arrives at 0.0002s, in the complexity case 3, at around 0.005s.&lt;/p&gt;
+&lt;p&gt;In the case of 15&amp;#8217;000&amp;#8217;000 entries, this is exactly what we found to be true for the memory case. Please see
+&lt;a href=&quot;http://florianhanke.com/picky/enterprise.html#use_case_1&quot;&gt;use case 1&lt;/a&gt; on the Picky page.&lt;/p&gt;
+&lt;h2&gt;Selecting a backend&lt;/h2&gt;
+&lt;p&gt;What does it mean for you when choosing the backend?&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;If you need a realtime index, then the only backend that supports this is the &lt;code&gt;Memory&lt;/code&gt; backend (current version at the time of this post is 3.5.4). We are working on getting the others up to speed, but this is what&amp;#8217;s there for now.&lt;/li&gt;
+	&lt;li&gt;If you need persistence and/or distributed Pickies, we recommend the Redis backend. Speed may not be fantastic, but from Redis 2.6.0 on it will be quite a bit faster. We predict around 3-4 times faster.&lt;/li&gt;
+	&lt;li&gt;The &lt;code&gt;File&lt;/code&gt; and &lt;code&gt;SQLite&lt;/code&gt; backends are still in development. Use the &lt;code&gt;File&lt;/code&gt; backend when you have a static index and do not want to use too much memory. The same holds for the &lt;code&gt;SQLite&lt;/code&gt; backend, with the improvement that you have all the SQLite tools at your service.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As usual, it&amp;#8217;s a tradeoff between speed, space, tools etc.&lt;/p&gt;
+&lt;h2&gt;The code&lt;/h2&gt;
+&lt;p&gt;The code for these tests is here:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://github.com/floere/picky/blob/master/server/performance_tests/search.rb&quot;&gt;http://github.com/floere/picky/blob/master/server/performance_tests/search.rb&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;We generated sets of 10-100000 indexed things, each with 4 categories and an id. Then we randomly selected data from the indexes and in roughly half of the cases are searching for just part of the word for which Picky uses a partial search.&lt;/p&gt;
+&lt;p&gt;We ran 100 random queries each, and divided the resulting time by 100 to get an average per-query-time.&lt;/p&gt;
+&lt;h2&gt;A note on combinatorial search engines&lt;/h2&gt;
+&lt;p&gt;Combinatorial search engines are hard to performance test.&lt;/p&gt;
+&lt;p&gt;If in a phone book search on Picky you search for &amp;#8220;peter paul victoria&amp;#8221;, Picky evaluates what you are most likely looking for. This involves a fair bit of calculation.&lt;/p&gt;
+&lt;p&gt;In the mentioned case, if &amp;#8220;peter&amp;#8221; can be a first name, name, street, city, and the other words are similarly ambiguous, then Picky has to look at all the possible combinations and has to find out which one is the one that is most likely, based on the &lt;a href=&quot;http://florianhanke.com/picky/documentation.html#indexes-categories-weights&quot;&gt;weights&lt;/a&gt; and &lt;a href=&quot;http://florianhanke.com/picky/documentation.html#search-options-boost&quot;&gt;boost&lt;/a&gt; you defined.&lt;/p&gt;
+&lt;p&gt;Now, this is very dependent on the data underlying it. So I tried to use relatively standard data.&lt;/p&gt;
+&lt;p&gt;So, in closing, it must be said that it is hard to compare this style of search engine to one of the generic search engines. But Picky would really like to take one on soon ;)&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Update&amp;nbsp;Performance</title>

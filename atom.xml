@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-18T16:50:51+11:00</updated>
+ <updated>2011-12-18T17:20:55+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -29,6 +29,7 @@
 &lt;p&gt;Other important changes:&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;&lt;code&gt;Picky::Index&lt;/code&gt;, option &lt;code&gt;weights&lt;/code&gt; has been renamed to &lt;code&gt;weight&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;Picky uses the &lt;a href=&quot;https://github.com/kschiess/procrastinate&quot;&gt;procrastinate&lt;/a&gt; gem to parallelize indexing.&lt;/li&gt;
 	&lt;li&gt;&lt;code&gt;Picky::Indexes.reload&lt;/code&gt; =&amp;gt; &lt;code&gt;Picky::Indexes.load&lt;/code&gt;, analog on &lt;code&gt;Index&lt;/code&gt;, &lt;code&gt;Category&lt;/code&gt;.&lt;/li&gt;
 	&lt;li&gt;If you call any &lt;code&gt;define_*&lt;/code&gt; methods, please remove the &lt;code&gt;define_&lt;/code&gt; part.&lt;/li&gt;
 	&lt;li&gt;If you defined a &lt;code&gt;source { with a block }&lt;/code&gt;, the block is now evaluated each time the indexer runs on a category.&lt;/li&gt;

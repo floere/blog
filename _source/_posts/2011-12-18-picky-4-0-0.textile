@@ -26,6 +26,7 @@ If you want to jump on 4.0, replace with a Sinatra app and convert your source i
 Other important changes:
 
 * @Picky::Index@, option @weights@ has been renamed to @weight@.
+* Picky uses the "procrastinate":https://github.com/kschiess/procrastinate gem to parallelize indexing.
 * @Picky::Indexes.reload@ => @Picky::Indexes.load@, analog on @Index@, @Category@.
 * If you call any @define_*@ methods, please remove the @define_@ part.
 * If you defined a @source { with a block }@, the block is now evaluated each time the indexer runs on a category.

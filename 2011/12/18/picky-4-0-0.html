@@ -74,6 +74,7 @@
       <p>Other important changes:</p>
       <ul>
       	<li><code>Picky::Index</code>, option <code>weights</code> has been renamed to <code>weight</code>.</li>
+      	<li>Picky uses the <a href="https://github.com/kschiess/procrastinate">procrastinate</a> gem to parallelize indexing.</li>
       	<li><code>Picky::Indexes.reload</code> =&gt; <code>Picky::Indexes.load</code>, analog on <code>Index</code>, <code>Category</code>.</li>
       	<li>If you call any <code>define_*</code> methods, please remove the <code>define_</code> part.</li>
       	<li>If you defined a <code>source { with a block }</code>, the block is now evaluated each time the indexer runs on a category.</li>

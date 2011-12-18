@@ -66,7 +66,7 @@
       <p>We&#8217;re going to look at a simple example and how to customize it with Picky 4.0!</p>
       <h2>The Copy &amp; Paste Example</h2>
       <p>The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a <code>Search</code> object on the index to search on it.</p>
-      <p>Go ahead, copy it into TextMate or similar!</p>
+      <p>Go ahead, copy it into TextMate 2 Alpha or similar!</p>
       <pre class="sh_ruby"><code>require 'picky'&#x000A;&#x000A;Person = Struct.new :id, :first, :last&#x000A;&#x000A;data = Picky::Index.new :people do&#x000A;  category :first&#x000A;  category :last&#x000A;end&#x000A;&#x000A;data.replace Person.new(1, 'Donald', 'Knuth')&#x000A;data.replace Person.new(2, 'Niklaus', 'Wirth')&#x000A;data.replace Person.new(3, 'Donald', 'Worth')&#x000A;data.replace Person.new(4, 'Peter', 'Niklaus')&#x000A;&#x000A;people = Picky::Search.new data&#x000A;&#x000A;results = people.search 'donald'&#x000A;&#x000A;p results.ids&#x000A;p results.allocations</code></pre>
       <p>This returns ids <code>[3, 1]</code> and
       the allocations <code>[ [:people, 0.0, 2, [ [:first, "donald", "donald"] ], [3, 1]] ]</code>. That might look a little funny, so let me explain: <code>:people</code> is the index name where it was found. <code>0.0</code> is the total weight. <code>2</code> is the total number of ids in this &#8220;allocation&#8221; (combination of categories).
@@ -148,6 +148,38 @@
       <h3>Boosting</h3>
       <p>To move an allocation up in the ranking, we used weights.</p>
       <p>Picky knows a trick that almost no search engine knows. It can <strong>boost combinations</strong>!</p>
+      <p>Look for:</p>
+      <pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+      <p>Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
+      <pre class="ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre></p>
+      <p>That&#8217;s pretty useful to know what was found where.</p>
+      <p>As people usually look for the first name, then the last name, we want to give this more boost.</p>
+      <p>Replace this:</p>
+      <pre class="ruby"><code>people = Picky::Search.new data</code></pre>
+      <p>with this</p>
+      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  boost [:first, :last] =&gt; +3&#x000A;end</code></pre>
+      <p>Now try again:</p>
+      <pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+      <p>A whole 3 points more! Try it the other way around:</p>
+      <pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+      <p>We don&#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!</p>
+      <p>But how about we want to boost in a specific way?</p>
+      <h3>Custom Boosting</h3>
+      <p>Copy this into the example:</p>
+      <pre class="ruby"><code>Boosts = Class.new do&#x000A;  def boost_for combinations&#x000A;    @map ||= {&#x000A;      [:first, :last] =&gt; +5&#x000A;    }&#x000A;    @map[combinations.map(&amp;:category_name)] || -20&#x000A;  end&#x000A;end</code></pre>
+      <p>(A combination is basically a tuple of category and token)</p>
+      <p>and replace:</p>
+      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  boost Boosts.new&#x000A;end</code></pre>
+      <p>Now try again:</p>
+      <pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+      <p>A whole 5 points more! Try it the other way around:</p>
+      <pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+      <p>A whopping -20, which would send this allocation back to the end of the list, was there more data.</p>
+      <h3>Conclusion</h3>
+      <p>I hope you&#8217;re going to try Picky in your next project.</p>
+      <p>See the next post for some fancy search options.</p>
+      Next
+      <a href="/blog/2011/12/18/picky-search-options.html" title="Next post: Picky&amp;nbsp;Search&amp;nbsp;Options">Picky&nbsp;Search&nbsp;Options</a>
       <br />
       Previous
       <a class="previous" href="/blog/2011/12/18/picky-4-0-0.html" title="Previous post: Picky&amp;nbsp;4.0">Picky&nbsp;4.0</a>

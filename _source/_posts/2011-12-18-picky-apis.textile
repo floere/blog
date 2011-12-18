@@ -14,7 +14,7 @@ h2. The Copy & Paste Example
 
 The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a @Search@ object on the index to search on it.
 
-Go ahead, copy it into TextMate or similar!
+Go ahead, copy it into TextMate 2 Alpha or similar!
 
 <pre class="sh_ruby"><code>require 'picky'
 
@@ -198,3 +198,73 @@ h3. Boosting
 To move an allocation up in the ranking, we used weights.
 
 Picky knows a trick that almost no search engine knows. It can *boost combinations*!
+
+Look for:
+
+<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+
+Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
+<pre class="ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre>
+
+That's pretty useful to know what was found where.
+
+As people usually look for the first name, then the last name, we want to give this more boost.
+
+Replace this:
+
+<pre class="ruby"><code>people = Picky::Search.new data</code></pre>
+
+with this
+
+<pre class="ruby"><code>people = Picky::Search.new data do
+  boost [:first, :last] => +3
+end</code></pre>
+
+Now try again:
+
+<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+
+A whole 3 points more! Try it the other way around:
+
+<pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+
+We don't get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!
+
+But how about we want to boost in a specific way?
+
+h3. Custom Boosting
+
+Copy this into the example:
+
+<pre class="ruby"><code>Boosts = Class.new do
+  def boost_for combinations
+    @map ||= {
+      [:first, :last] => +5
+    }
+    @map[combinations.map(&:category_name)] || -20
+  end
+end</code></pre>
+
+(A combination is basically a tuple of category and token)
+
+and replace:
+
+<pre class="ruby"><code>people = Picky::Search.new data do
+  boost Boosts.new
+end</code></pre>
+
+Now try again:
+
+<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+
+A whole 5 points more! Try it the other way around:
+
+<pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+
+A whopping -20, which would send this allocation back to the end of the list, was there more data.
+
+h3. Conclusion
+
+I hope you're going to try Picky in your next project.
+
+See the next post for some fancy search options.

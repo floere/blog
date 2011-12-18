@@ -4,13 +4,134 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-18T22:01:53+11:00</updated>
+ <updated>2011-12-18T22:37:20+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Search&amp;nbsp;Options</title>
+   <link href="http://florianhanke.com/blog/2011/12/18/picky-search-options.html"/>
+   <updated>2011-12-18T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/12/18/picky-search-options</id>
+   <content type="html">&lt;p&gt;A few examples of what search options are there &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;re going to look at a simple example and how to search it with Picky 4.0!&lt;/p&gt;
+&lt;h2&gt;The Copy &amp;amp; Paste Example&lt;/h2&gt;
+&lt;p&gt;(This is the same example as in the last post)&lt;/p&gt;
+&lt;p&gt;The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a &lt;code&gt;Search&lt;/code&gt; object on the index to search on it.&lt;/p&gt;
+&lt;p&gt;Go ahead, copy it into TextMate or similar!&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'picky'
+
+Person = Struct.new :id, :first, :last
+
+data = Picky::Index.new :people do
+  category :first
+  category :last
+end
+
+data.replace Person.new(1, 'Donald', 'Knuth')
+data.replace Person.new(2, 'Niklaus', 'Wirth')
+data.replace Person.new(3, 'Donald', 'Worth')
+data.replace Person.new(4, 'Peter', 'Niklaus')
+
+people = Picky::Search.new data
+
+results = people.search 'donald'
+
+p results.ids
+p results.allocations&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This returns ids &lt;code&gt;[3, 1]&lt;/code&gt; and
+the allocations &lt;code&gt;[ [:people, 0.0, 2, [ [:first, &quot;donald&quot;, &quot;donald&quot;] ], [3, 1]] ]&lt;/code&gt;. That might look a little funny, so let me explain: &lt;code&gt;:people&lt;/code&gt; is the index name where it was found. &lt;code&gt;0.0&lt;/code&gt; is the total weight. &lt;code&gt;2&lt;/code&gt; is the total number of ids in this &amp;#8220;allocation&amp;#8221; (combination of categories).
+&lt;code&gt;[:first, &quot;donald&quot;, &quot;donald&quot;]&lt;/code&gt; is the category the query word was found in, together with the token and the original.&lt;/p&gt;
+&lt;p&gt;All clear?&lt;/p&gt;
+&lt;p&gt;Try searching for &amp;#8220;Niklaus&amp;#8221;:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You should find ids &lt;code&gt;[2, 4]&lt;/code&gt; and two allocations now, first in the first name, then in the last name.&lt;/p&gt;
+&lt;p&gt;Cool. Are there some options to fudge the search?&lt;/p&gt;
+&lt;p&gt;Sure!&lt;/p&gt;
+&lt;h3&gt;boost&lt;/h3&gt;
+&lt;p&gt;To move an allocation up in the ranking, we used weights (see last post).&lt;/p&gt;
+&lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;
+&lt;p&gt;Look for:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s pretty useful to know what was found where.&lt;/p&gt;
+&lt;p&gt;As people usually look for the first name, then the last name, we want to give this more boost.&lt;/p&gt;
+&lt;p&gt;Replace this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;with this&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  boost [:first, :last] =&amp;gt; +3
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A whole 3 points more! Try it the other way around:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We don&amp;#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!&lt;/p&gt;
+&lt;h3&gt;max_allocations&lt;/h3&gt;
+&lt;p&gt;Sometimes you only want the best allocation to appear in the results.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This finds two ids and two allocations, once in the first name, once in the last name.&lt;/p&gt;
+&lt;p&gt;Replace:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  max_allocations 1
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now Picky only calculates 1 allocation. Try&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Only the best allocation is found.&lt;/p&gt;
+&lt;h3&gt;ignore_unassigned_tokens&lt;/h3&gt;
+&lt;p&gt;Did Donald Knuth ever have the nickname &amp;#8220;Popeye&amp;#8221;? Try this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Not really. But what if we want to find him even if one token cannot be assigned to a category?&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  ignore_unassigned_tokens
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Voilà!&lt;/p&gt;
+&lt;p&gt;This is incredibly useful for an advertisement search. Say in the ads index you only index the city where a person lives. If someone looks for &lt;code&gt;Florian Hanke Melbourne&lt;/code&gt;, you can show the person relevant ads from Melbourne.&lt;/p&gt;
+&lt;h3&gt;terminate_early&lt;/h3&gt;
+&lt;p&gt;Search for niklaus, and tell Picky you only want 1 id:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Yes, Picky only calculates 1 id, but still calculates and returns all valid allocations. if you only really need the ids (the Picky interface needs the allocations), then this is unnecessary and could be faster.&lt;/p&gt;
+&lt;p&gt;Replace:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  terminate_early
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Hey presto! Just one allocation.&lt;/p&gt;
+&lt;p&gt;This code&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  terminate_early +2
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;will tell Picky to calculate all necessary allocations, plus 2 following ones, for good measure.&lt;/p&gt;
+&lt;h3&gt;ignore&lt;/h3&gt;
+&lt;p&gt;Try this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You&amp;#8217;ll get results in first and last name. If you only wanted results from the first name, you&amp;#8217;d search for this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'first:Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Cool. But let&amp;#8217;s say: You, the search engine designer, don&amp;#8217;t want anybody to find anything in a last name, for any reason. Using &lt;code&gt;first:&lt;/code&gt; will select only first. But you might only want to remove the &lt;code&gt;last&lt;/code&gt; category. Do this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  ignore :last
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Niklaus is not found in the last name again.&lt;/p&gt;
+&lt;p&gt;You can give it even more:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  ignore :first, :last
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;But that is pretty silly in this example. Picky won&amp;#8217;t find anything anymore!&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;And that&amp;#8217;s the options the Picky Search object has. As you&amp;#8217;ve seen in the last post, some searching is defined on the indexes, but some options are exclusive to the search side, and are only defined there.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s best to play a bit to unlock their versatility and power :)&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;APIs</title>
@@ -21,7 +142,7 @@
 &lt;p&gt;We&amp;#8217;re going to look at a simple example and how to customize it with Picky 4.0!&lt;/p&gt;
 &lt;h2&gt;The Copy &amp;amp; Paste Example&lt;/h2&gt;
 &lt;p&gt;The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a &lt;code&gt;Search&lt;/code&gt; object on the index to search on it.&lt;/p&gt;
-&lt;p&gt;Go ahead, copy it into TextMate or similar!&lt;/p&gt;
+&lt;p&gt;Go ahead, copy it into TextMate 2 Alpha or similar!&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'picky'
 
 Person = Struct.new :id, :first, :last
@@ -139,7 +260,48 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;One important note: Picky always searches for the last token in the partial index, even without the asterisk next to the word. If it&amp;#8217;s not the last word, you need an asterisk: &amp;#8220;Don* Knuth&amp;#8221;.&lt;/p&gt;
 &lt;h3&gt;Boosting&lt;/h3&gt;
 &lt;p&gt;To move an allocation up in the ranking, we used weights.&lt;/p&gt;
-&lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;</content>
+&lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;
+&lt;p&gt;Look for:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s pretty useful to know what was found where.&lt;/p&gt;
+&lt;p&gt;As people usually look for the first name, then the last name, we want to give this more boost.&lt;/p&gt;
+&lt;p&gt;Replace this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;with this&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  boost [:first, :last] =&amp;gt; +3
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A whole 3 points more! Try it the other way around:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We don&amp;#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!&lt;/p&gt;
+&lt;p&gt;But how about we want to boost in a specific way?&lt;/p&gt;
+&lt;h3&gt;Custom Boosting&lt;/h3&gt;
+&lt;p&gt;Copy this into the example:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Boosts = Class.new do
+  def boost_for combinations
+    @map ||= {
+      [:first, :last] =&amp;gt; +5
+    }
+    @map[combinations.map(&amp;amp;:category_name)] || -20
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(A combination is basically a tuple of category and token)&lt;/p&gt;
+&lt;p&gt;and replace:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+  boost Boosts.new
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A whole 5 points more! Try it the other way around:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A whopping -20, which would send this allocation back to the end of the list, was there more data.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;I hope you&amp;#8217;re going to try Picky in your next project.&lt;/p&gt;
+&lt;p&gt;See the next post for some fancy search options.&lt;/p&gt;</content>
    
  </entry>
  

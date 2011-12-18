@@ -63,27 +63,27 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-        <p>It is about a new <code>Search</code> object option <code>ignore_unassigned_tokens</code> that is exposed from version 3.1.5 onwards. It allows you to tell Picky that it should just ignore any tokens which cannot be found in an index.</p>
-        <p>This is how you set it:</p>
-        <pre class="sh_ruby"><code>Search.new my_index do&#x000A;  ignore_unassigned_tokens true&#x000A;end</code></pre>
-        <p>The option was buried in an internal <span class="caps">API</span> but slowly made its way out to the <code>Search</code> object (see last post).</p>
-        <h2>Ignoring unassigned tokens</h2>
-        <p>What do I mean by this?</p>
-        <p>Let&#8217;s say you are searching for <code>"Chicken Cajun Style"</code>.</p>
-        <p>Picky only has &#8220;Chicken&#8221; and &#8220;Cajun&#8221; indexed, as a recipe title.</p>
-        <p>What happens is: Picky will find the token &#8220;Chicken&#8221; in the title category, and the token &#8220;Cajun&#8221;, also in the title category. But it won&#8217;t find &#8220;Style&#8221; anywhere in the index. It might, but not for the same indexed object.</p>
-        <p>So Picky will return an empty result set.</p>
-        <p>So maybe you want to make Picky more forgiving.</p>
-        <p>One way to do this is to tell it to ignore unassignable/unassigned tokens. This means that if a token cannot be matched to any category, it will be thrown away.</p>
-        <p>So, in the example above, Picky would return the results for <code>"Chicken Cajun"</code>. It&#8217;s as if the &#8220;Style&#8221; had never existed.</p>
-        <h2>An idea on how to use this</h2>
-        <p>One idea on how to use this is in an implicit search, separate from the main search.</p>
-        <p>So you have a main search, using the Picky interface, but also a space where you show relevant ads.</p>
-        <p>Say you have a <code>Car</code> model, with advertisements attached. If someone searches for a car, it will show relevant ads.</p>
-        <p>In the code you&#8217;d have:</p>
-        <pre class="sh_ruby"><code>cars_search = Search.new cars_index&#x000A;&#x000A;ads_search = Search.new cars_index do&#x000A;  ignore_unassigned_tokens true&#x000A;end</code></pre>
-        <p>And then you&#8217;d do two searches. The idea here is – even if there is no exact result in the main search – to show anything that is in any way related to the query. (See the case study on location based ads three posts back on how to fine-tune this)</p>
-        <p>That&#8217;s it – hope it inspires you to try Picky be more lenient, or perhaps this was exactly what you were looking for!</p>
+      <p>It is about a new <code>Search</code> object option <code>ignore_unassigned_tokens</code> that is exposed from version 3.1.5 onwards. It allows you to tell Picky that it should just ignore any tokens which cannot be found in an index.</p>
+      <p>This is how you set it:</p>
+      <pre class="sh_ruby"><code>Search.new my_index do&#x000A;  ignore_unassigned_tokens true&#x000A;end</code></pre>
+      <p>The option was buried in an internal <span class="caps">API</span> but slowly made its way out to the <code>Search</code> object (see last post).</p>
+      <h2>Ignoring unassigned tokens</h2>
+      <p>What do I mean by this?</p>
+      <p>Let&#8217;s say you are searching for <code>"Chicken Cajun Style"</code>.</p>
+      <p>Picky only has &#8220;Chicken&#8221; and &#8220;Cajun&#8221; indexed, as a recipe title.</p>
+      <p>What happens is: Picky will find the token &#8220;Chicken&#8221; in the title category, and the token &#8220;Cajun&#8221;, also in the title category. But it won&#8217;t find &#8220;Style&#8221; anywhere in the index. It might, but not for the same indexed object.</p>
+      <p>So Picky will return an empty result set.</p>
+      <p>So maybe you want to make Picky more forgiving.</p>
+      <p>One way to do this is to tell it to ignore unassignable/unassigned tokens. This means that if a token cannot be matched to any category, it will be thrown away.</p>
+      <p>So, in the example above, Picky would return the results for <code>"Chicken Cajun"</code>. It&#8217;s as if the &#8220;Style&#8221; had never existed.</p>
+      <h2>An idea on how to use this</h2>
+      <p>One idea on how to use this is in an implicit search, separate from the main search.</p>
+      <p>So you have a main search, using the Picky interface, but also a space where you show relevant ads.</p>
+      <p>Say you have a <code>Car</code> model, with advertisements attached. If someone searches for a car, it will show relevant ads.</p>
+      <p>In the code you&#8217;d have:</p>
+      <pre class="sh_ruby"><code>cars_search = Search.new cars_index&#x000A;&#x000A;ads_search = Search.new cars_index do&#x000A;  ignore_unassigned_tokens true&#x000A;end</code></pre>
+      <p>And then you&#8217;d do two searches. The idea here is – even if there is no exact result in the main search – to show anything that is in any way related to the query. (See the case study on location based ads three posts back on how to fine-tune this)</p>
+      <p>That&#8217;s it – hope it inspires you to try Picky be more lenient, or perhaps this was exactly what you were looking for!</p>
       Next
       <a href="/blog/2011/09/11/picky-case-study-single-server-app-for-heroku.html" title="Next post: Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Single&amp;nbsp;Server&amp;nbsp;App&amp;nbsp;for&amp;nbsp;Heroku">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Single&nbsp;Server&nbsp;App&nbsp;for&nbsp;Heroku</a>
       <br />
@@ -92,20 +92,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/09/05/picky-ignoring-unassigned-tokens';
-            var disqus_url = 'http://florianhanke.com/blog/2011/09/05/picky-ignoring-unassigned-tokens.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/09/05/picky-ignoring-unassigned-tokens';
+          var disqus_url = 'http://florianhanke.com/blog/2011/09/05/picky-ignoring-unassigned-tokens.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

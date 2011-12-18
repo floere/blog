@@ -63,15 +63,15 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post about running <a href="http://florianhanke.com/picky/">Picky</a> in a small script.</p>
-        <h2>Design Philosopy</h2>
-        <p>You all know that with Picky we want the full flexibility of Ruby.</p>
-        <p>What we also want is a search engine that runs with a minimal setup. Small and sweet. Portable, lightweight, bam!</p>
-        <p>In short: Picky wants to be the <a href="http://sinatrarb.com">Sinatra</a> of search engines. Did we achieve this? Not yet, but we are very close indeed.</p>
-        <p>Let&#8217;s have a quick dance in the rain.</p>
-        <h2>The code</h2>
-        <p>Go ahead and replace Picky with a very small script! You can copy, right? And paste? Ok. Go.</p>
-        <pre class="sh_ruby"><code># Possible since Picky 3.2.0.&#x000A;#&#x000A;require 'picky'&#x000A;&#x000A;include Picky&#x000A;&#x000A;Thing = Struct.new :id, :name&#x000A;&#x000A;index = Index.new :test do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;end&#x000A;&#x000A;index.replace Thing.new(1, 'Picky')&#x000A;index.replace Thing.new(2, 'Parslet')&#x000A;&#x000A;things = Search.new(index) do&#x000A;  boost [:name] =&gt; +3&#x000A;end&#x000A;&#x000A;p things.search("Pick").ids&#x000A;p things.search("Pic").to_hash&#x000A;p things.search("Parsley~").allocations</code></pre>
-        <p>That&#8217;s it. Easy to just try something, and later evolve into a fully fleshed, super-powerful search engine.</p>
+      <h2>Design Philosopy</h2>
+      <p>You all know that with Picky we want the full flexibility of Ruby.</p>
+      <p>What we also want is a search engine that runs with a minimal setup. Small and sweet. Portable, lightweight, bam!</p>
+      <p>In short: Picky wants to be the <a href="http://sinatrarb.com">Sinatra</a> of search engines. Did we achieve this? Not yet, but we are very close indeed.</p>
+      <p>Let&#8217;s have a quick dance in the rain.</p>
+      <h2>The code</h2>
+      <p>Go ahead and replace Picky with a very small script! You can copy, right? And paste? Ok. Go.</p>
+      <pre class="sh_ruby"><code># Possible since Picky 3.2.0.&#x000A;#&#x000A;require 'picky'&#x000A;&#x000A;include Picky&#x000A;&#x000A;Thing = Struct.new :id, :name&#x000A;&#x000A;index = Index.new :test do&#x000A;  category :name, similarity: Similarity::DoubleMetaphone.new(3)&#x000A;end&#x000A;&#x000A;index.replace Thing.new(1, 'Picky')&#x000A;index.replace Thing.new(2, 'Parslet')&#x000A;&#x000A;things = Search.new(index) do&#x000A;  boost [:name] =&gt; +3&#x000A;end&#x000A;&#x000A;p things.search("Pick").ids&#x000A;p things.search("Pic").to_hash&#x000A;p things.search("Parsley~").allocations</code></pre>
+      <p>That&#8217;s it. Easy to just try something, and later evolve into a fully fleshed, super-powerful search engine.</p>
       Next
       <a href="/blog/2011/11/13/picky-update-performance.html" title="Next post: Picky&amp;nbsp;Update&amp;nbsp;Performance">Picky&nbsp;Update&nbsp;Performance</a>
       <br />
@@ -80,20 +80,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/10/26/search-engine-in-a-script';
-            var disqus_url = 'http://florianhanke.com/blog/2011/10/26/search-engine-in-a-script.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/10/26/search-engine-in-a-script';
+          var disqus_url = 'http://florianhanke.com/blog/2011/10/26/search-engine-in-a-script.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

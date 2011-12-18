@@ -63,30 +63,30 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
-        <p>This time I want to do a two-part post on live parameters.</p>
-        <h2>What are Live Parameters?</h2>
-        <p>Imagine this situation:</p>
-        <p>You are sitting at your desk. A few levels below is an array of Picky servers, contentedly humming at a bagillion requests per second…</p>
-        <p>Ok, this is actually a fantasy of mine, but bear with me.</p>
-        <p>Suddenly, your boss enters, his hair pointier than ever!</p>
-        <p>He tells you that a customer&#8217;s space bar is not working anymore and now he&#8217;d like to use the comma <code>,</code> character to designate where words are separated.</p>
-        <p>Of course you roll your eyes, but he doesn&#8217;t give up. The customer needs to be served, no matter what!</p>
-        <p>At this point, what would be really good to have is a way of changing Picky&#8217;s behaviour with splitting words in queries.</p>
-        <p>(Btw, the <code>splits_text_on</code> option, a regexp, defines how picky splits text into tokens, or words.)</p>
-        <p>And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the <code>HUP</code> signal to have it restart), losing a fantastic amount of <span class="caps">CPU</span> cycles that would have been better used for searching with Picky.</p>
-        <p><img src="/blog/images/suckerfish1.png" alt="" /></p>
-        <p>This would be called changing <em>lame parameters</em>. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain <em>je-ne-sais-quoi</em> that only surfers have.</p>
-        <p>Live parameters are parameters that can be changed hot – in the running server.</p>
-        <p>Now wouldn&#8217;t that be nice? Turns out it isn&#8217;t as easy as I thought.</p>
-        <h2>How do I achieve this?</h2>
-        <p>The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.</p>
-        <p><img src="/blog/images/suckerfish2.png" alt="" /></p>
-        <p>So let&#8217;s call this thing that updates the configuration a <a href="http://en.wikipedia.org/wiki/Echeneidae">Suckerfish</a>. Suckerfishes – or Remoras – attach to a host (Fig. A), mostly sharks, by sucking onto them. This suckerfish (in the form of a request) would attach itself to a child, and from there open a channel, a pipe, to the master, where it could update the master config.</p>
-        <p>So after attaching itself, this fish would then whisper Picky sweet and golden nothings in its ear, causing it to update its master config.</p>
-        <h2>That&#8217;s fine, but where can I try it?</h2>
-        <p>Suckerfish is ready, but not release-ready yet. So you could <a href="http://github.com/floere/picky">clone picky</a>, and call <code>./install</code> in the top level directory to install all 1.3.0 gems locally.</p>
-        <p>But bear with me, for in part 2 (after the release of 1.3.0 and the picky-live gem, the &#8220;Suckerfish&#8221; gem) I&#8217;ll show how this can be done and how you can use Suckerfish as a weapon against pointy-haired bosses, or just for easy experimentation with your search parameters.</p>
-        <p>Don&#8217;t worry, it will get technical soon ;)</p>
+      <p>This time I want to do a two-part post on live parameters.</p>
+      <h2>What are Live Parameters?</h2>
+      <p>Imagine this situation:</p>
+      <p>You are sitting at your desk. A few levels below is an array of Picky servers, contentedly humming at a bagillion requests per second…</p>
+      <p>Ok, this is actually a fantasy of mine, but bear with me.</p>
+      <p>Suddenly, your boss enters, his hair pointier than ever!</p>
+      <p>He tells you that a customer&#8217;s space bar is not working anymore and now he&#8217;d like to use the comma <code>,</code> character to designate where words are separated.</p>
+      <p>Of course you roll your eyes, but he doesn&#8217;t give up. The customer needs to be served, no matter what!</p>
+      <p>At this point, what would be really good to have is a way of changing Picky&#8217;s behaviour with splitting words in queries.</p>
+      <p>(Btw, the <code>splits_text_on</code> option, a regexp, defines how picky splits text into tokens, or words.)</p>
+      <p>And you do, but: What you have to do now is change the config, deploy, restart the whole cluster (or send Unicorn the <code>HUP</code> signal to have it restart), losing a fantastic amount of <span class="caps">CPU</span> cycles that would have been better used for searching with Picky.</p>
+      <p><img src="/blog/images/suckerfish1.png" alt="" /></p>
+      <p>This would be called changing <em>lame parameters</em>. Live parameters are the cool counterpart of lame parameters, the ones with hair, a sunny disposition, having that certain <em>je-ne-sais-quoi</em> that only surfers have.</p>
+      <p>Live parameters are parameters that can be changed hot – in the running server.</p>
+      <p>Now wouldn&#8217;t that be nice? Turns out it isn&#8217;t as easy as I thought.</p>
+      <h2>How do I achieve this?</h2>
+      <p>The problem is that the Unicorn master – or with any multiprocessing-based server – holds the original copy of the configuration. You can easily update it in a child, but if the child dies, it will be replaced with a new one which has forgotten everything.</p>
+      <p><img src="/blog/images/suckerfish2.png" alt="" /></p>
+      <p>So let&#8217;s call this thing that updates the configuration a <a href="http://en.wikipedia.org/wiki/Echeneidae">Suckerfish</a>. Suckerfishes – or Remoras – attach to a host (Fig. A), mostly sharks, by sucking onto them. This suckerfish (in the form of a request) would attach itself to a child, and from there open a channel, a pipe, to the master, where it could update the master config.</p>
+      <p>So after attaching itself, this fish would then whisper Picky sweet and golden nothings in its ear, causing it to update its master config.</p>
+      <h2>That&#8217;s fine, but where can I try it?</h2>
+      <p>Suckerfish is ready, but not release-ready yet. So you could <a href="http://github.com/floere/picky">clone picky</a>, and call <code>./install</code> in the top level directory to install all 1.3.0 gems locally.</p>
+      <p>But bear with me, for in part 2 (after the release of 1.3.0 and the picky-live gem, the &#8220;Suckerfish&#8221; gem) I&#8217;ll show how this can be done and how you can use Suckerfish as a weapon against pointy-haired bosses, or just for easy experimentation with your search parameters.</p>
+      <p>Don&#8217;t worry, it will get technical soon ;)</p>
       Next
       <a href="/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html" title="Next post: Searching with Picky&amp;#58; Live Parameters Part 2">Searching with Picky&#58; Live Parameters Part 2</a>
       <br />
@@ -95,20 +95,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/01/25/searching-with-picky-live-parameters-part-1';
-            var disqus_url = 'http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/01/25/searching-with-picky-live-parameters-part-1';
+          var disqus_url = 'http://florianhanke.com/blog/2011/01/25/searching-with-picky-live-parameters-part-1.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

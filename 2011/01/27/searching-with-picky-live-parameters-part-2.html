@@ -63,118 +63,118 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
-        <p>This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like <a href="http://unicorn.bogomips.org/">unicorn</a>.</p>
-        <h2>tl;dr</h2>
-        <ol>
-        	<li><code>gem install picky-live</code></li>
-        	<li>Server: In <code>app/application.rb</code>, insert <pre class="sh_ruby"><code>route %r{\A/admin\Z} =&gt; LiveParameters.new</code></pre></li>
-        	<li>Enter <code>picky live</code> on the command line.</li>
-        	<li>Open <a href="http://localhost:4568/">The Suckerfish Interface</a>.</li>
-        	<li>Have fun!</li>
-        </ol>
-        <h2>What was the problem, again?</h2>
-        <p>The goal is that we want to update Picky&#8217;s config while it is answering search requests.</p>
-        <p>The problem is that we need to update the config in the master process, but most multiprocessing servers don&#8217;t allow easy access. And it&#8217;s good like that.</p>
-        <p><img src="/blog/images/suckerfish2.png" alt="" /></p>
-        <p>What I&#8217;d like to do is provide access for a suckerfish. But since it isn&#8217;t easy or a good idea to open direct access to the parent, the suckerfish must go through the child.</p>
-        <p>The child would accept data incoming from the suckerfish, process it and tell the parent what to change.</p>
-        <p>So what we&#8217;d need is for the child to be able to write the parent. It&#8217;s actually quite easy to do in Ruby. But how?</p>
-        <h2>The simplest way to write your parents.</h2>
-        <p>… apart from picking up a pen once in a while? Your mother didn&#8217;t spend 20 hours of her life in labor just for fun, you know!</p>
-        <p>Heh.</p>
-        <p>First, you open an <a href="http://ruby.runpaint.org/io#pipes">IO.pipe</a>. Then, in the <code>fork</code> (the child), you <code>close</code> off the &#8220;child&#8221; and then you are ready to <code>write</code>.</p>
-        <p>In the parent, you do the opposite, and call <code>gets</code> (for example) then wait for a message from the child.</p>
-        <pre class="sh_ruby"><code>child, parent = IO.pipe&#x000A;&#x000A;fork do&#x000A;  # In child.&#x000A;  #&#x000A;  child.close&#x000A;  puts "#{Process.pid}: I'll write soon."&#x000A;  parent.write "Hello from child!"&#x000A;end&#x000A;&#x000A;# In parent.&#x000A;#&#x000A;parent.close&#x000A;message = child.gets '!'&#x000A;puts "#{Process.pid}: #{message}"</code></pre>
-        <p>It&#8217;s copy-and-try!</p>
-        <p><code>Process.pid</code> returns the current process id, which is different in the child and the parent, as you can see after trying the example.
-        In the parent, the <code>child.gets</code> with a parameter will read up until having received that string, then return whatever has been read so far.</p>
-        <p>I always look at child and server as if the child was a perfect copy of the parent. And anything you change in the child won&#8217;t affect the parent. But if you change something in the parent, it will affect all future children.</p>
-        <h2>How Picky does it</h2>
-        <p>Five steps:</p>
-        <ol>
-        	<li>The Picky child receives the config update request.</li>
-        	<li>It tries to update its config (more on that below).</li>
-        	<li>If successful, it tells the parent. If not, it kills itself, and tells Suckerfish which config was wrong.</li>
-        	<li>The parent, on receiving the message, updates itself and kills off all other children (more on that below).</li>
-        	<li>The child will answer Suckerfish with the current configuration.</li>
-        </ol>
-        <p>The messaging is basically the same as above, but a bit more elaborate in Picky, since:</p>
-        <ul>
-        	<li>Picky doesn&#8217;t have control over the forking.
-        This means Picky doesn&#8217;t know when to close the <code>child</code>, which is why on each call received on the <span class="caps">API</span>, we just do a <pre class="sh_ruby"><code>@child.close unless @child.closed?</code></pre></li>
-        	<li>The server inside which Picky is running will fork off the parent multiple times, and not just at the beginning.
-        So, if the parent would do a <pre class="sh_ruby"><code>@parent.close</code></pre> as in the example, then yes, it would work fine. Up until the next time a child is forked. What happens when a child is forked?
-        The connection to the parent would already have been closed off by the parent itself, and the child would be unable to <code>write</code> on it. Solution? I just leave it open, since the parent doesn&#8217;t need to talk to the child.
-        (Ensuring years of therapy for the child)</li>
-        </ul>
-        <h2>How does Picky ensure there will be no problems in the parent process?</h2>
-        <p>What would happen if the Suckerfish had direct access to the master&#8217;s configuration?</p>
-        <p>We assume that the child is a close to perfect copy of the parent process. So what we do is try updating the configuration in the child first.</p>
-        <p>If that works, we can assume that in the parent, it will work too (no malformed configuration input). So we just send the parent the data and the parent will use the exact same method as the child to update itself.</p>
-        <p>Now we have the problem that there are still children hanging around with the old config. So what the parent process – any good parent ;) – does is kill all of these. The one giving it the ok config is spared, since it has the new config already. After that, new children are forked with the correct config.</p>
-        <p>What happens if the config is malformed? The child that accepted the suckerfish request needs to die, since its config might now be malformed. So what it does is prepare for an honorable <em>Harakiri</em>, tell the Suckerfish what is wrong, and perform a horizontal cut through its stomach, using <code>Process.kill(:QUIT, 0)</code>.</p>
-        <p>But… how do I get it to work in Picky?</p>
-        <h2>How you configure it in Picky</h2>
-        <p>Simple – you open a http interface in <code>app/application.rb</code> the same way as you would for a query. But this time, instead of a query, you have it point to an instance of <code>LiveParameters</code>.</p>
-        <p>Like that:
-        <pre class="sh_ruby"><code>route %r{\A/admin\Z} =&gt; LiveParameters.new</code></pre></p>
-        <p>And then, you have to…</p>
-        <p>No, wait. That&#8217;s it.</p>
-        <p>This opens a <span class="caps">JSON</span> interface into the heart of your Picky configuration.</p>
-        <h2>The interface</h2>
-        <ol>
-        	<li><span class="caps">HTTP</span> query params in, <span class="caps">JSON</span> hash out.</li>
-        	<li>On success, it returns the complete config, always.</li>
-        	<li>On failure, it returns the offending key with the value &#8220;<span class="caps">ERROR</span>&#8221;.</li>
-        	<li>If you pass in no query params, nothing will get updated, but you still get the config hash.</li>
-        	<li>If you pass in something like &#8230;?querying_splits_text_on=\s, it will update its config to split text on whitespaces.</li>
-        </ol>
-        <h2>Beware</h2>
-        <p>Just one thing: Be sure to not let your users have access to the live params url.</p>
-        <p>And also, be sure not to let your users have access to the live params url.</p>
-        <h2>The picky-live gem</h2>
-        <p>Because sending the server configuration messages per <span class="caps">HTTP</span> by hand is very tedious, Picky offers a much nicer interface, the picky-live gem.</p>
-        <p><code>gem install picky-live</code></p>
-        <p>Then, just enter</p>
-        <p><code>picky live</code></p>
-        <p>This will start up the Suckerfish web interface on a default port, <a href="http://localhost:4568">localhost:4568</a>, going through the default Suckerfish interface on <a href="http://localhost:8080/admin">/admin</a> in the Picky server.</p>
-        <p>If you have customized it to be on <code>/suckerfish</code> and you don&#8217;t want the Suckerfish web interface on the default port, you&#8217;d type:</p>
-        <p><code>picky live localhost:8080/suckerfish 1234</code></p>
-        <p>This would start up the interface on <a href="http://localhost:1234">localhost:1234</a>.</p>
-        <p>The interface looks like this:
-        <img src="/blog/images/suckerfish_interface.png" style="margin-left: -200px;" alt="" /></p>
-        <p>What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.</p>
-        <p>If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
-        <img src="/blog/images/suckerfish_updating.png" style="margin-left: -200px;" alt="" /></p>
-        <p>Then, as soon as I click on the &#8220;Update server now&#8221; button, a suckerfish speeds off, accesses the child through the right <span class="caps">URL</span>, tells the child to update. The child will try to update itself, and if that works, tell the master to update.</p>
-        <p>In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we&#8217;re using is brutal!)
-        <img src="/blog/images/suckerfish_error.png" style="margin-left: -200px;" alt="" /></p>
-        <p>Picky needs the child to perform harakiri, since we do not know if the config is still ok.</p>
-        <p>If all goes well, the master kills the <strong>other</strong> children (since they need the updated config) and lets the one telling him to update the config live. You will get a confirmation message, and the interface will update with the current configuration.</p>
-        <p>With suckerfish, children will die.</p>
-        <p>Sorry about that. What you get in return is a comfortable way of updating the server config on the fly. And that is worth the tradeoff ;)</p>
-        <h2>Performance?</h2>
-        <p>I bombarded the search server with 100&#8217;000 requests, concurrency 100 using ab:</p>
-        <p><code>ab -n 100000 -c 100 127.0.0.1:8080/all/full?query=s</code></p>
-        <p>Then, I started a Suckerfish and updated the config.</p>
-        <p>Result: Not really noticeable. A short hiccup when the master reforks, but not really noticeable.</p>
-        <p>If the config update fails, since only one worker child dies, the effect is almost not noticeable.</p>
-        <p>If the update works, one worker child remains, and the others need to be forked. But Unicorn handles this exceptionally gracefully. Thanks, Unicorn! Really proud of ya. Love you. Still, the harakiri stays.</p>
-        <h2>Disclaimer</h2>
-        <p>Updating everything on the fly is nice. But beware: The configuration in <code>app/application.rb</code> will not be updated. After experimenting with Suckerfish, you still need to update the config by hand.</p>
-        <p>That&#8217;s syntax pepper.</p>
-        <h2>Conclusion</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>that we can&#8217;t just update a config in a child (in a multiprocessing server)</li>
-        	<li>how a child can communicate with its parent</li>
-        	<li>how Picky does it</li>
-        	<li>how the the picky-live gem looks and works</li>
-        	<li>How you can try it yourself</li>
-        	<li>that it is fast</li>
-        	<li>that it can be dangerous if you don&#8217;t know what to do</li>
-        </ol>
-        <p>Hope you learnt something new :)</p>
+      <p>This is the second part of the Live Parameters blog post that deals with the problem of hot replacing a configuration of a search server like Picky running in a multiprocessing server like <a href="http://unicorn.bogomips.org/">unicorn</a>.</p>
+      <h2>tl;dr</h2>
+      <ol>
+      	<li><code>gem install picky-live</code></li>
+      	<li>Server: In <code>app/application.rb</code>, insert <pre class="sh_ruby"><code>route %r{\A/admin\Z} =&gt; LiveParameters.new</code></pre></li>
+      	<li>Enter <code>picky live</code> on the command line.</li>
+      	<li>Open <a href="http://localhost:4568/">The Suckerfish Interface</a>.</li>
+      	<li>Have fun!</li>
+      </ol>
+      <h2>What was the problem, again?</h2>
+      <p>The goal is that we want to update Picky&#8217;s config while it is answering search requests.</p>
+      <p>The problem is that we need to update the config in the master process, but most multiprocessing servers don&#8217;t allow easy access. And it&#8217;s good like that.</p>
+      <p><img src="/blog/images/suckerfish2.png" alt="" /></p>
+      <p>What I&#8217;d like to do is provide access for a suckerfish. But since it isn&#8217;t easy or a good idea to open direct access to the parent, the suckerfish must go through the child.</p>
+      <p>The child would accept data incoming from the suckerfish, process it and tell the parent what to change.</p>
+      <p>So what we&#8217;d need is for the child to be able to write the parent. It&#8217;s actually quite easy to do in Ruby. But how?</p>
+      <h2>The simplest way to write your parents.</h2>
+      <p>… apart from picking up a pen once in a while? Your mother didn&#8217;t spend 20 hours of her life in labor just for fun, you know!</p>
+      <p>Heh.</p>
+      <p>First, you open an <a href="http://ruby.runpaint.org/io#pipes">IO.pipe</a>. Then, in the <code>fork</code> (the child), you <code>close</code> off the &#8220;child&#8221; and then you are ready to <code>write</code>.</p>
+      <p>In the parent, you do the opposite, and call <code>gets</code> (for example) then wait for a message from the child.</p>
+      <pre class="sh_ruby"><code>child, parent = IO.pipe&#x000A;&#x000A;fork do&#x000A;  # In child.&#x000A;  #&#x000A;  child.close&#x000A;  puts "#{Process.pid}: I'll write soon."&#x000A;  parent.write "Hello from child!"&#x000A;end&#x000A;&#x000A;# In parent.&#x000A;#&#x000A;parent.close&#x000A;message = child.gets '!'&#x000A;puts "#{Process.pid}: #{message}"</code></pre>
+      <p>It&#8217;s copy-and-try!</p>
+      <p><code>Process.pid</code> returns the current process id, which is different in the child and the parent, as you can see after trying the example.
+      In the parent, the <code>child.gets</code> with a parameter will read up until having received that string, then return whatever has been read so far.</p>
+      <p>I always look at child and server as if the child was a perfect copy of the parent. And anything you change in the child won&#8217;t affect the parent. But if you change something in the parent, it will affect all future children.</p>
+      <h2>How Picky does it</h2>
+      <p>Five steps:</p>
+      <ol>
+      	<li>The Picky child receives the config update request.</li>
+      	<li>It tries to update its config (more on that below).</li>
+      	<li>If successful, it tells the parent. If not, it kills itself, and tells Suckerfish which config was wrong.</li>
+      	<li>The parent, on receiving the message, updates itself and kills off all other children (more on that below).</li>
+      	<li>The child will answer Suckerfish with the current configuration.</li>
+      </ol>
+      <p>The messaging is basically the same as above, but a bit more elaborate in Picky, since:</p>
+      <ul>
+      	<li>Picky doesn&#8217;t have control over the forking.
+      This means Picky doesn&#8217;t know when to close the <code>child</code>, which is why on each call received on the <span class="caps">API</span>, we just do a <pre class="sh_ruby"><code>@child.close unless @child.closed?</code></pre></li>
+      	<li>The server inside which Picky is running will fork off the parent multiple times, and not just at the beginning.
+      So, if the parent would do a <pre class="sh_ruby"><code>@parent.close</code></pre> as in the example, then yes, it would work fine. Up until the next time a child is forked. What happens when a child is forked?
+      The connection to the parent would already have been closed off by the parent itself, and the child would be unable to <code>write</code> on it. Solution? I just leave it open, since the parent doesn&#8217;t need to talk to the child.
+      (Ensuring years of therapy for the child)</li>
+      </ul>
+      <h2>How does Picky ensure there will be no problems in the parent process?</h2>
+      <p>What would happen if the Suckerfish had direct access to the master&#8217;s configuration?</p>
+      <p>We assume that the child is a close to perfect copy of the parent process. So what we do is try updating the configuration in the child first.</p>
+      <p>If that works, we can assume that in the parent, it will work too (no malformed configuration input). So we just send the parent the data and the parent will use the exact same method as the child to update itself.</p>
+      <p>Now we have the problem that there are still children hanging around with the old config. So what the parent process – any good parent ;) – does is kill all of these. The one giving it the ok config is spared, since it has the new config already. After that, new children are forked with the correct config.</p>
+      <p>What happens if the config is malformed? The child that accepted the suckerfish request needs to die, since its config might now be malformed. So what it does is prepare for an honorable <em>Harakiri</em>, tell the Suckerfish what is wrong, and perform a horizontal cut through its stomach, using <code>Process.kill(:QUIT, 0)</code>.</p>
+      <p>But… how do I get it to work in Picky?</p>
+      <h2>How you configure it in Picky</h2>
+      <p>Simple – you open a http interface in <code>app/application.rb</code> the same way as you would for a query. But this time, instead of a query, you have it point to an instance of <code>LiveParameters</code>.</p>
+      <p>Like that:
+      <pre class="sh_ruby"><code>route %r{\A/admin\Z} =&gt; LiveParameters.new</code></pre></p>
+      <p>And then, you have to…</p>
+      <p>No, wait. That&#8217;s it.</p>
+      <p>This opens a <span class="caps">JSON</span> interface into the heart of your Picky configuration.</p>
+      <h2>The interface</h2>
+      <ol>
+      	<li><span class="caps">HTTP</span> query params in, <span class="caps">JSON</span> hash out.</li>
+      	<li>On success, it returns the complete config, always.</li>
+      	<li>On failure, it returns the offending key with the value &#8220;<span class="caps">ERROR</span>&#8221;.</li>
+      	<li>If you pass in no query params, nothing will get updated, but you still get the config hash.</li>
+      	<li>If you pass in something like &#8230;?querying_splits_text_on=\s, it will update its config to split text on whitespaces.</li>
+      </ol>
+      <h2>Beware</h2>
+      <p>Just one thing: Be sure to not let your users have access to the live params url.</p>
+      <p>And also, be sure not to let your users have access to the live params url.</p>
+      <h2>The picky-live gem</h2>
+      <p>Because sending the server configuration messages per <span class="caps">HTTP</span> by hand is very tedious, Picky offers a much nicer interface, the picky-live gem.</p>
+      <p><code>gem install picky-live</code></p>
+      <p>Then, just enter</p>
+      <p><code>picky live</code></p>
+      <p>This will start up the Suckerfish web interface on a default port, <a href="http://localhost:4568">localhost:4568</a>, going through the default Suckerfish interface on <a href="http://localhost:8080/admin">/admin</a> in the Picky server.</p>
+      <p>If you have customized it to be on <code>/suckerfish</code> and you don&#8217;t want the Suckerfish web interface on the default port, you&#8217;d type:</p>
+      <p><code>picky live localhost:8080/suckerfish 1234</code></p>
+      <p>This would start up the interface on <a href="http://localhost:1234">localhost:1234</a>.</p>
+      <p>The interface looks like this:
+      <img src="/blog/images/suckerfish_interface.png" style="margin-left: -200px;" alt="" /></p>
+      <p>What you see are three configs that you are currently able to change on the fly. These are the configs for query text handing and wrangling.</p>
+      <p>If I change a config in the interface, it will tell me so (currently by changing the background color of the input): 
+      <img src="/blog/images/suckerfish_updating.png" style="margin-left: -200px;" alt="" /></p>
+      <p>Then, as soon as I click on the &#8220;Update server now&#8221; button, a suckerfish speeds off, accesses the child through the right <span class="caps">URL</span>, tells the child to update. The child will try to update itself, and if that works, tell the master to update.</p>
+      <p>In this example, the updating has failed. The child will tell me so, not tell the parent, and kill itself. (Man, this language we&#8217;re using is brutal!)
+      <img src="/blog/images/suckerfish_error.png" style="margin-left: -200px;" alt="" /></p>
+      <p>Picky needs the child to perform harakiri, since we do not know if the config is still ok.</p>
+      <p>If all goes well, the master kills the <strong>other</strong> children (since they need the updated config) and lets the one telling him to update the config live. You will get a confirmation message, and the interface will update with the current configuration.</p>
+      <p>With suckerfish, children will die.</p>
+      <p>Sorry about that. What you get in return is a comfortable way of updating the server config on the fly. And that is worth the tradeoff ;)</p>
+      <h2>Performance?</h2>
+      <p>I bombarded the search server with 100&#8217;000 requests, concurrency 100 using ab:</p>
+      <p><code>ab -n 100000 -c 100 127.0.0.1:8080/all/full?query=s</code></p>
+      <p>Then, I started a Suckerfish and updated the config.</p>
+      <p>Result: Not really noticeable. A short hiccup when the master reforks, but not really noticeable.</p>
+      <p>If the config update fails, since only one worker child dies, the effect is almost not noticeable.</p>
+      <p>If the update works, one worker child remains, and the others need to be forked. But Unicorn handles this exceptionally gracefully. Thanks, Unicorn! Really proud of ya. Love you. Still, the harakiri stays.</p>
+      <h2>Disclaimer</h2>
+      <p>Updating everything on the fly is nice. But beware: The configuration in <code>app/application.rb</code> will not be updated. After experimenting with Suckerfish, you still need to update the config by hand.</p>
+      <p>That&#8217;s syntax pepper.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that we can&#8217;t just update a config in a child (in a multiprocessing server)</li>
+      	<li>how a child can communicate with its parent</li>
+      	<li>how Picky does it</li>
+      	<li>how the the picky-live gem looks and works</li>
+      	<li>How you can try it yourself</li>
+      	<li>that it is fast</li>
+      	<li>that it can be dangerous if you don&#8217;t know what to do</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
       Next
       <a href="/blog/2011/02/01/parslet-intro.html" title="Next post: Parslet Intro">Parslet Intro</a>
       <br />
@@ -183,20 +183,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/01/27/searching-with-picky-live-parameters-part-2';
-            var disqus_url = 'http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/01/27/searching-with-picky-live-parameters-part-2';
+          var disqus_url = 'http://florianhanke.com/blog/2011/01/27/searching-with-picky-live-parameters-part-2.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

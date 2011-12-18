@@ -63,108 +63,108 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a (admittedly a bit ranty and chaotic, but bear with me – recipes will follow) post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-        <p>I&#8217;ve gotten a lot of feedback on Picky. Many people write in to tell me how cool everything looks, but often I don&#8217;t hear how it is working out later.</p>
-        <p>This led to me wondering if Picky is initially attracting users, but then losing them due to missing simple recipes on how everything is put together.</p>
-        <p>Out of thin air I get this feedback:</p>
-        <p><em>&#8220;for those just looking to get a glance at how the model, view and controller layers are set up for Picky there isn&#8217;t much in your docs to give that high-level glance. […] but there wasn&#8217;t anything in there […] detailing the actual plumbing that ties the app and data to picky.&#8221;</em> (ellipses mine)</p>
-        <p>He&#8217;s right.</p>
-        <p>There is the <a href="http://florianhanke.com/picky/getting_started.html">overview image</a> on the <em>getting started</em> page, but it isn&#8217;t very clear on how everything fits together.</p>
-        <p>There is also the <a href="http://github.com/floere/picky/wiki/Best-Practices-Setup">best practices setup</a> in <a href="http://github.com/floere/picky/wiki/">the Wiki</a>, but that does not really show any code, just how it is connected on an abstract level.</p>
-        <p>So, let me clear up a few things. This is the current state of how Picky is used:</p>
-        <p><img src="/blog/images/2011-05-19-overview.png" alt="" /></p>
-        <p>We have multiple areas:</p>
-        <ul>
-        	<li>The Picky server (gem <code>picky</code>) is a <em>standalone</em> server. You can send it <span class="caps">HTTP</span> requests and it will return <span class="caps">HTTP</span> responses with a <span class="caps">JSON</span> body.</li>
-        	<li>The Picky Client (gem <code>picky-client</code>) is a way to query the server comfortably using Ruby instead of having to put together the queries yourself.</li>
-        	<li>You use this Picky Client in your webapp to get <em>result ids</em> from the server.</li>
-        	<li>Picky also offers a Javascript interface that can display rendered results and a result count. The results need to be rendered in the webapp, the server only returns result ids.</li>
-        </ul>
-        <p>The <strong>absolute best way</strong> to see all this in code and in action is to try the <a href="http://florianhanke.com/picky/getting_started.html">getting started</a>. If you haven&#8217;t tried it, do so now, run it, and take a look at the code (especially in the server <code>app/application.rb</code>, in the client <code>app.rb</code>, the Sinatra app).</p>
-        <h2>Picky is <span class="caps">ORM</span> agnostic</h2>
-        <p>(This part is divided into my reasoning/ranting ;) for not offering <span class="caps">ORM</span> support and code examples on how to handle this)</p>
-        <h3>The <span class="caps">ORM</span> rant</h3>
-        <p>Most people trying Picky for the first time are expecting some sort of ActiveRecord or other <span class="caps">ORM</span> integration.</p>
-        <p>Let me tell you upfront: There is none. Yes, no requiring a gem and slapping on a module in Picky.</p>
-        <p>Why? Many other search engine Ruby adapters offer some sort of nice <span class="caps">ORM</span> support, which lets me easily search and find data.</p>
-        <p>While I would <strong>love</strong> to provide some sort <span class="caps">ORM</span> integration, let me tell you why I don&#8217;t support an <span class="caps">ORM</span> (yet):</p>
-        <p>It costs a lot of effort/resources to do right and I wanted to spend that time for making Picky good and have a great Javascript user interface.</p>
-        <p>Since for me the <strong>hard part is not the loading the data from some model into the index</strong> (that is mostly easy), <strong>but making a really good user interface and having the data indexed and searched really correctly</strong>.</p>
-        <p>I always felt that comfortable <span class="caps">ORM</span> integrations, while being comfortable, mostly hide the way your data is indexed.</p>
-        <p><strong>They provide you an easy solution to an easy problem.</strong></p>
-        <p>If your data is hard to index, your data might be too complicated, too normalized.</p>
-        <p>Picky on the other hand, gives you the power of doing searching right. <strong>In Ruby.</strong></p>
-        <p>Because search engines never work the same:</p>
-        <ul>
-        	<li>The last search engine you built simply had different data.</li>
-        	<li>There always will be edge cases, people not finding their data. Ever ran <code>rake 'try[some words]'</code> in the server directory? This will tell you exactly how Picky indexes these words, or preprocesses them before searching.</li>
-        	<li>There always will be the pointy haired boss finding the way to your desk, asking why his best friend doesn&#8217;t find X, but Y instead. This can be shown,  <a href="http://florianhanke.com/blog/2011/04/17/picky-integration-testing.html">integration tested</a> and fixed in minutes. Result: Friend finds X.</li>
-        </ul>
-        <p>Although it might be enticing to have a search set up really fast, it is most of the time paid later: When all is about making the search work really well and edge cases crop up (due to the fact that most data is rather freeform).</p>
-        <p>Then again, you might not care about all these edge cases or having a really good search. Then again, why are you reading this exactly?</p>
-        <h4><span class="caps">BIG</span> <strong><span class="caps">BUT</span></strong></h4>
-        <p>Let me say though that I see the appeal of having an <span class="caps">ORM</span> integration, and the next few months may see our efforts shifted towards having a Picky <span class="caps">ORM</span> integration. This is a result of a long discussion with <a href="http://github.com/karmi">Karel Minařik</a>, aka <a href="http://github.com/karmi/tire">Mr. Tire</a>.</p>
-        <p>It will probably take place first in the form of having a flexible external interface in the server through which data is sent and indexed.</p>
-        <p>The indexing definition would still be in the server, but the selection and sorting of data would be in the Rails / Sinatra etc. application.</p>
-        <p>In short:</p>
-        <ul>
-        	<li>Your webapp <strong>selects and sorts</strong> the data, sending it to the server.</li>
-        	<li>The Picky server <strong>indexes</strong> your data.</li>
-        </ul>
-        <p>But I need to think about this – your feedback is much appreciated!</p>
-        <h3>How to index your Rails data</h3>
-        <p>There are many ways to index your data. See <a href="http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh.html">the part under Flexible Sources</a> which explains how to use the <code>#each</code> method on your models to index.</p>
-        <h4>Whatevs, pickle face! I want to index my models!</h4>
-        <p>Don&#8217;t give in to the rage. Ruby is your Jedi weapon.</p>
-        <p>A few suggestions.</p>
-        <p>You have a model <code>Book</code> in your Rails app.</p>
-        <pre class="sh_ruby"><code>class Book &lt; ActiveRecord::Base&#x000A;  # your supermodel&#x000A;end</code></pre>
-        <p>and you&#8217;d like to reuse this in Picky.</p>
-        <p>Try this:</p>
-        <pre class="sh_ruby"><code># Get the model.&#x000A;#&#x000A;require "#{PICKY_ROOT}/../rails_app/app/models/book"&#x000A;&#x000A;# Get the database configuration from the Rails app.&#x000A;#&#x000A;db_config = YAML.load(File.open("#{PICKY_ROOT}/../rails_app/config/database.yml"))&#x000A;&#x000A;# Establish a connection using the right environment.&#x000A;#&#x000A;Book.establish_connection db_config[PICKY_ENVIRONMENT]&#x000A;&#x000A;# Utilize the #each method on e.g. Book.some_named_scope to index.&#x000A;#&#x000A;book_index = Index::Memory.new :book_each do&#x000A;  source     Book.order('title ASC')&#x000A;  category   :title&#x000A;  category   :author&#x000A;  # ...&#x000A;end&#x000A;</code></pre>
-        <p>Yes, sometimes the models are much more complicated, using <code>acts_as_something</code> (or the modern versions thereof) and class methods from them.</p>
-        <p>In that case, either require your rails app/environment, or just load the data from the database:</p>
-        <h4>Relationship status: It&#8217;s complicated</h4>
-        <p>Sometimes you need to index a complex combination of data (with a <code>JOIN</code> or so). For this you can use a database source in the server:</p>
-        <pre class="sh_ruby"><code>book_index = Index::Memory.new :book_each do&#x000A;  source     Sources::DB.new(&#x000A;               'SELECT b.id, b.title, a.name&#x000A;                FROM books b INNER JOIN authors a&#x000A;                ON a.id = b.author_id',&#x000A;               :file =&gt; "#{PICKY_ROOT}/rails_app/config/#{PICKY_ENVIRONMENT}/db.yml"&#x000A;             )&#x000A;  category   :title&#x000A;  category   :author&#x000A;  # ...&#x000A;end</code></pre>
-        <h2>The Picky server is a standalone server</h2>
-        <p>The server (currently) is completely independent of your Rails / Sinatra / ActiveRecord application.</p>
-        <p>That means it lives in a separate directory. It does not use your Rails environment.</p>
-        <p>The server offers a <span class="caps">HTTP</span> interface, returning <span class="caps">JSON</span> payload.</p>
-        <p>Let&#8217;s look at an example. In the server configuration <code>app/application.rb</code> you will have a route defined:</p>
-        <pre class="sh_ruby"><code>route %r{\A/media\Z} =&gt; Search.new(books_index, mp3_index)</code></pre>
-        <p>This does exactly what it says and will route search requests on <code>/media</code> to a search using the <code>books_index</code> and the <code>mp3_index</code>.</p>
-        <p>To directly query the server, you can use <code>curl</code>.</p>
-        <p>So, <code>curl 'localhost:8080/media?query=Pirates&amp;ids=20&amp;offset=0'</code> will return e.g. the id of &#8220;Pirates of the Carribean&#8221;.</p>
-        <p>But it won&#8217;t be just a list of the ids, but a <span class="caps">JSON</span> response. Let&#8217;s look at it:
-        <pre class="sh_json"><code>{&#x000A; "allocations":[&#x000A;  ["books",8.56,13,[["title","pirates","Pirates"]],[59,65,106,110,164,166,174,218,235,249,344,413,425]],&#x000A;  ["mp3s",5.48,241,[["title","pirates","Pirates"]],[5,6,7,8,12,13,161]]&#x000A; ],&#x000A; "offset": 0,&#x000A; "duration": 0.009041,&#x000A; "total": 254&#x000A;}</code></pre></p>
-        <p>We have several parts:</p>
-        <ul>
-        	<li>allocations: In what index it was found, and also in what categories in that index, including the 20 top ids (in this example).</li>
-        	<li>offset: The offset that was used to search.</li>
-        	<li>duration: The time it took Picky to find the results.</li>
-        	<li>total: The total number of result ids.</li>
-        </ul>
-        <p>Now, because it is a bit tedious to extract data from the <span class="caps">JSON</span> string, we wrote…</p>
-        <h2>The Picky client gem</h2>
-        <p>The Picky client handles the wrapping of the query and the unwrapping of the result <span class="caps">JSON</span> for you. For example, the command <code>picky search some_url</code> or the integration tests use the client to make accessing the result data much easier.</p>
-        <p><code>gem install picky-client</code></p>
-        <p>First, configure the client. It is always configured to point at a specific search (path):</p>
-        <pre class="sh_ruby"><code>MediaSearch = Picky::Client.new :host =&gt; 'localhost', :port =&gt; 8080, :path =&gt; '/media'</code></pre>
-        <p>Now you can use it like this:
-        <pre class="sh_ruby"><code>results = MediaSearch.search 'some query text', :ids =&gt; 20, :offset =&gt; 0</code></pre></p>
-        <p>The <code>results</code> variable now simply holds a hash with the <span class="caps">JSON</span> data. Extend it with <code>Picky::Convenience</code> to get a few nice methods on this hash.</p>
-        <pre class="sh_ruby"><code>results.extend Picky::Convenience&#x000A;results.ids # =&gt; array of the ids&#x000A;results.total # =&gt; amount of total ids (not just the 20)&#x000A;results.empty? # =&gt; Do we have results?</code></pre>
-        <p>Also nice is this one, which will take the result ids of the books, and load each corresponding Book model, then yield it to the block where you can render it:</p>
-        <pre class="sh_ruby"><code>results.populate_with Book do |book|&#x000A;  book.to_s&#x000A;end</code></pre>
-        <p>It&#8217;s best if you look at it in the Sinatra example application from the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a>.</p>
-        <h2>Conclusion</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>that Picky is a standalone server.</li>
-        	<li>that Picky does not yet offer an <span class="caps">ORM</span> integration.</li>
-        	<li>what you can do with the Picky client gem.</li>
-        </ol>
-        <p>Hope you learnt something new!</p>
+      <p>I&#8217;ve gotten a lot of feedback on Picky. Many people write in to tell me how cool everything looks, but often I don&#8217;t hear how it is working out later.</p>
+      <p>This led to me wondering if Picky is initially attracting users, but then losing them due to missing simple recipes on how everything is put together.</p>
+      <p>Out of thin air I get this feedback:</p>
+      <p><em>&#8220;for those just looking to get a glance at how the model, view and controller layers are set up for Picky there isn&#8217;t much in your docs to give that high-level glance. […] but there wasn&#8217;t anything in there […] detailing the actual plumbing that ties the app and data to picky.&#8221;</em> (ellipses mine)</p>
+      <p>He&#8217;s right.</p>
+      <p>There is the <a href="http://florianhanke.com/picky/getting_started.html">overview image</a> on the <em>getting started</em> page, but it isn&#8217;t very clear on how everything fits together.</p>
+      <p>There is also the <a href="http://github.com/floere/picky/wiki/Best-Practices-Setup">best practices setup</a> in <a href="http://github.com/floere/picky/wiki/">the Wiki</a>, but that does not really show any code, just how it is connected on an abstract level.</p>
+      <p>So, let me clear up a few things. This is the current state of how Picky is used:</p>
+      <p><img src="/blog/images/2011-05-19-overview.png" alt="" /></p>
+      <p>We have multiple areas:</p>
+      <ul>
+      	<li>The Picky server (gem <code>picky</code>) is a <em>standalone</em> server. You can send it <span class="caps">HTTP</span> requests and it will return <span class="caps">HTTP</span> responses with a <span class="caps">JSON</span> body.</li>
+      	<li>The Picky Client (gem <code>picky-client</code>) is a way to query the server comfortably using Ruby instead of having to put together the queries yourself.</li>
+      	<li>You use this Picky Client in your webapp to get <em>result ids</em> from the server.</li>
+      	<li>Picky also offers a Javascript interface that can display rendered results and a result count. The results need to be rendered in the webapp, the server only returns result ids.</li>
+      </ul>
+      <p>The <strong>absolute best way</strong> to see all this in code and in action is to try the <a href="http://florianhanke.com/picky/getting_started.html">getting started</a>. If you haven&#8217;t tried it, do so now, run it, and take a look at the code (especially in the server <code>app/application.rb</code>, in the client <code>app.rb</code>, the Sinatra app).</p>
+      <h2>Picky is <span class="caps">ORM</span> agnostic</h2>
+      <p>(This part is divided into my reasoning/ranting ;) for not offering <span class="caps">ORM</span> support and code examples on how to handle this)</p>
+      <h3>The <span class="caps">ORM</span> rant</h3>
+      <p>Most people trying Picky for the first time are expecting some sort of ActiveRecord or other <span class="caps">ORM</span> integration.</p>
+      <p>Let me tell you upfront: There is none. Yes, no requiring a gem and slapping on a module in Picky.</p>
+      <p>Why? Many other search engine Ruby adapters offer some sort of nice <span class="caps">ORM</span> support, which lets me easily search and find data.</p>
+      <p>While I would <strong>love</strong> to provide some sort <span class="caps">ORM</span> integration, let me tell you why I don&#8217;t support an <span class="caps">ORM</span> (yet):</p>
+      <p>It costs a lot of effort/resources to do right and I wanted to spend that time for making Picky good and have a great Javascript user interface.</p>
+      <p>Since for me the <strong>hard part is not the loading the data from some model into the index</strong> (that is mostly easy), <strong>but making a really good user interface and having the data indexed and searched really correctly</strong>.</p>
+      <p>I always felt that comfortable <span class="caps">ORM</span> integrations, while being comfortable, mostly hide the way your data is indexed.</p>
+      <p><strong>They provide you an easy solution to an easy problem.</strong></p>
+      <p>If your data is hard to index, your data might be too complicated, too normalized.</p>
+      <p>Picky on the other hand, gives you the power of doing searching right. <strong>In Ruby.</strong></p>
+      <p>Because search engines never work the same:</p>
+      <ul>
+      	<li>The last search engine you built simply had different data.</li>
+      	<li>There always will be edge cases, people not finding their data. Ever ran <code>rake 'try[some words]'</code> in the server directory? This will tell you exactly how Picky indexes these words, or preprocesses them before searching.</li>
+      	<li>There always will be the pointy haired boss finding the way to your desk, asking why his best friend doesn&#8217;t find X, but Y instead. This can be shown,  <a href="http://florianhanke.com/blog/2011/04/17/picky-integration-testing.html">integration tested</a> and fixed in minutes. Result: Friend finds X.</li>
+      </ul>
+      <p>Although it might be enticing to have a search set up really fast, it is most of the time paid later: When all is about making the search work really well and edge cases crop up (due to the fact that most data is rather freeform).</p>
+      <p>Then again, you might not care about all these edge cases or having a really good search. Then again, why are you reading this exactly?</p>
+      <h4><span class="caps">BIG</span> <strong><span class="caps">BUT</span></strong></h4>
+      <p>Let me say though that I see the appeal of having an <span class="caps">ORM</span> integration, and the next few months may see our efforts shifted towards having a Picky <span class="caps">ORM</span> integration. This is a result of a long discussion with <a href="http://github.com/karmi">Karel Minařik</a>, aka <a href="http://github.com/karmi/tire">Mr. Tire</a>.</p>
+      <p>It will probably take place first in the form of having a flexible external interface in the server through which data is sent and indexed.</p>
+      <p>The indexing definition would still be in the server, but the selection and sorting of data would be in the Rails / Sinatra etc. application.</p>
+      <p>In short:</p>
+      <ul>
+      	<li>Your webapp <strong>selects and sorts</strong> the data, sending it to the server.</li>
+      	<li>The Picky server <strong>indexes</strong> your data.</li>
+      </ul>
+      <p>But I need to think about this – your feedback is much appreciated!</p>
+      <h3>How to index your Rails data</h3>
+      <p>There are many ways to index your data. See <a href="http://florianhanke.com/blog/2011/04/14/picky-two-point-two-point-oh.html">the part under Flexible Sources</a> which explains how to use the <code>#each</code> method on your models to index.</p>
+      <h4>Whatevs, pickle face! I want to index my models!</h4>
+      <p>Don&#8217;t give in to the rage. Ruby is your Jedi weapon.</p>
+      <p>A few suggestions.</p>
+      <p>You have a model <code>Book</code> in your Rails app.</p>
+      <pre class="sh_ruby"><code>class Book &lt; ActiveRecord::Base&#x000A;  # your supermodel&#x000A;end</code></pre>
+      <p>and you&#8217;d like to reuse this in Picky.</p>
+      <p>Try this:</p>
+      <pre class="sh_ruby"><code># Get the model.&#x000A;#&#x000A;require "#{PICKY_ROOT}/../rails_app/app/models/book"&#x000A;&#x000A;# Get the database configuration from the Rails app.&#x000A;#&#x000A;db_config = YAML.load(File.open("#{PICKY_ROOT}/../rails_app/config/database.yml"))&#x000A;&#x000A;# Establish a connection using the right environment.&#x000A;#&#x000A;Book.establish_connection db_config[PICKY_ENVIRONMENT]&#x000A;&#x000A;# Utilize the #each method on e.g. Book.some_named_scope to index.&#x000A;#&#x000A;book_index = Index::Memory.new :book_each do&#x000A;  source     Book.order('title ASC')&#x000A;  category   :title&#x000A;  category   :author&#x000A;  # ...&#x000A;end&#x000A;</code></pre>
+      <p>Yes, sometimes the models are much more complicated, using <code>acts_as_something</code> (or the modern versions thereof) and class methods from them.</p>
+      <p>In that case, either require your rails app/environment, or just load the data from the database:</p>
+      <h4>Relationship status: It&#8217;s complicated</h4>
+      <p>Sometimes you need to index a complex combination of data (with a <code>JOIN</code> or so). For this you can use a database source in the server:</p>
+      <pre class="sh_ruby"><code>book_index = Index::Memory.new :book_each do&#x000A;  source     Sources::DB.new(&#x000A;               'SELECT b.id, b.title, a.name&#x000A;                FROM books b INNER JOIN authors a&#x000A;                ON a.id = b.author_id',&#x000A;               :file =&gt; "#{PICKY_ROOT}/rails_app/config/#{PICKY_ENVIRONMENT}/db.yml"&#x000A;             )&#x000A;  category   :title&#x000A;  category   :author&#x000A;  # ...&#x000A;end</code></pre>
+      <h2>The Picky server is a standalone server</h2>
+      <p>The server (currently) is completely independent of your Rails / Sinatra / ActiveRecord application.</p>
+      <p>That means it lives in a separate directory. It does not use your Rails environment.</p>
+      <p>The server offers a <span class="caps">HTTP</span> interface, returning <span class="caps">JSON</span> payload.</p>
+      <p>Let&#8217;s look at an example. In the server configuration <code>app/application.rb</code> you will have a route defined:</p>
+      <pre class="sh_ruby"><code>route %r{\A/media\Z} =&gt; Search.new(books_index, mp3_index)</code></pre>
+      <p>This does exactly what it says and will route search requests on <code>/media</code> to a search using the <code>books_index</code> and the <code>mp3_index</code>.</p>
+      <p>To directly query the server, you can use <code>curl</code>.</p>
+      <p>So, <code>curl 'localhost:8080/media?query=Pirates&amp;ids=20&amp;offset=0'</code> will return e.g. the id of &#8220;Pirates of the Carribean&#8221;.</p>
+      <p>But it won&#8217;t be just a list of the ids, but a <span class="caps">JSON</span> response. Let&#8217;s look at it:
+      <pre class="sh_json"><code>{&#x000A; "allocations":[&#x000A;  ["books",8.56,13,[["title","pirates","Pirates"]],[59,65,106,110,164,166,174,218,235,249,344,413,425]],&#x000A;  ["mp3s",5.48,241,[["title","pirates","Pirates"]],[5,6,7,8,12,13,161]]&#x000A; ],&#x000A; "offset": 0,&#x000A; "duration": 0.009041,&#x000A; "total": 254&#x000A;}</code></pre></p>
+      <p>We have several parts:</p>
+      <ul>
+      	<li>allocations: In what index it was found, and also in what categories in that index, including the 20 top ids (in this example).</li>
+      	<li>offset: The offset that was used to search.</li>
+      	<li>duration: The time it took Picky to find the results.</li>
+      	<li>total: The total number of result ids.</li>
+      </ul>
+      <p>Now, because it is a bit tedious to extract data from the <span class="caps">JSON</span> string, we wrote…</p>
+      <h2>The Picky client gem</h2>
+      <p>The Picky client handles the wrapping of the query and the unwrapping of the result <span class="caps">JSON</span> for you. For example, the command <code>picky search some_url</code> or the integration tests use the client to make accessing the result data much easier.</p>
+      <p><code>gem install picky-client</code></p>
+      <p>First, configure the client. It is always configured to point at a specific search (path):</p>
+      <pre class="sh_ruby"><code>MediaSearch = Picky::Client.new :host =&gt; 'localhost', :port =&gt; 8080, :path =&gt; '/media'</code></pre>
+      <p>Now you can use it like this:
+      <pre class="sh_ruby"><code>results = MediaSearch.search 'some query text', :ids =&gt; 20, :offset =&gt; 0</code></pre></p>
+      <p>The <code>results</code> variable now simply holds a hash with the <span class="caps">JSON</span> data. Extend it with <code>Picky::Convenience</code> to get a few nice methods on this hash.</p>
+      <pre class="sh_ruby"><code>results.extend Picky::Convenience&#x000A;results.ids # =&gt; array of the ids&#x000A;results.total # =&gt; amount of total ids (not just the 20)&#x000A;results.empty? # =&gt; Do we have results?</code></pre>
+      <p>Also nice is this one, which will take the result ids of the books, and load each corresponding Book model, then yield it to the block where you can render it:</p>
+      <pre class="sh_ruby"><code>results.populate_with Book do |book|&#x000A;  book.to_s&#x000A;end</code></pre>
+      <p>It&#8217;s best if you look at it in the Sinatra example application from the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a>.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that Picky is a standalone server.</li>
+      	<li>that Picky does not yet offer an <span class="caps">ORM</span> integration.</li>
+      	<li>what you can do with the Picky client gem.</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/05/30/picky-designing-orm-integration-1.html" title="Next post: Picky&amp;#58;&amp;nbsp;Designing&amp;nbsp;an ORM&amp;nbsp;Integration&amp;nbsp;1">Picky&#58;&nbsp;Designing&nbsp;an ORM&nbsp;Integration&nbsp;1</a>
       <br />
@@ -173,20 +173,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/05/19/picky-plumbing-overview';
-            var disqus_url = 'http://florianhanke.com/blog/2011/05/19/picky-plumbing-overview.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/05/19/picky-plumbing-overview';
+          var disqus_url = 'http://florianhanke.com/blog/2011/05/19/picky-plumbing-overview.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

@@ -63,70 +63,70 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>Some time ago, <a href="http://blog.absurd.li/">Kaspar</a> mentioned to me that it would be nice to have a <em>gem dependency search</em>, i.e. where you could search in which gems a gem is used.</p>
-        <p>I thought so too, so I wrote one :)
-        (and added some more features in the process)</p>
-        <p>Take a look: <a href="http://gemsearch.heroku.com/">http://gemsearch.heroku.com/</a></p>
-        <p>(Note, it might take <a href="http://heroku.com">Heroku</a> some time to ramp up the server)</p>
-        <h2>Current state</h2>
-        <p>While the <a href="http://rubygems.org/">current search</a> isn&#8217;t bad, it is missing the possibility of searching for an <strong>author</strong>, <strong>where</strong> a gem is used, or which <strong>version</strong> it has. Or any combination thereof, for that matter.</p>
-        <h2>Building the search</h2>
-        <p>I happened to have a <a href="http://florianhanke.com/picky/">fast &amp; clever search engine</a> lying around ;) so this is what I used.</p>
-        <p>How do you go about building or configuring a search engine?</p>
-        <h3>1. Look at what your goals are.</h3>
-        <p>My goals seemed simple enough.</p>
-        <p>Each gem should be findable under:</p>
-        <ul>
-        	<li>Its <strong>name</strong> (<a href="http://gemsearch.heroku.com/#/?q=heroku_addon">Try it</a>).</li>
-        	<li>Its <strong>version(s)</strong>, entered like x.y.z, or part thereof, x, x., x.y, x.y. (<a href="http://gemsearch.heroku.com/#/?q=1%2E2%2E">try it</a>).</li>
-        	<li>Its <strong>author&#8217;s names</strong>, or first/last names. Or parts thereof, like &#8220;flo&#8221; for florian (<a href="http://gemsearch.heroku.com/#/?q=hanke+flo">try it</a>).</li>
-        	<li>The gems it is <strong>dependent</strong> upon. universe-parsing depends on parslet, for example (<a href="http://gemsearch.heroku.com/#/?q=needs%3Aparslet">try it</a>).</li>
-        	<li>The names, gem name and dependent gem name should be <strong>phonetically findable</strong> (<a href="http://gemsearch.heroku.com/#/?q=rspoc%7E">try it</a>).</li>
-        	<li>The authors too should be <strong>phonetically findable</strong> – since who knows how to write &#8220;Heinemeier&#8221; (<a href="http://gemsearch.heroku.com/#/?q=heynemeyer%7E">try it</a>)?</li>
-        	<li>All should be findable without entering the whole thing, like &#8220;1.0&#8221;, or &#8220;activesupp&#8221; (<a href="http://gemsearch.heroku.com/#/?q=activesupp">try it</a>).</li>
-        	<li>One should be able to specify what he is looking for by prefixing e.g. &#8220;uses:&#8221; in front of the search term (<a href="http://gemsearch.heroku.com/#/?q=uses%3Apicky">Try it</a>). Or others, like &#8220;dependency:&#8221;, &#8220;dependencies:&#8221;, &#8220;depends:&#8221;, &#8220;using:&#8221;, &#8220;uses:&#8221;, &#8220;use:&#8221;, &#8220;needs:&#8221; (all possible).</li>
-        </ul>
-        <p>I leave out the description for now, as it requires quite a bit of thinking and tinkering.</p>
-        <p>With the goals defined&#8230;</p>
-        <h3>2. Look at the data.</h3>
-        <p>I downloaded the <a href="http://rubygems.org/Marshal.4.8.Z">Marshal</a> file, extracted the relevant data and restructured it into a readable <span class="caps">CSV</span>.</p>
-        <p>Two potential problems I noticed:</p>
-        <ul>
-        	<li>Gem names are spaced using either an underscore _ or a hyphen -.</li>
-        	<li>For the same name, there are sometimes up to three different encodings. Take the gems of <a href="http://www.twitter.com/godfoca">Nicolás Sanguinetti</a> for example. <a href="http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti">Try it</a> and look at the author names.</li>
-        </ul>
-        <p>Those were problematic. What does one do? Try to find an optimal solution.</p>
-        <h3>3. Marry the goals and the data.</h3>
-        <p>I decided not to tackle the display issues of the second point, encodings, but just the indexing issues. What I do is use <a href="/2011/01/13/searching-with-picky-character-substituters.html">character substitution</a>, to make &#8220;Nicolás&#8221; findable under &#8220;nicolas&#8221;. This I do by saving the name as &#8220;nicolas&#8221; in the index, and also perform this character substitution on each search. <a href="http://gemsearch.heroku.com/#/?q=nicol%C3%A1s+sanguinetti">Try it with án áccent</a>.</p>
-        <p>Deciding on what to with the gem names was a little harder. What is the problem?</p>
-        <p>The problem is manyfold. For one, searchers should not need to know whether a gem was spaced with an underscore or a hyphen. Actually, I thought it best they be able to find it using a space. So the picky-live gem should be findable by typing &#8220;picky live&#8221; (<a href="http://gemsearch.heroku.com/#/?q=picky+live">Try it</a>).</p>
-        <p>However, if you then look for &#8220;sinatra&#8221;, the actual sinatra gem is not the first in the list. This is because I opted to go for an alphabetical ordering.</p>
-        <p>However, if I need the user to enter the full name (like &#8220;anthonymoralez-apn_on_rails&#8221;), they might not find it at all.</p>
-        <p>So, the way I did it now is have the user be able to use spaces when searching and trust people to depend on Picky&#8217;s combinatorial nature. For example, if you look for sinatra and know that one of the owners is called Tomayko, you&#8217;ll get to your answer directly: <a href="http://gemsearch.heroku.com/#/?q=sinatra+tomayko">Search for &#8216;sinatra tomayko&#8217;</a>.</p>
-        <p>Generally, the more you can help Picky, the more it will help you right back.</p>
-        <h3>4. Have users try it and get feedback.</h3>
-        <p>This is where you come in :)</p>
-        <p><a href="http://gemsearch.heroku.com/">Check it out</a>, if you haven&#8217;t yet and tell me what you think <a href="http://www.twitter.com/hanke">@hanke</a>! Do you have ideas for improvement? (If yes, tell me which so I can improve it)</p>
-        <p>How about we use this search on <a href="http://rubygems.org">rubygems.org</a>? :)</p>
-        <h3>A few technical Picky specifics.</h3>
-        <p>A few Picky specifics for insiders:</p>
-        <ul>
-        	<li>We have 4 data categories: <code>name, version, author, dependencies</code>.</li>
-        	<li>The partial search &#8220;rail*&#8221; is done using <code>Partial::Substring.new(from: 1)</code>.</li>
-        	<li>The similarity &#8220;hallou~&#8221; is done using: <code>Similarity::Phonetic.new(2)</code>.</li>
-        	<li>A singly occurring name will be weighted up a little: <code>:weights =&gt; { [:name] =&gt; +1 } }</code>.</li>
-        	<li>The author for example can be prefixed with: <code>qualifiers: [:author, :authors, :written, :writer, :by]</code>.</li>
-        </ul>
-        <p>Yes, currently I <a href="http://www.isolani.co.uk/blog/javascript/BreakingTheWebWithHashBangs">break the web with hashtags</a> – I&#8217;m rewriting it to use <code>pushState</code>.</p>
-        <h2>Thanks</h2>
-        <p>Many thanks to <a href="http://heroku.com">Heroku</a> for providing the infrastructure!</p>
-        <h2>Conclusions</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>that there&#8217;s a better way to search Rubygems</li>
-        	<li>where you can go to try it</li>
-        	<li>how you could go about creating a search</li>
-        </ol>
-        <p>Hope you learnt something new :)</p>
+      <p>I thought so too, so I wrote one :)
+      (and added some more features in the process)</p>
+      <p>Take a look: <a href="http://gemsearch.heroku.com/">http://gemsearch.heroku.com/</a></p>
+      <p>(Note, it might take <a href="http://heroku.com">Heroku</a> some time to ramp up the server)</p>
+      <h2>Current state</h2>
+      <p>While the <a href="http://rubygems.org/">current search</a> isn&#8217;t bad, it is missing the possibility of searching for an <strong>author</strong>, <strong>where</strong> a gem is used, or which <strong>version</strong> it has. Or any combination thereof, for that matter.</p>
+      <h2>Building the search</h2>
+      <p>I happened to have a <a href="http://florianhanke.com/picky/">fast &amp; clever search engine</a> lying around ;) so this is what I used.</p>
+      <p>How do you go about building or configuring a search engine?</p>
+      <h3>1. Look at what your goals are.</h3>
+      <p>My goals seemed simple enough.</p>
+      <p>Each gem should be findable under:</p>
+      <ul>
+      	<li>Its <strong>name</strong> (<a href="http://gemsearch.heroku.com/#/?q=heroku_addon">Try it</a>).</li>
+      	<li>Its <strong>version(s)</strong>, entered like x.y.z, or part thereof, x, x., x.y, x.y. (<a href="http://gemsearch.heroku.com/#/?q=1%2E2%2E">try it</a>).</li>
+      	<li>Its <strong>author&#8217;s names</strong>, or first/last names. Or parts thereof, like &#8220;flo&#8221; for florian (<a href="http://gemsearch.heroku.com/#/?q=hanke+flo">try it</a>).</li>
+      	<li>The gems it is <strong>dependent</strong> upon. universe-parsing depends on parslet, for example (<a href="http://gemsearch.heroku.com/#/?q=needs%3Aparslet">try it</a>).</li>
+      	<li>The names, gem name and dependent gem name should be <strong>phonetically findable</strong> (<a href="http://gemsearch.heroku.com/#/?q=rspoc%7E">try it</a>).</li>
+      	<li>The authors too should be <strong>phonetically findable</strong> – since who knows how to write &#8220;Heinemeier&#8221; (<a href="http://gemsearch.heroku.com/#/?q=heynemeyer%7E">try it</a>)?</li>
+      	<li>All should be findable without entering the whole thing, like &#8220;1.0&#8221;, or &#8220;activesupp&#8221; (<a href="http://gemsearch.heroku.com/#/?q=activesupp">try it</a>).</li>
+      	<li>One should be able to specify what he is looking for by prefixing e.g. &#8220;uses:&#8221; in front of the search term (<a href="http://gemsearch.heroku.com/#/?q=uses%3Apicky">Try it</a>). Or others, like &#8220;dependency:&#8221;, &#8220;dependencies:&#8221;, &#8220;depends:&#8221;, &#8220;using:&#8221;, &#8220;uses:&#8221;, &#8220;use:&#8221;, &#8220;needs:&#8221; (all possible).</li>
+      </ul>
+      <p>I leave out the description for now, as it requires quite a bit of thinking and tinkering.</p>
+      <p>With the goals defined&#8230;</p>
+      <h3>2. Look at the data.</h3>
+      <p>I downloaded the <a href="http://rubygems.org/Marshal.4.8.Z">Marshal</a> file, extracted the relevant data and restructured it into a readable <span class="caps">CSV</span>.</p>
+      <p>Two potential problems I noticed:</p>
+      <ul>
+      	<li>Gem names are spaced using either an underscore _ or a hyphen -.</li>
+      	<li>For the same name, there are sometimes up to three different encodings. Take the gems of <a href="http://www.twitter.com/godfoca">Nicolás Sanguinetti</a> for example. <a href="http://gemsearch.heroku.com/#/?q=nicolas+sanguinetti">Try it</a> and look at the author names.</li>
+      </ul>
+      <p>Those were problematic. What does one do? Try to find an optimal solution.</p>
+      <h3>3. Marry the goals and the data.</h3>
+      <p>I decided not to tackle the display issues of the second point, encodings, but just the indexing issues. What I do is use <a href="/2011/01/13/searching-with-picky-character-substituters.html">character substitution</a>, to make &#8220;Nicolás&#8221; findable under &#8220;nicolas&#8221;. This I do by saving the name as &#8220;nicolas&#8221; in the index, and also perform this character substitution on each search. <a href="http://gemsearch.heroku.com/#/?q=nicol%C3%A1s+sanguinetti">Try it with án áccent</a>.</p>
+      <p>Deciding on what to with the gem names was a little harder. What is the problem?</p>
+      <p>The problem is manyfold. For one, searchers should not need to know whether a gem was spaced with an underscore or a hyphen. Actually, I thought it best they be able to find it using a space. So the picky-live gem should be findable by typing &#8220;picky live&#8221; (<a href="http://gemsearch.heroku.com/#/?q=picky+live">Try it</a>).</p>
+      <p>However, if you then look for &#8220;sinatra&#8221;, the actual sinatra gem is not the first in the list. This is because I opted to go for an alphabetical ordering.</p>
+      <p>However, if I need the user to enter the full name (like &#8220;anthonymoralez-apn_on_rails&#8221;), they might not find it at all.</p>
+      <p>So, the way I did it now is have the user be able to use spaces when searching and trust people to depend on Picky&#8217;s combinatorial nature. For example, if you look for sinatra and know that one of the owners is called Tomayko, you&#8217;ll get to your answer directly: <a href="http://gemsearch.heroku.com/#/?q=sinatra+tomayko">Search for &#8216;sinatra tomayko&#8217;</a>.</p>
+      <p>Generally, the more you can help Picky, the more it will help you right back.</p>
+      <h3>4. Have users try it and get feedback.</h3>
+      <p>This is where you come in :)</p>
+      <p><a href="http://gemsearch.heroku.com/">Check it out</a>, if you haven&#8217;t yet and tell me what you think <a href="http://www.twitter.com/hanke">@hanke</a>! Do you have ideas for improvement? (If yes, tell me which so I can improve it)</p>
+      <p>How about we use this search on <a href="http://rubygems.org">rubygems.org</a>? :)</p>
+      <h3>A few technical Picky specifics.</h3>
+      <p>A few Picky specifics for insiders:</p>
+      <ul>
+      	<li>We have 4 data categories: <code>name, version, author, dependencies</code>.</li>
+      	<li>The partial search &#8220;rail*&#8221; is done using <code>Partial::Substring.new(from: 1)</code>.</li>
+      	<li>The similarity &#8220;hallou~&#8221; is done using: <code>Similarity::Phonetic.new(2)</code>.</li>
+      	<li>A singly occurring name will be weighted up a little: <code>:weights =&gt; { [:name] =&gt; +1 } }</code>.</li>
+      	<li>The author for example can be prefixed with: <code>qualifiers: [:author, :authors, :written, :writer, :by]</code>.</li>
+      </ul>
+      <p>Yes, currently I <a href="http://www.isolani.co.uk/blog/javascript/BreakingTheWebWithHashBangs">break the web with hashtags</a> – I&#8217;m rewriting it to use <code>pushState</code>.</p>
+      <h2>Thanks</h2>
+      <p>Many thanks to <a href="http://heroku.com">Heroku</a> for providing the infrastructure!</p>
+      <h2>Conclusions</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that there&#8217;s a better way to search Rubygems</li>
+      	<li>where you can go to try it</li>
+      	<li>how you could go about creating a search</li>
+      </ol>
+      <p>Hope you learnt something new :)</p>
       Next
       <a href="/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html" title="Next post: Searching with Picky&amp;#58; Live&amp;nbsp;reloading&amp;nbsp;indexes">Searching with Picky&#58; Live&nbsp;reloading&nbsp;indexes</a>
       <br />
@@ -135,20 +135,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/02/13/a-better-rubygems-search';
-            var disqus_url = 'http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/02/13/a-better-rubygems-search';
+          var disqus_url = 'http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

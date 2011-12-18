@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky&nbsp;4.0</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Picky&nbsp;4.0</h1>
+      <div class="categories">
+        ruby / picky
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p><a href="http://florianhanke.com/picky/">Picky</a> 4.0 release &#8211; a quick description of the goals and the changes from version 3.6.16.</p>
+      <h2>Goals</h2>
+      <p>The ultimate goal of Picky is to become <strong><span class="caps">THE</span></strong> choice for a <strong>lightweight</strong> search engine, as <strong>flexible</strong> as possible, regarding the container on one hand (useable in a script/a <a href="http://sinatrarb.com">Sinatra</a> instance, a DRb server, wherever) and in itself on the other hand, offering a rich <a href="https://github.com/floere/picky/blob/master/server/APIs.textile"><span class="caps">API</span></a> where you plug in search engine behavior.</p>
+      <p>Release 4.0 is another big step towards these goals.</p>
+      <h2>Changes (tl;dr)</h2>
+      <p>The one big change is that both the classic Picky application and classic Picky sources have been removed. If you need these, please continue using 3.6.16.</p>
+      <p>If you want to jump on 4.0, replace with a Sinatra app and convert your source into one that responds to <code>#each</code> (See the Wiki on sources).</p>
+      <p>Other important changes:</p>
+      <ul>
+      	<li><code>Picky::Index</code>, option <code>weights</code> has been renamed to <code>weight</code>.</li>
+      	<li><code>Picky::Indexes.reload</code> =&gt; <code>Picky::Indexes.load</code>, analog on <code>Index</code>, <code>Category</code>.</li>
+      	<li>If you call any <code>define_*</code> methods, please remove the <code>define_</code> part.</li>
+      	<li>If you defined a <code>source { with a block }</code>, the block is now evaluated each time the indexer runs on a category.</li>
+      	<li>Rake task <code>rake index:parallel</code> is used by <code>rake index</code>. If you can&#8217;t index in multiple processes, please use <code>rake index:serial</code>.</li>
+      </ul>
+      <h2>Detailed Changes</h2>
+      <p>This is for users that are currently on version 3.6.&#215;. Extracted from the <a href="https://github.com/floere/picky/blob/master/history.textile">history.textile</a> file:</p>
+      <ul>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> <code>Picky::Indexes.index</code> does not index in parallel anymore.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Renamed <code>Picky::Indexes.index_for_tests</code> to <code>Picky::Indexes.index</code>.</li>
+      	<li>hanke: (server) If you want to explicitly run parallel indexing programmatically, use <code>Picky::Indexes.index Picky::Scheduler.new(parallel: true)</code> or <code>Picky::Indexes[:index_name].index Picky::Scheduler.new(parallel: true)</code>.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Renamed <code>Picky::Wrappers::Category::ExactFirst</code> to <code>Picky::Results::ExactFirst</code>. Extend instead of wrap: <code>index.extend Results::ExactFirst</code> or <code>category.extend Results::ExactFirst</code>. If an index is extended, each category of the index will be extended.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> <code>Picky::Indexes.reload</code> has been renamed to <code>Picky::Indexes.load</code>.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> <code>index.reload</code> has been renamed to <code>index.load</code>.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> <code>category.reload</code> has been renamed to <code>category.load</code>.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Removed all <code>define_...</code> methods on indexes.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Removed Picky classic application. Please use Picky e.g. in a Sinatra app.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Removed Picky classic sources. Please use a source with the #each method.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Option <code>weights</code> for the <code>Picky::Index#category</code> method has been renamed <code>weight</code> to conform with the other methods.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Picky does not require the text gem anymore by default. Only when you use phonetic similarity. It will tell you what it needs.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Added the PICKY_ENVIRONMENT in front of the Redis key namespace to differentiate the various environments.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Removed <code>rake routes</code> since only the classic server was able to provide it.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Removed the classic server from the generators.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Reverting customizeable backends from version 3.3.2. They are no longer available. Please use simple subclassing to achieve funky backends.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> SQLite <code>self_indexed</code> and Redis <code>immediate</code> option is now called <code>realtime</code>, as changes go directly through to the actual backends, in &#8220;realtime&#8221;.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> The <code>tokenizer</code> option for a category has been renamed to <code>indexing</code>, to conform with the methods for the index and the sinatra app.</li>
+      	<li>hanke: (server) <span class="caps">BREAKING</span> Internal <code>Similarity#encoded</code> method has been renamed to <code>#encode</code>.</li>
+      	<li>hanke: (statistics) Overhauled statistics interface. Use <code>picky statistics log/search.log</code> to start it.</li>
+      	<li>hanke: (server) The <code>Index#source</code> block is now evaluated every time an indexer runs.</li>
+      	<li>hanke: (server) Explicitly uses <code>Yajl::Encoder#encode</code> for <span class="caps">JSON</span> encoding.</li>
+      	<li>hanke: (server) Fixed cases where even when no similarity was defined on a category, similar results were still found.</li>
+      	<li>hanke: (server) Rake task <code>index</code> now points to task <code>index:parallel</code> by default. Call <code>rake:serial</code> to index serially.</li>
+      	<li>hanke: (server) Indexer calls <code>reconnect!</code> on sources that support it.</li>
+      	<li>hanke: (server) Location/Volumetric/Geosearch rewritten.</li>
+      	<li>hanke: (generators) Fixed integration specs for the generated &#8220;all in one&#8221; server/client.</li>
+      	<li>hanke: (generators) Changed method calls to adapt to above changes.</li>
+      	<li>hanke: (server) Using the <code>procrastinate</code> gem to parallelize indexing.</li>
+      	<li>hanke: (server) Indexing call structure cleaned up. Improves performance by about 40%.</li>
+      </ul>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/11/20/picky-search-performance.html" title="Previous post: Picky&amp;nbsp;Search&amp;nbsp;Performance&amp;nbsp;(Backends)">Picky&nbsp;Search&nbsp;Performance&nbsp;(Backends)</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/12/18/picky-4-0-0';
+          var disqus_url = 'http://florianhanke.com/blog/2011/12/18/picky-4-0-0.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

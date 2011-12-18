@@ -63,84 +63,84 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
-        <p>This post is on reloading indexes by way of signals. So, first let&#8217;s talk a little about signals. Then, in the second half, I talk about reloading the memory index in Picky.</p>
-        <p>Warp 9?</p>
-        <ul>
-        	<li><a href="#signals">Signals in Ruby</a></li>
-        	<li><a href="#oldhandler">Still calling the old trap handler</a></li>
-        	<li><a href="#reloading">Reloading the indexes</a></li>
-        	<li><a href="#exception">Back when Ruby was mostly foxes and bacon</a></li>
-        	<li><a href="#conclusion">Conclusion</a></li>
-        </ul>
-        <p>En-gage.</p>
-        <h2 id="signals">Signals in Ruby</h2>
-        <p>Signals are way of sending instructions to a running process. Here&#8217;s a <a href="http://www.ruby-doc.org/core/classes/Signal.html#M001253">list of signals</a>.</p>
-        <p>In Ruby you handle these signals by giving the <a href="http://www.ruby-doc.org/core/classes/Signal.html#M001252">Signal#trap</a> method a handler block:</p>
-        <p>What if I give it two? Let&#8217;s try it.</p>
-        <pre class="sh_ruby"><code>Signal.trap('USR1') { p "hello" }&#x000A;Signal.trap('USR1') { p "world" }&#x000A;&#x000A;# Print out the process PID such that it is easier&#x000A;# to enter "kill -USR1 the_printed_process_pid"&#x000A;#&#x000A;puts Process.pid&#x000A;&#x000A;# You have sixty seconds to defuse … err try this example.&#x000A;#&#x000A;sleep 60</code></pre>
-        <p>Then, enter <code>kill -USR1 &lt;the printed process pid&gt;</code> and see what happens.</p>
-        <p>What happens is that the second block that prints &#8220;world&#8221; replaces the first one. So we see:</p>
-        <pre class="sh_bash"><code>type here&gt; ruby signals.rb &#x000A;77306&#x000A;"world"</code></pre>
-        <p>Ruby throws the old block away. What if I don&#8217;t want this?</p>
-        <h2 id="oldhandler">Still calling the old trap handler</h2>
-        <p>So, for example, in Unicorn, sending the <code>USR1</code> signal handler reopens all logs. What if I want to do something else? If I just do</p>
-        <pre class="sh_ruby"><code>Signal.trap('USR1') { something_else }</code></pre>
-        <p>the old handler will be gone.</p>
-        <p>So, my assumption was that Ruby gives me the old handler when calling</p>
-        <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1')</code></pre>
-        <p>Nope. Hurting the <a href="http://de.wikipedia.org/wiki/Principle_of_Least_Surprise"><span class="caps">POLS</span></a> a little here. It only gives me the old handler when installing a new one.</p>
-        <p>So what can you do? Use this &#8220;trick&#8221;:</p>
-        <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1') {}&#x000A;Signal.trap('USR1') { something_else; old_handler.call }</code></pre>
-        <p>So I install a bogus handler to get the old handler, then throw the bogus handler away, right away, and call the old handler in the new handler.</p>
-        <h2 id="reloading">Reloading the indexes</h2>
-        <p>Currently, Picky does not support realtime indexes. It also runs with memory-only indexes (a <a href="http://redis.io/">Redis</a> index backend is in the works). So, while the Picky server is running, it does not by itself pick up the new indexes, even if you generate new index files by running <code>rake index</code>.</p>
-        <p>Btw, did you ever try to call <code>rake -T</code> while in your Picky server project?</p>
-        <p>How can we reload the indexes?</p>
-        <p>Quite easy, actually. Reloading the memory indexes is done by calling</p>
-        <pre class="sh_ruby"><code>Indexes.reload</code></pre>
-        <p>That&#8217;s it.</p>
-        <p>How do we get the Picky server process to call <code>Indexes.reload</code>?</p>
-        <p>Now talking about all that signal handling pays off! :)</p>
-        <h3>… in a non-forking web server.</h3>
-        <p>When running Picky in a non-forking web server, in e.g. thin, in the file <code>app/application.rb</code> we&#8217;d call</p>
-        <pre class="sh_ruby"><code>Signal.trap('USR1') { Indexes.reload }</code></pre>
-        <p>and then in the Terminal, we run</p>
-        <pre class="sh_bash"><code>type here&gt; rake index&#x000A;... (Picky indexes and writes new index files. Afterwards you tell the server to reload the indexes.)&#x000A;type here&gt; kill -USR1 your_picky_server_process_id</code></pre>
-        <p>You should see some output that the server has reloaded the indexes.</p>
-        <h3>… in a forking web server.</h3>
-        <p>Unicorn, for example. Picky&#8217;s current web server of choice.</p>
-        <p>Since Unicorn already defines <code>USR1</code>, we use the trick we&#8217;ve talked about above to not replace the unicorn handler (if you need it):</p>
-        <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1') {}&#x000A;Signal.trap('USR1') { Indexes.reload; old_handler.call }</code></pre>
-        <p>(Doesn&#8217;t have to be <code>USR1</code>, btw)</p>
-        <p>After indexing and sending the <code>USR1</code> signal to the Unicorn master, we aren&#8217;t finished. Since the indexes have only been reloaded in the master, while the children are still happily using the old indexes.</p>
-        <p>Check out <a href="http://unicorn.bogomips.org/SIGNALS.html">this very helpful page about signals in Unicorn</a>. If <code>preload_app</code> is set to <code>false</code> in the unicorn.ru, you can just send a <code>HUP</code> signal to the master. It will then kill all children, and fork then. Finished.</p>
-        <p>When using Unicorn, you may of course also use <a href="http://unicorn.bogomips.org/SIGNALS.html">the way Unicorn does it</a>. See the instructions under &#8220;Procedure to replace a running unicorn executable&#8221;.</p>
-        <p>Good stuff! Although this procedure uses around double the memory the Picky server uses normally, while the index reloading uses around 1.5 times the size of the largest sub-index (in a nutshell, a lot less than the Unicorn replacement technique).</p>
-        <h3>… periodically.</h3>
-        <p>What about reloading the indexes periodically?</p>
-        <p>You could, of course, try to use a <code>Thread</code>, trying to reload the indexes every X time units and monkey around with it (tell me if you are successful :) ). I wouldn&#8217;t.</p>
-        <p>I recommend to externally trigger <code>rake index</code>, and then trigger reloads from outside using the mentioned signals.</p>
-        <h2 id="exception">Btw, a fun thing with signals you should not do</h2>
-        <p><em>Back when Ruby was mostly foxes and bacons</em>, I happened to type this:</p>
-        <pre class="sh_ruby"><code>begin&#x000A;  p Process.pid&#x000A;  looong_running_method&#x000A;rescue Exception =&gt; e&#x000A;  p "Oh deary me!"&#x000A;  retry&#x000A;end</code></pre>
-        <p>Note: I did not actually type <code>looong_running_method</code> and <code>"Oh deary me!"</code>, but you get the idea ;)</p>
-        <p>The idea was that if the long running method fails, it&#8217;d just retry running it.</p>
-        <p>Sounds good, right? Try running it, and stop it with <code>Ctrl-C</code>. The problem is the line <code>rescue Exception =&gt; e</code>.</p>
-        <p>Why? I soon found out that catching all <code>Exceptions</code> is not a good idea if you&#8217;d like stopping your program by way of <code>Ctrl-C</code>, since <code>SignalException</code> inherits from <code>Exception</code>:</p>
-        <pre class="sh_ruby"><code>p SignalException.ancestors # =&gt; [SignalException, Exception, Object, Kernel, BasicObject]</code></pre>
-        <p><code>Ctrl-C</code> sends a <code>SIGINT</code>, an <code>INT</code> signal to your process. Internally, a <code>SignalException</code> is raised, which is then caught by the <code>rescue</code>.</p>
-        <p>A <code>kill -9</code> sends this process to Walhalla. The place where all programs go that have incurred a major learning experience on their writers.</p>
-        <h2 id="conclusion">Conclusion</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>how signals work</li>
-        	<li>that reloading indexes in a running Picky server is easy</li>
-        	<li>how you use signals to reload the server</li>
-        	<li>how reloading works in different web servers</li>
-        	<li>that reloading the indexes isn&#8217;t without problems</li>
-        	<li>that you need to be careful when catching exceptions</li>
-        </ol>
-        <p>Hope you learnt something new!</p>
+      <p>This post is on reloading indexes by way of signals. So, first let&#8217;s talk a little about signals. Then, in the second half, I talk about reloading the memory index in Picky.</p>
+      <p>Warp 9?</p>
+      <ul>
+      	<li><a href="#signals">Signals in Ruby</a></li>
+      	<li><a href="#oldhandler">Still calling the old trap handler</a></li>
+      	<li><a href="#reloading">Reloading the indexes</a></li>
+      	<li><a href="#exception">Back when Ruby was mostly foxes and bacon</a></li>
+      	<li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+      <p>En-gage.</p>
+      <h2 id="signals">Signals in Ruby</h2>
+      <p>Signals are way of sending instructions to a running process. Here&#8217;s a <a href="http://www.ruby-doc.org/core/classes/Signal.html#M001253">list of signals</a>.</p>
+      <p>In Ruby you handle these signals by giving the <a href="http://www.ruby-doc.org/core/classes/Signal.html#M001252">Signal#trap</a> method a handler block:</p>
+      <p>What if I give it two? Let&#8217;s try it.</p>
+      <pre class="sh_ruby"><code>Signal.trap('USR1') { p "hello" }&#x000A;Signal.trap('USR1') { p "world" }&#x000A;&#x000A;# Print out the process PID such that it is easier&#x000A;# to enter "kill -USR1 the_printed_process_pid"&#x000A;#&#x000A;puts Process.pid&#x000A;&#x000A;# You have sixty seconds to defuse … err try this example.&#x000A;#&#x000A;sleep 60</code></pre>
+      <p>Then, enter <code>kill -USR1 &lt;the printed process pid&gt;</code> and see what happens.</p>
+      <p>What happens is that the second block that prints &#8220;world&#8221; replaces the first one. So we see:</p>
+      <pre class="sh_bash"><code>type here&gt; ruby signals.rb &#x000A;77306&#x000A;"world"</code></pre>
+      <p>Ruby throws the old block away. What if I don&#8217;t want this?</p>
+      <h2 id="oldhandler">Still calling the old trap handler</h2>
+      <p>So, for example, in Unicorn, sending the <code>USR1</code> signal handler reopens all logs. What if I want to do something else? If I just do</p>
+      <pre class="sh_ruby"><code>Signal.trap('USR1') { something_else }</code></pre>
+      <p>the old handler will be gone.</p>
+      <p>So, my assumption was that Ruby gives me the old handler when calling</p>
+      <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1')</code></pre>
+      <p>Nope. Hurting the <a href="http://de.wikipedia.org/wiki/Principle_of_Least_Surprise"><span class="caps">POLS</span></a> a little here. It only gives me the old handler when installing a new one.</p>
+      <p>So what can you do? Use this &#8220;trick&#8221;:</p>
+      <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1') {}&#x000A;Signal.trap('USR1') { something_else; old_handler.call }</code></pre>
+      <p>So I install a bogus handler to get the old handler, then throw the bogus handler away, right away, and call the old handler in the new handler.</p>
+      <h2 id="reloading">Reloading the indexes</h2>
+      <p>Currently, Picky does not support realtime indexes. It also runs with memory-only indexes (a <a href="http://redis.io/">Redis</a> index backend is in the works). So, while the Picky server is running, it does not by itself pick up the new indexes, even if you generate new index files by running <code>rake index</code>.</p>
+      <p>Btw, did you ever try to call <code>rake -T</code> while in your Picky server project?</p>
+      <p>How can we reload the indexes?</p>
+      <p>Quite easy, actually. Reloading the memory indexes is done by calling</p>
+      <pre class="sh_ruby"><code>Indexes.reload</code></pre>
+      <p>That&#8217;s it.</p>
+      <p>How do we get the Picky server process to call <code>Indexes.reload</code>?</p>
+      <p>Now talking about all that signal handling pays off! :)</p>
+      <h3>… in a non-forking web server.</h3>
+      <p>When running Picky in a non-forking web server, in e.g. thin, in the file <code>app/application.rb</code> we&#8217;d call</p>
+      <pre class="sh_ruby"><code>Signal.trap('USR1') { Indexes.reload }</code></pre>
+      <p>and then in the Terminal, we run</p>
+      <pre class="sh_bash"><code>type here&gt; rake index&#x000A;... (Picky indexes and writes new index files. Afterwards you tell the server to reload the indexes.)&#x000A;type here&gt; kill -USR1 your_picky_server_process_id</code></pre>
+      <p>You should see some output that the server has reloaded the indexes.</p>
+      <h3>… in a forking web server.</h3>
+      <p>Unicorn, for example. Picky&#8217;s current web server of choice.</p>
+      <p>Since Unicorn already defines <code>USR1</code>, we use the trick we&#8217;ve talked about above to not replace the unicorn handler (if you need it):</p>
+      <pre class="sh_ruby"><code>old_handler = Signal.trap('USR1') {}&#x000A;Signal.trap('USR1') { Indexes.reload; old_handler.call }</code></pre>
+      <p>(Doesn&#8217;t have to be <code>USR1</code>, btw)</p>
+      <p>After indexing and sending the <code>USR1</code> signal to the Unicorn master, we aren&#8217;t finished. Since the indexes have only been reloaded in the master, while the children are still happily using the old indexes.</p>
+      <p>Check out <a href="http://unicorn.bogomips.org/SIGNALS.html">this very helpful page about signals in Unicorn</a>. If <code>preload_app</code> is set to <code>false</code> in the unicorn.ru, you can just send a <code>HUP</code> signal to the master. It will then kill all children, and fork then. Finished.</p>
+      <p>When using Unicorn, you may of course also use <a href="http://unicorn.bogomips.org/SIGNALS.html">the way Unicorn does it</a>. See the instructions under &#8220;Procedure to replace a running unicorn executable&#8221;.</p>
+      <p>Good stuff! Although this procedure uses around double the memory the Picky server uses normally, while the index reloading uses around 1.5 times the size of the largest sub-index (in a nutshell, a lot less than the Unicorn replacement technique).</p>
+      <h3>… periodically.</h3>
+      <p>What about reloading the indexes periodically?</p>
+      <p>You could, of course, try to use a <code>Thread</code>, trying to reload the indexes every X time units and monkey around with it (tell me if you are successful :) ). I wouldn&#8217;t.</p>
+      <p>I recommend to externally trigger <code>rake index</code>, and then trigger reloads from outside using the mentioned signals.</p>
+      <h2 id="exception">Btw, a fun thing with signals you should not do</h2>
+      <p><em>Back when Ruby was mostly foxes and bacons</em>, I happened to type this:</p>
+      <pre class="sh_ruby"><code>begin&#x000A;  p Process.pid&#x000A;  looong_running_method&#x000A;rescue Exception =&gt; e&#x000A;  p "Oh deary me!"&#x000A;  retry&#x000A;end</code></pre>
+      <p>Note: I did not actually type <code>looong_running_method</code> and <code>"Oh deary me!"</code>, but you get the idea ;)</p>
+      <p>The idea was that if the long running method fails, it&#8217;d just retry running it.</p>
+      <p>Sounds good, right? Try running it, and stop it with <code>Ctrl-C</code>. The problem is the line <code>rescue Exception =&gt; e</code>.</p>
+      <p>Why? I soon found out that catching all <code>Exceptions</code> is not a good idea if you&#8217;d like stopping your program by way of <code>Ctrl-C</code>, since <code>SignalException</code> inherits from <code>Exception</code>:</p>
+      <pre class="sh_ruby"><code>p SignalException.ancestors # =&gt; [SignalException, Exception, Object, Kernel, BasicObject]</code></pre>
+      <p><code>Ctrl-C</code> sends a <code>SIGINT</code>, an <code>INT</code> signal to your process. Internally, a <code>SignalException</code> is raised, which is then caught by the <code>rescue</code>.</p>
+      <p>A <code>kill -9</code> sends this process to Walhalla. The place where all programs go that have incurred a major learning experience on their writers.</p>
+      <h2 id="conclusion">Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>how signals work</li>
+      	<li>that reloading indexes in a running Picky server is easy</li>
+      	<li>how you use signals to reload the server</li>
+      	<li>how reloading works in different web servers</li>
+      	<li>that reloading the indexes isn&#8217;t without problems</li>
+      	<li>that you need to be careful when catching exceptions</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/03/02/searching-with-picky-redis.html" title="Next post: Searching with Picky&amp;#58; Redis">Searching with Picky&#58; Redis</a>
       <br />
@@ -149,20 +149,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/02/20/searching-with-picky-live-reloading-indexes';
-            var disqus_url = 'http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/02/20/searching-with-picky-live-reloading-indexes';
+          var disqus_url = 'http://florianhanke.com/blog/2011/02/20/searching-with-picky-live-reloading-indexes.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

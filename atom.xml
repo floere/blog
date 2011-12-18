@@ -4,13 +4,70 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-11-20T23:18:40+11:00</updated>
+ <updated>2011-12-18T16:39:59+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;4.0</title>
+   <link href="http://florianhanke.com/blog/2011/12/18/picky-4-0-0.html"/>
+   <updated>2011-12-18T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/12/18/picky-4-0-0</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt; 4.0 release &amp;#8211; a quick description of the goals and the changes from version 3.6.16.&lt;/p&gt;
+&lt;h2&gt;Goals&lt;/h2&gt;
+&lt;p&gt;The ultimate goal of Picky is to become &lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;THE&lt;/span&gt;&lt;/strong&gt; choice for a &lt;strong&gt;lightweight&lt;/strong&gt; search engine, as &lt;strong&gt;flexible&lt;/strong&gt; as possible, regarding the container on one hand (useable in a script/a &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; instance, a DRb server, wherever) and in itself on the other hand, offering a rich &lt;a href=&quot;https://github.com/floere/picky/blob/master/server/APIs.textile&quot;&gt;&lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/a&gt; where you plug in search engine behavior.&lt;/p&gt;
+&lt;p&gt;Release 4.0 is another big step towards these goals.&lt;/p&gt;
+&lt;h2&gt;Changes (tl;dr)&lt;/h2&gt;
+&lt;p&gt;The one big change is that both the classic Picky application and classic Picky sources have been removed. If you need these, please continue using 3.6.16.&lt;/p&gt;
+&lt;p&gt;If you want to jump on 4.0, replace with a Sinatra app and convert your source into one that responds to &lt;code&gt;#each&lt;/code&gt; (See the Wiki on sources).&lt;/p&gt;
+&lt;p&gt;Other important changes:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;code&gt;Picky::Index&lt;/code&gt;, option &lt;code&gt;weights&lt;/code&gt; has been renamed to &lt;code&gt;weight&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Picky::Indexes.reload&lt;/code&gt; =&amp;gt; &lt;code&gt;Picky::Indexes.load&lt;/code&gt;, analog on &lt;code&gt;Index&lt;/code&gt;, &lt;code&gt;Category&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;If you call any &lt;code&gt;define_*&lt;/code&gt; methods, please remove the &lt;code&gt;define_&lt;/code&gt; part.&lt;/li&gt;
+	&lt;li&gt;If you defined a &lt;code&gt;source { with a block }&lt;/code&gt;, the block is now evaluated each time the indexer runs on a category.&lt;/li&gt;
+	&lt;li&gt;Rake task &lt;code&gt;rake index:parallel&lt;/code&gt; is used by &lt;code&gt;rake index&lt;/code&gt;. If you can&amp;#8217;t index in multiple processes, please use &lt;code&gt;rake index:serial&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Detailed Changes&lt;/h2&gt;
+&lt;p&gt;This is for users that are currently on version 3.6.&amp;#215;. Extracted from the &lt;a href=&quot;https://github.com/floere/picky/blob/master/history.textile&quot;&gt;history.textile&lt;/a&gt; file:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; &lt;code&gt;Picky::Indexes.index&lt;/code&gt; does not index in parallel anymore.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Renamed &lt;code&gt;Picky::Indexes.index_for_tests&lt;/code&gt; to &lt;code&gt;Picky::Indexes.index&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) If you want to explicitly run parallel indexing programmatically, use &lt;code&gt;Picky::Indexes.index Picky::Scheduler.new(parallel: true)&lt;/code&gt; or &lt;code&gt;Picky::Indexes[:index_name].index Picky::Scheduler.new(parallel: true)&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Renamed &lt;code&gt;Picky::Wrappers::Category::ExactFirst&lt;/code&gt; to &lt;code&gt;Picky::Results::ExactFirst&lt;/code&gt;. Extend instead of wrap: &lt;code&gt;index.extend Results::ExactFirst&lt;/code&gt; or &lt;code&gt;category.extend Results::ExactFirst&lt;/code&gt;. If an index is extended, each category of the index will be extended.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; &lt;code&gt;Picky::Indexes.reload&lt;/code&gt; has been renamed to &lt;code&gt;Picky::Indexes.load&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; &lt;code&gt;index.reload&lt;/code&gt; has been renamed to &lt;code&gt;index.load&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; &lt;code&gt;category.reload&lt;/code&gt; has been renamed to &lt;code&gt;category.load&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Removed all &lt;code&gt;define_...&lt;/code&gt; methods on indexes.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Removed Picky classic application. Please use Picky e.g. in a Sinatra app.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Removed Picky classic sources. Please use a source with the #each method.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Option &lt;code&gt;weights&lt;/code&gt; for the &lt;code&gt;Picky::Index#category&lt;/code&gt; method has been renamed &lt;code&gt;weight&lt;/code&gt; to conform with the other methods.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Picky does not require the text gem anymore by default. Only when you use phonetic similarity. It will tell you what it needs.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Added the PICKY_ENVIRONMENT in front of the Redis key namespace to differentiate the various environments.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Removed &lt;code&gt;rake routes&lt;/code&gt; since only the classic server was able to provide it.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Removed the classic server from the generators.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Reverting customizeable backends from version 3.3.2. They are no longer available. Please use simple subclassing to achieve funky backends.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; SQLite &lt;code&gt;self_indexed&lt;/code&gt; and Redis &lt;code&gt;immediate&lt;/code&gt; option is now called &lt;code&gt;realtime&lt;/code&gt;, as changes go directly through to the actual backends, in &amp;#8220;realtime&amp;#8221;.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; The &lt;code&gt;tokenizer&lt;/code&gt; option for a category has been renamed to &lt;code&gt;indexing&lt;/code&gt;, to conform with the methods for the index and the sinatra app.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) &lt;span class=&quot;caps&quot;&gt;BREAKING&lt;/span&gt; Internal &lt;code&gt;Similarity#encoded&lt;/code&gt; method has been renamed to &lt;code&gt;#encode&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;hanke: (statistics) Overhauled statistics interface. Use &lt;code&gt;picky statistics log/search.log&lt;/code&gt; to start it.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) The &lt;code&gt;Index#source&lt;/code&gt; block is now evaluated every time an indexer runs.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Explicitly uses &lt;code&gt;Yajl::Encoder#encode&lt;/code&gt; for &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; encoding.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Fixed cases where even when no similarity was defined on a category, similar results were still found.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Rake task &lt;code&gt;index&lt;/code&gt; now points to task &lt;code&gt;index:parallel&lt;/code&gt; by default. Call &lt;code&gt;rake:serial&lt;/code&gt; to index serially.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Indexer calls &lt;code&gt;reconnect!&lt;/code&gt; on sources that support it.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Location/Volumetric/Geosearch rewritten.&lt;/li&gt;
+	&lt;li&gt;hanke: (generators) Fixed integration specs for the generated &amp;#8220;all in one&amp;#8221; server/client.&lt;/li&gt;
+	&lt;li&gt;hanke: (generators) Changed method calls to adapt to above changes.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Using the &lt;code&gt;procrastinate&lt;/code&gt; gem to parallelize indexing.&lt;/li&gt;
+	&lt;li&gt;hanke: (server) Indexing call structure cleaned up. Improves performance by about 40%.&lt;/li&gt;
+&lt;/ul&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Search&amp;nbsp;Performance&amp;nbsp;(Backends)</title>

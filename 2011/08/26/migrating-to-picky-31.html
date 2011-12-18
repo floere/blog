@@ -63,30 +63,30 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This post is intended for <a href="http://florianhanke.com/picky/">Picky</a> users that are at version 3.0 (or near) and would like to move to version 3.1.</p>
-        <h2>Picky 3.1 is released!</h2>
-        <p>You&#8217;re probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?</p>
-        <p>First of all, let me say sorry for the quick succession of upgrades. Picky will help you and tell you what to do, as good as it can.</p>
-        <p>Secondly, Picky&#8217;s goal is to be very <strong>modular</strong> and have <strong>exchangeable modules</strong>, while <strong>not being more complicated</strong> to read or use.</p>
-        <p>What does this have to do with this update?</p>
-        <h2>What has changed?</h2>
-        <p>Instead of defining your memory/redis indexes like so</p>
-        <pre class="sh_ruby"><code>memory_index = Picky::Indexes::Memory.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Indexes::Redis.new :name do&#x000A;  # definition&#x000A;end</code></pre>
-        <p>you now only use <code>Picky::Index.new</code> and pass in the appropriate index backend. Since the memory backend is the default, you don&#8217;t need to pass it in. For the Redis backend, you use <code>Picky::Backends::Redis.new</code>:</p>
-        <pre class="sh_ruby"><code>memory_index = Picky::Index.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Index.new :name do&#x000A;  backend Picky::Backends::Redis.new&#x000A;  # definition&#x000A;end</code></pre>
-        <p>Two reasons:</p>
-        <ul>
-        	<li>Exchangeable backends</li>
-        	<li>Inheritance is overrated</li>
-        </ul>
-        <h2>Double Index. What does it meeeean?</h2>
-        <p>This means that from now on you can pass in your own backend!</p>
-        <p>We would be quite happy if someone decided to do a purely file-based backend :) Got one? Please contribute!
-        (As an example, see <a href="http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb">http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb</a>, explanations will follow. Stay tuned!)</p>
-        <p>This is the main <span class="caps">API</span> change in 3.1.</p>
-        <h2>ちわ, WaDoku!</h2>
-        <p>In other news, Picky now can index and search Japanese.
-        (Mainly due to <a href="http://wadoku.eu/">this project</a> and the combined efforts of <a href="http://twitter.com/rogerbraun">Roger Braun</a> and <a href="http://twitter.com/brianmario">Brian Lopez</a>)</p>
-        <p>Thanks for reading and have fun! さよなら!!!</p>
+      <h2>Picky 3.1 is released!</h2>
+      <p>You&#8217;re probably wondering: The last post handled upgrading to 3.0, why is there another update so close to it?</p>
+      <p>First of all, let me say sorry for the quick succession of upgrades. Picky will help you and tell you what to do, as good as it can.</p>
+      <p>Secondly, Picky&#8217;s goal is to be very <strong>modular</strong> and have <strong>exchangeable modules</strong>, while <strong>not being more complicated</strong> to read or use.</p>
+      <p>What does this have to do with this update?</p>
+      <h2>What has changed?</h2>
+      <p>Instead of defining your memory/redis indexes like so</p>
+      <pre class="sh_ruby"><code>memory_index = Picky::Indexes::Memory.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Indexes::Redis.new :name do&#x000A;  # definition&#x000A;end</code></pre>
+      <p>you now only use <code>Picky::Index.new</code> and pass in the appropriate index backend. Since the memory backend is the default, you don&#8217;t need to pass it in. For the Redis backend, you use <code>Picky::Backends::Redis.new</code>:</p>
+      <pre class="sh_ruby"><code>memory_index = Picky::Index.new :name do&#x000A;  # definition&#x000A;end&#x000A;&#x000A;redis_index = Picky::Index.new :name do&#x000A;  backend Picky::Backends::Redis.new&#x000A;  # definition&#x000A;end</code></pre>
+      <p>Two reasons:</p>
+      <ul>
+      	<li>Exchangeable backends</li>
+      	<li>Inheritance is overrated</li>
+      </ul>
+      <h2>Double Index. What does it meeeean?</h2>
+      <p>This means that from now on you can pass in your own backend!</p>
+      <p>We would be quite happy if someone decided to do a purely file-based backend :) Got one? Please contribute!
+      (As an example, see <a href="http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb">http://github.com/floere/picky/blob/master/server/lib/picky/backends/redis.rb</a>, explanations will follow. Stay tuned!)</p>
+      <p>This is the main <span class="caps">API</span> change in 3.1.</p>
+      <h2>ちわ, WaDoku!</h2>
+      <p>In other news, Picky now can index and search Japanese.
+      (Mainly due to <a href="http://wadoku.eu/">this project</a> and the combined efforts of <a href="http://twitter.com/rogerbraun">Roger Braun</a> and <a href="http://twitter.com/brianmario">Brian Lopez</a>)</p>
+      <p>Thanks for reading and have fun! さよなら!!!</p>
       Next
       <a href="/blog/2011/08/31/picky-case-study-restricting-results.html" title="Next post: Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Restricting&amp;nbsp;Results">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Restricting&nbsp;Results</a>
       <br />
@@ -95,20 +95,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/08/26/migrating-to-picky-31';
-            var disqus_url = 'http://florianhanke.com/blog/2011/08/26/migrating-to-picky-31.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/08/26/migrating-to-picky-31';
+          var disqus_url = 'http://florianhanke.com/blog/2011/08/26/migrating-to-picky-31.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

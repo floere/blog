@@ -63,61 +63,61 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-        <p>Let me show you how to do a simple and fun geo search in Picky.</p>
-        <p>But first, lean back.</p>
-        <h2>Enjoy the show</h2>
-        <p>The index contains around 21&#8217;000 Swiss places, taken from Wikipedia.</p>
-        <p>First, I click a little around – Picky gives me places around the clicked location.</p>
-        <p>After that I show what happens if I just give Picky a latitude or a longitude. Then, combined with the place text, finally, just with the place text.</p>
-        <p>You&#8217;ll understand when you see it :)</p>
-        <p>It&#8217;s best to switch to full-screen:</p>
-        <p><iframe src="http://player.vimeo.com/video/22594668" width="707" height="726" frameborder="0"></iframe></p>
-        <p>The blob in the middle is Switzerland, by the way ;)</p>
-        <p>How do we do it?</p>
-        <h2>The server code</h2>
-        <p>The server … you probably could have done sleeping if you&#8217;ve been reading this blog dilligently ;)</p>
-        <p>The data comes from the <span class="caps">CSV</span> file <code>data/swiss_places.csv</code></p>
-        <pre class="sh_ruby"><code>places = Index::Memory.new :geo do&#x000A;  source         Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')&#x000A;  category       :location, partial: Partial::Substring.new(from: 1)&#x000A;  geo_categories :north, :east, 1, precision: 3&#x000A;end</code></pre>
-        <p>What&#8217;s interesting here is the <code>geo_categories</code> method. It takes two categories, <code>north</code>, and <code>east</code>, which are both in the lat/lng format, e.g. <code>47.2</code>, <code>8.3</code>. (It also takes options <code>lat_from</code>, and <code>lng_from</code> if the categories don&#8217;t have the same names as in the data source)</p>
-        <p>Also, the 1 parameter in <code>geo_categories</code> denotes that we search 1 km around the clicked location.</p>
-        <p>This is actually the simple part. It does no exact calculation, but an approximate one that&#8217;s most correct in temperate zones. But as you see in the video, it works well. Especially in a &#8220;what&#8217;s around me&#8221; type search.</p>
-        <p>Still in the server config <code>app/application.rb</code>:</p>
-        <pre class="sh_ruby"><code>route %r{\A/places\Z} =&gt; Search.new(places)</code></pre>
-        <p>Self-explanatory, eh? As regexp, you could also use <code>%r{^/places$}</code>.</p>
-        <p>That&#8217;s it for the server. Nothing special so far.</p>
-        <p><code>rake index; rake start</code> and off we go.</p>
-        <h2>The client code</h2>
-        <p>In this part we&#8217;re going to install the map.</p>
-        <p>So we&#8217;re using the generated code, but add a little more information to the returned json hash.</p>
-        <p>We not only need the list results, but also the coordinates themselves. So we&#8217;re going to add them to the results separately.</p>
-        <p>We (ab)use <code>populate_with</code>, the method that makes models out of the returned ids and yields them to the block to be rendered.</p>
-        <p>We then use the models to add geo coordinates to the result hash that is sent to the client.</p>
-        <pre class="sh_ruby"><code>results = Geo.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]&#x000A;results.extend Picky::Convenience&#x000A;results[:geo] ||= [] # &lt;= We initialize an array of coordinates in the results hash.&#x000A;results.populate_with Location do |location|&#x000A;  results[:geo] &lt;&lt; [location.north, location.east] # &lt;- and we populate it with the coordinates.&#x000A;  location.to_s&#x000A;end</code></pre>
-        <p>So essentially, our geo data piggybacks to the Javascript client. JS, here we come!</p>
-        <h2>The javascript client code</h2>
-        <p>The javascript client requires a bit more work. Well, the map does.</p>
-        <p>We insert this after the <code>PickyClient</code> code. The first 6 lines are noise and map preparation.</p>
-        <pre class="sh_javascript"><code>// The map&#x000A;//&#x000A;$(document).ready(function() {&#x000A;  if (GBrowserIsCompatible()) {&#x000A;    // Map setup.&#x000A;    //&#x000A;    map = new GMap2(document.getElementById('map_div'));&#x000A;    map.addControl(new GSmallMapControl());&#x000A;    map.setCenter(new GLatLng(46.85, 8.05), 13);&#x000A;    map.setZoom(7);&#x000A;&#x000A;    // Click listener.&#x000A;    //&#x000A;    GEvent.addListener(map, "click", function(overlay, latlng) {&#x000A;      if (latlng) {&#x000A;        pickyClient.insert(Math.round(latlng.lat()*1000)/1000 + ' ' + Math.round(latlng.lng()*1000)/1000);&#x000A;      }&#x000A;    });&#x000A;  }&#x000A;});</code></pre>
-        <p>Then, we add the most important part: A click <code>listener</code> that inserts the coordinates (rounded to 3 digits) in the search field, as you have seen in the video.</p>
-        <p>Now, searches are already sent off to Picky and come back. Whoosh!</p>
-        <p>What do we need to do now? Yes, draw some markers in the map. The <code>PickyClient</code> offers a callback that is called after Picky has updated the results (there are also <code>before</code> and <code>success</code>):</p>
-        <pre class="sh_javascript"><code>after: function(data, query) {&#x000A;  map.clearOverlays();&#x000A;&#x000A;  var geo = data.original_hash.geo;&#x000A;  if (geo) {&#x000A;    for (var i = 0; i &lt; geo.length; i++) {&#x000A;      map.addOverlay(new GMarker(new GLatLng(geo[i][0], geo[i][1])));&#x000A;    };&#x000A;  }&#x000A;},</code></pre>
-        <p>First we clear the overlays for the new results.</p>
-        <p>Then, we get the piggybacking geo data using the data object&#8217;s <code>original_hash</code> function, finally iterating over all coordinates and adding overlays as we go.</p>
-        <p>By default, the client only gets 20 results at a time. We set it to 100 using the <code>fullResults</code> option.</p>
-        <pre class="sh_javascript"><code>fullResults: 100</code></pre>
-        <p>That&#8217;s it. It&#8217;s fast and quite easy to set up.</p>
-        <h2>Sidenote</h2>
-        <p>Since for Swiss data it is clear which is the longitude and which is the latitude (no data intersection), we can just enter e.g. <code>47.2 8.3</code>, but if your data area isn&#8217;t exclusive, e.g. <code>33.1 33.2</code>, meaning that latitude values can also be longitude values, just add <code>north:33.1 east:33.2</code>, to denote what is what if north, east are the names of your categories.</p>
-        <h2>Conclusion</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>that a geo search in Picky is quite snappy.</li>
-        	<li>that you can search for latitude and location name only, for example.</li>
-        	<li>how you can configure the server.</li>
-        	<li>how you can configure the client and the web frontend.</li>
-        </ol>
-        <p>Hope you learnt something new!</p>
+      <p>Let me show you how to do a simple and fun geo search in Picky.</p>
+      <p>But first, lean back.</p>
+      <h2>Enjoy the show</h2>
+      <p>The index contains around 21&#8217;000 Swiss places, taken from Wikipedia.</p>
+      <p>First, I click a little around – Picky gives me places around the clicked location.</p>
+      <p>After that I show what happens if I just give Picky a latitude or a longitude. Then, combined with the place text, finally, just with the place text.</p>
+      <p>You&#8217;ll understand when you see it :)</p>
+      <p>It&#8217;s best to switch to full-screen:</p>
+      <p><iframe src="http://player.vimeo.com/video/22594668" width="707" height="726" frameborder="0"></iframe></p>
+      <p>The blob in the middle is Switzerland, by the way ;)</p>
+      <p>How do we do it?</p>
+      <h2>The server code</h2>
+      <p>The server … you probably could have done sleeping if you&#8217;ve been reading this blog dilligently ;)</p>
+      <p>The data comes from the <span class="caps">CSV</span> file <code>data/swiss_places.csv</code></p>
+      <pre class="sh_ruby"><code>places = Index::Memory.new :geo do&#x000A;  source         Sources::CSV.new(:location, :north, :east, file: 'data/swiss_places.csv')&#x000A;  category       :location, partial: Partial::Substring.new(from: 1)&#x000A;  geo_categories :north, :east, 1, precision: 3&#x000A;end</code></pre>
+      <p>What&#8217;s interesting here is the <code>geo_categories</code> method. It takes two categories, <code>north</code>, and <code>east</code>, which are both in the lat/lng format, e.g. <code>47.2</code>, <code>8.3</code>. (It also takes options <code>lat_from</code>, and <code>lng_from</code> if the categories don&#8217;t have the same names as in the data source)</p>
+      <p>Also, the 1 parameter in <code>geo_categories</code> denotes that we search 1 km around the clicked location.</p>
+      <p>This is actually the simple part. It does no exact calculation, but an approximate one that&#8217;s most correct in temperate zones. But as you see in the video, it works well. Especially in a &#8220;what&#8217;s around me&#8221; type search.</p>
+      <p>Still in the server config <code>app/application.rb</code>:</p>
+      <pre class="sh_ruby"><code>route %r{\A/places\Z} =&gt; Search.new(places)</code></pre>
+      <p>Self-explanatory, eh? As regexp, you could also use <code>%r{^/places$}</code>.</p>
+      <p>That&#8217;s it for the server. Nothing special so far.</p>
+      <p><code>rake index; rake start</code> and off we go.</p>
+      <h2>The client code</h2>
+      <p>In this part we&#8217;re going to install the map.</p>
+      <p>So we&#8217;re using the generated code, but add a little more information to the returned json hash.</p>
+      <p>We not only need the list results, but also the coordinates themselves. So we&#8217;re going to add them to the results separately.</p>
+      <p>We (ab)use <code>populate_with</code>, the method that makes models out of the returned ids and yields them to the block to be rendered.</p>
+      <p>We then use the models to add geo coordinates to the result hash that is sent to the client.</p>
+      <pre class="sh_ruby"><code>results = Geo.search params[:query], :ids =&gt; params[:ids], :offset =&gt; params[:offset]&#x000A;results.extend Picky::Convenience&#x000A;results[:geo] ||= [] # &lt;= We initialize an array of coordinates in the results hash.&#x000A;results.populate_with Location do |location|&#x000A;  results[:geo] &lt;&lt; [location.north, location.east] # &lt;- and we populate it with the coordinates.&#x000A;  location.to_s&#x000A;end</code></pre>
+      <p>So essentially, our geo data piggybacks to the Javascript client. JS, here we come!</p>
+      <h2>The javascript client code</h2>
+      <p>The javascript client requires a bit more work. Well, the map does.</p>
+      <p>We insert this after the <code>PickyClient</code> code. The first 6 lines are noise and map preparation.</p>
+      <pre class="sh_javascript"><code>// The map&#x000A;//&#x000A;$(document).ready(function() {&#x000A;  if (GBrowserIsCompatible()) {&#x000A;    // Map setup.&#x000A;    //&#x000A;    map = new GMap2(document.getElementById('map_div'));&#x000A;    map.addControl(new GSmallMapControl());&#x000A;    map.setCenter(new GLatLng(46.85, 8.05), 13);&#x000A;    map.setZoom(7);&#x000A;&#x000A;    // Click listener.&#x000A;    //&#x000A;    GEvent.addListener(map, "click", function(overlay, latlng) {&#x000A;      if (latlng) {&#x000A;        pickyClient.insert(Math.round(latlng.lat()*1000)/1000 + ' ' + Math.round(latlng.lng()*1000)/1000);&#x000A;      }&#x000A;    });&#x000A;  }&#x000A;});</code></pre>
+      <p>Then, we add the most important part: A click <code>listener</code> that inserts the coordinates (rounded to 3 digits) in the search field, as you have seen in the video.</p>
+      <p>Now, searches are already sent off to Picky and come back. Whoosh!</p>
+      <p>What do we need to do now? Yes, draw some markers in the map. The <code>PickyClient</code> offers a callback that is called after Picky has updated the results (there are also <code>before</code> and <code>success</code>):</p>
+      <pre class="sh_javascript"><code>after: function(data, query) {&#x000A;  map.clearOverlays();&#x000A;&#x000A;  var geo = data.original_hash.geo;&#x000A;  if (geo) {&#x000A;    for (var i = 0; i &lt; geo.length; i++) {&#x000A;      map.addOverlay(new GMarker(new GLatLng(geo[i][0], geo[i][1])));&#x000A;    };&#x000A;  }&#x000A;},</code></pre>
+      <p>First we clear the overlays for the new results.</p>
+      <p>Then, we get the piggybacking geo data using the data object&#8217;s <code>original_hash</code> function, finally iterating over all coordinates and adding overlays as we go.</p>
+      <p>By default, the client only gets 20 results at a time. We set it to 100 using the <code>fullResults</code> option.</p>
+      <pre class="sh_javascript"><code>fullResults: 100</code></pre>
+      <p>That&#8217;s it. It&#8217;s fast and quite easy to set up.</p>
+      <h2>Sidenote</h2>
+      <p>Since for Swiss data it is clear which is the longitude and which is the latitude (no data intersection), we can just enter e.g. <code>47.2 8.3</code>, but if your data area isn&#8217;t exclusive, e.g. <code>33.1 33.2</code>, meaning that latitude values can also be longitude values, just add <code>north:33.1 east:33.2</code>, to denote what is what if north, east are the names of your categories.</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>that a geo search in Picky is quite snappy.</li>
+      	<li>that you can search for latitude and location name only, for example.</li>
+      	<li>how you can configure the server.</li>
+      	<li>how you can configure the client and the web frontend.</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/04/26/picky-geosearch-2.html" title="Next post: Picky&amp;#58;&amp;nbsp;Geosearch&amp;nbsp;2">Picky&#58;&nbsp;Geosearch&nbsp;2</a>
       <br />
@@ -126,20 +126,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/04/19/picky-geosearch-1';
-            var disqus_url = 'http://florianhanke.com/blog/2011/04/19/picky-geosearch-1.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/04/19/picky-geosearch-1';
+          var disqus_url = 'http://florianhanke.com/blog/2011/04/19/picky-geosearch-1.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

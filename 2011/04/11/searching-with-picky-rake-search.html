@@ -63,32 +63,32 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
-        <p>This post is about a fun little experimental toy I&#8217;ve been working on: <code>picky search &lt;url&gt;</code>.</p>
-        <h2>Update!</h2>
-        <p><code>rake search</code> is <code>picky search</code> from 2.2.0 on.</p>
-        <h2>picky search &lt;url&gt;?</h2>
-        <p>Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).</p>
-        <h2>How do I use it?</h2>
-        <p>See this short video (it&#8217;s best to full-screen it):</p>
-        <p><iframe src="http://player.vimeo.com/video/22216442" width="600" height="387" frameborder="0"></iframe></p>
-        <ol>
-        	<li>Start a Picky server.</li>
-        	<li>Then type <code>picky search /some/url</code> (where <code>/some/url</code> is a path – or url if not on this server – you&#8217;ve defined using <code>route</code> in <code>app/application.rb</code>).</li>
-        	<li>Then, just type away.</li>
-        </ol>
-        <p>The result id count will update as you type.</p>
-        <p>When pressing enter, the top 20 result ids will appear next to your search text.</p>
-        <p>If you want to exit, just <code>Ctrl-C</code>. That&#8217;s it.</p>
-        <p>Note that you need the picky-client &amp; highline gem installed. But Picky will tell you so if you haven&#8217;t.</p>
-        <h2>How does it work?</h2>
-        <p>I use the highline gem (by <a href="http://twitter.com/jeg2">@JEG2</a>) to get single characters (using the appropriately named <code>get_character</code>) from the user and then move the cursor around using <code>\e[#{amount}D</code> (left) and <code>\e[#{amount}C</code> (right), <code>print</code> ing to the <span class="caps">STDOUT</span> and <code>flush</code> ing it a lot.</p>
-        <p>If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I&#8217;d like to hear about it!</p>
-        <h2>Conclusion</h2>
-        <p>So we&#8217;ve seen</p>
-        <ol>
-        	<li>how you run a search directly in the terminal.</li>
-        </ol>
-        <p>Hope you learnt something new!</p>
+      <p>This post is about a fun little experimental toy I&#8217;ve been working on: <code>picky search &lt;url&gt;</code>.</p>
+      <h2>Update!</h2>
+      <p><code>rake search</code> is <code>picky search</code> from 2.2.0 on.</p>
+      <h2>picky search &lt;url&gt;?</h2>
+      <p>Yes. While working on a server, I sometimes want to see if the search engine works correctly directly in the terminal (normally I use tests, but sometimes I need that quick look).</p>
+      <h2>How do I use it?</h2>
+      <p>See this short video (it&#8217;s best to full-screen it):</p>
+      <p><iframe src="http://player.vimeo.com/video/22216442" width="600" height="387" frameborder="0"></iframe></p>
+      <ol>
+      	<li>Start a Picky server.</li>
+      	<li>Then type <code>picky search /some/url</code> (where <code>/some/url</code> is a path – or url if not on this server – you&#8217;ve defined using <code>route</code> in <code>app/application.rb</code>).</li>
+      	<li>Then, just type away.</li>
+      </ol>
+      <p>The result id count will update as you type.</p>
+      <p>When pressing enter, the top 20 result ids will appear next to your search text.</p>
+      <p>If you want to exit, just <code>Ctrl-C</code>. That&#8217;s it.</p>
+      <p>Note that you need the picky-client &amp; highline gem installed. But Picky will tell you so if you haven&#8217;t.</p>
+      <h2>How does it work?</h2>
+      <p>I use the highline gem (by <a href="http://twitter.com/jeg2">@JEG2</a>) to get single characters (using the appropriately named <code>get_character</code>) from the user and then move the cursor around using <code>\e[#{amount}D</code> (left) and <code>\e[#{amount}C</code> (right), <code>print</code> ing to the <span class="caps">STDOUT</span> and <code>flush</code> ing it a lot.</p>
+      <p>If there is a gem which makes it easy to position objects in the terminal which update it (by being used in a visitor pattern or however), I&#8217;d like to hear about it!</p>
+      <h2>Conclusion</h2>
+      <p>So we&#8217;ve seen</p>
+      <ol>
+      	<li>how you run a search directly in the terminal.</li>
+      </ol>
+      <p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/04/12/picky-data-sources-next-steps.html" title="Next post: Picky&amp;nbsp;Data&amp;nbsp;Sources&amp;#58; Next&amp;nbsp;Steps">Picky&nbsp;Data&nbsp;Sources&#58; Next&nbsp;Steps</a>
       <br />
@@ -97,20 +97,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/04/11/searching-with-picky-rake-search';
-            var disqus_url = 'http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/04/11/searching-with-picky-rake-search';
+          var disqus_url = 'http://florianhanke.com/blog/2011/04/11/searching-with-picky-rake-search.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

@@ -63,103 +63,103 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post about designing realtime indexes for  <a href="http://florianhanke.com/picky/">Picky</a>.</p>
-        <p>Realtime indexes are an exciting thing! The possibility of inserting something into a search engine, then having the thing pop up immediately in results is fantastic. Wouldn&#8217;t you love that in Picky? Man, me too!</p>
-        <p>Too bad that we yet have to implement it. Heh.</p>
-        <p>On the other hand, some good <span class="caps">TDD</span> should do it. &#8220;<span class="caps">TDD</span>&#8221; you ask? <span class="caps">TDD</span> of course, is the noble activity of Thought Driven Development. Also known as <span class="caps">QDD</span>, Question Driven Development.</p>
-        <p>Let&#8217;s fire up the cranial engines and get the gray matter bubbling.</p>
-        <p>Specifically, I&#8217;d like to talk about the <span class="caps">API</span>, and how to implement it in Picky. Along the way I will touch on the inverted index, necessary bookkeeping, how I will implement it, how to use it and how <strong>not</strong> to use it, the latter being more important than the former.</p>
-        <h2>What is a realtime index?</h2>
-        <p>A realtime index is an index that has the ability to have e.g. text indexed at runtime, and returning results for that text <strong>immediately</strong> after indexing.</p>
-        <p>One example for a Ruby realtime search engine is <a href="http://masanjin.net/whistlepig/">Whistlepig</a> by <a href="http://twitter.com/wm">William Morgan</a>.</p>
-        <p>Ok, let&#8217;s talk about what we want.</p>
-        <h2>What I want</h2>
-        <p>In ways, writing Picky has been like being the first person in a group of mountaineers: You climb a mountain. It&#8217;s a bit taxing. But we take it one step at a time. The summit is visible at all times. Meaning: Goal clear, steps towards it too.</p>
-        <p>As a first step towards a multi-process, multi-threaded realtime index we&#8217;d like to get it working for a single process, for a single thread. Then cross the next bridge when we get to it.</p>
-        <p>When designing software, I have yet to see a case where designing multiple things at the same time is better than focusing on a single thing at first.</p>
-        <p>Ok, so let&#8217;s just look at what we want:</p>
-        <h2><span class="caps">API</span></h2>
-        <p>Let&#8217;s offer three methods on an index:</p>
-        <ul>
-        	<li><code>#remove(id)</code> (Removes an element with a given id from the index)</li>
-        	<li><code>#add(object)</code> (Adds an element with a given id to the index)</li>
-        	<li><code>#replace(object)</code> (<code>#remove</code> followed by <code>#add</code> – this is what you&#8217;d use usually)</li>
-        </ul>
-        <p>We could just do the replace method first, but there might be cases where you&#8217;d want to remove and add separately. When you have a producer and a consumer, for example.</p>
-        <p>What would they return? I&#8217;m quite unsure yet. Let&#8217;s leave that out for later. Maybe you have some ideas?</p>
-        <p>How would we call these?</p>
-        <pre class="sh_ruby"><code>index = Picky::Index.new(:example) do&#x000A;  # index definition&#x000A;end&#x000A;index.remove(13)&#x000A;index.add(thing)&#x000A;index.replace(thing_that_responds_to_the_id_method)</code></pre>
-        <p>You call these methods from a <a href="http://sinatrarb.com">Sinatra</a> or Rails action, from a Signal trap, etc.</p>
-        <h2>What I do (not yet) want</h2>
-        <p>To focus on a good <span class="caps">SRP</span> implementation of realtime indexes, we won&#8217;t (yet) implement:</p>
-        <ul>
-        	<li>Multiprocess</li>
-        	<li>Multithreading</li>
-        </ul>
-        <p>and work for the (assumed) 80% case where we want to have more recent objects sorted at the top of the results (Whistlepig also does this).</p>
-        <p>So, realtime indexes will be sorted initially like a normal index, but will then gravitate towards a &#8220;most recent first&#8221; sorting.</p>
-        <h2>Summary</h2>
-        <p>So, what we want is a realtime index that lets us add and remove elements at runtime. Elements that are removed will not show up anymore in the results and elements that are added will show up on top of the results.</p>
-        <p>So,</p>
-        <ol>
-        	<li><code>thing_search.search "blah" # =&gt; [1,2,3]</code></li>
-        	<li><code>index_of_thing_search.add(thing_with_id_5_and_text_blah)</code></li>
-        	<li><code>thing_search.search "blah" # =&gt; [5,1,2,3]</code></li>
-        </ol>
-        <p>is what we want.</p>
-        <p>That is an (assumed) default case and this is what we will go for in this first implementation.</p>
-        <h2>The inverted index</h2>
-        <p>Amongst other things, Picky contains an <a href="http://en.wikipedia.org/wiki/Inverted_index">Inverted Index</a> that is central to most search engines.</p>
-        <p>We&#8217;ll review it quickly so you can follow the implementation.</p>
-        <p>In its simplest form, the inverted index saves tokens that point to a list of ids.</p>
-        <pre class="sh_ruby"><code>{&#x000A;  :token1 =&gt; [1,4,2,5,6],&#x000A;  :token2 =&gt; [3,4,8,2]&#x000A;}</code></pre>
-        <p>and so on. This makes it easy to look up text that the user is looking for. Just do a</p>
-        <pre class="sh_ruby"><code>ids = inverted_index[text]</code></pre>
-        <p>and you have all the ids that contain that text.</p>
-        <p>Picky has quite a few more internal indexes that help it look stuff up, but we&#8217;ll focus on the inverted index here.</p>
-        <p>All clear? Now let&#8217;s add realtime indexing to that.</p>
-        <h2>The naive approach</h2>
-        <p>So, given that we have an inverted index like</p>
-        <pre class="sh_ruby"><code>{&#x000A;  :picky =&gt; [1,2,3,4,5],&#x000A;  :whistlepig =&gt; [5,6,7,8,9]&#x000A;}</code></pre>
-        <p>and we want to remove an id, say <code>5</code>, in a naive way.</p>
-        <p>We could just iterate over all arrays on the values side of the hash. Here, this would be easy:</p>
-        <pre class="sh_ruby"><code>inverted_index.each do |_, ids|&#x000A;  ids.delete id_to_remove&#x000A;end</code></pre>
-        <p>You probably already see the problem. On a 12GB index (the first Picky production use case), this would take a loooong time.</p>
-        <p>So, although nice and very understandable, this is not feasible.</p>
-        <p>We need to make it faster.</p>
-        <h2>A better way</h2>
-        <p>Q: How do you make something faster in computer science?</p>
-        <p>A: Get a bigger computer?</p>
-        <p>A: More processors?</p>
-        <p>A: Uh, why are you looking at me like that?</p>
-        <p>Q: <b>whacks student with a large trout</b></p>
-        <p>But seriously, if you want to get <strong>speed</strong>, you have to sacrifice <strong>space</strong>. Hello, age-old trade-off.</p>
-        <p>This always means adding some sort of data structure, since when I say space, I mean data structures. And this means complexity. From which follows that we have consistency troubles ahead of us.</p>
-        <p>Anyway, on with it!</p>
-        <h3>The fast approach that needs some bookkeeping&#8482;</h3>
-        <p>So, instead of iterating over all id arrays, we should remember which array had a certain id in it.</p>
-        <p>How would you do this?</p>
-        <p>Hello Mr. Hash. We remember which id was in which array. So we have a telephone book of ids that maps to the id array <em>references</em>, such that:</p>
-        <pre class="sh_ruby"><code>{&#x000A;  1 =&gt; [[1,2,3,4,5]],             # reference&#x000A;  5 =&gt; [[1,2,3,4,5], [5,6,7,8,9]] # references&#x000A;}</code></pre>
-        <p>Now we can ask this mapping to find out incredibly quickly which arrays we need to update:</p>
-        <pre class="sh_ruby"><code>array_of_id_arrays = mapping[5]</code></pre>
-        <h3>A bit of a kicker / homework</h3>
-        <p>I&#8217;ve got a question for you:</p>
-        <p>In the case of removing an id, how would you remove it? Look at</p>
-        <pre class="sh_ruby"><code>mapping[5].each do |id_array|&#x000A;  id_array.delete 5&#x000A;end</code></pre>
-        <p>Does this work? Has the array in the hash changed? If so, why? If not, why not?</p>
-        <p>Hint: It&#8217;s not an accident I was talking about <em>references</em>, above.</p>
-        <h3>Adding</h3>
-        <p>Removing is relatively easy. How about adding?</p>
-        <p>When adding, we process the data to get tokens, then look up each token in the inverted index, prepending the id to the id_array.</p>
-        <pre class="sh_ruby"><code>tokens.each do |token|&#x000A;  inverted_index[token].unshift id&#x000A;end</code></pre>
-        <p>Easy as well.</p>
-        <p>Note: This is only a good thing to do if the id isn&#8217;t in the index yet.</p>
-        <h2>Conclusion</h2>
-        <p>When just looking at the inverted index, realtime indexing looks rather easy doesn&#8217;t it?</p>
-        <p>Well, I hope it does so now, to you, I also hope that the basics of search engines seem less daunting to you now :)</p>
-        <p>It will be a bit more complicated to implement, as a few more internal indexes need to be held consistent, but as usual, a large array of tests should help with that.</p>
-        <h2>Caveats</h2>
-        <p>This implementation completely ignores the case where Picky runs in multiple processes (i.e. in Unicorn), or in multiple threads. But we&#8217;ll cross that bridge when we get to it. These concerns are completely orthogonal, thus it&#8217;s a good thing to separate thinking about them. As usual.</p>
+      <p>Realtime indexes are an exciting thing! The possibility of inserting something into a search engine, then having the thing pop up immediately in results is fantastic. Wouldn&#8217;t you love that in Picky? Man, me too!</p>
+      <p>Too bad that we yet have to implement it. Heh.</p>
+      <p>On the other hand, some good <span class="caps">TDD</span> should do it. &#8220;<span class="caps">TDD</span>&#8221; you ask? <span class="caps">TDD</span> of course, is the noble activity of Thought Driven Development. Also known as <span class="caps">QDD</span>, Question Driven Development.</p>
+      <p>Let&#8217;s fire up the cranial engines and get the gray matter bubbling.</p>
+      <p>Specifically, I&#8217;d like to talk about the <span class="caps">API</span>, and how to implement it in Picky. Along the way I will touch on the inverted index, necessary bookkeeping, how I will implement it, how to use it and how <strong>not</strong> to use it, the latter being more important than the former.</p>
+      <h2>What is a realtime index?</h2>
+      <p>A realtime index is an index that has the ability to have e.g. text indexed at runtime, and returning results for that text <strong>immediately</strong> after indexing.</p>
+      <p>One example for a Ruby realtime search engine is <a href="http://masanjin.net/whistlepig/">Whistlepig</a> by <a href="http://twitter.com/wm">William Morgan</a>.</p>
+      <p>Ok, let&#8217;s talk about what we want.</p>
+      <h2>What I want</h2>
+      <p>In ways, writing Picky has been like being the first person in a group of mountaineers: You climb a mountain. It&#8217;s a bit taxing. But we take it one step at a time. The summit is visible at all times. Meaning: Goal clear, steps towards it too.</p>
+      <p>As a first step towards a multi-process, multi-threaded realtime index we&#8217;d like to get it working for a single process, for a single thread. Then cross the next bridge when we get to it.</p>
+      <p>When designing software, I have yet to see a case where designing multiple things at the same time is better than focusing on a single thing at first.</p>
+      <p>Ok, so let&#8217;s just look at what we want:</p>
+      <h2><span class="caps">API</span></h2>
+      <p>Let&#8217;s offer three methods on an index:</p>
+      <ul>
+      	<li><code>#remove(id)</code> (Removes an element with a given id from the index)</li>
+      	<li><code>#add(object)</code> (Adds an element with a given id to the index)</li>
+      	<li><code>#replace(object)</code> (<code>#remove</code> followed by <code>#add</code> – this is what you&#8217;d use usually)</li>
+      </ul>
+      <p>We could just do the replace method first, but there might be cases where you&#8217;d want to remove and add separately. When you have a producer and a consumer, for example.</p>
+      <p>What would they return? I&#8217;m quite unsure yet. Let&#8217;s leave that out for later. Maybe you have some ideas?</p>
+      <p>How would we call these?</p>
+      <pre class="sh_ruby"><code>index = Picky::Index.new(:example) do&#x000A;  # index definition&#x000A;end&#x000A;index.remove(13)&#x000A;index.add(thing)&#x000A;index.replace(thing_that_responds_to_the_id_method)</code></pre>
+      <p>You call these methods from a <a href="http://sinatrarb.com">Sinatra</a> or Rails action, from a Signal trap, etc.</p>
+      <h2>What I do (not yet) want</h2>
+      <p>To focus on a good <span class="caps">SRP</span> implementation of realtime indexes, we won&#8217;t (yet) implement:</p>
+      <ul>
+      	<li>Multiprocess</li>
+      	<li>Multithreading</li>
+      </ul>
+      <p>and work for the (assumed) 80% case where we want to have more recent objects sorted at the top of the results (Whistlepig also does this).</p>
+      <p>So, realtime indexes will be sorted initially like a normal index, but will then gravitate towards a &#8220;most recent first&#8221; sorting.</p>
+      <h2>Summary</h2>
+      <p>So, what we want is a realtime index that lets us add and remove elements at runtime. Elements that are removed will not show up anymore in the results and elements that are added will show up on top of the results.</p>
+      <p>So,</p>
+      <ol>
+      	<li><code>thing_search.search "blah" # =&gt; [1,2,3]</code></li>
+      	<li><code>index_of_thing_search.add(thing_with_id_5_and_text_blah)</code></li>
+      	<li><code>thing_search.search "blah" # =&gt; [5,1,2,3]</code></li>
+      </ol>
+      <p>is what we want.</p>
+      <p>That is an (assumed) default case and this is what we will go for in this first implementation.</p>
+      <h2>The inverted index</h2>
+      <p>Amongst other things, Picky contains an <a href="http://en.wikipedia.org/wiki/Inverted_index">Inverted Index</a> that is central to most search engines.</p>
+      <p>We&#8217;ll review it quickly so you can follow the implementation.</p>
+      <p>In its simplest form, the inverted index saves tokens that point to a list of ids.</p>
+      <pre class="sh_ruby"><code>{&#x000A;  :token1 =&gt; [1,4,2,5,6],&#x000A;  :token2 =&gt; [3,4,8,2]&#x000A;}</code></pre>
+      <p>and so on. This makes it easy to look up text that the user is looking for. Just do a</p>
+      <pre class="sh_ruby"><code>ids = inverted_index[text]</code></pre>
+      <p>and you have all the ids that contain that text.</p>
+      <p>Picky has quite a few more internal indexes that help it look stuff up, but we&#8217;ll focus on the inverted index here.</p>
+      <p>All clear? Now let&#8217;s add realtime indexing to that.</p>
+      <h2>The naive approach</h2>
+      <p>So, given that we have an inverted index like</p>
+      <pre class="sh_ruby"><code>{&#x000A;  :picky =&gt; [1,2,3,4,5],&#x000A;  :whistlepig =&gt; [5,6,7,8,9]&#x000A;}</code></pre>
+      <p>and we want to remove an id, say <code>5</code>, in a naive way.</p>
+      <p>We could just iterate over all arrays on the values side of the hash. Here, this would be easy:</p>
+      <pre class="sh_ruby"><code>inverted_index.each do |_, ids|&#x000A;  ids.delete id_to_remove&#x000A;end</code></pre>
+      <p>You probably already see the problem. On a 12GB index (the first Picky production use case), this would take a loooong time.</p>
+      <p>So, although nice and very understandable, this is not feasible.</p>
+      <p>We need to make it faster.</p>
+      <h2>A better way</h2>
+      <p>Q: How do you make something faster in computer science?</p>
+      <p>A: Get a bigger computer?</p>
+      <p>A: More processors?</p>
+      <p>A: Uh, why are you looking at me like that?</p>
+      <p>Q: <b>whacks student with a large trout</b></p>
+      <p>But seriously, if you want to get <strong>speed</strong>, you have to sacrifice <strong>space</strong>. Hello, age-old trade-off.</p>
+      <p>This always means adding some sort of data structure, since when I say space, I mean data structures. And this means complexity. From which follows that we have consistency troubles ahead of us.</p>
+      <p>Anyway, on with it!</p>
+      <h3>The fast approach that needs some bookkeeping&#8482;</h3>
+      <p>So, instead of iterating over all id arrays, we should remember which array had a certain id in it.</p>
+      <p>How would you do this?</p>
+      <p>Hello Mr. Hash. We remember which id was in which array. So we have a telephone book of ids that maps to the id array <em>references</em>, such that:</p>
+      <pre class="sh_ruby"><code>{&#x000A;  1 =&gt; [[1,2,3,4,5]],             # reference&#x000A;  5 =&gt; [[1,2,3,4,5], [5,6,7,8,9]] # references&#x000A;}</code></pre>
+      <p>Now we can ask this mapping to find out incredibly quickly which arrays we need to update:</p>
+      <pre class="sh_ruby"><code>array_of_id_arrays = mapping[5]</code></pre>
+      <h3>A bit of a kicker / homework</h3>
+      <p>I&#8217;ve got a question for you:</p>
+      <p>In the case of removing an id, how would you remove it? Look at</p>
+      <pre class="sh_ruby"><code>mapping[5].each do |id_array|&#x000A;  id_array.delete 5&#x000A;end</code></pre>
+      <p>Does this work? Has the array in the hash changed? If so, why? If not, why not?</p>
+      <p>Hint: It&#8217;s not an accident I was talking about <em>references</em>, above.</p>
+      <h3>Adding</h3>
+      <p>Removing is relatively easy. How about adding?</p>
+      <p>When adding, we process the data to get tokens, then look up each token in the inverted index, prepending the id to the id_array.</p>
+      <pre class="sh_ruby"><code>tokens.each do |token|&#x000A;  inverted_index[token].unshift id&#x000A;end</code></pre>
+      <p>Easy as well.</p>
+      <p>Note: This is only a good thing to do if the id isn&#8217;t in the index yet.</p>
+      <h2>Conclusion</h2>
+      <p>When just looking at the inverted index, realtime indexing looks rather easy doesn&#8217;t it?</p>
+      <p>Well, I hope it does so now, to you, I also hope that the basics of search engines seem less daunting to you now :)</p>
+      <p>It will be a bit more complicated to implement, as a few more internal indexes need to be held consistent, but as usual, a large array of tests should help with that.</p>
+      <h2>Caveats</h2>
+      <p>This implementation completely ignores the case where Picky runs in multiple processes (i.e. in Unicorn), or in multiple threads. But we&#8217;ll cross that bridge when we get to it. These concerns are completely orthogonal, thus it&#8217;s a good thing to separate thinking about them. As usual.</p>
       Next
       <a href="/blog/2011/10/23/twitter.html" title="Next post: Twitter&amp;nbsp;Account">Twitter&nbsp;Account</a>
       <br />
@@ -168,20 +168,20 @@
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
-          //<![CDATA[
-            var disqus_shortname = 'florianhanke';
-            var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-            var disqus_identifier = '/2011/10/23/designing-realtime-indexes';
-            var disqus_url = 'http://florianhanke.com/blog/2011/10/23/designing-realtime-indexes.html';
-            
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-          //]]>
-        </script>
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/10/23/designing-realtime-indexes';
+          var disqus_url = 'http://florianhanke.com/blog/2011/10/23/designing-realtime-indexes.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
       <noscript>
         Please enable JavaScript to view the
         <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>

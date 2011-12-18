@@ -4,13 +4,144 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-18T17:20:55+11:00</updated>
+ <updated>2011-12-18T22:01:53+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;APIs</title>
+   <link href="http://florianhanke.com/blog/2011/12/18/picky-apis.html"/>
+   <updated>2011-12-18T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/12/18/picky-apis</id>
+   <content type="html">&lt;p&gt;A few examples of how to inject your own functionality into &lt;a href=&quot;http://florianhanke.com/picky/&quot;&gt;Picky&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;re going to look at a simple example and how to customize it with Picky 4.0!&lt;/p&gt;
+&lt;h2&gt;The Copy &amp;amp; Paste Example&lt;/h2&gt;
+&lt;p&gt;The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a &lt;code&gt;Search&lt;/code&gt; object on the index to search on it.&lt;/p&gt;
+&lt;p&gt;Go ahead, copy it into TextMate or similar!&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'picky'
+
+Person = Struct.new :id, :first, :last
+
+data = Picky::Index.new :people do
+  category :first
+  category :last
+end
+
+data.replace Person.new(1, 'Donald', 'Knuth')
+data.replace Person.new(2, 'Niklaus', 'Wirth')
+data.replace Person.new(3, 'Donald', 'Worth')
+data.replace Person.new(4, 'Peter', 'Niklaus')
+
+people = Picky::Search.new data
+
+results = people.search 'donald'
+
+p results.ids
+p results.allocations&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This returns ids &lt;code&gt;[3, 1]&lt;/code&gt; and
+the allocations &lt;code&gt;[ [:people, 0.0, 2, [ [:first, &quot;donald&quot;, &quot;donald&quot;] ], [3, 1]] ]&lt;/code&gt;. That might look a little funny, so let me explain: &lt;code&gt;:people&lt;/code&gt; is the index name where it was found. &lt;code&gt;0.0&lt;/code&gt; is the total weight. &lt;code&gt;2&lt;/code&gt; is the total number of ids in this &amp;#8220;allocation&amp;#8221; (combination of categories).
+&lt;code&gt;[:first, &quot;donald&quot;, &quot;donald&quot;]&lt;/code&gt; is the category the query word was found in, together with the token and the original.&lt;/p&gt;
+&lt;p&gt;All clear?&lt;/p&gt;
+&lt;p&gt;Try searching for &amp;#8220;Niklaus&amp;#8221;:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You should find ids &lt;code&gt;[2, 4]&lt;/code&gt; and two allocations now, first in the first name, then in the last name.&lt;/p&gt;
+&lt;p&gt;What if you want to find the last name first? We add some weight to it!&lt;/p&gt;
+&lt;h3&gt;Adding weight&lt;/h3&gt;
+&lt;p&gt;By default, Picky already weighs the categories with a logarithmic weight. That is, the more a token occurs in a category, the &amp;#8220;heavier&amp;#8221; it is.&lt;/p&gt;
+&lt;p&gt;So this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is actually&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, weight: Weights::Logarithmic.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, for &amp;#8220;Niklaus&amp;#8221;, that resolves to a weight of 0.0.&lt;/p&gt;
+&lt;p&gt;So let&amp;#8217;s add our own weight object. It just needs to respond to &lt;code&gt;#weight_for(amount_of_ids)&lt;/code&gt; and return a float.&lt;/p&gt;
+&lt;p&gt;We ignore the amount and return a flat 12.3. Copy this in your example:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Weight = Class.new do
+  def weight_for amount
+    12.3
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and replace&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, weight: Weight.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now the last name comes first, with a weight of 12.3, not surprisingly.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 12.3, 1, [[:last, &quot;niklaus&quot;, &quot;niklaus&quot;]], [4]], [:people, 0.0, 1, [[:first, &quot;niklaus&quot;, &quot;niklaus&quot;]], [2]]]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Picky provides a few weights itself:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;code&gt;Picky::Weights::Logarithmic.new&lt;/code&gt; The default.&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Picky::Weights::Constant.new&lt;/code&gt; (with 0.0) or &lt;code&gt;Picky::Weights::Constant.new(1.23)&lt;/code&gt; (with 1.23)&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Picky::Weights::Dynamic.new { |str_or_sym| str_or_sym.size }&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What if we want &amp;#8220;Wirth&amp;#8221; and &amp;#8220;Worth&amp;#8221; be found at the same time?&lt;/p&gt;
+&lt;h3&gt;Adding similarity&lt;/h3&gt;
+&lt;p&gt;By default, Picky does not look for similar words.&lt;/p&gt;
+&lt;p&gt;This:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is actually&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity::None.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, look for &amp;#8220;warth~&amp;#8221; (the ~ tells Picky to look for similar words):&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You found nothing, right?&lt;/p&gt;
+&lt;p&gt;Picky only looks for similar words if the category enables it!&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s write a similarity such that both will be found. Copy this in your example:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Similarity = Class.new do
+  def encode text
+    text.gsub /[aeiou]/, ''
+  end
+  def prioritize ary, encoded
+
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We encode a text such that its vowels are removed. This will make &amp;#8220;wirth&amp;#8221; and &amp;#8220;worth&amp;#8221; resolve both to &amp;#8220;wrth&amp;#8221;, and that makes them similar.
+(The &lt;code&gt;prioritize&lt;/code&gt; method allows you to sort and trim the similars list)&lt;/p&gt;
+&lt;p&gt;and replace&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Again, search for &amp;#8220;warth~&amp;#8221;.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This time you found both, right?&lt;/p&gt;
+&lt;p&gt;Picky offers &lt;code&gt;Similarity::Soundex.new(amount_of_similar)&lt;/code&gt;, &lt;code&gt;Similarity::Metaphone.new(amount_of_similar)&lt;/code&gt; and &lt;code&gt;Similarity::DoubleMetaphone.new(amount_of_similar)&lt;/code&gt;. But rolling your own is easy, as you have seen.&lt;/p&gt;
+&lt;h3&gt;Adding partial searching&lt;/h3&gt;
+&lt;p&gt;Can you find Donald Knuth by entering &amp;#8220;Donal&amp;#8221;?&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'donal'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can. But why?&lt;/p&gt;
+&lt;p&gt;The word &amp;#8220;donal&amp;#8221; finds something because this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is actually&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial::Postfix.new(from: -3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That means it finds &amp;#8220;dona&amp;#8221;, &amp;#8220;donal&amp;#8221;, &amp;#8220;donald&amp;#8221;. Try them all!&lt;/p&gt;
+&lt;p&gt;Does it find &amp;#8220;don&amp;#8221;? Try it:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;No, it doesn&amp;#8217;t! We could use &lt;code&gt;Partial::Postfix.new(from: -4)&lt;/code&gt; to include this case, but let&amp;#8217;s write our own :)&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Partial = Class.new do
+  def each_partial text
+    text = text.dup
+    (text.size - 1).times do
+      yield text.chop!
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and replace&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Try again:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we find Donald. You can even do this with our partial code:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'd'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We still find him.&lt;/p&gt;
+&lt;p&gt;Now, Picky already offers a few partial behaviours:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;code&gt;Partial::None.new&lt;/code&gt; (Do not search for a partial)&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Partial::Postfix.new(from: position)&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Partial::Substring.new(from: position, to: position)&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;Partial::Infix.new(min: size, max: size)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One important note: Picky always searches for the last token in the partial index, even without the asterisk next to the word. If it&amp;#8217;s not the last word, you need an asterisk: &amp;#8220;Don* Knuth&amp;#8221;.&lt;/p&gt;
+&lt;h3&gt;Boosting&lt;/h3&gt;
+&lt;p&gt;To move an allocation up in the ranking, we used weights.&lt;/p&gt;
+&lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;4.0</title>

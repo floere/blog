@@ -1,0 +1,200 @@
+---
+layout: post
+title: Picky&nbsp;APIs
+categories:
+  - ruby
+  - picky
+  - api
+---
+A few examples of how to inject your own functionality into "Picky":http://florianhanke.com/picky/.
+
+We're going to look at a simple example and how to customize it with Picky 4.0!
+
+h2. The Copy & Paste Example
+
+The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a @Search@ object on the index to search on it.
+
+Go ahead, copy it into TextMate or similar!
+
+<pre class="sh_ruby"><code>require 'picky'
+
+Person = Struct.new :id, :first, :last
+
+data = Picky::Index.new :people do
+  category :first
+  category :last
+end
+
+data.replace Person.new(1, 'Donald', 'Knuth')
+data.replace Person.new(2, 'Niklaus', 'Wirth')
+data.replace Person.new(3, 'Donald', 'Worth')
+data.replace Person.new(4, 'Peter', 'Niklaus')
+
+people = Picky::Search.new data
+
+results = people.search 'donald'
+
+p results.ids
+p results.allocations</code></pre>
+
+This returns ids @[3, 1]@ and
+the allocations @[ [:people, 0.0, 2, [ [:first, "donald", "donald"] ], [3, 1]] ]@. That might look a little funny, so let me explain: @:people@ is the index name where it was found. @0.0@ is the total weight. @2@ is the total number of ids in this "allocation" (combination of categories).
+@[:first, "donald", "donald"]@ is the category the query word was found in, together with the token and the original.
+
+All clear?
+
+Try searching for "Niklaus":
+
+<pre class="ruby"><code>results = people.search 'niklaus'</code></pre>
+
+You should find ids @[2, 4]@ and two allocations now, first in the first name, then in the last name.
+
+What if you want to find the last name first? We add some weight to it!
+
+h3. Adding weight
+
+By default, Picky already weighs the categories with a logarithmic weight. That is, the more a token occurs in a category, the "heavier" it is.
+
+So this:
+
+<pre class="ruby"><code>category :last</code></pre>
+
+is actually
+
+<pre class="ruby"><code>category :last, weight: Weights::Logarithmic.new</code></pre>
+
+However, for "Niklaus", that resolves to a weight of 0.0.
+
+So let's add our own weight object. It just needs to respond to @#weight_for(amount_of_ids)@ and return a float.
+
+We ignore the amount and return a flat 12.3. Copy this in your example:
+
+<pre class="ruby"><code>Weight = Class.new do
+  def weight_for amount
+    12.3
+  end
+end</code></pre>
+
+and replace
+
+<pre class="ruby"><code>category :last, weight: Weight.new</code></pre>
+
+Now the last name comes first, with a weight of 12.3, not surprisingly.
+
+<pre class="ruby"><code>[[:people, 12.3, 1, [[:last, "niklaus", "niklaus"]], [4]], [:people, 0.0, 1, [[:first, "niklaus", "niklaus"]], [2]]]</code></pre>
+
+Picky provides a few weights itself:
+
+* @Picky::Weights::Logarithmic.new@ The default.
+* @Picky::Weights::Constant.new@ (with 0.0) or @Picky::Weights::Constant.new(1.23)@ (with 1.23)
+* @Picky::Weights::Dynamic.new { |str_or_sym| str_or_sym.size }@
+
+What if we want "Wirth" and "Worth" be found at the same time?
+
+h3. Adding similarity
+
+By default, Picky does not look for similar words.
+
+This:
+
+<pre class="ruby"><code>category :last</code></pre>
+
+is actually
+
+<pre class="ruby"><code>category :last, similarity: Similarity::None.new</code></pre>
+
+Now, look for "warth~" (the ~ tells Picky to look for similar words):
+
+<pre class="ruby"><code>results = people.search 'warth~'</code></pre>
+
+You found nothing, right?
+
+Picky only looks for similar words if the category enables it!
+
+Let's write a similarity such that both will be found. Copy this in your example:
+
+<pre class="ruby"><code>Similarity = Class.new do
+  def encode text
+    text.gsub /[aeiou]/, ''
+  end
+  def prioritize ary, encoded
+
+  end
+end</code></pre>
+
+We encode a text such that its vowels are removed. This will make "wirth" and "worth" resolve both to "wrth", and that makes them similar.
+(The @prioritize@ method allows you to sort and trim the similars list)
+
+and replace
+
+<pre class="ruby"><code>category :last, similarity: Similarity.new</code></pre>
+
+Again, search for "warth~".
+
+<pre class="ruby"><code>results = people.search 'warth~'</code></pre>
+
+This time you found both, right?
+
+Picky offers @Similarity::Soundex.new(amount_of_similar)@, @Similarity::Metaphone.new(amount_of_similar)@ and @Similarity::DoubleMetaphone.new(amount_of_similar)@. But rolling your own is easy, as you have seen.
+
+h3. Adding partial searching
+
+Can you find Donald Knuth by entering "Donal"?
+
+<pre class="ruby"><code>results = people.search 'donal'</code></pre>
+
+You can. But why?
+
+The word "donal" finds something because this:
+
+<pre class="ruby"><code>category :first</code></pre>
+
+is actually
+
+<pre class="ruby"><code>category :first, partial: Partial::Postfix.new(from: -3)</code></pre>
+
+That means it finds "dona", "donal", "donald". Try them all!
+
+Does it find "don"? Try it:
+
+<pre class="ruby"><code>results = people.search 'don'</code></pre>
+
+No, it doesn't! We could use @Partial::Postfix.new(from: -4)@ to include this case, but let's write our own :)
+
+<pre class="ruby"><code>Partial = Class.new do
+  def each_partial text
+    text = text.dup
+    (text.size - 1).times do
+      yield text.chop!
+    end
+  end
+end</code></pre>
+
+and replace
+
+<pre class="ruby"><code>category :first, partial: Partial.new</code></pre>
+
+Try again:
+
+<pre class="ruby"><code>results = people.search 'don'</code></pre>
+
+Now we find Donald. You can even do this with our partial code:
+
+<pre class="ruby"><code>results = people.search 'd'</code></pre>
+
+We still find him.
+
+Now, Picky already offers a few partial behaviours:
+
+* @Partial::None.new@ (Do not search for a partial)
+* @Partial::Postfix.new(from: position)@
+* @Partial::Substring.new(from: position, to: position)@
+* @Partial::Infix.new(min: size, max: size)@
+
+One important note: Picky always searches for the last token in the partial index, even without the asterisk next to the word. If it's not the last word, you need an asterisk: "Don* Knuth".
+
+h3. Boosting
+
+To move an allocation up in the ranking, we used weights.
+
+Picky knows a trick that almost no search engine knows. It can *boost combinations*!

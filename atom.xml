@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-18T16:39:59+11:00</updated>
+ <updated>2011-12-18T16:49:50+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -21,6 +21,8 @@
 &lt;h2&gt;Goals&lt;/h2&gt;
 &lt;p&gt;The ultimate goal of Picky is to become &lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;THE&lt;/span&gt;&lt;/strong&gt; choice for a &lt;strong&gt;lightweight&lt;/strong&gt; search engine, as &lt;strong&gt;flexible&lt;/strong&gt; as possible, regarding the container on one hand (useable in a script/a &lt;a href=&quot;http://sinatrarb.com&quot;&gt;Sinatra&lt;/a&gt; instance, a DRb server, wherever) and in itself on the other hand, offering a rich &lt;a href=&quot;https://github.com/floere/picky/blob/master/server/APIs.textile&quot;&gt;&lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/a&gt; where you plug in search engine behavior.&lt;/p&gt;
 &lt;p&gt;Release 4.0 is another big step towards these goals.&lt;/p&gt;
+&lt;h2&gt;Thanks&lt;/h2&gt;
+&lt;p&gt;Thanks to all who helped with this release! Among others: &lt;a href=&quot;http://twitter.com/rogerbraun&quot;&gt;Roger Braun&lt;/a&gt;, &lt;a href=&quot;http://twitter.com/ende42&quot;&gt;Niko Dittmann&lt;/a&gt;, &lt;a href=&quot;http://twitter.com/kasparschiess&quot;&gt;Kaspar Schiess&lt;/a&gt;, &lt;a href=&quot;http://twitter.com/glenmaddern&quot;&gt;Glen Maddern&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Changes (tl;dr)&lt;/h2&gt;
 &lt;p&gt;The one big change is that both the classic Picky application and classic Picky sources have been removed. If you need these, please continue using 3.6.16.&lt;/p&gt;
 &lt;p&gt;If you want to jump on 4.0, replace with a Sinatra app and convert your source into one that responds to &lt;code&gt;#each&lt;/code&gt; (See the Wiki on sources).&lt;/p&gt;

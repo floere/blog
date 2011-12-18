@@ -13,6 +13,10 @@ The ultimate goal of Picky is to become *THE* choice for a *lightweight* search 
 
 Release 4.0 is another big step towards these goals.
 
+h2. Thanks
+
+Thanks to all who helped with this release! Among others: "Roger Braun":http://twitter.com/rogerbraun, "Niko Dittmann":http://twitter.com/ende42, "Kaspar Schiess":http://twitter.com/kasparschiess, "Glen Maddern":http://twitter.com/glenmaddern.
+
 h2. Changes (tl;dr)
 
 The one big change is that both the classic Picky application and classic Picky sources have been removed. If you need these, please continue using 3.6.16.

@@ -5,7 +5,7 @@ categories:
   - ruby
   - picky
 ---
-"Picky":http://florianhanke.com/picky/ 4.0 release - a quick description of the goals and the changes from version 3.6.16.
+"Picky":http://florianhanke.com/picky/ 4.0 release - a quick description of the goals and the changes from version 3.6.16. More to come later.
 
 h2. Goals
 

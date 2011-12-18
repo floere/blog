@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Why&nbsp;I&nbsp;don't&nbsp;use&nbsp;round&nbsp;brackets</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>Why&nbsp;I&nbsp;don't&nbsp;use&nbsp;round&nbsp;brackets</h1>
+      <div class="categories">
+        ruby / programming
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>This is a blog post for once <span class="caps">NOT</span> <span class="caps">ABOUT</span> <span class="caps">PICKY</span>! :D So enjoy the tentacle-free space.</p>
+      <p>Let me be blunt: I really don&#8217;t like reading Ruby code that uses a lot of round brackets.</p>
+      <p>No, let me be blunter: I hate reading code that uses a lot of round brackets.</p>
+      <p>Actually, it&#8217;s like this: <strong>Round brackets are the training wheels of a Ruby coder. They might be useful in the beginning, but at some point they should come off!</strong></p>
+      <p>But let me be less contrarian and just show you why I don&#8217;t use them anymore…</p>
+      <h2>Weaning yourself off the training wheels</h2>
+      <p>There&#8217;s a few good reasons why I don&#8217;t use round brackets anymore.</p>
+      <h3>Less noise</h3>
+      <p>Brackets introduce visual noise. Compare and contrast these two method signatures:</p>
+      <pre class="ruby"><code>def extract_from(text)</code></pre>
+      <p>with</p>
+      <pre class="ruby"><code>def extract_from text</code></pre>
+      <p>What do you gain by introducing brackets? Would you gain something by introducing them into text?</p>
+      <pre class="ruby"><code>My name is(Florian Hanke)</code></pre>
+      <p>If you think this text example has nothing to do with code then we have different views on code readability. It&#8217;s more legible to me.</p>
+      <h3>Law of Demeter</h3>
+      <p>You&#8217;ve probably heard of the <a href="http://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a>? If you haven&#8217;t, please read about it :)</p>
+      <p>Not wanting to use round brackets introduces a strain every time I am about to break the Law of Demeter.</p>
+      <p>Consider this code:</p>
+      <pre class="ruby"><code>text = extract other_text</code></pre>
+      <p>Now, if I wanted to call another method on the result, I&#8217;d have to write this:</p>
+      <pre class="ruby"><code>text = extract(other_text).process</code></pre>
+      <p>Spotting violations is easy for me. I just look for the brackets. If I see brackets in my code, I instantly know that they are there for a good reason and that I actually had a reason to break the Law of Demeter.</p>
+      <p>Code like</p>
+      <pre class="ruby"><code>a.b(c).d(e).f</code></pre>
+      <p>is simply impossible for me, and that&#8217;s a good thing!</p>
+      <h3>Typing</h3>
+      <p>This is not about typing speed. It is simply about comfort. The comfort of not having to do bracket acrobatics&#8482;.</p>
+      <p>Not using brackets lets you type as if the code was free text.</p>
+      <p>As opposed to e.g. JavaScript, Ruby actually lets you do this, so take advantage.</p>
+      <h3>Being explicit about no parameters</h3>
+      <p>Two small counterpoints.</p>
+      <p>I use Rspec. Chances are, you use it as well.</p>
+      <p>There&#8217;s an expression that goes like this:</p>
+      <pre class="ruby"><code>thing.should_receive(:some_method).once.with</code></pre>
+      <p>It&#8217;s a fluid interface, so using parentheses is ok for me. One of the exceptions. However, I even add them explicitly to tell the future me that I really don&#8217;t expect any parameters:</p>
+      <pre class="ruby"><code>thing.should_receive(:some_method).once.with()</code></pre>
+      <p>Equals &#8220;with nothing&#8221;.</p>
+      <p>Another exception is the &#8220;gobbler&#8221; * argument to a method, where Ruby needs brackets to know what it is looking at.</p>
+      <pre class="ruby"><code>def try(*) end</code></pre>
+      <h3>But I&#8217;m used to it!</h3>
+      <p>Yes, and you&#8217;re also trained on <span class="caps">QWERTY</span>. Doesn&#8217;t mean it was a good idea.</p>
+      <h3>But, but, I need to help Ruby with reading my code!</h3>
+      <p>Please. You&#8217;re probably the first to cheer when the robot overlords arrive.</p>
+      <h3>Conclusion</h3>
+      <p>It&#8217;s a good idea to be sceptical.</p>
+      <p>I simply asked myself: Why am I actually using brackets when they are not needed?</p>
+      <p>I couldn&#8217;t think of good reasons, while I was able to find some reasons against using brackets.</p>
+      <p>Hence, no brackets.</p>
+      <p><span class="caps">WDYT</span>?</p>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2011/12/18/picky-search-options.html" title="Previous post: Picky&amp;nbsp;Search&amp;nbsp;Options">Picky&nbsp;Search&nbsp;Options</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2011/12/18/why-i-dont-use-parentheses';
+          var disqus_url = 'http://florianhanke.com/blog/2011/12/18/why-i-dont-use-parentheses.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

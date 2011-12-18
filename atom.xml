@@ -4,13 +4,71 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-18T22:37:20+11:00</updated>
+ <updated>2011-12-18T23:27:12+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Why&amp;nbsp;I&amp;nbsp;don't&amp;nbsp;use&amp;nbsp;round&amp;nbsp;brackets</title>
+   <link href="http://florianhanke.com/blog/2011/12/18/why-i-dont-use-parentheses.html"/>
+   <updated>2011-12-18T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/12/18/why-i-dont-use-parentheses</id>
+   <content type="html">&lt;p&gt;This is a blog post for once &lt;span class=&quot;caps&quot;&gt;NOT&lt;/span&gt; &lt;span class=&quot;caps&quot;&gt;ABOUT&lt;/span&gt; &lt;span class=&quot;caps&quot;&gt;PICKY&lt;/span&gt;! :D So enjoy the tentacle-free space.&lt;/p&gt;
+&lt;p&gt;Let me be blunt: I really don&amp;#8217;t like reading Ruby code that uses a lot of round brackets.&lt;/p&gt;
+&lt;p&gt;No, let me be blunter: I hate reading code that uses a lot of round brackets.&lt;/p&gt;
+&lt;p&gt;Actually, it&amp;#8217;s like this: &lt;strong&gt;Round brackets are the training wheels of a Ruby coder. They might be useful in the beginning, but at some point they should come off!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;But let me be less contrarian and just show you why I don&amp;#8217;t use them anymore…&lt;/p&gt;
+&lt;h2&gt;Weaning yourself off the training wheels&lt;/h2&gt;
+&lt;p&gt;There&amp;#8217;s a few good reasons why I don&amp;#8217;t use round brackets anymore.&lt;/p&gt;
+&lt;h3&gt;Less noise&lt;/h3&gt;
+&lt;p&gt;Brackets introduce visual noise. Compare and contrast these two method signatures:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def extract_from(text)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;with&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def extract_from text&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What do you gain by introducing brackets? Would you gain something by introducing them into text?&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;My name is(Florian Hanke)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you think this text example has nothing to do with code then we have different views on code readability. It&amp;#8217;s more legible to me.&lt;/p&gt;
+&lt;h3&gt;Law of Demeter&lt;/h3&gt;
+&lt;p&gt;You&amp;#8217;ve probably heard of the &lt;a href=&quot;http://en.wikipedia.org/wiki/Law_of_Demeter&quot;&gt;Law of Demeter&lt;/a&gt;? If you haven&amp;#8217;t, please read about it :)&lt;/p&gt;
+&lt;p&gt;Not wanting to use round brackets introduces a strain every time I am about to break the Law of Demeter.&lt;/p&gt;
+&lt;p&gt;Consider this code:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;text = extract other_text&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, if I wanted to call another method on the result, I&amp;#8217;d have to write this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;text = extract(other_text).process&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Spotting violations is easy for me. I just look for the brackets. If I see brackets in my code, I instantly know that they are there for a good reason and that I actually had a reason to break the Law of Demeter.&lt;/p&gt;
+&lt;p&gt;Code like&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;a.b(c).d(e).f&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;is simply impossible for me, and that&amp;#8217;s a good thing!&lt;/p&gt;
+&lt;h3&gt;Typing&lt;/h3&gt;
+&lt;p&gt;This is not about typing speed. It is simply about comfort. The comfort of not having to do bracket acrobatics&amp;#8482;.&lt;/p&gt;
+&lt;p&gt;Not using brackets lets you type as if the code was free text.&lt;/p&gt;
+&lt;p&gt;As opposed to e.g. JavaScript, Ruby actually lets you do this, so take advantage.&lt;/p&gt;
+&lt;h3&gt;Being explicit about no parameters&lt;/h3&gt;
+&lt;p&gt;Two small counterpoints.&lt;/p&gt;
+&lt;p&gt;I use Rspec. Chances are, you use it as well.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s an expression that goes like this:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It&amp;#8217;s a fluid interface, so using parentheses is ok for me. One of the exceptions. However, I even add them explicitly to tell the future me that I really don&amp;#8217;t expect any parameters:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Equals &amp;#8220;with nothing&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Another exception is the &amp;#8220;gobbler&amp;#8221; * argument to a method, where Ruby needs brackets to know what it is looking at.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def try(*) end&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;But I&amp;#8217;m used to it!&lt;/h3&gt;
+&lt;p&gt;Yes, and you&amp;#8217;re also trained on &lt;span class=&quot;caps&quot;&gt;QWERTY&lt;/span&gt;. Doesn&amp;#8217;t mean it was a good idea.&lt;/p&gt;
+&lt;h3&gt;But, but, I need to help Ruby with reading my code!&lt;/h3&gt;
+&lt;p&gt;Please. You&amp;#8217;re probably the first to cheer when the robot overlords arrive.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;It&amp;#8217;s a good idea to be sceptical.&lt;/p&gt;
+&lt;p&gt;I simply asked myself: Why am I actually using brackets when they are not needed?&lt;/p&gt;
+&lt;p&gt;I couldn&amp;#8217;t think of good reasons, while I was able to find some reasons against using brackets.&lt;/p&gt;
+&lt;p&gt;Hence, no brackets.&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;caps&quot;&gt;WDYT&lt;/span&gt;?&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Search&amp;nbsp;Options</title>

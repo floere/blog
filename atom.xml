@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-28T17:11:02+11:00</updated>
+ <updated>2011-12-28T17:41:29+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -141,15 +141,6 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I couldn&amp;#8217;t think of good reasons, while I was able to find some reasons against using brackets.&lt;/p&gt;
 &lt;p&gt;Hence, no brackets.&lt;/p&gt;
 &lt;p&gt;&lt;span class=&quot;caps&quot;&gt;WDYT&lt;/span&gt;?&lt;/p&gt;</content>
-   
- </entry>
- 
- <entry>
-   <title type="html">The&amp;nbsp;evolution&amp;nbsp;of&amp;nbsp;RAILS_ENV</title>
-   <link href="http://florianhanke.com/blog/2011/12/18/the-evolution-of-rails-env.html"/>
-   <updated>2011-12-18T00:00:00+11:00</updated>
-   <id>http://florianhanke.com/blog/2011/12/18/the-evolution-of-rails-env</id>
-   <content type="html">&lt;h2&gt;RAILS_ENV&lt;/h2&gt;</content>
    
  </entry>
  

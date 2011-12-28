@@ -1,0 +1,12 @@
+---
+layout: post
+title: The&nbsp;evolution&nbsp;of&nbsp;RAILS_ENV
+categories:
+  - ruby
+  - programming
+  - rails
+  - rack
+---
+
+
+h2. RAILS_ENV

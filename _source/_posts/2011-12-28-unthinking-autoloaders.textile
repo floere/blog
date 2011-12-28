@@ -1,0 +1,103 @@
+---
+layout: post
+title: Unthinking&nbsp;Autoloader
+categories:
+  - ruby
+  - programming
+---
+Let me inform you that the original title was "Autoloading Is Cancer". That basically sets the scene.
+
+Don't know what autoloading is? Check out "Peter Cooper's quick intro":http://www.rubyinside.com/ruby-techniques-revealed-autoload-1652.html.
+
+h2. Intro
+
+I believe that autoloading is used for all the wrong reasons, and I posit that coders who use autoloading don't really know why they use it.
+
+If you *are* using it: Do you know why? Maybe I am unfair here, but this is a blog post to shake you up a little bit. You filthy autoloading pig.
+
+h2. Readable and clean code
+
+After years of coding, one of the most important functions of code for me is *its readability*. I do it for *myself*, but first for *everyone* who has a problem with my lib's functionality and/or simply wants to know how something works.
+
+After all, code is the best documentation, and is used most as such (apart from its _raison d'être_ of being run).
+
+If others can go in and read your code, and even enjoy it, and are learning something from it, then you know that you have a great lib.
+
+Even if the reader can't use it right away, he/she can take away something from it.
+
+h2. Information transportation
+
+To take away something from your code, it needs to transport information (into your brain that is) in the most efficient fashion.
+
+h3. Contrast and compare
+
+Let's see what information can be gained by reading this code:
+
+<pre class="ruby"><code>require 'models/person'
+require 'models/company'
+require 'server/auxiliary'
+require 'server/core'</code></pre>
+
+From this code, I can take away a lot of things!
+
+In order of importance:
+
+* 4 files are required (obvious)
+* Apparently we have model-related code and server related code (obvious since someone has done his/her naming homework)
+
+But much cooler:
+
+* The @Person@ model is probably* most independent.
+* The @Company@ model might depend on the @Person@, but the @Person@ model is independent* of the @Company@ model.
+* The server code might use the models.
+* The auxiliary server code is probably* independent of the core server code. 
+
+The * refers to the fact that the code, dynamically, might still not be independent (since it could refer to a constant in a method etc.). If it isn't, and is required before the "dependency", ewwww. 
+
+So, why do I think this independence thing is so cool. Let me show you another example:
+
+<pre class="ruby"><code>require 'server/core'
+require 'models/person'
+require 'models/company'
+require 'server/auxiliary'</code></pre>
+
+This code tells me with a high probability that something might be awry in this code and I definitely need to take a closer look. Do the models refer to the server? Does the server not use the models at all? Does the "auxiliary" code use the models? Is this just a naming problem or do we have something at hand that needs to be trashed?
+
+Now that we know that one can gain quite a bit of information by reading code (surprise! :) ), let's take a look at the autoloading example:
+
+<pre class="ruby"><code>module Server
+  autoload :Core,      'server/core'
+  autoload :Auxiliary, 'server/auxiliary'
+end
+module Models
+  autoload :Person,  'models/person'
+  autoload :Company, 'models/company'
+end</code></pre>
+
+From this code we can take away the following things that are non-obvious:
+
+* Jack shit.
+
+I have no clue as to who needs what, and why. No hints.
+
+This code fails me in readability on so many levels. Never mind introduces unneeded complexity. Also, can you tell me what happens when code like this is run in forked child processes? What about threads? What about both?
+
+h2. Conclusion
+
+I noticed that many people use autoloading for three reasons:
+
+* It's a cool Ruby technique. (I am ignoring this one)
+* They don't want to think about dependencies in their code. (Also ignoring this one)
+* It enhances startup time.
+
+h3. Startup Time
+
+Although it might help a bit by spreading the loading code over the run time of your program, believe me: This is not the place to solve this problem.
+
+A long startup time hints at deeper problems with code structure, unnecessary precaching, etc. in your lib or the libs you are using.
+
+Autoloading is not a solution for slow startup time. It is, at best, a quick fix for a problem which really is begging for some brains to be applied.
+
+h2. Final Question
+
+Why do you use autoloading? Do you have good reasons that I haven't considered?

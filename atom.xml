@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-29T17:16:58+11:00</updated>
+ <updated>2011-12-29T17:18:44+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -62,9 +62,9 @@ end&lt;/code&gt;&lt;/pre&gt;
   	@wrapped = wrapped
   end	
   def each_partial text
-	@wrapped.each_partial do |partial|
-	  yield partial if partial.size.even?
-	end
+	  @wrapped.each_partial do |partial|
+	    yield partial if partial.size.even?
+	  end
   end
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I like it! The partializer doesn&amp;#8217;t really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.&lt;/p&gt;

@@ -78,9 +78,9 @@ Thanks to it yielding, we could have just wrapped one of the given partializers 
   	@wrapped = wrapped
   end	
   def each_partial text
-	@wrapped.each_partial do |partial|
-	  yield partial if partial.size.even?
-	end
+	  @wrapped.each_partial do |partial|
+	    yield partial if partial.size.even?
+	  end
   end
 end</code></pre>
 

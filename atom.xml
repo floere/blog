@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-29T17:16:16+11:00</updated>
+ <updated>2011-12-29T17:16:58+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -72,7 +72,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let&amp;#8217;s say you want to search for people via name or location. In addition, you&amp;#8217;d like to show an advertisement next to the search results corresponding to the location.&lt;/p&gt;
 &lt;p&gt;See &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;So if someone searches for &amp;#8220;Florian Melbourne&amp;#8221;, it should find a Florian in Melbourne, but also show an ad from Melbourne.&lt;/p&gt;
-&lt;p&gt;The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won&amp;#8217;t return any results if the query contains a name. So how do we make the ad search return &lt;em&gt;names&lt;/em&gt;???&lt;/p&gt;
+&lt;p&gt;The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won&amp;#8217;t return any results if the query contains a name. So how do we make the ad search ignore &lt;em&gt;names&lt;/em&gt;???&lt;/p&gt;
 &lt;p&gt;Picky tries to assign every search word to a likely category. What we&amp;#8217;d like is to only assign to locations, and if it is a name, to just ignore it.&lt;/p&gt;
 &lt;p&gt;The magic thing to use here is &lt;code&gt;ignore_unassigned_tokens&lt;/code&gt;. So if a name cannot be assigned to a category, it will simply be ignored. That&amp;#8217;s it! Run the full example to see for yourself.&lt;/p&gt;
 &lt;h2&gt;Yours?&lt;/h2&gt;

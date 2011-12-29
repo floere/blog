@@ -94,7 +94,7 @@ See "https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.
 
 So if someone searches for "Florian Melbourne", it should find a Florian in Melbourne, but also show an ad from Melbourne.
 
-The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won't return any results if the query contains a name. So how do we make the ad search return _names_???
+The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won't return any results if the query contains a name. So how do we make the ad search ignore _names_???
 
 Picky tries to assign every search word to a likely category. What we'd like is to only assign to locations, and if it is a name, to just ignore it.
 

@@ -91,11 +91,11 @@
       <p>Wasn&#8217;t that easy?</p>
       <h4>With a Twist</h4>
       <p>Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.</p>
-      <pre class="ruby"><code>class Partializer&#x000A;  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)&#x000A;  	@wrapped = wrapped&#x000A;  end	&#x000A;  def each_partial text&#x000A;    @wrapped.each_partial do |partial|&#x000A;	  yield partial if partial.size.even?&#x000A;	end&#x000A;  end&#x000A;end</code></pre>
+      <pre class="ruby"><code>class Partializer&#x000A;  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)&#x000A;  	@wrapped = wrapped&#x000A;  end	&#x000A;  def each_partial text&#x000A;	@wrapped.each_partial do |partial|&#x000A;	  yield partial if partial.size.even?&#x000A;	end&#x000A;  end&#x000A;end</code></pre>
       <p>I like it! The partializer doesn&#8217;t really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.</p>
       <h3>Context Sensitive Advertisements</h3>
-      <p><a href="https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb">https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb</a></p>
       <p>Let&#8217;s say you want to search for people via name or location. In addition, you&#8217;d like to show an advertisement next to the search results corresponding to the location.</p>
+      <p>See <a href="https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb">https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb</a>.</p>
       <p>So if someone searches for &#8220;Florian Melbourne&#8221;, it should find a Florian in Melbourne, but also show an ad from Melbourne.</p>
       <p>The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won&#8217;t return any results if the query contains a name. So how do we make the ad search return <em>names</em>???</p>
       <p>Picky tries to assign every search word to a likely category. What we&#8217;d like is to only assign to locations, and if it is a name, to just ignore it.</p>

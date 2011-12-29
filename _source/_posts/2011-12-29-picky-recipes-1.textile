@@ -78,7 +78,7 @@ Thanks to it yielding, we could have just wrapped one of the given partializers 
   	@wrapped = wrapped
   end	
   def each_partial text
-    @wrapped.each_partial do |partial|
+	@wrapped.each_partial do |partial|
 	  yield partial if partial.size.even?
 	end
   end
@@ -88,9 +88,9 @@ I like it! The partializer doesn't really know what partializer it gets. However
 
 h3. Context Sensitive Advertisements
 
-"https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb":https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb
-
 Let's say you want to search for people via name or location. In addition, you'd like to show an advertisement next to the search results corresponding to the location.
+
+See "https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb":https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb.
 
 So if someone searches for "Florian Melbourne", it should find a Florian in Melbourne, but also show an ad from Melbourne.
 

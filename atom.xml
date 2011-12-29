@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-29T17:14:59+11:00</updated>
+ <updated>2011-12-29T17:16:16+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -62,15 +62,15 @@ end&lt;/code&gt;&lt;/pre&gt;
   	@wrapped = wrapped
   end	
   def each_partial text
-    @wrapped.each_partial do |partial|
+	@wrapped.each_partial do |partial|
 	  yield partial if partial.size.even?
 	end
   end
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I like it! The partializer doesn&amp;#8217;t really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.&lt;/p&gt;
 &lt;h3&gt;Context Sensitive Advertisements&lt;/h3&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s say you want to search for people via name or location. In addition, you&amp;#8217;d like to show an advertisement next to the search results corresponding to the location.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;So if someone searches for &amp;#8220;Florian Melbourne&amp;#8221;, it should find a Florian in Melbourne, but also show an ad from Melbourne.&lt;/p&gt;
 &lt;p&gt;The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won&amp;#8217;t return any results if the query contains a name. So how do we make the ad search return &lt;em&gt;names&lt;/em&gt;???&lt;/p&gt;
 &lt;p&gt;Picky tries to assign every search word to a likely category. What we&amp;#8217;d like is to only assign to locations, and if it is a name, to just ignore it.&lt;/p&gt;

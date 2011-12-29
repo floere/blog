@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-29T17:09:56+11:00</updated>
+ <updated>2011-12-29T17:12:06+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -23,7 +23,8 @@
 &lt;p&gt;BUT. The question I should have asked myself is: When I try something for the first time, what do I need? I guess, like many others, I am guilty of being rather lazy when trying software – I need a quick fix.&lt;/p&gt;
 &lt;p&gt;This led me to put up a quick copy and paste code example on the &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;main page&lt;/a&gt;. I haven&amp;#8217;t received any feedback on it yet (except by a friend who urged me to use syntax highlighting), but I am happy with it. It shows the strengths of Picky off nicely.&lt;/p&gt;
 &lt;h2&gt;Customized Search Engines in Projects&lt;/h2&gt;
-&lt;p&gt;However, &lt;strong&gt;all&lt;/strong&gt; of the Picky projects are projects where the search engine needed to be modified from a little to – mostly – a lot. And in all the cases I or someone else helped getting it right. I don&amp;#8217;t believe this is a problem of Picky, but mostly a mixture of not knowing what options there are and the fact that Picky is not a &amp;#8220;boolean&amp;#8221; search engine framework.&lt;/p&gt;
+&lt;p&gt;However, &lt;strong&gt;all&lt;/strong&gt; of the Picky projects are projects where the search engine needed to be modified from a little to – mostly – a lot. And in all the cases I or someone else helped getting it right. I don&amp;#8217;t believe this is a problem of Picky, but mostly a mixture of not knowing what options there are and the fact that Picky is not a &amp;#8220;boolean&amp;#8221; search engine framework.
+(And, I might add, some of the stunts would not be possible with a non-flexible search engine like … not-Picky)&lt;/p&gt;
 &lt;h2&gt;The Recipes&lt;/h2&gt;
 &lt;p&gt;This led me to start putting together a few examples which you can copy and paste quickly to see how something works and how it can be used.&lt;/p&gt;
 &lt;p&gt;The &lt;a href=&quot;http://github.com/floere/picky/tree/master/recipes&quot;&gt;first 25 simple recipes&lt;/a&gt; are pushed to the picky repo. You can clone the project, then run the recipes by using &amp;#8220;rake&amp;#8221; on the command line inside the recipes directory.&lt;/p&gt;

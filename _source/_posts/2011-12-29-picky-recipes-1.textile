@@ -1,0 +1,108 @@
+---
+layout: post
+title: Picky&nbsp;Recipes
+categories:
+  - ruby
+  - picky
+---
+I'm currently putting together a collection of Picky recipes.
+
+I noticed that people who wanted to try Picky had a bit of trouble getting into it. Sure, there is the "getting started guide":http://florianhanke.com/picky/getting_started.html on the "main page":http://florianhanke.com/picky. And there's also videos and blog posts.
+
+h2. The Quick Demo Fix
+
+BUT. The question I should have asked myself is: When I try something for the first time, what do I need? I guess, like many others, I am guilty of being rather lazy when trying software – I need a quick fix.
+
+This led me to put up a quick copy and paste code example on the "main page":http://florianhanke.com/picky. I haven't received any feedback on it yet (except by a friend who urged me to use syntax highlighting), but I am happy with it. It shows the strengths of Picky off nicely.
+
+h2. Customized Search Engines in Projects
+
+However, *all* of the Picky projects are projects where the search engine needed to be modified from a little to – mostly – a lot. And in all the cases I or someone else helped getting it right. I don't believe this is a problem of Picky, but mostly a mixture of not knowing what options there are and the fact that Picky is not a "boolean" search engine framework.
+
+h2. The Recipes
+
+This led me to start putting together a few examples which you can copy and paste quickly to see how something works and how it can be used.
+
+The "first 25 simple recipes":http://github.com/floere/picky/tree/master/recipes are pushed to the picky repo. You can clone the project, then run the recipes by using "rake" on the command line inside the recipes directory.
+
+Let me show one or two that I like to whet your appetite.
+
+h3. Realtime Indexing vs. Static Indexing
+
+These examples illustrate how to use the static vs. the realtime index.
+
+See "https://github.com/floere/picky/blob/master/recipes/basic/static_index.rb":https://github.com/floere/picky/blob/master/recipes/basic/static_index.rb and "https://github.com/floere/picky/blob/master/recipes/basic/realtime_index.rb":https://github.com/floere/picky/blob/master/recipes/basic/realtime_index.rb. 
+
+Static indexing is easier if you only index once per day and are happy to use @rake index@. Realtime indexing shows you how you can update the index as you get new data.
+
+h3. Only finds evenly sized partials
+
+This is a bit of a silly recipe, but it illustrates well how easy it is to add a custom partializer.
+
+Partial searches refer to somebody being able to search for "flor" and still finding "florian" (use "flor*" to explicitly search partially for that word).
+
+Now what we want is to find only partial words whose length is even. This is the recipe for it: "https://github.com/floere/picky/blob/master/recipes/partial/customized.rb":https://github.com/floere/picky/blob/master/recipes/partial/customized.rb.
+
+To use it, we just pass in our own partializer
+
+<pre class="ruby"><code>data = Picky::Index.new :people do
+  category :first  
+  category :last, partial: Partializer.new # <= Passed in here.
+end</code></pre>
+
+that is defined as
+
+<pre class="ruby"><code>class Partializer
+  def each_partial text
+    temp = text.dup
+    temp.length.times do
+      yield temp if temp.size.even?
+      temp.chop!
+    end
+  end
+end</code></pre>
+
+Picky just needs an object with an @each_partial@ method. Our special partializer chops the word apart until it is gone, and yields if the word is of even length.
+
+Thus we only find a partial if of even length.
+
+Wasn't that easy?
+
+h4. With a Twist
+
+Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.
+
+<pre class="ruby"><code>class Partializer
+  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)
+  	@wrapped = wrapped
+  end	
+  def each_partial text
+    @wrapped.each_partial do |partial|
+	  yield partial if partial.size.even?
+	end
+  end
+end</code></pre>
+
+I like it! The partializer doesn't really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.
+
+h3. Context Sensitive Advertisements
+
+"https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb":https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb
+
+Let's say you want to search for people via name or location. In addition, you'd like to show an advertisement next to the search results corresponding to the location.
+
+So if someone searches for "Florian Melbourne", it should find a Florian in Melbourne, but also show an ad from Melbourne.
+
+The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won't return any results if the query contains a name. So how do we make the ad search return _names_???
+
+Picky tries to assign every search word to a likely category. What we'd like is to only assign to locations, and if it is a name, to just ignore it.
+
+The magic thing to use here is @ignore_unassigned_tokens@. So if a name cannot be assigned to a category, it will simply be ignored. That's it! Run the full example to see for yourself.
+
+h2. Yours?
+
+If you have recipes to contribute, don't be shy. I'd particularly be happy for a Rails one.
+
+h2. Outlook
+
+I'll be adding recipes as I go. What do you think? Do the recipes help? Do they bewilder you? Do you find what you are looking for? Why? Why not?

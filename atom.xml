@@ -4,13 +4,82 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-28T17:41:29+11:00</updated>
+ <updated>2011-12-29T17:07:30+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Recipes</title>
+   <link href="http://florianhanke.com/blog/2011/12/29/picky-recipes-1.html"/>
+   <updated>2011-12-29T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2011/12/29/picky-recipes-1</id>
+   <content type="html">&lt;p&gt;I&amp;#8217;m currently putting together a collection of Picky recipes.&lt;/p&gt;
+&lt;p&gt;I noticed that people who wanted to try Picky had a bit of trouble getting into it. Sure, there is the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;getting started guide&lt;/a&gt; on the &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;main page&lt;/a&gt;. And there&amp;#8217;s also videos and blog posts.&lt;/p&gt;
+&lt;h2&gt;The Quick Demo Fix&lt;/h2&gt;
+&lt;p&gt;BUT. The question I should have asked myself is: When I try something for the first time, what do I need? I guess, like many others, I am guilty of being rather lazy when trying software – I need a quick fix.&lt;/p&gt;
+&lt;p&gt;This led me to put up a quick copy and paste code example on the &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;main page&lt;/a&gt;. I haven&amp;#8217;t received any feedback on it yet (except by a friend who urged me to use syntax highlighting), but I am happy with it. It shows the strengths of Picky off nicely.&lt;/p&gt;
+&lt;h2&gt;Customized Search Engines in Projects&lt;/h2&gt;
+&lt;p&gt;However, &lt;strong&gt;all&lt;/strong&gt; of the Picky projects are projects where the search engine needed to be modified from a little to – mostly – a lot. And in all the cases I or someone else helped getting it right. I don&amp;#8217;t believe this is a problem of Picky, but mostly a mixture of not knowing what options there are and the fact that Picky is not a &amp;#8220;boolean&amp;#8221; search engine framework.&lt;/p&gt;
+&lt;h2&gt;The Recipes&lt;/h2&gt;
+&lt;p&gt;This led me to start putting together a few examples which you can copy and paste quickly to see how something works and how it can be used.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;http://github.com/floere/picky/tree/master/recipes&quot;&gt;first 25 simple recipes&lt;/a&gt; are pushed to the picky repo. You can clone the project, then run the recipes by using &amp;#8220;rake&amp;#8221; on the command line inside the recipes directory.&lt;/p&gt;
+&lt;p&gt;Let me show one or two that I like to whet your appetite.&lt;/p&gt;
+&lt;h3&gt;Realtime Indexing vs. Static Indexing&lt;/h3&gt;
+&lt;p&gt;These examples illustrate how to use the static vs. the realtime index.&lt;/p&gt;
+&lt;p&gt;See &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/basic/static_index.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/basic/static_index.rb&lt;/a&gt; and &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/basic/realtime_index.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/basic/realtime_index.rb&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Static indexing is easier if you only index once per day and are happy to use &lt;code&gt;rake index&lt;/code&gt;. Realtime indexing shows you how you can update the index as you get new data.&lt;/p&gt;
+&lt;h3&gt;Only finds evenly sized partials&lt;/h3&gt;
+&lt;p&gt;This is a bit of a silly recipe, but it illustrates well how easy it is to add a custom partializer.&lt;/p&gt;
+&lt;p&gt;Partial searches refer to somebody being able to search for &amp;#8220;flor&amp;#8221; and still finding &amp;#8220;florian&amp;#8221; (use &amp;#8220;flor*&amp;#8221; to explicitly search partially for that word).&lt;/p&gt;
+&lt;p&gt;Now what we want is to find only partial words whose length is even. This is the recipe for it: &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/partial/customized.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/partial/customized.rb&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To use it, we just pass in our own partializer&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :people do
+  category :first  
+  category :last, partial: Partializer.new # &amp;lt;= Passed in here.
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;that is defined as&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Partializer
+  def each_partial text
+    temp = text.dup
+    temp.length.times do
+      yield temp if temp.size.even?
+      temp.chop!
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Picky just needs an object with an &lt;code&gt;each_partial&lt;/code&gt; method. Our special partializer chops the word apart until it is gone, and yields if the word is of even length.&lt;/p&gt;
+&lt;p&gt;Thus we only find a partial if of even length.&lt;/p&gt;
+&lt;p&gt;Wasn&amp;#8217;t that easy?&lt;/p&gt;
+&lt;h4&gt;With a Twist&lt;/h4&gt;
+&lt;p&gt;Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Partializer
+  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)
+  	@wrapped = wrapped
+  end	
+  def each_partial text
+    @wrapped.each_partial do |partial|
+	  yield partial if partial.size.even?
+	end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I like it! The partializer doesn&amp;#8217;t really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.&lt;/p&gt;
+&lt;h3&gt;Context Sensitive Advertisements&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/advanced/advertisement.rb&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s say you want to search for people via name or location. In addition, you&amp;#8217;d like to show an advertisement next to the search results corresponding to the location.&lt;/p&gt;
+&lt;p&gt;So if someone searches for &amp;#8220;Florian Melbourne&amp;#8221;, it should find a Florian in Melbourne, but also show an ad from Melbourne.&lt;/p&gt;
+&lt;p&gt;The problem is, if I just use two indexes (one for people, one for ads), if I search in both, the ad index won&amp;#8217;t return any results if the query contains a name. So how do we make the ad search return &lt;em&gt;names&lt;/em&gt;???&lt;/p&gt;
+&lt;p&gt;Picky tries to assign every search word to a likely category. What we&amp;#8217;d like is to only assign to locations, and if it is a name, to just ignore it.&lt;/p&gt;
+&lt;p&gt;The magic thing to use here is &lt;code&gt;ignore_unassigned_tokens&lt;/code&gt;. So if a name cannot be assigned to a category, it will simply be ignored. That&amp;#8217;s it! Run the full example to see for yourself.&lt;/p&gt;
+&lt;h2&gt;Yours?&lt;/h2&gt;
+&lt;p&gt;If you have recipes to contribute, don&amp;#8217;t be shy. I&amp;#8217;d particularly be happy for a Rails one.&lt;/p&gt;
+&lt;h2&gt;Outlook&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;ll be adding recipes as I go. What do you think? Do the recipes help? Do they bewilder you? Do you find what you are looking for? Why? Why not?&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Unthinking&amp;nbsp;Autoloader</title>

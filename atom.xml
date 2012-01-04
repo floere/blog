@@ -4,13 +4,96 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2011-12-29T17:18:44+11:00</updated>
+ <updated>2012-01-04T19:12:36+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Active&amp;nbsp;Record</title>
+   <link href="http://florianhanke.com/blog/2012/01/04/picky-active-record.html"/>
+   <updated>2012-01-04T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/01/04/picky-active-record</id>
+   <content type="html">&lt;p&gt;This post is about the challenges of designing an Active Record interface for Picky.&lt;/p&gt;
+&lt;p&gt;When we last time looked at writing a nice ActiveRecord integration, around version 2.0, and then 3.0, Picky the server wasn&amp;#8217;t ready yet.&lt;/p&gt;
+&lt;p&gt;What was missing?&lt;/p&gt;
+&lt;p&gt;Most importantly, an interface to save updates as they come in (in Picky: &lt;code&gt;Index#add&lt;/code&gt;, &lt;code&gt;Index#remove&lt;/code&gt;, &lt;code&gt;Index#replace&lt;/code&gt;). Secondly, the possibility to dump indexes during runtime (&lt;code&gt;Index#dump&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;How would we go about designing an Active Record interface for Picky? How do others do it?&lt;/p&gt;
+&lt;h2&gt;Others&lt;/h2&gt;
+&lt;p&gt;Some search servers (like &lt;a href=&quot;http://sphinxsearch.com/&quot;&gt;Sphinx&lt;/a&gt;) do not really offer an interface for live updates, but instead go the route of cleverly reindexing from a central data repository.&lt;/p&gt;
+&lt;p&gt;Other search servers offer &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; interfaces (for example &lt;a href=&quot;http://elasticsearch.org&quot;&gt;elasticsearch&lt;/a&gt; with its &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; &lt;span class=&quot;caps&quot;&gt;POST&lt;/span&gt;/&lt;span class=&quot;caps&quot;&gt;PUT&lt;/span&gt; etc. interface).&lt;/p&gt;
+&lt;p&gt;Since it is a nice and flexible standard interface, it enables interested coders to write software for it, for example &lt;a href=&quot;http://github.com/karmi/tire&quot;&gt;Tire&lt;/a&gt;. This is a great way of attracting effort.&lt;/p&gt;
+&lt;p&gt;Another idea would be to open a port the engine listens on, pipes, or any form of communication imaginable.&lt;/p&gt;
+&lt;p&gt;In any case, Picky needs a standard interface.&lt;/p&gt;
+&lt;h2&gt;The rough idea&lt;/h2&gt;
+&lt;p&gt;Our rough idea is to listen for updates in the server and create a gem for use with active record (and others), which talks to the server every time some data is updated.&lt;/p&gt;
+&lt;p&gt;What are the challenges in the server?&lt;/p&gt;
+&lt;h2&gt;The Server&lt;/h2&gt;
+&lt;p&gt;Picky does not have a standard external interface beyond the &lt;code&gt;Picky::Index&lt;/code&gt; and &lt;code&gt;Picky::Search&lt;/code&gt;, which searches over the indexes.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new(:name) do
+  # ...
+end
+things = Picky::Search.new index
+things.search 'something'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Of course, this is a very flexible approach, but comes with the problem that we need an implementation for all the different containers of Picky.&lt;/p&gt;
+&lt;p&gt;In the case of Sinatra, it will offer a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; interface, where the picky-activerecord gem will send updates to.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s see how we would implement that. For updates, we will define a put action:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;put '/' do
+  index_name = params['index']
+  index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.
+  index.replace_from params['data']
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The method &lt;code&gt;replace_from(hash)&lt;/code&gt; is available in edge currently. Omitted is error handling.&lt;/p&gt;
+&lt;p&gt;Then we can write up the &lt;span class=&quot;caps&quot;&gt;DELETE&lt;/span&gt; action etc., wrap it into a nice module &lt;code&gt;Picky::Interfaces::External&lt;/code&gt;, for example.&lt;/p&gt;
+&lt;p&gt;Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that &lt;code&gt;Module&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class MyPickyServer &amp;lt; Sinatra::Base
+  extend Picky::Interfaces::External
+  
+  # ...
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, when we&amp;#8217;d like to create/update/delete an indexed entry, we simply send a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; request to the Picky server with the following payload:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  index: &quot;people&quot;,
+  data: {
+    id: 7,
+    name: &quot;Florian&quot;,
+    surname: &quot;Hanke&quot;
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sounds easy so far, right?&lt;/p&gt;
+&lt;p&gt;Ah, but what if we stop and restart Picky? What happens to the indexed data?&lt;/p&gt;
+&lt;h3&gt;When Picky is restarted&lt;/h3&gt;
+&lt;p&gt;Let&amp;#8217;s say you don&amp;#8217;t use the realtime &lt;code&gt;SQLite&lt;/code&gt; or &lt;code&gt;Redis&lt;/code&gt; persistent backend to store your indexes, but the standard &lt;code&gt;Memory&lt;/code&gt; backend.&lt;/p&gt;
+&lt;p&gt;If we simply restarted, we would lose the indexes. We need a way to dump the data. One way to do this is simply dumping it when you quit Picky:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;at_exit { Picky::Indexes.dump }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;or a specific index:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;at_exit { the_index.dump }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And then, as you restart the server, you simply load the indexes. Probably in &lt;code&gt;config.ru&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Picky::Indexes.load&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I&amp;#8217;m quite excited about this!&lt;/p&gt;
+&lt;p&gt;Sure, you have to write this yourself, but … you also &lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;CAN&lt;/span&gt;&lt;/strong&gt; write it yourself. And control the behaviour of it. Dump it every X requests? Only on exit? I don&amp;#8217;t care! (I mean, I &lt;strong&gt;do&lt;/strong&gt;, but not how you do it :) )&lt;/p&gt;
+&lt;p&gt;In closing, I like that in a documentation, picky-activerecord will only need a single line for the server: Add &lt;code&gt;extend Picky::Interfaces::External&lt;/code&gt; to your Sinatra app.&lt;/p&gt;
+&lt;h3&gt;Other interfaces?&lt;/h3&gt;
+&lt;p&gt;At the beginning, we will focus on writing an experimental/standard Sinatra interface.&lt;/p&gt;
+&lt;p&gt;This will result in a nice Module that people can use to make their Sinatra Picky server open to external updates.&lt;/p&gt;
+&lt;p&gt;But what about other interfaces?&lt;/p&gt;
+&lt;p&gt;Since we expect the Picky Sinatra external interface to only be around 20-30 lines, we&amp;#8217;ll just leave it open for now and implement as the need arises.&lt;/p&gt;
+&lt;h2&gt;The Client&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;ll save the discussion on the client for later, but just quickly outline the ideas:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;It should offer a simple and easy configuration possibility, with the default being &lt;code&gt;host: 'localhost', port: 8080, path:'/'&lt;/code&gt;.&lt;/li&gt;
+	&lt;li&gt;It hooks into the &lt;code&gt;after_save&lt;/code&gt; callback.&lt;/li&gt;
+	&lt;li&gt;It offers the possibility to save arbitrary data (not just model &lt;code&gt;Person&lt;/code&gt;, or &lt;code&gt;Company&lt;/code&gt; etc., but arbitrary hashes, like &lt;code&gt;Music&lt;/code&gt;, including a list of &lt;code&gt;Genres&lt;/code&gt;, even though that combined object doesn&amp;#8217;t exist – I might note that it could make great sense to create a combined model like this).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;You&lt;/h2&gt;
+&lt;p&gt;What do you think of the server design? Any obvious flaws? Ideas? Suggestions by those who have used other, similar interfaces?&lt;/p&gt;
+&lt;p&gt;Have you already started on writing a picky-activerecord gem? :D&lt;/p&gt;
+&lt;p&gt;In any case, thanks for following the slow but steady progress of Picky!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Recipes</title>

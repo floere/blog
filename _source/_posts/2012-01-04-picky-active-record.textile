@@ -1,0 +1,131 @@
+---
+layout: post
+title: Picky&nbsp;Active&nbsp;Record
+categories:
+  - ruby
+  - picky
+---
+This post is about the challenges of designing an Active Record interface for Picky.
+
+When we last time looked at writing a nice ActiveRecord integration, around version 2.0, and then 3.0, Picky the server wasn't ready yet.
+
+What was missing?
+
+Most importantly, an interface to save updates as they come in (in Picky: @Index#add@, @Index#remove@, @Index#replace@). Secondly, the possibility to dump indexes during runtime (@Index#dump@).
+
+How would we go about designing an Active Record interface for Picky? How do others do it?
+
+h2. Others
+
+Some search servers (like "Sphinx":http://sphinxsearch.com/) do not really offer an interface for live updates, but instead go the route of cleverly reindexing from a central data repository.
+
+Other search servers offer HTTP interfaces (for example "elasticsearch":http://elasticsearch.org with its JSON POST/PUT etc. interface). 
+
+Since it is a nice and flexible standard interface, it enables interested coders to write software for it, for example "Tire":http://github.com/karmi/tire. This is a great way of attracting effort.
+
+Another idea would be to open a port the engine listens on, pipes, or any form of communication imaginable.
+
+In any case, Picky needs a standard interface.
+
+h2. The rough idea
+
+Our rough idea is to listen for updates in the server and create a gem for use with active record (and others), which talks to the server every time some data is updated.
+
+What are the challenges in the server?
+
+h2. The Server
+
+Picky does not have a standard external interface beyond the @Picky::Index@ and @Picky::Search@, which searches over the indexes.
+
+<pre class="ruby"><code>index = Picky::Index.new(:name) do
+  # ...
+end
+things = Picky::Search.new index
+things.search 'something'</code></pre>
+
+Of course, this is a very flexible approach, but comes with the problem that we need an implementation for all the different containers of Picky.
+
+In the case of Sinatra, it will offer a HTTP interface, where the picky-activerecord gem will send updates to.
+
+Let's see how we would implement that. For updates, we will define a put action:
+
+<pre class="ruby"><code>put '/' do
+  index_name = params['index']
+  index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.
+  index.replace_from params['data']
+end</code></pre>
+
+The method @replace_from(hash)@ is available in edge currently. Omitted is error handling.
+
+Then we can write up the DELETE action etc., wrap it into a nice module @Picky::Interfaces::External@, for example.
+
+Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that @Module@:
+
+<pre class="ruby"><code>class MyPickyServer < Sinatra::Base
+  extend Picky::Interfaces::External
+  
+  # ...
+end</code></pre>
+
+Then, when we'd like to create/update/delete an indexed entry, we simply send a HTTP request to the Picky server with the following payload:
+
+<pre><code>{
+  index: "people",
+  data: {
+    id: 7,
+    name: "Florian",
+    surname: "Hanke"
+  }
+}</code></pre>
+
+Sounds easy so far, right?
+
+Ah, but what if we stop and restart Picky? What happens to the indexed data?
+
+h3. When Picky is restarted
+
+Let's say you don't use the realtime @SQLite@ or @Redis@ persistent backend to store your indexes, but the standard @Memory@ backend.
+
+If we simply restarted, we would lose the indexes. We need a way to dump the data. One way to do this is simply dumping it when you quit Picky:
+
+<pre class="ruby"><code>at_exit { Picky::Indexes.dump }</code></pre>
+
+or a specific index:
+
+<pre class="ruby"><code>at_exit { the_index.dump }</code></pre>
+
+And then, as you restart the server, you simply load the indexes. Probably in @config.ru@:
+
+<pre class="ruby"><code>Picky::Indexes.load</code></pre>
+
+I'm quite excited about this!
+
+Sure, you have to write this yourself, but … you also *CAN* write it yourself. And control the behaviour of it. Dump it every X requests? Only on exit? I don't care! (I mean, I *do*, but not how you do it :) )
+
+In closing, I like that in a documentation, picky-activerecord will only need a single line for the server: Add @extend Picky::Interfaces::External@ to your Sinatra app.
+
+h3. Other interfaces?
+
+At the beginning, we will focus on writing an experimental/standard Sinatra interface.
+
+This will result in a nice Module that people can use to make their Sinatra Picky server open to external updates.
+
+But what about other interfaces?
+
+Since we expect the Picky Sinatra external interface to only be around 20-30 lines, we'll just leave it open for now and implement as the need arises.
+
+h2. The Client
+
+We'll save the discussion on the client for later, but just quickly outline the ideas:
+
+# It should offer a simple and easy configuration possibility, with the default being @host: 'localhost', port: 8080, path:'/'@.
+* It hooks into the @after_save@ callback.
+* It offers the possibility to save arbitrary data (not just model @Person@, or @Company@ etc., but arbitrary hashes, like @Music@, including a list of @Genres@, even though that combined object doesn't exist – I might note that it could make great sense to create a combined model like this).
+
+h2. You
+
+What do you think of the server design? Any obvious flaws? Ideas? Suggestions by those who have used other, similar interfaces?
+
+Have you already started on writing a picky-activerecord gem? :D
+
+In any case, thanks for following the slow but steady progress of Picky!

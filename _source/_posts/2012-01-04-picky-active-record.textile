@@ -55,7 +55,7 @@ Let's see how we would implement that. For updates, we will define a put action:
   index.replace_from params['data']
 end</code></pre>
 
-The method @replace_from(hash)@ is available in edge currently. Omitted is error handling.
+The method @replace_from(hash)@ is available in edge currently. Error handling is omitted.
 
 Then we can write up the DELETE action etc., wrap it into a nice module @Picky::Interfaces::External@, for example.
 
@@ -121,6 +121,7 @@ We'll save the discussion on the client for later, but just quickly outline the 
 # It should offer a simple and easy configuration possibility, with the default being @host: 'localhost', port: 8080, path:'/'@.
 * It hooks into the @after_save@ callback.
 * It offers the possibility to save arbitrary data (not just model @Person@, or @Company@ etc., but arbitrary hashes, like @Music@, including a list of @Genres@, even though that combined object doesn't exist – I might note that it could make great sense to create a combined model like this).
+* It should be less than 100 lines. I'm not kidding.
 
 h2. You
 

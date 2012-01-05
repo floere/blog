@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-01-04T19:12:36+11:00</updated>
+ <updated>2012-01-05T11:01:39+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -46,7 +46,7 @@ things.search 'something'&lt;/code&gt;&lt;/pre&gt;
   index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.
   index.replace_from params['data']
 end&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The method &lt;code&gt;replace_from(hash)&lt;/code&gt; is available in edge currently. Omitted is error handling.&lt;/p&gt;
+&lt;p&gt;The method &lt;code&gt;replace_from(hash)&lt;/code&gt; is available in edge currently. Error handling is omitted.&lt;/p&gt;
 &lt;p&gt;Then we can write up the &lt;span class=&quot;caps&quot;&gt;DELETE&lt;/span&gt; action etc., wrap it into a nice module &lt;code&gt;Picky::Interfaces::External&lt;/code&gt;, for example.&lt;/p&gt;
 &lt;p&gt;Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that &lt;code&gt;Module&lt;/code&gt;:&lt;/p&gt;
 &lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class MyPickyServer &amp;lt; Sinatra::Base
@@ -87,6 +87,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 	&lt;li&gt;It should offer a simple and easy configuration possibility, with the default being &lt;code&gt;host: 'localhost', port: 8080, path:'/'&lt;/code&gt;.&lt;/li&gt;
 	&lt;li&gt;It hooks into the &lt;code&gt;after_save&lt;/code&gt; callback.&lt;/li&gt;
 	&lt;li&gt;It offers the possibility to save arbitrary data (not just model &lt;code&gt;Person&lt;/code&gt;, or &lt;code&gt;Company&lt;/code&gt; etc., but arbitrary hashes, like &lt;code&gt;Music&lt;/code&gt;, including a list of &lt;code&gt;Genres&lt;/code&gt;, even though that combined object doesn&amp;#8217;t exist – I might note that it could make great sense to create a combined model like this).&lt;/li&gt;
+	&lt;li&gt;It should be less than 100 lines. I&amp;#8217;m not kidding.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2&gt;You&lt;/h2&gt;
 &lt;p&gt;What do you think of the server design? Any obvious flaws? Ideas? Suggestions by those who have used other, similar interfaces?&lt;/p&gt;

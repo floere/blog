@@ -83,7 +83,7 @@
       <p>In the case of Sinatra, it will offer a <span class="caps">HTTP</span> interface, where the picky-activerecord gem will send updates to.</p>
       <p>Let&#8217;s see how we would implement that. For updates, we will define a put action:</p>
       <pre class="ruby"><code>put '/' do&#x000A;  index_name = params['index']&#x000A;  index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.&#x000A;  index.replace_from params['data']&#x000A;end</code></pre>
-      <p>The method <code>replace_from(hash)</code> is available in edge currently. Omitted is error handling.</p>
+      <p>The method <code>replace_from(hash)</code> is available in edge currently. Error handling is omitted.</p>
       <p>Then we can write up the <span class="caps">DELETE</span> action etc., wrap it into a nice module <code>Picky::Interfaces::External</code>, for example.</p>
       <p>Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that <code>Module</code>:</p>
       <pre class="ruby"><code>class MyPickyServer &lt; Sinatra::Base&#x000A;  extend Picky::Interfaces::External&#x000A;  &#x000A;  # ...&#x000A;end</code></pre>
@@ -113,6 +113,7 @@
       	<li>It should offer a simple and easy configuration possibility, with the default being <code>host: 'localhost', port: 8080, path:'/'</code>.</li>
       	<li>It hooks into the <code>after_save</code> callback.</li>
       	<li>It offers the possibility to save arbitrary data (not just model <code>Person</code>, or <code>Company</code> etc., but arbitrary hashes, like <code>Music</code>, including a list of <code>Genres</code>, even though that combined object doesn&#8217;t exist – I might note that it could make great sense to create a combined model like this).</li>
+      	<li>It should be less than 100 lines. I&#8217;m not kidding.</li>
       </ol>
       <h2>You</h2>
       <p>What do you think of the server design? Any obvious flaws? Ideas? Suggestions by those who have used other, similar interfaces?</p>

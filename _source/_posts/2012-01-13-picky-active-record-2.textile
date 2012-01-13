@@ -1,0 +1,156 @@
+---
+layout: post
+title: Picky&nbsp;Active&nbsp;Record&nbsp;2
+categories:
+  - ruby
+  - picky
+  - activerecord
+---
+This post talks about integrating Picky directly into Rails/ActiveRecord.
+
+(By the way, greetings from "Rails Camp X Adelaide":http://www.cmswire.com/events/item/rails-camp-x-adelaide-2012-013342.php – come up and say hi if you are here!)
+
+In the last post we talked about a light active record integration. This has been "implemented in the prototype":https://github.com/floere/picky/tree/master/server/prototypes/active_record and released in Picky 4.0.9.
+
+By light integration we mean:
+* You have a separate Picky server.
+* The Picky server is not configured via the ActiveRecord model.
+* The ActiveRecord data is simply sent to the Picky server as-is for indexing after each commit.
+
+h3. A quick example of 4.0.9 ActiveRecord integration
+
+First, configure a Sinatra Picky server to be open for external indexing.
+
+<pre class="ruby"><code>class YourSearch < Sinatra::Base
+  extend Sinatra::IndexActions
+
+  # Configure indexes etc. as usual
+end</code></pre>
+
+Then, configure your AR model:
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  # These are the default options.
+  #
+  extend Picky::Client::ActiveRecord.configure(host: 'localhost', port: 8080, path: '/')
+
+  # The model definition as usual.
+end</code></pre>
+
+And that's it already :)
+
+h2. Direct integration
+
+While the above is very nice, you still need a separate server.
+
+Usually I advocate keeping search separate from the app, because normally, search and app have different goals. For example, caching for either needs to work differently. Search maybe needs to be restarted independently etc.
+
+But sometimes, you simply want a quick and simple search to directly run in the one server you have.
+
+So instead of setting up a separate server, we would integrate Picky directly in the model.
+
+How would we do this?
+
+h2. A first simple implementation
+
+At this point I am incredibly glad to have designed Picky to work and run anywhere.
+
+Since you already can stick it anywhere (a Sinatra server, a DRb server, a simple script, a PORO, ...), you can relatively easily stick it into an active record model.
+
+How, you ask? Let me show you "the whole thing":https://github.com/floere/picky/tree/master/server/prototypes/inside_active_record and then pick it apart.
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  
+  class << self
+    data = Picky::Index.new :models do
+      category :name
+      category :surname
+    end
+  
+    define_method :replace do |model|
+      data.replace model
+    end
+    
+    define_method :remove do |id|
+      data.remove id
+    end
+  
+    models = Picky::Search.new data
+    
+    define_method :search do |*args|
+      models.search *args
+    end
+  end
+  
+  after_commit do
+    if destroyed?
+      self.class.remove self.id
+    else
+      self.class.replace self
+    end
+  end
+  
+end</code></pre>
+
+Got that? If not, here's a step by step explanation:
+
+We want the index and the search object to reside in the (singleton) class to define methods there, so we open it:
+
+<pre class="ruby"><code>class << self</code></pre>
+
+Then we define a Picky index (two searchable categories, @name@ and @surname@) and two methods. One to @replace@ ("insert or update") indexed models and one to @remove@ indexed models with a given id:
+
+<pre class="ruby"><code>data = Picky::Index.new :models do
+  category :name
+  category :surname
+end
+
+define_method :replace do |model|
+  data.replace model
+end
+
+define_method :remove do |id|
+  data.remove id
+end</code></pre>
+
+Why am I using @define_method@ instead of @def@? I want to capture the @data@ (index) and the @models@ (search) in the block for these methods to use them later on.
+
+These two methods, since defined on the class' singleton class, are used like that:
+<pre class="ruby"><code>Model.replace model</code></pre>
+and
+<pre class="ruby"><code>Model.remove model_id</code></pre>
+
+These are all the methods that have to do with curating the index.
+
+Finally, we want the class to update the index as soon as it changes. We use AR 3.0+ @after_commit@ callback for that:
+
+<pre class="ruby"><code>after_commit do
+  if destroyed?
+    self.class.remove self
+  else
+    self.class.replace self
+  end
+end</code></pre>
+
+So if the object has been destroyed, we remove it from the index (using the "class methods" we defined earlier). If it hasn't, we simply replace the data.
+
+Interesting to note: On a @replace@, Picky simply calls the methods the categories name: @name@ and @surname@. So not only can Picky index Active Record attributes, but any method it has.
+
+h2. First conclusion
+
+You can already do this in the current Picky version 4.0.9.
+
+However, this has a few disadvantages:
+* The indexes aren't yet saved. (Hint: @Picky::Indexes.dump@)
+* If they would be saved, they would not yet be reloaded.
+
+How do we do this? The dumping is relatively easy, but how do we get the data back into that index when restarting and loading the index?
+If you're into trying to implement that have a go. If not, stay tuned! :)
+
+Another question for you: Is sticking the method on the @Model@ like
+
+<pre class="ruby"><code>Model.replace model</code></pre>
+
+actually a good idea? What if, say Thinking Sphinx, reloads your models? Is your model – being an AR model – not already doing enough? What about the single responsibility principle?
+
+It's already night here at Rails Camp X Adelaide, so good night. And good luck. Stay tuned!

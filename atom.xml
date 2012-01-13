@@ -4,13 +4,133 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-01-05T11:01:39+11:00</updated>
+ <updated>2012-01-13T22:52:14+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Active&amp;nbsp;Record&amp;nbsp;2</title>
+   <link href="http://florianhanke.com/blog/2012/01/13/picky-active-record-2.html"/>
+   <updated>2012-01-13T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/01/13/picky-active-record-2</id>
+   <content type="html">&lt;p&gt;This post talks about integrating Picky directly into Rails/ActiveRecord.&lt;/p&gt;
+&lt;p&gt;(By the way, greetings from &lt;a href=&quot;http://www.cmswire.com/events/item/rails-camp-x-adelaide-2012-013342.php&quot;&gt;Rails Camp X Adelaide&lt;/a&gt; – come up and say hi if you are here!)&lt;/p&gt;
+&lt;p&gt;In the last post we talked about a light active record integration. This has been &lt;a href=&quot;https://github.com/floere/picky/tree/master/server/prototypes/active_record&quot;&gt;implemented in the prototype&lt;/a&gt; and released in Picky 4.0.9.&lt;/p&gt;
+&lt;p&gt;By light integration we mean:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;You have a separate Picky server.&lt;/li&gt;
+	&lt;li&gt;The Picky server is not configured via the ActiveRecord model.&lt;/li&gt;
+	&lt;li&gt;The ActiveRecord data is simply sent to the Picky server as-is for indexing after each commit.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;A quick example of 4.0.9 ActiveRecord integration&lt;/h3&gt;
+&lt;p&gt;First, configure a Sinatra Picky server to be open for external indexing.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class YourSearch &amp;lt; Sinatra::Base
+  extend Sinatra::IndexActions
+
+  # Configure indexes etc. as usual
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, configure your AR model:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+  # These are the default options.
+  #
+  extend Picky::Client::ActiveRecord.configure(host: 'localhost', port: 8080, path: '/')
+
+  # The model definition as usual.
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And that&amp;#8217;s it already :)&lt;/p&gt;
+&lt;h2&gt;Direct integration&lt;/h2&gt;
+&lt;p&gt;While the above is very nice, you still need a separate server.&lt;/p&gt;
+&lt;p&gt;Usually I advocate keeping search separate from the app, because normally, search and app have different goals. For example, caching for either needs to work differently. Search maybe needs to be restarted independently etc.&lt;/p&gt;
+&lt;p&gt;But sometimes, you simply want a quick and simple search to directly run in the one server you have.&lt;/p&gt;
+&lt;p&gt;So instead of setting up a separate server, we would integrate Picky directly in the model.&lt;/p&gt;
+&lt;p&gt;How would we do this?&lt;/p&gt;
+&lt;h2&gt;A first simple implementation&lt;/h2&gt;
+&lt;p&gt;At this point I am incredibly glad to have designed Picky to work and run anywhere.&lt;/p&gt;
+&lt;p&gt;Since you already can stick it anywhere (a Sinatra server, a DRb server, a simple script, a &lt;span class=&quot;caps&quot;&gt;PORO&lt;/span&gt;, &amp;#8230;), you can relatively easily stick it into an active record model.&lt;/p&gt;
+&lt;p&gt;How, you ask? Let me show you &lt;a href=&quot;https://github.com/floere/picky/tree/master/server/prototypes/inside_active_record&quot;&gt;the whole thing&lt;/a&gt; and then pick it apart.&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+  
+  class &amp;lt;&amp;lt; self
+    data = Picky::Index.new :models do
+      category :name
+      category :surname
+    end
+  
+    define_method :replace do |model|
+      data.replace model
+    end
+    
+    define_method :remove do |id|
+      data.remove id
+    end
+  
+    models = Picky::Search.new data
+    
+    define_method :search do |*args|
+      models.search *args
+    end
+  end
+  
+  after_commit do
+    if destroyed?
+      self.class.remove self.id
+    else
+      self.class.replace self
+    end
+  end
+  
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Got that? If not, here&amp;#8217;s a step by step explanation:&lt;/p&gt;
+&lt;p&gt;We want the index and the search object to reside in the (singleton) class to define methods there, so we open it:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class &amp;lt;&amp;lt; self&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then we define a Picky index (two searchable categories, &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;surname&lt;/code&gt;) and two methods. One to &lt;code&gt;replace&lt;/code&gt; (&amp;#8220;insert or update&amp;#8221;) indexed models and one to &lt;code&gt;remove&lt;/code&gt; indexed models with a given id:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :models do
+  category :name
+  category :surname
+end
+
+define_method :replace do |model|
+  data.replace model
+end
+
+define_method :remove do |id|
+  data.remove id
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Why am I using &lt;code&gt;define_method&lt;/code&gt; instead of &lt;code&gt;def&lt;/code&gt;? I want to capture the &lt;code&gt;data&lt;/code&gt; (index) and the &lt;code&gt;models&lt;/code&gt; (search) in the block for these methods to use them later on.&lt;/p&gt;
+&lt;p&gt;These two methods, since defined on the class&amp;#8217; singleton class, are used like that:
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
+and
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.remove model_id&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;These are all the methods that have to do with curating the index.&lt;/p&gt;
+&lt;p&gt;Finally, we want the class to update the index as soon as it changes. We use AR 3.0+ &lt;code&gt;after_commit&lt;/code&gt; callback for that:&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;after_commit do
+  if destroyed?
+    self.class.remove self
+  else
+    self.class.replace self
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So if the object has been destroyed, we remove it from the index (using the &amp;#8220;class methods&amp;#8221; we defined earlier). If it hasn&amp;#8217;t, we simply replace the data.&lt;/p&gt;
+&lt;p&gt;Interesting to note: On a &lt;code&gt;replace&lt;/code&gt;, Picky simply calls the methods the categories name: &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;surname&lt;/code&gt;. So not only can Picky index Active Record attributes, but any method it has.&lt;/p&gt;
+&lt;h2&gt;First conclusion&lt;/h2&gt;
+&lt;p&gt;You can already do this in the current Picky version 4.0.9.&lt;/p&gt;
+&lt;p&gt;However, this has a few disadvantages:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;The indexes aren&amp;#8217;t yet saved. (Hint: &lt;code&gt;Picky::Indexes.dump&lt;/code&gt;)&lt;/li&gt;
+	&lt;li&gt;If they would be saved, they would not yet be reloaded.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;How do we do this? The dumping is relatively easy, but how do we get the data back into that index when restarting and loading the index?
+If you&amp;#8217;re into trying to implement that have a go. If not, stay tuned! :)&lt;/p&gt;
+&lt;p&gt;Another question for you: Is sticking the method on the &lt;code&gt;Model&lt;/code&gt; like&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;actually a good idea? What if, say Thinking Sphinx, reloads your models? Is your model – being an AR model – not already doing enough? What about the single responsibility principle?&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s already night here at Rails Camp X Adelaide, so good night. And good luck. Stay tuned!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Active&amp;nbsp;Record</title>

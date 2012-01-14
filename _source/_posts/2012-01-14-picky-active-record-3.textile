@@ -1,0 +1,202 @@
+---
+layout: post
+title: Picky&nbsp;Active&nbsp;Record&nbsp;3
+categories:
+  - ruby
+  - picky
+  - activerecord
+---
+This post talks about integrating Picky directly into Rails/ActiveRecord.
+
+(By the way, greetings from "Rails Camp X Adelaide":http://www.cmswire.com/events/item/rails-camp-x-adelaide-2012-013342.php – come up and say hi if you are here!)
+
+The last post illustrated a way of writing an active record integration. Still missing is index persistence.
+
+However, in this post I'd like to talk about wrapping the last solution up into a nicer bundle.
+
+h2. Beautifying the last solution
+
+Why? It contains a few advanced Ruby concepts and statements. While I think everybody should know about @class << self@ and @define_method@, it can get kind of hard to read compared to a more declarative style that Tire (Elastic Search), Thinking Sphinx (Sphinx), or Sunspot (Solr) offer.
+
+However: While I like the declarative style in many cases, some libraries hide away too much important code. Many times even code that is hugely important, or does things to your model which you only find out about after reading the library source. After a crash. In production.
+
+h2. Goals
+
+So what I'd like is
+
+* have the important bits be visible and manipulable.
+* hide away boilerplate code that makes code harder to read.
+
+And maybe most important:
+
+* use the standard Picky API
+
+A quick reminder what the basic Picky API is:
+
+<pre class="ruby"><code>data = Picky::Index.new :name do
+  category :name
+end
+things = Picky::Search.new data
+things.search 'something'</code></pre>
+
+Most other search engine adapters try to elegantify the original API. This is nice.
+
+However, having control over both APIs, I believe that using the original (standard) Picky API creates a pressure on it to stay as elegant as possible and as useable as possible.
+
+If we hide away the Picky API, pressure is only excerted on the ActiveRecord/Picky adapter. This also means that people who only use the Picky ActiveRecord API only come in contact with that one.
+
+Why is this a problem?
+This is a problem when people want to _transcend_ the AR API to use for example the separate and specific Picky server. If the APIs look and feel fundamentally different, users will not willingly make this jump.
+In fact, many people then start looking for search engine alternatives. This is a bad thing. Let me put this in bold, because it gets violated so many times:
+
+*The jump from the simple API to the harder API should not be noticeable.*
+
+The only way to do this is use a subset of the original API for the simpler one. However, since Picky is about giving *you* the power, we will not constrict you, but instead make the whole API accessible.
+
+h2. A first draft
+
+I am not the biggest fan of the following pattern:
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  include Picky::ActiveRecord
+  
+  some_method_call_from_the included, module
+end</code></pre>
+
+I am not sure why since it's perfectly ok Ruby. I believe it is because it usually consists of two lines, and only one really describes what is going on: "I am using this" and "I am using it like this".
+
+With this subgoal in mind, I started drafting the API. It turned out like this:
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  extend(Picky::ActiveRecord.new(:models) do
+    Picky::Index.new :models do
+      category :name
+      category :surname
+    end
+  end)
+end</code></pre>
+
+Don't judge me. It gets better.
+
+Why do I use so many round parentheses, having declared them unnecessary not so long ago?
+
+Turns out, @extend@ gobbles up my block. Try running the following code:
+
+<pre class="ruby"><code>module A; end
+class B
+  extend A do
+  	# ...
+  end
+end</code></pre>
+
+I am unsure what happens here. Looking at the "CRuby code":http://ruby-doc.org/core-1.9.3/Object.html#method-i-extend didn't help. Ideas?
+
+I guess we can all agree that this API is neither good looking nor elegant. Let's try again.
+
+h2. A better draft
+
+So, teeth grinding, we return back to the standard solution of having a separate include and declarations. However, I'd like to be able to use the Picky API.
+
+This is what I've come up with:
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  include Picky::ActiveRecord
+  
+  index = Picky::Index.new :models do
+    category :name
+    category :surname
+  end
+  
+  search = Picky::Search.new index
+  
+  updates_picky index
+  searches_picky search
+end</code></pre>
+
+Let's look at the design in detail.
+
+h3. In detail
+
+First of all, note that no saving of indexes in instance variables is done. You can do it, should you need it, but Picky is not saving anything like @@__picky_index@ for you. Instead, the index and the search are both passed into the a method in which they are captured in a closure.
+
+Let's look at the API code.
+
+The line
+
+<pre class="ruby"><code>include Picky::ActiveRecord</code></pre>
+
+does two things: First, it includes two other modules, @Picky::ActiveRecord::Indexing@ and @Picky::ActiveRecord::Searching@, that are concerned with indexing and searching, respectively. It is well imaginable that one doesn't want realtime indexing, just searching, or vice versa.
+
+<pre class="ruby"><code>index = Picky::Index.new :models do
+  category :name
+  category :surname
+end
+
+search = Picky::Search.new index</code></pre>
+
+This is the standard Picky API. You create an index (definition) and pass it into the search.
+
+The line
+
+<pre class="ruby"><code>updates_picky index</code></pre>
+
+tells this class to automatically update the given index as soon as the @after_commit@ method is called.
+
+This method can also be called as follows:
+
+<pre class="ruby"><code>updates_picky :models</code></pre>
+
+or
+
+<pre class="ruby"><code>updates_picky</code></pre>
+
+The first one uses the index called @:models@ and the second one uses @model_class.name.tableize@ to find the model name.
+
+Finally, the line
+
+<pre class="ruby"><code>searches_picky search</code></pre>
+
+installs a @Model.search@ method using the given @search@.
+
+h3. Also of note
+
+This API does not really care where anything is set up. This is well possible:
+
+<pre class="ruby"><code>class Model < ActiveRecord::Base
+  include Picky::ActiveRecord
+end
+
+# In e.g. initializers/picky.rb
+#
+index = Picky::Index.new :models do
+  category :name
+  category :surname
+end
+  
+search = Picky::Search.new index
+  
+Model.updates_picky index
+Model.searches_picky search
+</code></pre>
+
+for the case where you'd like your search code outside the model.
+
+Also, you can call @updates_picky@ multiple times:
+
+<pre class="ruby"><code>Model.updates_picky index
+Model.updates_picky index2
+Model.updates_picky index3</code></pre>
+
+Any updates to the model will update each index.
+
+h2. Implementation
+
+If you're interested in the implementation, see "the Picky::ActiveRecord module":https://github.com/floere/picky/blob/de7784bb15768fba38870601b2ecf59a64009ec7/server/prototypes/integrated_active_record/active_record.rb (code at the time of this writing).
+
+h2. Finally, you
+
+Hope you like the API design series. The API is certainly turning out to be simple. Too simple? Who knows.
+
+Opinions, ideas?
+
+We still haven't looked at index persistence. We save this for another blog post.

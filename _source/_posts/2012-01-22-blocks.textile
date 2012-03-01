@@ -1,0 +1,67 @@
+---
+published: false
+layout: post
+title: Blocks
+categories:
+  - ruby
+---
+This is a post on my love of Ruby blocks.
+
+Reading a series of "great blog posts on how to program a game in a functional language" led me to this post on "J", a programming language who sports the _under_ feature.
+
+Under refers to "Under a reversible action, do this". One of the examples he lists is this: "Open the file, Do something with it, close the file."
+
+This reminds you probably of something. Me too!
+
+This is exactly the way the @File.open@ method with a given block works:
+
+<pre class="ruby"><code>File.open { |opened_file| }</code></pre>
+
+h2. Ruby Blocks
+
+There are many good blog posts and books out there talking about blocks, how they work etc. so I do not want to spend any time on that. Neither do I want to talk about the difference of blocks and lambdas.
+
+Instead I'd like to talk about the "patterns" where I use them.
+
+Blocks to me are an encapsulated, portable unit of work. In Ruby, they can be executed in a number of ways, and in a number of contexts.
+
+h2. When does one use blocks?
+
+Blocks are used in the case where
+
+* you have a unit of work to be done and it needs to be done a number of times.
+* the unit of work needs to be configured and then executed at a later time.
+* you need a combination of the above.
+
+A very simple example we all know is this:
+<pre class="ruby"><code>5.times { |i| "This is the #{i}. time we run the block" }</code></pre>
+
+
+
+
+Let's look at a more elaborate example, this time from the indexing process in Picky.
+
+Picky indexes a number of indexes together with their categories. One great feature of the Picky categories is that they can be indexed independently of each other. Thus, the order in which the categories are executed does not matter.
+
+Let's think about this in more abstract terms. We have
+
+* indexing (the _unit of work_)
+* the order of indexing (the _call order_)
+
+There's a number of ways one can implement this. What's clear is that the actual indexing work needs to be in a block or method (also a unit of work that can be called in different order).
+
+I _could_ have gone the method way. In the class @Indexes@, I could have made a call to @indexes.each &:index@, and in each of these, I could have called @categories.each &:index@.
+But I didn't. Why?
+This is how it worked in its first incarnation, and it worked well.
+
+However, what about running the indexing in parallel? If you want to do it the method way, you need a number of objects whose @index@ method you can call. This could look like this:
+
+<pre class="ruby"><code>def index
+  things_to_index = indexes.get_things_to_index
+  loop do
+  	thing_to_index = things_to_index
+	fork do
+  	
+  	end
+  end
+end</code></pre>

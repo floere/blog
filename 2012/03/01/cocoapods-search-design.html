@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="/blog/favico.ico" rel="shortcut icon" />
+    <!-- Ugh. -->
+    <script src="/blog/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="/blog/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/blog/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <!-- Ugh. -->
+    <script src="/javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link href="/javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="/stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>CocoaPods&nbsp;Search&nbsp;Design</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("/blog/javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="/../">home</a>
+        •
+      </li>
+      <li>
+        <a href="/../blog/">blog</a>
+        •
+      </li>
+      <li>
+        <a href="/../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="/../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="/../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="/../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>CocoaPods&nbsp;Search&nbsp;Design</h1>
+      <div class="categories">
+        ruby / picky / search design
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <h2>Intro</h2>
+      <p>You might have heard of <a href="http://cocoapods.org">CocoaPods</a>, an Objective-C library dependency manager. The project was initiated by <a href="http://twitter.com/alloy">Eloy Durán</a>.</p>
+      <p>This post is about designing a search engine for CocoaPods. I&#8217;m using <a href="http://florianhanke.com/picky">Picky</a> for it, with moderate modifications.</p>
+      <p>Chances are you know <a href="http://rubygems.org">RubyGems</a>. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a <a href="http://cocoapods.org/#get_started">podspec</a> (similar to a gemspec), you ask for it to be included in the <a href="http://github.com/CocoaPods/Specs">central repository</a> via a pull request. If it is accepted, from then on you get commit rights to push other pods.</p>
+      <p>Since I think the <a href="http://rubygems.org/search">rubygems search</a> is too slow, and not very impressive, I tried to make the <a href="http://cocoapods.org">CocoaPods search</a> an example of how such a search should be designed.</p>
+      <p>(Note: I&#8217;m not just criticizing, but also <em>putting code where my mouth is</em> regarding the rubygems search – try my <a href="http://gemsearch.heroku.com/">alternative take</a> on it and <a href="./../../../2011/02/13/a-better-rubygems-search.html">read about it here</a>)</p>
+      <p>Many ideas come from the old gem search alternative, but a few features are new, compiled in the…</p>
+      <h2>Highlights</h2>
+      <ul>
+      	<li><a href="#hooks">Automagic index updates via Github post receive hooks</a></li>
+      	<li><a href="#composites">Making composite names (e.g. BlocksKit) searchable</a></li>
+      	<li><a href="#callbacks">Filtering by OS</a></li>
+      	<li><a href="#duplicates">Removing duplicates from results</a></li>
+      </ul>
+      <h2 id="hooks">Automagic index updates via Github post receive hooks</h2>
+      <p>The challenge was to have Picky automatically update the search index without restarting, and without polling.</p>
+      <p>The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&#8217;s repo features at our disposal.</p>
+      <p>The feature we need is <a href="http://help.github.com/post-receive-hooks/">post receive hooks</a>. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled <span class="caps">URL</span>, as follows:</p>
+      <pre class="ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do&#x000A;  # index updating code here&#x000A;end</code></pre>
+      <p>Every time this <span class="caps">URL</span> is called, Picky downloads the zip file from github, unzips it, and indexes the loaded specs. All while running. That&#8217;s it.</p>
+      <p><strong><span class="caps">HOLD</span> ON!</strong>, you say, why don&#8217;t you just do a <code>git pull</code>? I wish I could. But currently, Heroku doesn&#8217;t allow <code>git pull</code>,
+      or <code>tar</code>,
+      or <code>gunzip</code>. So currently, the search engine always downloads the zip file.</p>
+      <h2 id="composites">Making composite names searchable</h2>
+      <p>Pod names do not use spaces but are camelcased, e.g. &#8220;BlocksKit&#8221;. Like most search engines, Picky would index this as one word.</p>
+      <p>However, we want people to be able to find it when they type <a href="http://cocoapods.org/?q=blocks%20kit">blocks kit</a>, or just <a href="http://cocoapods.org/?q=kit">kit</a>.</p>
+      <p>In Picky lingo: If the data contains <code>"BlocksKit"</code>, how do we index it as <code>"BlocksKit Blocks Kit"</code>?</p>
+      <p>Turns out there is a snazzy Ruby regexp for that:</p>
+      <pre class="ruby"><code>name.split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
+      <p>Nice, eh? :)</p>
+      <p>The Pod model offers a <code>prepared_name</code> method, using the above <code>split</code>, returning <code>"BlocksKit Blocks Kit"</code>, which Picky uses for the <code>name</code> category and consequently indexes all three words.</p>
+      <h2 id="callbacks">Filtering by OS</h2>
+      <p>This is a more advanced Picky trick, which might only be interesting to pros.</p>
+      <p>Like Ruby gems, pods can run on multiple OS&#8217;. Either on iOS or on OS X.</p>
+      <p>We always want to filter by either both (<span class="caps">AND</span>), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: &#8220;on:&lt;some_platform&gt; rest of the query&#8221;.</p>
+      <p>This is problematic since it uses a lot of space, and also confuses the user.</p>
+      <p>We would like to make this invisible. Picky helps us by offering multiple JS callbacks. First of all we define a regexp to remove the platform search term:</p>
+      <pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
+      <p>If you copy a search link like <a href="http://cocoapods.org/?q=on:osx%20Kiwi">http://cocoapods.org/?q=on:osx%20Kiwi</a>, Picky runs the <code>beforeInsert</code> callback, while also checking the correct OS (not pictured), simply removing the OS part from the query:</p>
+      <pre class="javascript"><code>// Before a query is inserted into the search field&#x000A;// we clean it of any platform terms.&#x000A;//&#x000A;beforeInsert: function(query) {&#x000A;  return query.replace(platformRemoverRegexp, '');&#x000A;}</code></pre>
+      <p>And before sending the search request to the backend, Picky calls the <code>before</code> callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values <code>on:ios on:osx</code>, <code>on:ios</code>, and <code>on:osx</code>).</p>
+      <pre class="javascript"><code>before: function(query, params) {&#x000A;  query = query.replace(platformRemoverRegexp, '');&#x000A;  var platformModifier = platformSelect.find("input:checked").val();&#x000A;  return platformModifier + ' ' + query;&#x000A;}</code></pre>
+      <p>However, the complete query, including the OS is still inserted into the <span class="caps">URL</span>, ready for you to copy. Just the platform part is hidden out of sight.</p>
+      <h2 id="duplicates">Removing duplicates from results</h2>
+      <p>This is a more advanced Picky trick, which might only be interesting to pros.</p>
+      <p>I often get requests on how to remove duplicates from search requests.</p>
+      <p>Why are there duplicates in Picky&#8217;s search results anyway? Picky returns categorized search results. For example, it might deem the combination of categories <code>"first_name", "last_name"</code> more important, before all search results found in the categories <code>"street", "last_name"</code>. But this also means that the same entry can be contained in both combinations of categories!</p>
+      <p>Many Picky users just use <code>results.ids</code> to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return <code>[1,3,1,2,3]</code>,
+      with results <code>1</code>
+      and <code>3</code> occurring twice.</p>
+      <pre class="javascript"><code>// We filter duplicate ids here.&#x000A;// (Not in the server as it might be&#x000A;// used for APIs etc.)&#x000A;//&#x000A;success: function(data, query) {&#x000A;  var seen = {};&#x000A;  &#x000A;  var allocations = data.allocations;&#x000A;  allocations.each(function(i, allocation) {&#x000A;    var ids     = allocation.ids;&#x000A;    var entries = allocation.entries;&#x000A;    var remove = [];&#x000A;    &#x000A;    ids.each(function(j, id) {&#x000A;      if (seen[id]) {&#x000A;        data.total -= 1;&#x000A;        remove.push(j);&#x000A;      } else {&#x000A;        seen[id] = true;&#x000A;      }&#x000A;    });&#x000A;    &#x000A;    for(var l = remove.length-1; 0 &lt;= l; l--) {&#x000A;      entries.splice(remove[l], 1);&#x000A;    }&#x000A;    &#x000A;    allocation.entries = entries;&#x000A;  });&#x000A;  &#x000A;  return data;&#x000A;}</code></pre>
+      <h2>Other fun things to try!</h2>
+      <ul>
+      	<li>Search for anything and then click on a pod author name in the results.</li>
+      	<li>Just enter <a href="http://cocoapods.org/?q=luke%21.0">Luke 1.0</a> to get all pods written by a luke with version 1.0*.</li>
+      	<li>Enter e.g. <a href="http://cocoapods.org/?q=stacked">stacked</a> and press various platform buttons to see what happens to the results.</li>
+      	<li>Enter e.g. <a href="http://cocoapods.org/?q=uses:json">uses:json</a> to see all pods which use a pod with &#8220;json&#8221; in their name.</li>
+      </ul>
+      <br />
+      Previous
+      <a class="previous" href="/blog/2012/01/14/picky-active-record-3.html" title="Previous post: Picky&amp;nbsp;Active&amp;nbsp;Record&amp;nbsp;3">Picky&nbsp;Active&nbsp;Record&nbsp;3</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/03/01/cocoapods-search-design';
+          var disqus_url = 'http://florianhanke.com/blog/2012/03/01/cocoapods-search-design.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

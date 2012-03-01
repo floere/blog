@@ -4,127 +4,13 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-01T21:31:20+11:00</updated>
+ <updated>2012-03-01T22:04:21+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
- 
- <entry>
-   <title type="html">CocoaPods&amp;nbsp;Search&amp;nbsp;Design</title>
-   <link href="http://florianhanke.com/blog/2012/03/01/cocoapods-search-design.html"/>
-   <updated>2012-03-01T00:00:00+11:00</updated>
-   <id>http://florianhanke.com/blog/2012/03/01/cocoapods-search-design</id>
-   <content type="html">&lt;p&gt;You probably have heard of &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods&lt;/a&gt;, an Objective-C library dependency manager. The project was initiated by &lt;a href=&quot;http://twitter.com/alloy&quot;&gt;Eloy Durán&lt;/a&gt;.&lt;/p&gt;
-&lt;h2&gt;Intro&lt;/h2&gt;
-&lt;p&gt;This post is about designing a search engine for CocoaPods. I&amp;#8217;m using &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt; for it, with moderate modifications.&lt;/p&gt;
-&lt;p&gt;Chances are you know &lt;a href=&quot;http://rubygems.org&quot;&gt;RubyGems&lt;/a&gt;. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a &lt;a href=&quot;http://cocoapods.org/#get_started&quot;&gt;podspec&lt;/a&gt; (similar to a gemspec), you ask for it to be included in the &lt;a href=&quot;http://github.com/CocoaPods/Specs&quot;&gt;central repository&lt;/a&gt; via a pull request. If it is accepted, from then on you get commit rights to push other pods.&lt;/p&gt;
-&lt;p&gt;Since I think the &lt;a href=&quot;http://rubygems.org/search&quot;&gt;rubygems search&lt;/a&gt; is too slow, and not very impressive, I tried to make the &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods search&lt;/a&gt; an example of how such a search should be designed.&lt;/p&gt;
-&lt;p&gt;(Note: I&amp;#8217;m not just criticizing, but also &lt;em&gt;putting code where my mouth is&lt;/em&gt; regarding the rubygems search – try my &lt;a href=&quot;http://gemsearch.heroku.com/&quot;&gt;alternative take&lt;/a&gt; on it and &lt;a href=&quot;./../../../2011/02/13/a-better-rubygems-search.html&quot;&gt;read about it here&lt;/a&gt;)&lt;/p&gt;
-&lt;p&gt;Many ideas come from the old gem search alternative, but a few features are new, compiled in the…&lt;/p&gt;
-&lt;h2&gt;Highlights&lt;/h2&gt;
-&lt;ul&gt;
-	&lt;li&gt;&lt;a href=&quot;#hooks&quot;&gt;Automagic index updates via Github post receive hooks&lt;/a&gt;&lt;/li&gt;
-	&lt;li&gt;&lt;a href=&quot;#composites&quot;&gt;Making composite names (e.g. BlocksKit) searchable&lt;/a&gt;&lt;/li&gt;
-	&lt;li&gt;&lt;a href=&quot;#callbacks&quot;&gt;Filtering by OS&lt;/a&gt;&lt;/li&gt;
-	&lt;li&gt;&lt;a href=&quot;#duplicates&quot;&gt;Removing duplicates from results&lt;/a&gt;&lt;/li&gt;
-	&lt;li&gt;&lt;a href=&quot;#fun&quot;&gt;Fun things to try!&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&quot;hooks&quot;&gt;Automagic index updates via Github post receive hooks&lt;/h2&gt;
-&lt;p&gt;The challenge was to have Picky automatically update the search index without restarting, and without polling.&lt;/p&gt;
-&lt;p&gt;The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&amp;#8217;s repo features at our disposal.&lt;/p&gt;
-&lt;p&gt;The feature we need is &lt;a href=&quot;http://help.github.com/post-receive-hooks/&quot;&gt;post receive hooks&lt;/a&gt;. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, as follows:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;post &quot;/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}&quot; do
-  # index updating code here
-end&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Every time this &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; is called, Picky downloads the zip file from github, unzips it, and indexes the loaded specs. All while running. That&amp;#8217;s it.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;HOLD&lt;/span&gt; ON!&lt;/strong&gt;, you say, why don&amp;#8217;t you just do a &lt;code&gt;git pull&lt;/code&gt;? I wish I could. But currently, Heroku doesn&amp;#8217;t allow &lt;code&gt;git pull&lt;/code&gt;,
-or &lt;code&gt;tar&lt;/code&gt;,
-or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downloads the zip file.&lt;/p&gt;
-&lt;h2 id=&quot;composites&quot;&gt;Making composite names searchable&lt;/h2&gt;
-&lt;p&gt;Pod names do not use spaces but are camelcased, e.g. &amp;#8220;BlocksKit&amp;#8221;. Like most search engines, Picky would index this as one word.&lt;/p&gt;
-&lt;p&gt;However, we want people to be able to find it when they type &lt;a href=&quot;http://cocoapods.org/?q=blocks%20kit&quot;&gt;blocks kit&lt;/a&gt;, or just &lt;a href=&quot;http://cocoapods.org/?q=kit&quot;&gt;kit&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;In Picky lingo: If the data contains &lt;code&gt;&quot;BlocksKit&quot;&lt;/code&gt;, how do we index it as &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;?&lt;/p&gt;
-&lt;p&gt;Turns out there is a snazzy Ruby regexp for that:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;name.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Nice, eh? :)&lt;/p&gt;
-&lt;p&gt;The Pod model offers a &lt;code&gt;prepared_name&lt;/code&gt; method, using the above &lt;code&gt;split&lt;/code&gt;, returning &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;, which Picky uses for the &lt;code&gt;name&lt;/code&gt; category and consequently indexes all three words.&lt;/p&gt;
-&lt;h2 id=&quot;callbacks&quot;&gt;Filtering by OS&lt;/h2&gt;
-&lt;p&gt;This is a more advanced Picky trick, which might only be interesting to pros.&lt;/p&gt;
-&lt;p&gt;Like Ruby gems, pods can run on multiple OS&amp;#8217;. Either on iOS or on OS X.&lt;/p&gt;
-&lt;p&gt;We always want to filter by either both (&lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt;), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: &amp;#8220;on:&amp;lt;some_platform&amp;gt; rest of the query&amp;#8221;.&lt;/p&gt;
-&lt;p&gt;This is problematic since it uses a lot of space, and also confuses the user.&lt;/p&gt;
-&lt;p&gt;We would like to make this invisible. Picky helps us by offering multiple JS callbacks. First of all we define a regexp to remove the platform search term:&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;If you copy a search link like &lt;a href=&quot;http://cocoapods.org/?q=on:osx%20Kiwi&quot;&gt;http://cocoapods.org/?q=on:osx%20Kiwi&lt;/a&gt;, Picky runs the &lt;code&gt;beforeInsert&lt;/code&gt; callback, while also checking the correct OS (not pictured), simply removing the OS part from the query:&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;// Before a query is inserted into the search field
-// we clean it of any platform terms.
-//
-beforeInsert: function(query) {
-  return query.replace(platformRemoverRegexp, '');
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;And before sending the search request to the backend, Picky calls the &lt;code&gt;before&lt;/code&gt; callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values &lt;code&gt;on:ios on:osx&lt;/code&gt;, &lt;code&gt;on:ios&lt;/code&gt;, and &lt;code&gt;on:osx&lt;/code&gt;).&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;before: function(query, params) {
-  query = query.replace(platformRemoverRegexp, '');
-  var platformModifier = platformSelect.find(&quot;input:checked&quot;).val();
-  return platformModifier + ' ' + query;
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;However, the complete query, including the OS is still inserted into the &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, ready for you to copy. Just the platform part is hidden out of sight.&lt;/p&gt;
-&lt;h2 id=&quot;duplicates&quot;&gt;Removing duplicates from results&lt;/h2&gt;
-&lt;p&gt;This is a more advanced Picky trick, which might only be interesting to pros.&lt;/p&gt;
-&lt;p&gt;I often get requests on how to remove duplicates from search requests.&lt;/p&gt;
-&lt;p&gt;Why are there duplicates in Picky&amp;#8217;s search results anyway? Picky returns categorized search results. For example, it might deem the combination of categories &lt;code&gt;&quot;first_name&quot;, &quot;last_name&quot;&lt;/code&gt; more important, before all search results found in the categories &lt;code&gt;&quot;street&quot;, &quot;last_name&quot;&lt;/code&gt;. But this also means that the same entry can be contained in both combinations of categories!&lt;/p&gt;
-&lt;p&gt;Many Picky users just use &lt;code&gt;results.ids&lt;/code&gt; to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return &lt;code&gt;[1,3,1,2,3]&lt;/code&gt;,
-with results &lt;code&gt;1&lt;/code&gt;
-and &lt;code&gt;3&lt;/code&gt; occurring twice.&lt;/p&gt;
-&lt;p&gt;Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates.&lt;/p&gt;
-&lt;p&gt;We achieve this by using Picky&amp;#8217;s JS &lt;code&gt;success&lt;/code&gt; callback:&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;// We filter duplicate ids here.
-// (Not in the server as it might be
-// used for APIs etc.)
-//
-success: function(data, query) {
-  var seen = {};
-  
-  var allocations = data.allocations;
-  allocations.each(function(i, allocation) {
-    var ids     = allocation.ids;
-    var entries = allocation.entries;
-    var remove = [];
-    
-    ids.each(function(j, id) {
-      if (seen[id]) {
-        data.total -= 1;
-        remove.push(j);
-      } else {
-        seen[id] = true;
-      }
-    });
-    
-    for(var l = remove.length-1; 0 &amp;lt;= l; l--) {
-      entries.splice(remove[l], 1);
-    }
-    
-    allocation.entries = entries;
-  });
-  
-  return data;
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This goes through all combinations of categories (aka &lt;em&gt;allocations&lt;/em&gt;) and removes entries if we&amp;#8217;ve already seen them previously. This ensures we only see unique results.&lt;/p&gt;
-&lt;p&gt;We could well do this in the server, but I opted against it, because a possible future search &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; might want to expose the duplicate results. This is why we do it in the client.&lt;/p&gt;
-&lt;h2 id=&quot;fun&quot;&gt;Other fun things to try!&lt;/h2&gt;
-&lt;ul&gt;
-	&lt;li&gt;Search for anything and then click on a pod author name in the results.&lt;/li&gt;
-	&lt;li&gt;Enter &lt;a href=&quot;http://cocoapods.org/?q=luke%21.0&quot;&gt;Luke 1.0&lt;/a&gt; to get all pods written by a luke with version 1.0*.&lt;/li&gt;
-	&lt;li&gt;Enter e.g. &lt;a href=&quot;http://cocoapods.org/?q=stacked&quot;&gt;stacked&lt;/a&gt; and press each platform button to see what happens to the results.&lt;/li&gt;
-	&lt;li&gt;Enter e.g. &lt;a href=&quot;http://cocoapods.org/?q=uses:json&quot;&gt;uses:json&lt;/a&gt; to see all pods which use a pod with &amp;#8220;json&amp;#8221; in their name.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2&gt;Feedback&lt;/h2&gt;
-&lt;p&gt;We&amp;#8217;re very glad for feedback – shoot us a line at &lt;a href=&quot;http://twitter.com/CocoaPodsOrg&quot;&gt;http://twitter.com/CocoaPodsOrg&lt;/a&gt;, or at &lt;a href=&quot;http://twitter.com/picky_rb&quot;&gt;http://twitter.com/picky_rb&lt;/a&gt;. Thanks!&lt;/p&gt;</content>
-   
- </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Active&amp;nbsp;Record&amp;nbsp;3</title>

@@ -62,8 +62,8 @@
       </div>
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>You probably have heard of <a href="http://cocoapods.org">CocoaPods</a>, an Objective-C library dependency manager. The project was initiated by <a href="http://twitter.com/alloy">Eloy Durán</a>.</p>
       <h2>Intro</h2>
-      <p>You might have heard of <a href="http://cocoapods.org">CocoaPods</a>, an Objective-C library dependency manager. The project was initiated by <a href="http://twitter.com/alloy">Eloy Durán</a>.</p>
       <p>This post is about designing a search engine for CocoaPods. I&#8217;m using <a href="http://florianhanke.com/picky">Picky</a> for it, with moderate modifications.</p>
       <p>Chances are you know <a href="http://rubygems.org">RubyGems</a>. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a <a href="http://cocoapods.org/#get_started">podspec</a> (similar to a gemspec), you ask for it to be included in the <a href="http://github.com/CocoaPods/Specs">central repository</a> via a pull request. If it is accepted, from then on you get commit rights to push other pods.</p>
       <p>Since I think the <a href="http://rubygems.org/search">rubygems search</a> is too slow, and not very impressive, I tried to make the <a href="http://cocoapods.org">CocoaPods search</a> an example of how such a search should be designed.</p>
@@ -75,6 +75,7 @@
       	<li><a href="#composites">Making composite names (e.g. BlocksKit) searchable</a></li>
       	<li><a href="#callbacks">Filtering by OS</a></li>
       	<li><a href="#duplicates">Removing duplicates from results</a></li>
+      	<li><a href="#fun">Fun things to try!</a></li>
       </ul>
       <h2 id="hooks">Automagic index updates via Github post receive hooks</h2>
       <p>The challenge was to have Picky automatically update the search index without restarting, and without polling.</p>
@@ -112,14 +113,20 @@
       <p>Many Picky users just use <code>results.ids</code> to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return <code>[1,3,1,2,3]</code>,
       with results <code>1</code>
       and <code>3</code> occurring twice.</p>
+      <p>Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates.</p>
+      <p>We achieve this by using Picky&#8217;s JS <code>success</code> callback:</p>
       <pre class="javascript"><code>// We filter duplicate ids here.&#x000A;// (Not in the server as it might be&#x000A;// used for APIs etc.)&#x000A;//&#x000A;success: function(data, query) {&#x000A;  var seen = {};&#x000A;  &#x000A;  var allocations = data.allocations;&#x000A;  allocations.each(function(i, allocation) {&#x000A;    var ids     = allocation.ids;&#x000A;    var entries = allocation.entries;&#x000A;    var remove = [];&#x000A;    &#x000A;    ids.each(function(j, id) {&#x000A;      if (seen[id]) {&#x000A;        data.total -= 1;&#x000A;        remove.push(j);&#x000A;      } else {&#x000A;        seen[id] = true;&#x000A;      }&#x000A;    });&#x000A;    &#x000A;    for(var l = remove.length-1; 0 &lt;= l; l--) {&#x000A;      entries.splice(remove[l], 1);&#x000A;    }&#x000A;    &#x000A;    allocation.entries = entries;&#x000A;  });&#x000A;  &#x000A;  return data;&#x000A;}</code></pre>
-      <h2>Other fun things to try!</h2>
+      <p>This goes through all combinations of categories (aka <em>allocations</em>) and removes entries if we&#8217;ve already seen them previously. This ensures we only see unique results.</p>
+      <p>We could well do this in the server, but I opted against it, because a possible future search <span class="caps">API</span> might want to expose the duplicate results. This is why we do it in the client.</p>
+      <h2 id="fun">Other fun things to try!</h2>
       <ul>
       	<li>Search for anything and then click on a pod author name in the results.</li>
-      	<li>Just enter <a href="http://cocoapods.org/?q=luke%21.0">Luke 1.0</a> to get all pods written by a luke with version 1.0*.</li>
-      	<li>Enter e.g. <a href="http://cocoapods.org/?q=stacked">stacked</a> and press various platform buttons to see what happens to the results.</li>
+      	<li>Enter <a href="http://cocoapods.org/?q=luke%21.0">Luke 1.0</a> to get all pods written by a luke with version 1.0*.</li>
+      	<li>Enter e.g. <a href="http://cocoapods.org/?q=stacked">stacked</a> and press each platform button to see what happens to the results.</li>
       	<li>Enter e.g. <a href="http://cocoapods.org/?q=uses:json">uses:json</a> to see all pods which use a pod with &#8220;json&#8221; in their name.</li>
       </ul>
+      <h2>Feedback</h2>
+      <p>We&#8217;re very glad for feedback – shoot us a line at <a href="http://twitter.com/CocoaPodsOrg">http://twitter.com/CocoaPodsOrg</a>, or at <a href="http://twitter.com/picky_rb">http://twitter.com/picky_rb</a>. Thanks!</p>
       <br />
       Previous
       <a class="previous" href="/blog/2012/01/14/picky-active-record-3.html" title="Previous post: Picky&amp;nbsp;Active&amp;nbsp;Record&amp;nbsp;3">Picky&nbsp;Active&nbsp;Record&nbsp;3</a>

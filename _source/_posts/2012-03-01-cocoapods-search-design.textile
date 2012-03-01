@@ -7,9 +7,9 @@ categories:
   - search design
 ---
 
-h2. Intro
+You probably have heard of "CocoaPods":http://cocoapods.org, an Objective-C library dependency manager. The project was initiated by "Eloy Durán":http://twitter.com/alloy.
 
-You might have heard of "CocoaPods":http://cocoapods.org, an Objective-C library dependency manager. The project was initiated by "Eloy Durán":http://twitter.com/alloy.
+h2. Intro
 
 This post is about designing a search engine for CocoaPods. I'm using "Picky":http://florianhanke.com/picky for it, with moderate modifications.
 
@@ -27,6 +27,7 @@ h2. Highlights
 * "Making composite names (e.g. BlocksKit) searchable":#composites
 * "Filtering by OS":#callbacks
 * "Removing duplicates from results":#duplicates
+* "Fun things to try!":#fun
 
 h2(#hooks). Automagic index updates via Github post receive hooks
 
@@ -105,7 +106,11 @@ Why are there duplicates in Picky's search results anyway? Picky returns categor
 
 Many Picky users just use @results.ids@ to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return @[1,3,1,2,3]@,
 with results @1@
-and @3@ occurring twice.  
+and @3@ occurring twice.
+
+Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates.
+
+We achieve this by using Picky's JS @success@ callback:
 
 <pre class="javascript"><code>// We filter duplicate ids here.
 // (Not in the server as it might be
@@ -139,9 +144,17 @@ success: function(data, query) {
   return data;
 }</code></pre>
 
-h2. Other fun things to try!
+This goes through all combinations of categories (aka _allocations_) and removes entries if we've already seen them previously. This ensures we only see unique results.
+
+We could well do this in the server, but I opted against it, because a possible future search API might want to expose the duplicate results. This is why we do it in the client.
+
+h2(#fun). Other fun things to try!
 
 * Search for anything and then click on a pod author name in the results.
-* Just enter "Luke 1.0":http://cocoapods.org/?q=luke%21.0 to get all pods written by a luke with version 1.0*.
-* Enter e.g. "stacked":http://cocoapods.org/?q=stacked and press various platform buttons to see what happens to the results.
+* Enter "Luke 1.0":http://cocoapods.org/?q=luke%21.0 to get all pods written by a luke with version 1.0*.
+* Enter e.g. "stacked":http://cocoapods.org/?q=stacked and press each platform button to see what happens to the results.
 * Enter e.g. "uses:json":http://cocoapods.org/?q=uses:json to see all pods which use a pod with "json" in their name.
+
+h2. Feedback
+
+We're very glad for feedback – shoot us a line at "http://twitter.com/CocoaPodsOrg":http://twitter.com/CocoaPodsOrg, or at "http://twitter.com/picky_rb":http://twitter.com/picky_rb. Thanks!

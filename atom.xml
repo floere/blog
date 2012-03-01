@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-01T21:22:30+11:00</updated>
+ <updated>2012-03-01T21:31:20+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,8 +17,8 @@
    <link href="http://florianhanke.com/blog/2012/03/01/cocoapods-search-design.html"/>
    <updated>2012-03-01T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2012/03/01/cocoapods-search-design</id>
-   <content type="html">&lt;h2&gt;Intro&lt;/h2&gt;
-&lt;p&gt;You might have heard of &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods&lt;/a&gt;, an Objective-C library dependency manager. The project was initiated by &lt;a href=&quot;http://twitter.com/alloy&quot;&gt;Eloy Durán&lt;/a&gt;.&lt;/p&gt;
+   <content type="html">&lt;p&gt;You probably have heard of &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods&lt;/a&gt;, an Objective-C library dependency manager. The project was initiated by &lt;a href=&quot;http://twitter.com/alloy&quot;&gt;Eloy Durán&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;This post is about designing a search engine for CocoaPods. I&amp;#8217;m using &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt; for it, with moderate modifications.&lt;/p&gt;
 &lt;p&gt;Chances are you know &lt;a href=&quot;http://rubygems.org&quot;&gt;RubyGems&lt;/a&gt;. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a &lt;a href=&quot;http://cocoapods.org/#get_started&quot;&gt;podspec&lt;/a&gt; (similar to a gemspec), you ask for it to be included in the &lt;a href=&quot;http://github.com/CocoaPods/Specs&quot;&gt;central repository&lt;/a&gt; via a pull request. If it is accepted, from then on you get commit rights to push other pods.&lt;/p&gt;
 &lt;p&gt;Since I think the &lt;a href=&quot;http://rubygems.org/search&quot;&gt;rubygems search&lt;/a&gt; is too slow, and not very impressive, I tried to make the &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods search&lt;/a&gt; an example of how such a search should be designed.&lt;/p&gt;
@@ -30,6 +30,7 @@
 	&lt;li&gt;&lt;a href=&quot;#composites&quot;&gt;Making composite names (e.g. BlocksKit) searchable&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#callbacks&quot;&gt;Filtering by OS&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href=&quot;#duplicates&quot;&gt;Removing duplicates from results&lt;/a&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;a href=&quot;#fun&quot;&gt;Fun things to try!&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&quot;hooks&quot;&gt;Automagic index updates via Github post receive hooks&lt;/h2&gt;
 &lt;p&gt;The challenge was to have Picky automatically update the search index without restarting, and without polling.&lt;/p&gt;
@@ -78,6 +79,8 @@ beforeInsert: function(query) {
 &lt;p&gt;Many Picky users just use &lt;code&gt;results.ids&lt;/code&gt; to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return &lt;code&gt;[1,3,1,2,3]&lt;/code&gt;,
 with results &lt;code&gt;1&lt;/code&gt;
 and &lt;code&gt;3&lt;/code&gt; occurring twice.&lt;/p&gt;
+&lt;p&gt;Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates.&lt;/p&gt;
+&lt;p&gt;We achieve this by using Picky&amp;#8217;s JS &lt;code&gt;success&lt;/code&gt; callback:&lt;/p&gt;
 &lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;// We filter duplicate ids here.
 // (Not in the server as it might be
 // used for APIs etc.)
@@ -109,13 +112,17 @@ success: function(data, query) {
   
   return data;
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;h2&gt;Other fun things to try!&lt;/h2&gt;
+&lt;p&gt;This goes through all combinations of categories (aka &lt;em&gt;allocations&lt;/em&gt;) and removes entries if we&amp;#8217;ve already seen them previously. This ensures we only see unique results.&lt;/p&gt;
+&lt;p&gt;We could well do this in the server, but I opted against it, because a possible future search &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; might want to expose the duplicate results. This is why we do it in the client.&lt;/p&gt;
+&lt;h2 id=&quot;fun&quot;&gt;Other fun things to try!&lt;/h2&gt;
 &lt;ul&gt;
 	&lt;li&gt;Search for anything and then click on a pod author name in the results.&lt;/li&gt;
-	&lt;li&gt;Just enter &lt;a href=&quot;http://cocoapods.org/?q=luke%21.0&quot;&gt;Luke 1.0&lt;/a&gt; to get all pods written by a luke with version 1.0*.&lt;/li&gt;
-	&lt;li&gt;Enter e.g. &lt;a href=&quot;http://cocoapods.org/?q=stacked&quot;&gt;stacked&lt;/a&gt; and press various platform buttons to see what happens to the results.&lt;/li&gt;
+	&lt;li&gt;Enter &lt;a href=&quot;http://cocoapods.org/?q=luke%21.0&quot;&gt;Luke 1.0&lt;/a&gt; to get all pods written by a luke with version 1.0*.&lt;/li&gt;
+	&lt;li&gt;Enter e.g. &lt;a href=&quot;http://cocoapods.org/?q=stacked&quot;&gt;stacked&lt;/a&gt; and press each platform button to see what happens to the results.&lt;/li&gt;
 	&lt;li&gt;Enter e.g. &lt;a href=&quot;http://cocoapods.org/?q=uses:json&quot;&gt;uses:json&lt;/a&gt; to see all pods which use a pod with &amp;#8220;json&amp;#8221; in their name.&lt;/li&gt;
-&lt;/ul&gt;</content>
+&lt;/ul&gt;
+&lt;h2&gt;Feedback&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;re very glad for feedback – shoot us a line at &lt;a href=&quot;http://twitter.com/CocoaPodsOrg&quot;&gt;http://twitter.com/CocoaPodsOrg&lt;/a&gt;, or at &lt;a href=&quot;http://twitter.com/picky_rb&quot;&gt;http://twitter.com/picky_rb&lt;/a&gt;. Thanks!&lt;/p&gt;</content>
    
  </entry>
  

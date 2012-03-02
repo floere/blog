@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T00:31:25+11:00</updated>
+ <updated>2012-03-03T00:34:54+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,8 @@
    <link href="http://florianhanke.com/blog/2012/03/01/cocoapods-search-design.html"/>
    <updated>2012-03-01T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2012/03/01/cocoapods-search-design</id>
-   <content type="html">&lt;p&gt;You probably have heard of &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods&lt;/a&gt;, an Objective-C library dependency manager. The project was initiated by &lt;a href=&quot;http://twitter.com/alloy&quot;&gt;Eloy Durán&lt;/a&gt;. It&amp;#8217;s good stuff!&lt;/p&gt;
+   <content type="html">&lt;p&gt;You probably have heard of &lt;a href=&quot;http://cocoapods.org&quot;&gt;CocoaPods&lt;/a&gt;, an Objective-C library dependency manager. The project was initiated by &lt;a href=&quot;http://twitter.com/alloy&quot;&gt;Eloy Durán&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Let me tell you it&amp;#8217;s good stuff!&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;This post is about designing a search engine for CocoaPods. I&amp;#8217;m using &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt; for it, with moderate modifications.&lt;/p&gt;
 &lt;p&gt;Chances are you know &lt;a href=&quot;http://rubygems.org&quot;&gt;RubyGems&lt;/a&gt;. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a &lt;a href=&quot;http://cocoapods.org/#get_started&quot;&gt;podspec&lt;/a&gt; (similar to a gemspec), you ask for it to be included in the &lt;a href=&quot;http://github.com/CocoaPods/Specs&quot;&gt;central repository&lt;/a&gt; via a pull request. If it is accepted, from then on you get commit rights to push other pods.&lt;/p&gt;

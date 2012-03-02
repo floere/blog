@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T01:03:18+11:00</updated>
+ <updated>2012-03-03T01:11:51+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -49,8 +49,8 @@ or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downl
 &lt;p&gt;However, we want people to be able to find it when they type &lt;a href=&quot;http://cocoapods.org/?q=blocks%20kit&quot;&gt;blocks kit&lt;/a&gt;, or just &lt;a href=&quot;http://cocoapods.org/?q=kit&quot;&gt;kit&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;In Picky lingo: If the data contains &lt;code&gt;&quot;BlocksKit&quot;&lt;/code&gt;, how do we index it as &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;?&lt;/p&gt;
 &lt;p&gt;Turns out there is a snazzy Ruby regexp for that:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;name.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Nice, eh? :)&lt;/p&gt;
+&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;&quot;BlocksKit&quot;.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Nice, eh? As a bonus works fine with numbers :)&lt;/p&gt;
 &lt;p&gt;The Pod model offers a &lt;code&gt;prepared_name&lt;/code&gt; method, using the above &lt;code&gt;split&lt;/code&gt;, returning &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;, which Picky uses for the &lt;code&gt;name&lt;/code&gt; category and consequently indexes all three words.&lt;/p&gt;
 &lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :name,
          similarity: Similarity::DoubleMetaphone.new(2),

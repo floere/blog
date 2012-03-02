@@ -59,9 +59,9 @@ In Picky lingo: If the data contains @"BlocksKit"@, how do we index it as @"Bloc
 
 Turns out there is a snazzy Ruby regexp for that:
 
-<pre class="ruby"><code>name.split /([A-Z]?[a-z]+)/ # => ["", "Blocks", "", "Kit"]</code></pre>
+<pre class="ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # => ["", "Blocks", "", "Kit"]</code></pre>
 
-Nice, eh? :)
+Nice, eh? As a bonus works fine with numbers :)
 
 The Pod model offers a @prepared_name@ method, using the above @split@, returning @"BlocksKit Blocks Kit"@, which Picky uses for the @name@ category and consequently indexes all three words.
 

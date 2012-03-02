@@ -92,8 +92,8 @@
       <p>However, we want people to be able to find it when they type <a href="http://cocoapods.org/?q=blocks%20kit">blocks kit</a>, or just <a href="http://cocoapods.org/?q=kit">kit</a>.</p>
       <p>In Picky lingo: If the data contains <code>"BlocksKit"</code>, how do we index it as <code>"BlocksKit Blocks Kit"</code>?</p>
       <p>Turns out there is a snazzy Ruby regexp for that:</p>
-      <pre class="ruby"><code>name.split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
-      <p>Nice, eh? :)</p>
+      <pre class="ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
+      <p>Nice, eh? As a bonus works fine with numbers :)</p>
       <p>The Pod model offers a <code>prepared_name</code> method, using the above <code>split</code>, returning <code>"BlocksKit Blocks Kit"</code>, which Picky uses for the <code>name</code> category and consequently indexes all three words.</p>
       <pre class="ruby"><code>category :name,&#x000A;         similarity: Similarity::DoubleMetaphone.new(2),&#x000A;         partial: Partial::Substring.new(from: 1),&#x000A;         qualifiers: [:name, :pod],&#x000A;         :from =&gt; :prepared_name # &lt;= :from indicates which (data) method to call in the source object</code></pre>
       <p>Try it with <a href="http://cocoapods.org/?q=dynamic%20delegate">dynamic delegate</a>! :)</p>

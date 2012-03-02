@@ -16,18 +16,18 @@ This post is about designing a search engine for CocoaPods. I'm using "Picky":ht
 
 Chances are you know "RubyGems":http://rubygems.org. CocoaPods use a slightly different approach, one I personally find very elegant: After creating a "podspec":http://cocoapods.org/#get_started (similar to a gemspec), you ask for it to be included in the "central repository":http://github.com/CocoaPods/Specs via a pull request. If it is accepted, from then on you get commit rights to push other pods.
 
-Since I think the "rubygems search":http://rubygems.org/search is too slow, and not very impressive, I tried to make the "CocoaPods search":http://cocoapods.org an example of how such a search should be designed.
+Since I think the "rubygems search":http://rubygems.org/search is too slow, and not very impressive, I tried to make the "CocoaPods search":http://cocoapods.org an example of how such a search should be designed. Try it! :)
 
 (Note: I'm not just criticizing, but also _putting code where my mouth is_ regarding the rubygems search – try my "alternative take":http://gemsearch.heroku.com/ on it and "read about it here":./../../../2011/02/13/a-better-rubygems-search.html)
 
-Many ideas come from the old gem search alternative, but a few features are new, compiled in the…
+Many ideas for the CocoaPods search come from the old gem search alternative, but a few features are new, compiled in the…
 
 h2. Highlights
 
 * "Automagic index updates via Github post receive hooks":#hooks
 * "Making composite names (e.g. BlocksKit) searchable":#composites
-* "Filtering by OS":#callbacks
-* "Removing duplicates from results":#duplicates
+* "Advanced: Invisible filtering by OS":#callbacks
+* "Advanced: Removing duplicates from results":#duplicates
 * "Fun things to try!":#fun
 
 h2(#hooks). Automagic index updates via Github post receive hooks
@@ -64,21 +64,40 @@ Nice, eh? :)
 
 The Pod model offers a @prepared_name@ method, using the above @split@, returning @"BlocksKit Blocks Kit"@, which Picky uses for the @name@ category and consequently indexes all three words.
 
+<pre class="ruby"><code>category :name,
+         similarity: Similarity::DoubleMetaphone.new(2),
+         partial: Partial::Substring.new(from: 1),
+         qualifiers: [:name, :pod],
+         :from => :prepared_name # <= :from indicates which (data) method to call in the source object</code></pre>
+
+
 h2(#callbacks). Filtering by OS
 
 This is a more advanced Picky trick, which might only be interesting to pros.
 
-Like Ruby gems, pods can run on multiple OS'. Either on iOS or on OS X.
+Like Ruby gems, pods can run on multiple OSs. Either on iOS or on OS X.
 
-We always want to filter by either both (AND), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: "on:&lt;some_platform&gt; rest of the query".
+We always want to filter by either both (AND), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: @"on:some_platform rest of the query"@.
 
-This is problematic since it uses a lot of space, and also confuses the user.
+This is problematic since it uses a lot of input field space, and also confuses the user.
 
-We would like to make this invisible. Picky helps us by offering multiple JS callbacks. First of all we define a regexp to remove the platform search term:
+We would like to not show the OS in the search field, but use the value from the iOS style radio buttons.
 
-<pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
+Picky helps us by offering multiple JS callbacks. If you copy a search link like "http://cocoapods.org/?q=on:osx%20Kiwi":http://cocoapods.org/?q=on:osx%20Kiwi into the URL bar, Picky
+runs a few JS callbacks, in the following order:
 
-If you copy a search link like "http://cocoapods.org/?q=on:osx%20Kiwi":http://cocoapods.org/?q=on:osx%20Kiwi, Picky runs the @beforeInsert@ callback, while also checking the correct OS (not pictured), simply removing the OS part from the query:
+# @beforeInsert(query) // Before inserting the query into the search field.@
+# @before(query, params) // Before sending the query back to the server.@
+# @after(data, query) // After receiving the query back, before rendering.@
+# @success(data, query) // After the view/results have been updated.@
+
+(@data@ is the JS PickyData object)
+
+We need both @beforeInsert@ and @before@.
+
+In @beforeInsert@, we remove the @os@ part, before it is inserted into the search field. In @before@, before sending it to the backend, we add the OS back into the query, taken from the radio button value.
+
+In code (the Picky JS search client options), it looks like this:
 
 <pre class="javascript"><code>// Before a query is inserted into the search field
 // we clean it of any platform terms.
@@ -87,31 +106,39 @@ beforeInsert: function(query) {
   return query.replace(platformRemoverRegexp, '');
 }</code></pre>
 
+The regexp to remove the platform search term looks like this:
+
+<pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
+
 And before sending the search request to the backend, Picky calls the @before@ callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values @on:ios on:osx@, @on:ios@, and @on:osx@).
 
 <pre class="javascript"><code>before: function(query, params) {
-  query = query.replace(platformRemoverRegexp, '');
-  var platformModifier = platformSelect.find("input:checked").val();
-  return platformModifier + ' ' + query;
+  query = query.replace(platformRemoverRegexp, ''); // Clean the query.
+  var platformModifier = platformSelect.find("input:checked").val(); // Get the selected OS.
+  return platformModifier + ' ' + query; // Prepend it to the query.
 }</code></pre>
 
 However, the complete query, including the OS is still inserted into the URL, ready for you to copy. Just the platform part is hidden out of sight.
 
+5 lines of nicely customizable code :)
+
 h2(#duplicates). Removing duplicates from results
 
-This is a more advanced Picky trick, which might only be interesting to pros.
+This is another more advanced Picky trick, which might only be interesting to pros.
 
 I often get requests on how to remove duplicates from search requests.
 
-Why are there duplicates in Picky's search results anyway? Picky returns categorized search results. For example, it might deem the combination of categories @"first_name", "last_name"@ more important, before all search results found in the categories @"street", "last_name"@. But this also means that the same entry can be contained in both combinations of categories!
+Why are there duplicates in Picky's search results anyway?
+
+Picky returns categorized search results. For example, it might deem the combination of categories @"first_name", "last_name"@ more important, before all search results found in the categories @"street", "last_name"@. But this also means that the same entry can be contained in both combinations of categories!
 
 Many Picky users just use @results.ids@ to extract a list of ids. To get the list of ids, Picky goes through the results in each combination of categories and extracts the ids. This means that Picky may well return @[1,3,1,2,3]@,
 with results @1@
 and @3@ occurring twice.
 
-Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates.
+Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates to not confuse searchers.
 
-We achieve this by using Picky's JS @success@ callback:
+We achieve this by using Picky's JS @success@ callback. This goes through all combinations of categories (aka _allocations_) and removes entries from the allocations if we've already seen them previously. It ensures we only see unique results.
 
 <pre class="javascript"><code>// We filter duplicate ids here.
 // (Not in the server as it might be
@@ -145,14 +172,12 @@ success: function(data, query) {
   return data;
 }</code></pre>
 
-This goes through all combinations of categories (aka _allocations_) and removes entries if we've already seen them previously. This ensures we only see unique results.
-
 We could well do this in the server, but I opted against it, because a possible future search API might want to expose the duplicate results. This is why we do it in the client.
 
 h2(#fun). Other fun things to try!
 
-* Search for anything and then click on a pod author name in the results.
-* Enter "Luke 1.0":http://cocoapods.org/?q=luke%21.0 to get all pods written by a luke with version 1.0*.
+* "Search":http://cocoapods.org for anything and then click on a pod author name in the results.
+* Enter "Luke 1.0":http://cocoapods.org/?q=luke%201.0 to get all pods written by a luke with version 1.0*.
 * Enter e.g. "stacked":http://cocoapods.org/?q=stacked and press each platform button to see what happens to the results.
 * Enter e.g. "uses:json":http://cocoapods.org/?q=uses:json to see all pods which use a pod with "json" in their name.
 

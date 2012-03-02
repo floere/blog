@@ -7,7 +7,7 @@ categories:
   - search design
 ---
 
-You probably have heard of "CocoaPods":http://cocoapods.org, an Objective-C library dependency manager. The project was initiated by "Eloy Durán":http://twitter.com/alloy.
+You probably have heard of "CocoaPods":http://cocoapods.org, an Objective-C library dependency manager. The project was initiated by "Eloy Durán":http://twitter.com/alloy. It's good stuff!
 
 h2. Intro
 

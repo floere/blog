@@ -184,3 +184,5 @@ h2(#fun). Other fun things to try!
 h2. Feedback
 
 We're very glad for feedback – shoot us a line at "http://twitter.com/CocoaPodsOrg":http://twitter.com/CocoaPodsOrg, or at "http://twitter.com/picky_rb":http://twitter.com/picky_rb. Thanks!
+
+Thanks also to the CocoaPods team for a great project!

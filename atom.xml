@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T01:11:51+11:00</updated>
+ <updated>2012-03-03T01:42:30+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -36,7 +36,7 @@
 &lt;h2 id=&quot;hooks&quot;&gt;Automagic index updates via Github post receive hooks&lt;/h2&gt;
 &lt;p&gt;The challenge was to have Picky automatically update the search index without restarting, and without polling.&lt;/p&gt;
 &lt;p&gt;The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&amp;#8217;s repo features at our disposal.&lt;/p&gt;
-&lt;p&gt;The feature we need is &lt;a href=&quot;http://help.github.com/post-receive-hooks/&quot;&gt;post receive hooks&lt;/a&gt;. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, as follows:&lt;/p&gt;
+&lt;p&gt;The feature we use is &lt;a href=&quot;http://help.github.com/post-receive-hooks/&quot;&gt;post receive hooks&lt;/a&gt;. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, as follows:&lt;/p&gt;
 &lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;post &quot;/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}&quot; do
   # index updating code here
 end&lt;/code&gt;&lt;/pre&gt;

@@ -37,7 +37,7 @@ The challenge was to have Picky automatically update the search index without re
 
 The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github's repo features at our disposal.
 
-The feature we need is "post receive hooks":http://help.github.com/post-receive-hooks/. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled URL, as follows:
+The feature we use is "post receive hooks":http://help.github.com/post-receive-hooks/. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled URL, as follows:
 
 <pre class="ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do
   # index updating code here

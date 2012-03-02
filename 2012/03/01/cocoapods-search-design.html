@@ -81,7 +81,7 @@
       <h2 id="hooks">Automagic index updates via Github post receive hooks</h2>
       <p>The challenge was to have Picky automatically update the search index without restarting, and without polling.</p>
       <p>The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&#8217;s repo features at our disposal.</p>
-      <p>The feature we need is <a href="http://help.github.com/post-receive-hooks/">post receive hooks</a>. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled <span class="caps">URL</span>, as follows:</p>
+      <p>The feature we use is <a href="http://help.github.com/post-receive-hooks/">post receive hooks</a>. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled <span class="caps">URL</span>, as follows:</p>
       <pre class="ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do&#x000A;  # index updating code here&#x000A;end</code></pre>
       <p>Every time this <span class="caps">URL</span> is called, Picky downloads the zip file from github, unzips it, and indexes the loaded specs. All while running. That&#8217;s it.</p>
       <p><strong><span class="caps">HOLD</span> ON!</strong>, you say, why don&#8217;t you just do a <code>git pull</code>? I wish I could. But currently, Heroku doesn&#8217;t allow <code>git pull</code>,

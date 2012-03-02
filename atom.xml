@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T01:42:30+11:00</updated>
+ <updated>2012-03-03T01:51:41+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -90,7 +90,7 @@ beforeInsert: function(query) {
   var platformModifier = platformSelect.find(&quot;input:checked&quot;).val(); // Get the selected OS.
   return platformModifier + ' ' + query; // Prepend it to the query.
 }&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;However, the complete query, including the OS is still inserted into the &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, ready for you to copy. Just the platform part is hidden out of sight.&lt;/p&gt;
+&lt;p&gt;However, the complete query, including the OS is still inserted into the &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, ready for you to copy and send to friends.&lt;/p&gt;
 &lt;p&gt;5 lines of nicely customizable code :)&lt;/p&gt;
 &lt;h2 id=&quot;duplicates&quot;&gt;Removing duplicates from results&lt;/h2&gt;
 &lt;p&gt;This is another more advanced Picky trick, which might only be interesting to pros.&lt;/p&gt;

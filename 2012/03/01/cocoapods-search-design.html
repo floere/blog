@@ -120,7 +120,7 @@
       <pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
       <p>And before sending the search request to the backend, Picky calls the <code>before</code> callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values <code>on:ios on:osx</code>, <code>on:ios</code>, and <code>on:osx</code>).</p>
       <pre class="javascript"><code>before: function(query, params) {&#x000A;  query = query.replace(platformRemoverRegexp, ''); // Clean the query.&#x000A;  var platformModifier = platformSelect.find("input:checked").val(); // Get the selected OS.&#x000A;  return platformModifier + ' ' + query; // Prepend it to the query.&#x000A;}</code></pre>
-      <p>However, the complete query, including the OS is still inserted into the <span class="caps">URL</span>, ready for you to copy. Just the platform part is hidden out of sight.</p>
+      <p>However, the complete query, including the OS is still inserted into the <span class="caps">URL</span>, ready for you to copy and send to friends.</p>
       <p>5 lines of nicely customizable code :)</p>
       <h2 id="duplicates">Removing duplicates from results</h2>
       <p>This is another more advanced Picky trick, which might only be interesting to pros.</p>

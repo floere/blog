@@ -120,7 +120,7 @@ And before sending the search request to the backend, Picky calls the @before@ c
   return platformModifier + ' ' + query; // Prepend it to the query.
 }</code></pre>
 
-However, the complete query, including the OS is still inserted into the URL, ready for you to copy. Just the platform part is hidden out of sight.
+However, the complete query, including the OS is still inserted into the URL, ready for you to copy and send to friends.
 
 5 lines of nicely customizable code :)
 

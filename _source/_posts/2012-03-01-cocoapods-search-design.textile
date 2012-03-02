@@ -70,6 +70,7 @@ The Pod model offers a @prepared_name@ method, using the above @split@, returnin
          qualifiers: [:name, :pod],
          :from => :prepared_name # <= :from indicates which (data) method to call in the source object</code></pre>
 
+Try it with "dynamic delegate":http://cocoapods.org/?q=dynamic%20delegate! :)
 
 h2(#callbacks). Filtering by OS
 

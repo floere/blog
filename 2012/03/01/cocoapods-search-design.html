@@ -95,6 +95,7 @@
       <p>Nice, eh? :)</p>
       <p>The Pod model offers a <code>prepared_name</code> method, using the above <code>split</code>, returning <code>"BlocksKit Blocks Kit"</code>, which Picky uses for the <code>name</code> category and consequently indexes all three words.</p>
       <pre class="ruby"><code>category :name,&#x000A;         similarity: Similarity::DoubleMetaphone.new(2),&#x000A;         partial: Partial::Substring.new(from: 1),&#x000A;         qualifiers: [:name, :pod],&#x000A;         :from =&gt; :prepared_name # &lt;= :from indicates which (data) method to call in the source object</code></pre>
+      <p>Try it with <a href="http://cocoapods.org/?q=dynamic%20delegate">dynamic delegate</a>! :)</p>
       <h2 id="callbacks">Filtering by OS</h2>
       <p>This is a more advanced Picky trick, which might only be interesting to pros.</p>
       <p>Like Ruby gems, pods can run on multiple OSs. Either on iOS or on OS X.</p>

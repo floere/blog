@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: CocoaPods&nbsp;Search&nbsp;Design
 categories:

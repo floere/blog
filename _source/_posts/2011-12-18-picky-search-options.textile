@@ -47,7 +47,7 @@ All clear?
 
 Try searching for "Niklaus":
 
-<pre class="ruby"><code>results = people.search 'niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'niklaus'</code></pre>
 
 You should find ids @[2, 4]@ and two allocations now, first in the first name, then in the last name.
 
@@ -63,10 +63,10 @@ Picky knows a trick that almost no search engine knows. It can *boost combinatio
 
 Look for:
 
-<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
 
 Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-<pre class="ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre>
+<pre class="sh_ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre>
 
 That's pretty useful to know what was found where.
 
@@ -74,21 +74,21 @@ As people usually look for the first name, then the last name, we want to give t
 
 Replace this:
 
-<pre class="ruby"><code>people = Picky::Search.new data</code></pre>
+<pre class="sh_ruby"><code>people = Picky::Search.new data</code></pre>
 
 with this
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   boost [:first, :last] => +3
 end</code></pre>
 
 Now try again:
 
-<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
 
 A whole 3 points more! Try it the other way around:
 
-<pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
 
 We don't get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!
 
@@ -96,19 +96,19 @@ h3. max_allocations
 
 Sometimes you only want the best allocation to appear in the results.
 
-<pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
 
 This finds two ids and two allocations, once in the first name, once in the last name.
 
 Replace:
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   max_allocations 1
 end</code></pre>
 
 Now Picky only calculates 1 allocation. Try
 
-<pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
 
 Only the best allocation is found.
 
@@ -116,17 +116,17 @@ h3. ignore_unassigned_tokens
 
 Did Donald Knuth ever have the nickname "Popeye"? Try this:
 
-<pre class="ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
 
 Not really. But what if we want to find him even if one token cannot be assigned to a category?
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   ignore_unassigned_tokens
 end</code></pre>
 
 Try again:
 
-<pre class="ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
 
 Voilà!
 
@@ -136,25 +136,25 @@ h3. terminate_early
 
 Search for niklaus, and tell Picky you only want 1 id:
 
-<pre class="ruby"><code>results = people.search 'Niklaus', 1</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus', 1</code></pre>
 
 Yes, Picky only calculates 1 id, but still calculates and returns all valid allocations. if you only really need the ids (the Picky interface needs the allocations), then this is unnecessary and could be faster.
 
 Replace:
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   terminate_early
 end</code></pre>
 
 Try again:
 
-<pre class="ruby"><code>results = people.search 'Niklaus', 1</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus', 1</code></pre>
 
 Hey presto! Just one allocation.
 
 This code
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   terminate_early +2
 end</code></pre>
 
@@ -164,27 +164,27 @@ h3. ignore
 
 Try this:
 
-<pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
 
 You'll get results in first and last name. If you only wanted results from the first name, you'd search for this:
 
-<pre class="ruby"><code>results = people.search 'first:Niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'first:Niklaus'</code></pre>
 
 Cool. But let's say: You, the search engine designer, don't want anybody to find anything in a last name, for any reason. Using @first:@ will select only first. But you might only want to remove the @last@ category. Do this:
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   ignore :last
 end</code></pre>
 
 Try again:
 
-<pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
 
 Niklaus is not found in the last name again.
 
 You can give it even more:
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   ignore :first, :last
 end</code></pre>
 

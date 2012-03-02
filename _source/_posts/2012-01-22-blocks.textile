@@ -15,7 +15,7 @@ This reminds you probably of something. Me too!
 
 This is exactly the way the @File.open@ method with a given block works:
 
-<pre class="ruby"><code>File.open { |opened_file| }</code></pre>
+<pre class="sh_ruby"><code>File.open { |opened_file| }</code></pre>
 
 h2. Ruby Blocks
 
@@ -34,7 +34,7 @@ Blocks are used in the case where
 * you need a combination of the above.
 
 A very simple example we all know is this:
-<pre class="ruby"><code>5.times { |i| "This is the #{i}. time we run the block" }</code></pre>
+<pre class="sh_ruby"><code>5.times { |i| "This is the #{i}. time we run the block" }</code></pre>
 
 
 
@@ -56,7 +56,7 @@ This is how it worked in its first incarnation, and it worked well.
 
 However, what about running the indexing in parallel? If you want to do it the method way, you need a number of objects whose @index@ method you can call. This could look like this:
 
-<pre class="ruby"><code>def index
+<pre class="sh_ruby"><code>def index
   things_to_index = indexes.get_things_to_index
   loop do
   	thing_to_index = things_to_index

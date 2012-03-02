@@ -45,7 +45,7 @@ All clear?
 
 Try searching for "Niklaus":
 
-<pre class="ruby"><code>results = people.search 'niklaus'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'niklaus'</code></pre>
 
 You should find ids @[2, 4]@ and two allocations now, first in the first name, then in the last name.
 
@@ -57,11 +57,11 @@ By default, Picky already weighs the categories with a logarithmic weight. That 
 
 So this:
 
-<pre class="ruby"><code>category :last</code></pre>
+<pre class="sh_ruby"><code>category :last</code></pre>
 
 is actually
 
-<pre class="ruby"><code>category :last, weight: Weights::Logarithmic.new</code></pre>
+<pre class="sh_ruby"><code>category :last, weight: Weights::Logarithmic.new</code></pre>
 
 However, for "Niklaus", that resolves to a weight of 0.0.
 
@@ -69,7 +69,7 @@ So let's add our own weight object. It just needs to respond to @#weight_for(amo
 
 We ignore the amount and return a flat 12.3. Copy this in your example:
 
-<pre class="ruby"><code>Weight = Class.new do
+<pre class="sh_ruby"><code>Weight = Class.new do
   def weight_for amount
     12.3
   end
@@ -77,11 +77,11 @@ end</code></pre>
 
 and replace
 
-<pre class="ruby"><code>category :last, weight: Weight.new</code></pre>
+<pre class="sh_ruby"><code>category :last, weight: Weight.new</code></pre>
 
 Now the last name comes first, with a weight of 12.3, not surprisingly.
 
-<pre class="ruby"><code>[[:people, 12.3, 1, [[:last, "niklaus", "niklaus"]], [4]], [:people, 0.0, 1, [[:first, "niklaus", "niklaus"]], [2]]]</code></pre>
+<pre class="sh_ruby"><code>[[:people, 12.3, 1, [[:last, "niklaus", "niklaus"]], [4]], [:people, 0.0, 1, [[:first, "niklaus", "niklaus"]], [2]]]</code></pre>
 
 Picky provides a few weights itself:
 
@@ -97,15 +97,15 @@ By default, Picky does not look for similar words.
 
 This:
 
-<pre class="ruby"><code>category :last</code></pre>
+<pre class="sh_ruby"><code>category :last</code></pre>
 
 is actually
 
-<pre class="ruby"><code>category :last, similarity: Similarity::None.new</code></pre>
+<pre class="sh_ruby"><code>category :last, similarity: Similarity::None.new</code></pre>
 
 Now, look for "warth~" (the ~ tells Picky to look for similar words):
 
-<pre class="ruby"><code>results = people.search 'warth~'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
 
 You found nothing, right?
 
@@ -113,7 +113,7 @@ Picky only looks for similar words if the category enables it!
 
 Let's write a similarity such that both will be found. Copy this in your example:
 
-<pre class="ruby"><code>Similarity = Class.new do
+<pre class="sh_ruby"><code>Similarity = Class.new do
   def encode text
     text.gsub /[aeiou]/, ''
   end
@@ -127,11 +127,11 @@ We encode a text such that its vowels are removed. This will make "wirth" and "w
 
 and replace
 
-<pre class="ruby"><code>category :last, similarity: Similarity.new</code></pre>
+<pre class="sh_ruby"><code>category :last, similarity: Similarity.new</code></pre>
 
 Again, search for "warth~".
 
-<pre class="ruby"><code>results = people.search 'warth~'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
 
 This time you found both, right?
 
@@ -141,27 +141,27 @@ h3. Adding partial searching
 
 Can you find Donald Knuth by entering "Donal"?
 
-<pre class="ruby"><code>results = people.search 'donal'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'donal'</code></pre>
 
 You can. But why?
 
 The word "donal" finds something because this:
 
-<pre class="ruby"><code>category :first</code></pre>
+<pre class="sh_ruby"><code>category :first</code></pre>
 
 is actually
 
-<pre class="ruby"><code>category :first, partial: Partial::Postfix.new(from: -3)</code></pre>
+<pre class="sh_ruby"><code>category :first, partial: Partial::Postfix.new(from: -3)</code></pre>
 
 That means it finds "dona", "donal", "donald". Try them all!
 
 Does it find "don"? Try it:
 
-<pre class="ruby"><code>results = people.search 'don'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
 
 No, it doesn't! We could use @Partial::Postfix.new(from: -4)@ to include this case, but let's write our own :)
 
-<pre class="ruby"><code>Partial = Class.new do
+<pre class="sh_ruby"><code>Partial = Class.new do
   def each_partial text
     text = text.dup
     (text.size - 1).times do
@@ -172,15 +172,15 @@ end</code></pre>
 
 and replace
 
-<pre class="ruby"><code>category :first, partial: Partial.new</code></pre>
+<pre class="sh_ruby"><code>category :first, partial: Partial.new</code></pre>
 
 Try again:
 
-<pre class="ruby"><code>results = people.search 'don'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
 
 Now we find Donald. You can even do this with our partial code:
 
-<pre class="ruby"><code>results = people.search 'd'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'd'</code></pre>
 
 We still find him.
 
@@ -201,10 +201,10 @@ Picky knows a trick that almost no search engine knows. It can *boost combinatio
 
 Look for:
 
-<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
 
 Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-<pre class="ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre>
+<pre class="sh_ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre>
 
 That's pretty useful to know what was found where.
 
@@ -212,21 +212,21 @@ As people usually look for the first name, then the last name, we want to give t
 
 Replace this:
 
-<pre class="ruby"><code>people = Picky::Search.new data</code></pre>
+<pre class="sh_ruby"><code>people = Picky::Search.new data</code></pre>
 
 with this
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   boost [:first, :last] => +3
 end</code></pre>
 
 Now try again:
 
-<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
 
 A whole 3 points more! Try it the other way around:
 
-<pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
 
 We don't get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!
 
@@ -236,7 +236,7 @@ h3. Custom Boosting
 
 Copy this into the example:
 
-<pre class="ruby"><code>Boosts = Class.new do
+<pre class="sh_ruby"><code>Boosts = Class.new do
   def boost_for combinations
     @map ||= {
       [:first, :last] => +5
@@ -249,17 +249,17 @@ end</code></pre>
 
 and replace:
 
-<pre class="ruby"><code>people = Picky::Search.new data do
+<pre class="sh_ruby"><code>people = Picky::Search.new data do
   boost Boosts.new
 end</code></pre>
 
 Now try again:
 
-<pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
 
 A whole 5 points more! Try it the other way around:
 
-<pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+<pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
 
 A whopping -20, which would send this allocation back to the end of the list, was there more data.
 

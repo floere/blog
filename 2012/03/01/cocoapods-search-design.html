@@ -26,27 +26,27 @@
   <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
     <ol class="nav">
       <li>
-        <a href="/../">home</a>
+        <a href="./../../../../">home</a>
         •
       </li>
       <li>
-        <a href="/../blog/">blog</a>
+        <a href="./../../../">blog</a>
         •
       </li>
       <li>
-        <a href="/../picky/">picky</a>
+        <a href="./../../../../picky/">picky</a>
         •
       </li>
       <li>
-        <a href="/../phd/">phd</a>
+        <a href="./../../../../phd/">phd</a>
         •
       </li>
       <li>
-        <a href="/../phony/">phony</a>
+        <a href="./../../../../phony/">phony</a>
         •
       </li>
       <li>
-        <a href="/../view_models/">view models</a>
+        <a href="./../../../../view_models/">view models</a>
       </li>
     </ol>
     <div class="post">
@@ -76,7 +76,7 @@
       <p>The challenge was to have Picky automatically update the search index without restarting, and without polling.</p>
       <p>The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&#8217;s repo features at our disposal.</p>
       <p>The feature we use is <a href="http://help.github.com/post-receive-hooks/">post receive hooks</a>. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled <span class="caps">URL</span>, as follows:</p>
-      <pre class="ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do&#x000A;  # index updating code here&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do&#x000A;  # index updating code here&#x000A;end</code></pre>
       <p>Every time this <span class="caps">URL</span> is called, Picky downloads the zip file from github, unzips it, and indexes the loaded specs. All while running. That&#8217;s it.</p>
       <p><strong><span class="caps">HOLD</span> ON!</strong>, you say, why don&#8217;t you just do a <code>git pull</code>? I wish I could. But currently, Heroku doesn&#8217;t allow <code>git pull</code>,
       or <code>tar</code>,
@@ -86,10 +86,10 @@
       <p>However, we want people to be able to find it when they type <a href="http://cocoapods.org/?q=blocks%20kit">blocks kit</a>, or just <a href="http://cocoapods.org/?q=kit">kit</a>.</p>
       <p>In Picky lingo: If the data contains <code>"BlocksKit"</code>, how do we index it as <code>"BlocksKit Blocks Kit"</code>?</p>
       <p>Turns out there is a snazzy Ruby regexp for that:</p>
-      <pre class="ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
+      <pre class="sh_ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
       <p>Nice, eh? As a bonus works fine with numbers :)</p>
       <p>The Pod model offers a <code>prepared_name</code> method, using the above <code>split</code>, returning <code>"BlocksKit Blocks Kit"</code>, which Picky uses for the <code>name</code> category and consequently indexes all three words.</p>
-      <pre class="ruby"><code>category :name,&#x000A;         similarity: Similarity::DoubleMetaphone.new(2),&#x000A;         partial: Partial::Substring.new(from: 1),&#x000A;         qualifiers: [:name, :pod],&#x000A;         :from =&gt; :prepared_name # &lt;= :from indicates which (data) method to call in the source object</code></pre>
+      <pre class="sh_ruby"><code>category :name,&#x000A;         similarity: Similarity::DoubleMetaphone.new(2),&#x000A;         partial: Partial::Substring.new(from: 1),&#x000A;         qualifiers: [:name, :pod],&#x000A;         :from =&gt; :prepared_name # &lt;= :from indicates which (data) method to call in the source object</code></pre>
       <p>Try it with <a href="http://cocoapods.org/?q=dynamic%20delegate">dynamic delegate</a>! :)</p>
       <h2 id="callbacks">Filtering by OS</h2>
       <p>This is a more advanced Picky trick, which might only be interesting to pros.</p>
@@ -109,11 +109,11 @@
       <p>We need both <code>beforeInsert</code> and <code>before</code>.</p>
       <p>In <code>beforeInsert</code>, we remove the <code>os</code> part, before it is inserted into the search field. In <code>before</code>, before sending it to the backend, we add the OS back into the query, taken from the radio button value.</p>
       <p>In code (the Picky JS search client options), it looks like this:</p>
-      <pre class="javascript"><code>// Before a query is inserted into the search field&#x000A;// we clean it of any platform terms.&#x000A;//&#x000A;beforeInsert: function(query) {&#x000A;  return query.replace(platformRemoverRegexp, '');&#x000A;}</code></pre>
+      <pre class="sh_javascript"><code>// Before a query is inserted into the search field&#x000A;// we clean it of any platform terms.&#x000A;//&#x000A;beforeInsert: function(query) {&#x000A;  return query.replace(platformRemoverRegexp, '');&#x000A;}</code></pre>
       <p>The regexp to remove the platform search term looks like this:</p>
-      <pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
+      <pre class="sh_javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
       <p>And before sending the search request to the backend, Picky calls the <code>before</code> callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values <code>on:ios on:osx</code>, <code>on:ios</code>, and <code>on:osx</code>).</p>
-      <pre class="javascript"><code>before: function(query, params) {&#x000A;  query = query.replace(platformRemoverRegexp, ''); // Clean the query.&#x000A;  var platformModifier = platformSelect.find("input:checked").val(); // Get the selected OS.&#x000A;  return platformModifier + ' ' + query; // Prepend it to the query.&#x000A;}</code></pre>
+      <pre class="sh_javascript"><code>before: function(query, params) {&#x000A;  query = query.replace(platformRemoverRegexp, ''); // Clean the query.&#x000A;  var platformModifier = platformSelect.find("input:checked").val(); // Get the selected OS.&#x000A;  return platformModifier + ' ' + query; // Prepend it to the query.&#x000A;}</code></pre>
       <p>However, the complete query, including the OS is still inserted into the <span class="caps">URL</span>, ready for you to copy and send to friends.</p>
       <p>5 lines of nicely customizable code :)</p>
       <h2 id="duplicates">Removing duplicates from results</h2>
@@ -126,7 +126,7 @@
       and <code>3</code> occurring twice.</p>
       <p>Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates to not confuse searchers.</p>
       <p>We achieve this by using Picky&#8217;s JS <code>success</code> callback. This goes through all combinations of categories (aka <em>allocations</em>) and removes entries from the allocations if we&#8217;ve already seen them previously. It ensures we only see unique results.</p>
-      <pre class="javascript"><code>// We filter duplicate ids here.&#x000A;// (Not in the server as it might be&#x000A;// used for APIs etc.)&#x000A;//&#x000A;success: function(data, query) {&#x000A;  var seen = {};&#x000A;  &#x000A;  var allocations = data.allocations;&#x000A;  allocations.each(function(i, allocation) {&#x000A;    var ids     = allocation.ids;&#x000A;    var entries = allocation.entries;&#x000A;    var remove = [];&#x000A;    &#x000A;    ids.each(function(j, id) {&#x000A;      if (seen[id]) {&#x000A;        data.total -= 1;&#x000A;        remove.push(j);&#x000A;      } else {&#x000A;        seen[id] = true;&#x000A;      }&#x000A;    });&#x000A;    &#x000A;    for(var l = remove.length-1; 0 &lt;= l; l--) {&#x000A;      entries.splice(remove[l], 1);&#x000A;    }&#x000A;    &#x000A;    allocation.entries = entries;&#x000A;  });&#x000A;  &#x000A;  return data;&#x000A;}</code></pre>
+      <pre class="sh_javascript"><code>// We filter duplicate ids here.&#x000A;// (Not in the server as it might be&#x000A;// used for APIs etc.)&#x000A;//&#x000A;success: function(data, query) {&#x000A;  var seen = {};&#x000A;  &#x000A;  var allocations = data.allocations;&#x000A;  allocations.each(function(i, allocation) {&#x000A;    var ids     = allocation.ids;&#x000A;    var entries = allocation.entries;&#x000A;    var remove = [];&#x000A;    &#x000A;    ids.each(function(j, id) {&#x000A;      if (seen[id]) {&#x000A;        data.total -= 1;&#x000A;        remove.push(j);&#x000A;      } else {&#x000A;        seen[id] = true;&#x000A;      }&#x000A;    });&#x000A;    &#x000A;    for(var l = remove.length-1; 0 &lt;= l; l--) {&#x000A;      entries.splice(remove[l], 1);&#x000A;    }&#x000A;    &#x000A;    allocation.entries = entries;&#x000A;  });&#x000A;  &#x000A;  return data;&#x000A;}</code></pre>
       <p>We could well do this in the server, but I opted against it, because a possible future search <span class="caps">API</span> might want to expose the duplicate results. This is why we do it in the client.</p>
       <h2 id="fun">Other fun things to try!</h2>
       <ul>

@@ -26,27 +26,27 @@
   <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
     <ol class="nav">
       <li>
-        <a href="/../">home</a>
+        <a href="./../../../../">home</a>
         •
       </li>
       <li>
-        <a href="/../blog/">blog</a>
+        <a href="./../../../">blog</a>
         •
       </li>
       <li>
-        <a href="/../picky/">picky</a>
+        <a href="./../../../../picky/">picky</a>
         •
       </li>
       <li>
-        <a href="/../phd/">phd</a>
+        <a href="./../../../../phd/">phd</a>
         •
       </li>
       <li>
-        <a href="/../phony/">phony</a>
+        <a href="./../../../../phony/">phony</a>
         •
       </li>
       <li>
-        <a href="/../view_models/">view models</a>
+        <a href="./../../../../view_models/">view models</a>
       </li>
     </ol>
     <div class="post">
@@ -72,15 +72,15 @@
       <p>What are the challenges in the server?</p>
       <h2>The Server</h2>
       <p>Picky does not have a standard external interface beyond the <code>Picky::Index</code> and <code>Picky::Search</code>, which searches over the indexes.</p>
-      <pre class="ruby"><code>index = Picky::Index.new(:name) do&#x000A;  # ...&#x000A;end&#x000A;things = Picky::Search.new index&#x000A;things.search 'something'</code></pre>
+      <pre class="sh_ruby"><code>index = Picky::Index.new(:name) do&#x000A;  # ...&#x000A;end&#x000A;things = Picky::Search.new index&#x000A;things.search 'something'</code></pre>
       <p>Of course, this is a very flexible approach, but comes with the problem that we need an implementation for all the different containers of Picky.</p>
       <p>In the case of Sinatra, it will offer a <span class="caps">HTTP</span> interface, where the picky-activerecord gem will send updates to.</p>
       <p>Let&#8217;s see how we would implement that. For updates, we will define a put action:</p>
-      <pre class="ruby"><code>put '/' do&#x000A;  index_name = params['index']&#x000A;  index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.&#x000A;  index.replace_from params['data']&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>put '/' do&#x000A;  index_name = params['index']&#x000A;  index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.&#x000A;  index.replace_from params['data']&#x000A;end</code></pre>
       <p>The method <code>replace_from(hash)</code> is available in edge currently. Error handling is omitted.</p>
       <p>Then we can write up the <span class="caps">DELETE</span> action etc., wrap it into a nice module <code>Picky::Interfaces::External</code>, for example.</p>
       <p>Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that <code>Module</code>:</p>
-      <pre class="ruby"><code>class MyPickyServer &lt; Sinatra::Base&#x000A;  extend Picky::Interfaces::External&#x000A;  &#x000A;  # ...&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class MyPickyServer &lt; Sinatra::Base&#x000A;  extend Picky::Interfaces::External&#x000A;  &#x000A;  # ...&#x000A;end</code></pre>
       <p>Then, when we&#8217;d like to create/update/delete an indexed entry, we simply send a <span class="caps">HTTP</span> request to the Picky server with the following payload:</p>
       <pre><code>{&#x000A;  index: "people",&#x000A;  data: {&#x000A;    id: 7,&#x000A;    name: "Florian",&#x000A;    surname: "Hanke"&#x000A;  }&#x000A;}</code></pre>
       <p>Sounds easy so far, right?</p>
@@ -88,11 +88,11 @@
       <h3>When Picky is restarted</h3>
       <p>Let&#8217;s say you don&#8217;t use the realtime <code>SQLite</code> or <code>Redis</code> persistent backend to store your indexes, but the standard <code>Memory</code> backend.</p>
       <p>If we simply restarted, we would lose the indexes. We need a way to dump the data. One way to do this is simply dumping it when you quit Picky:</p>
-      <pre class="ruby"><code>at_exit { Picky::Indexes.dump }</code></pre>
+      <pre class="sh_ruby"><code>at_exit { Picky::Indexes.dump }</code></pre>
       <p>or a specific index:</p>
-      <pre class="ruby"><code>at_exit { the_index.dump }</code></pre>
+      <pre class="sh_ruby"><code>at_exit { the_index.dump }</code></pre>
       <p>And then, as you restart the server, you simply load the indexes. Probably in <code>config.ru</code>:</p>
-      <pre class="ruby"><code>Picky::Indexes.load</code></pre>
+      <pre class="sh_ruby"><code>Picky::Indexes.load</code></pre>
       <p>I&#8217;m quite excited about this!</p>
       <p>Sure, you have to write this yourself, but … you also <strong><span class="caps">CAN</span></strong> write it yourself. And control the behaviour of it. Dump it every X requests? Only on exit? I don&#8217;t care! (I mean, I <strong>do</strong>, but not how you do it :) )</p>
       <p>In closing, I like that in a documentation, picky-activerecord will only need a single line for the server: Add <code>extend Picky::Interfaces::External</code> to your Sinatra app.</p>

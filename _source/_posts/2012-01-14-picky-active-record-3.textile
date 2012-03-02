@@ -33,7 +33,7 @@ And maybe most important:
 
 A quick reminder what the basic Picky API is:
 
-<pre class="ruby"><code>data = Picky::Index.new :name do
+<pre class="sh_ruby"><code>data = Picky::Index.new :name do
   category :name
 end
 things = Picky::Search.new data
@@ -57,7 +57,7 @@ h2. A first draft
 
 I am not the biggest fan of the following pattern:
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   include Picky::ActiveRecord
   
   some_method_call_from_the included, module
@@ -67,7 +67,7 @@ I am not sure why since it's perfectly ok Ruby. I believe it is because it usual
 
 With this subgoal in mind, I started drafting the API. It turned out like this:
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   extend(Picky::ActiveRecord.new(:models) do
     Picky::Index.new :models do
       category :name
@@ -82,7 +82,7 @@ Why do I use so many round parentheses, having declared them unnecessary not so 
 
 Turns out, @extend@ gobbles up my block. Try running the following code:
 
-<pre class="ruby"><code>module A; end
+<pre class="sh_ruby"><code>module A; end
 class B
   extend A do
   	# ...
@@ -99,7 +99,7 @@ So, teeth grinding, we return back to the standard solution of having a separate
 
 This is what I've come up with:
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   include Picky::ActiveRecord
   
   index = Picky::Index.new :models do
@@ -123,11 +123,11 @@ Let's look at the API code.
 
 The line
 
-<pre class="ruby"><code>include Picky::ActiveRecord</code></pre>
+<pre class="sh_ruby"><code>include Picky::ActiveRecord</code></pre>
 
 does two things: First, it includes two other modules, @Picky::ActiveRecord::Indexing@ and @Picky::ActiveRecord::Searching@, that are concerned with indexing and searching, respectively. It is well imaginable that one doesn't want realtime indexing, just searching, or vice versa.
 
-<pre class="ruby"><code>index = Picky::Index.new :models do
+<pre class="sh_ruby"><code>index = Picky::Index.new :models do
   category :name
   category :surname
 end
@@ -138,23 +138,23 @@ This is the standard Picky API. You create an index (definition) and pass it int
 
 The line
 
-<pre class="ruby"><code>updates_picky index</code></pre>
+<pre class="sh_ruby"><code>updates_picky index</code></pre>
 
 tells this class to automatically update the given index as soon as the @after_commit@ method is called.
 
 This method can also be called as follows:
 
-<pre class="ruby"><code>updates_picky :models</code></pre>
+<pre class="sh_ruby"><code>updates_picky :models</code></pre>
 
 or
 
-<pre class="ruby"><code>updates_picky</code></pre>
+<pre class="sh_ruby"><code>updates_picky</code></pre>
 
 The first one uses the index called @:models@ and the second one uses @model_class.name.tableize@ to find the model name.
 
 Finally, the line
 
-<pre class="ruby"><code>searches_picky search</code></pre>
+<pre class="sh_ruby"><code>searches_picky search</code></pre>
 
 installs a @Model.search@ method using the given @search@.
 
@@ -162,7 +162,7 @@ h3. Also of note
 
 This API does not really care where anything is set up. This is well possible:
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   include Picky::ActiveRecord
 end
 
@@ -183,7 +183,7 @@ for the case where you'd like your search code outside the model.
 
 Also, you can call @updates_picky@ multiple times:
 
-<pre class="ruby"><code>Model.updates_picky index
+<pre class="sh_ruby"><code>Model.updates_picky index
 Model.updates_picky index2
 Model.updates_picky index3</code></pre>
 

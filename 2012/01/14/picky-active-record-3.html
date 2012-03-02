@@ -26,27 +26,27 @@
   <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
     <ol class="nav">
       <li>
-        <a href="/../">home</a>
+        <a href="./../../../../">home</a>
         •
       </li>
       <li>
-        <a href="/../blog/">blog</a>
+        <a href="./../../../">blog</a>
         •
       </li>
       <li>
-        <a href="/../picky/">picky</a>
+        <a href="./../../../../picky/">picky</a>
         •
       </li>
       <li>
-        <a href="/../phd/">phd</a>
+        <a href="./../../../../phd/">phd</a>
         •
       </li>
       <li>
-        <a href="/../phony/">phony</a>
+        <a href="./../../../../phony/">phony</a>
         •
       </li>
       <li>
-        <a href="/../view_models/">view models</a>
+        <a href="./../../../../view_models/">view models</a>
       </li>
     </ol>
     <div class="post">
@@ -74,7 +74,7 @@
       	<li>use the standard Picky <span class="caps">API</span></li>
       </ul>
       <p>A quick reminder what the basic Picky <span class="caps">API</span> is:</p>
-      <pre class="ruby"><code>data = Picky::Index.new :name do&#x000A;  category :name&#x000A;end&#x000A;things = Picky::Search.new data&#x000A;things.search 'something'</code></pre>
+      <pre class="sh_ruby"><code>data = Picky::Index.new :name do&#x000A;  category :name&#x000A;end&#x000A;things = Picky::Search.new data&#x000A;things.search 'something'</code></pre>
       <p>Most other search engine adapters try to elegantify the original <span class="caps">API</span>. This is nice.</p>
       <p>However, having control over both APIs, I believe that using the original (standard) Picky <span class="caps">API</span> creates a pressure on it to stay as elegant as possible and as useable as possible.</p>
       <p>If we hide away the Picky <span class="caps">API</span>, pressure is only excerted on the ActiveRecord/Picky adapter. This also means that people who only use the Picky ActiveRecord <span class="caps">API</span> only come in contact with that one.</p>
@@ -85,46 +85,46 @@
       <p>The only way to do this is use a subset of the original <span class="caps">API</span> for the simpler one. However, since Picky is about giving <strong>you</strong> the power, we will not constrict you, but instead make the whole <span class="caps">API</span> accessible.</p>
       <h2>A first draft</h2>
       <p>I am not the biggest fan of the following pattern:</p>
-      <pre class="ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;  &#x000A;  some_method_call_from_the included, module&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;  &#x000A;  some_method_call_from_the included, module&#x000A;end</code></pre>
       <p>I am not sure why since it&#8217;s perfectly ok Ruby. I believe it is because it usually consists of two lines, and only one really describes what is going on: &#8220;I am using this&#8221; and &#8220;I am using it like this&#8221;.</p>
       <p>With this subgoal in mind, I started drafting the <span class="caps">API</span>. It turned out like this:</p>
-      <pre class="ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  extend(Picky::ActiveRecord.new(:models) do&#x000A;    Picky::Index.new :models do&#x000A;      category :name&#x000A;      category :surname&#x000A;    end&#x000A;  end)&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  extend(Picky::ActiveRecord.new(:models) do&#x000A;    Picky::Index.new :models do&#x000A;      category :name&#x000A;      category :surname&#x000A;    end&#x000A;  end)&#x000A;end</code></pre>
       <p>Don&#8217;t judge me. It gets better.</p>
       <p>Why do I use so many round parentheses, having declared them unnecessary not so long ago?</p>
       <p>Turns out, <code>extend</code> gobbles up my block. Try running the following code:</p>
-      <pre class="ruby"><code>module A; end&#x000A;class B&#x000A;  extend A do&#x000A;  	# ...&#x000A;  end&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>module A; end&#x000A;class B&#x000A;  extend A do&#x000A;  	# ...&#x000A;  end&#x000A;end</code></pre>
       <p>I am unsure what happens here. Looking at the <a href="http://ruby-doc.org/core-1.9.3/Object.html#method-i-extend">CRuby code</a> didn&#8217;t help. Ideas?</p>
       <p>I guess we can all agree that this <span class="caps">API</span> is neither good looking nor elegant. Let&#8217;s try again.</p>
       <h2>A better draft</h2>
       <p>So, teeth grinding, we return back to the standard solution of having a separate include and declarations. However, I&#8217;d like to be able to use the Picky <span class="caps">API</span>.</p>
       <p>This is what I&#8217;ve come up with:</p>
-      <pre class="ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;  &#x000A;  index = Picky::Index.new :models do&#x000A;    category :name&#x000A;    category :surname&#x000A;  end&#x000A;  &#x000A;  search = Picky::Search.new index&#x000A;  &#x000A;  updates_picky index&#x000A;  searches_picky search&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;  &#x000A;  index = Picky::Index.new :models do&#x000A;    category :name&#x000A;    category :surname&#x000A;  end&#x000A;  &#x000A;  search = Picky::Search.new index&#x000A;  &#x000A;  updates_picky index&#x000A;  searches_picky search&#x000A;end</code></pre>
       <p>Let&#8217;s look at the design in detail.</p>
       <h3>In detail</h3>
       <p>First of all, note that no saving of indexes in instance variables is done. You can do it, should you need it, but Picky is not saving anything like <code>@__picky_index</code> for you. Instead, the index and the search are both passed into the a method in which they are captured in a closure.</p>
       <p>Let&#8217;s look at the <span class="caps">API</span> code.</p>
       <p>The line</p>
-      <pre class="ruby"><code>include Picky::ActiveRecord</code></pre>
+      <pre class="sh_ruby"><code>include Picky::ActiveRecord</code></pre>
       <p>does two things: First, it includes two other modules, <code>Picky::ActiveRecord::Indexing</code> and <code>Picky::ActiveRecord::Searching</code>, that are concerned with indexing and searching, respectively. It is well imaginable that one doesn&#8217;t want realtime indexing, just searching, or vice versa.</p>
-      <pre class="ruby"><code>index = Picky::Index.new :models do&#x000A;  category :name&#x000A;  category :surname&#x000A;end&#x000A;&#x000A;search = Picky::Search.new index</code></pre>
+      <pre class="sh_ruby"><code>index = Picky::Index.new :models do&#x000A;  category :name&#x000A;  category :surname&#x000A;end&#x000A;&#x000A;search = Picky::Search.new index</code></pre>
       <p>This is the standard Picky <span class="caps">API</span>. You create an index (definition) and pass it into the search.</p>
       <p>The line</p>
-      <pre class="ruby"><code>updates_picky index</code></pre>
+      <pre class="sh_ruby"><code>updates_picky index</code></pre>
       <p>tells this class to automatically update the given index as soon as the <code>after_commit</code> method is called.</p>
       <p>This method can also be called as follows:</p>
-      <pre class="ruby"><code>updates_picky :models</code></pre>
+      <pre class="sh_ruby"><code>updates_picky :models</code></pre>
       <p>or</p>
-      <pre class="ruby"><code>updates_picky</code></pre>
+      <pre class="sh_ruby"><code>updates_picky</code></pre>
       <p>The first one uses the index called <code>:models</code> and the second one uses <code>model_class.name.tableize</code> to find the model name.</p>
       <p>Finally, the line</p>
-      <pre class="ruby"><code>searches_picky search</code></pre>
+      <pre class="sh_ruby"><code>searches_picky search</code></pre>
       <p>installs a <code>Model.search</code> method using the given <code>search</code>.</p>
       <h3>Also of note</h3>
       <p>This <span class="caps">API</span> does not really care where anything is set up. This is well possible:</p>
-      <pre class="ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;end&#x000A;&#x000A;# In e.g. initializers/picky.rb&#x000A;#&#x000A;index = Picky::Index.new :models do&#x000A;  category :name&#x000A;  category :surname&#x000A;end&#x000A;  &#x000A;search = Picky::Search.new index&#x000A;  &#x000A;Model.updates_picky index&#x000A;Model.searches_picky search&#x000A;</code></pre>
+      <pre class="sh_ruby"><code>class Model &lt; ActiveRecord::Base&#x000A;  include Picky::ActiveRecord&#x000A;end&#x000A;&#x000A;# In e.g. initializers/picky.rb&#x000A;#&#x000A;index = Picky::Index.new :models do&#x000A;  category :name&#x000A;  category :surname&#x000A;end&#x000A;  &#x000A;search = Picky::Search.new index&#x000A;  &#x000A;Model.updates_picky index&#x000A;Model.searches_picky search&#x000A;</code></pre>
       <p>for the case where you&#8217;d like your search code outside the model.</p>
       <p>Also, you can call <code>updates_picky</code> multiple times:</p>
-      <pre class="ruby"><code>Model.updates_picky index&#x000A;Model.updates_picky index2&#x000A;Model.updates_picky index3</code></pre>
+      <pre class="sh_ruby"><code>Model.updates_picky index&#x000A;Model.updates_picky index2&#x000A;Model.updates_picky index3</code></pre>
       <p>Any updates to the model will update each index.</p>
       <h2>Implementation</h2>
       <p>If you&#8217;re interested in the implementation, see <a href="https://github.com/floere/picky/blob/de7784bb15768fba38870601b2ecf59a64009ec7/server/prototypes/integrated_active_record/active_record.rb">the Picky::ActiveRecord module</a> (code at the time of this writing).</p>

@@ -26,27 +26,27 @@
   <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
     <ol class="nav">
       <li>
-        <a href="/../">home</a>
+        <a href="./../../../../">home</a>
         •
       </li>
       <li>
-        <a href="/../blog/">blog</a>
+        <a href="./../../../">blog</a>
         •
       </li>
       <li>
-        <a href="/../picky/">picky</a>
+        <a href="./../../../../picky/">picky</a>
         •
       </li>
       <li>
-        <a href="/../phd/">phd</a>
+        <a href="./../../../../phd/">phd</a>
         •
       </li>
       <li>
-        <a href="/../phony/">phony</a>
+        <a href="./../../../../phony/">phony</a>
         •
       </li>
       <li>
-        <a href="/../view_models/">view models</a>
+        <a href="./../../../../view_models/">view models</a>
       </li>
     </ol>
     <div class="post">
@@ -68,7 +68,7 @@
       <code>[:first, "donald", "donald"]</code> is the category the query word was found in, together with the token and the original.</p>
       <p>All clear?</p>
       <p>Try searching for &#8220;Niklaus&#8221;:</p>
-      <pre class="ruby"><code>results = people.search 'niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'niklaus'</code></pre>
       <p>You should find ids <code>[2, 4]</code> and two allocations now, first in the first name, then in the last name.</p>
       <p>Cool. Are there some options to fudge the search?</p>
       <p>Sure!</p>
@@ -76,62 +76,62 @@
       <p>To move an allocation up in the ranking, we used weights (see last post).</p>
       <p>Picky knows a trick that almost no search engine knows. It can <strong>boost combinations</strong>!</p>
       <p>Look for:</p>
-      <pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
       <p>Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-      <pre class="ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre></p>
+      <pre class="sh_ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre></p>
       <p>That&#8217;s pretty useful to know what was found where.</p>
       <p>As people usually look for the first name, then the last name, we want to give this more boost.</p>
       <p>Replace this:</p>
-      <pre class="ruby"><code>people = Picky::Search.new data</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data</code></pre>
       <p>with this</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  boost [:first, :last] =&gt; +3&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  boost [:first, :last] =&gt; +3&#x000A;end</code></pre>
       <p>Now try again:</p>
-      <pre class="ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
       <p>A whole 3 points more! Try it the other way around:</p>
-      <pre class="ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
       <p>We don&#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!</p>
       <h3>max_allocations</h3>
       <p>Sometimes you only want the best allocation to appear in the results.</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
       <p>This finds two ids and two allocations, once in the first name, once in the last name.</p>
       <p>Replace:</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  max_allocations 1&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  max_allocations 1&#x000A;end</code></pre>
       <p>Now Picky only calculates 1 allocation. Try</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
       <p>Only the best allocation is found.</p>
       <h3>ignore_unassigned_tokens</h3>
       <p>Did Donald Knuth ever have the nickname &#8220;Popeye&#8221;? Try this:</p>
-      <pre class="ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
       <p>Not really. But what if we want to find him even if one token cannot be assigned to a category?</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  ignore_unassigned_tokens&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  ignore_unassigned_tokens&#x000A;end</code></pre>
       <p>Try again:</p>
-      <pre class="ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Donald Popeye Knuth'</code></pre>
       <p>Voilà!</p>
       <p>This is incredibly useful for an advertisement search. Say in the ads index you only index the city where a person lives. If someone looks for <code>Florian Hanke Melbourne</code>, you can show the person relevant ads from Melbourne.</p>
       <h3>terminate_early</h3>
       <p>Search for niklaus, and tell Picky you only want 1 id:</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus', 1</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus', 1</code></pre>
       <p>Yes, Picky only calculates 1 id, but still calculates and returns all valid allocations. if you only really need the ids (the Picky interface needs the allocations), then this is unnecessary and could be faster.</p>
       <p>Replace:</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  terminate_early&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  terminate_early&#x000A;end</code></pre>
       <p>Try again:</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus', 1</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus', 1</code></pre>
       <p>Hey presto! Just one allocation.</p>
       <p>This code</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  terminate_early +2&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  terminate_early +2&#x000A;end</code></pre>
       <p>will tell Picky to calculate all necessary allocations, plus 2 following ones, for good measure.</p>
       <h3>ignore</h3>
       <p>Try this:</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
       <p>You&#8217;ll get results in first and last name. If you only wanted results from the first name, you&#8217;d search for this:</p>
-      <pre class="ruby"><code>results = people.search 'first:Niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'first:Niklaus'</code></pre>
       <p>Cool. But let&#8217;s say: You, the search engine designer, don&#8217;t want anybody to find anything in a last name, for any reason. Using <code>first:</code> will select only first. But you might only want to remove the <code>last</code> category. Do this:</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  ignore :last&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  ignore :last&#x000A;end</code></pre>
       <p>Try again:</p>
-      <pre class="ruby"><code>results = people.search 'Niklaus'</code></pre>
+      <pre class="sh_ruby"><code>results = people.search 'Niklaus'</code></pre>
       <p>Niklaus is not found in the last name again.</p>
       <p>You can give it even more:</p>
-      <pre class="ruby"><code>people = Picky::Search.new data do&#x000A;  ignore :first, :last&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  ignore :first, :last&#x000A;end</code></pre>
       <p>But that is pretty silly in this example. Picky won&#8217;t find anything anymore!</p>
       <h2>Conclusion</h2>
       <p>And that&#8217;s the options the Picky Search object has. As you&#8217;ve seen in the last post, some searching is defined on the indexes, but some options are exclusive to the search side, and are only defined there.</p>

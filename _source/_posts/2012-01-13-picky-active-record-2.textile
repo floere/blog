@@ -21,7 +21,7 @@ h3. A quick example of 4.0.9 ActiveRecord integration
 
 First, configure a Sinatra Picky server to be open for external indexing.
 
-<pre class="ruby"><code>class YourSearch < Sinatra::Base
+<pre class="sh_ruby"><code>class YourSearch < Sinatra::Base
   extend Sinatra::IndexActions
 
   # Configure indexes etc. as usual
@@ -29,7 +29,7 @@ end</code></pre>
 
 Then, configure your AR model:
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   # These are the default options.
   #
   extend Picky::Client::ActiveRecord.configure(host: 'localhost', port: 8080, path: '/')
@@ -59,7 +59,7 @@ Since you already can stick it anywhere (a Sinatra server, a DRb server, a simpl
 
 How, you ask? Let me show you "the whole thing":https://github.com/floere/picky/tree/master/server/prototypes/inside_active_record and then pick it apart.
 
-<pre class="ruby"><code>class Model < ActiveRecord::Base
+<pre class="sh_ruby"><code>class Model < ActiveRecord::Base
   
   class << self
     data = Picky::Index.new :models do
@@ -96,11 +96,11 @@ Got that? If not, here's a step by step explanation:
 
 We want the index and the search object to reside in the (singleton) class to define methods there, so we open it:
 
-<pre class="ruby"><code>class << self</code></pre>
+<pre class="sh_ruby"><code>class << self</code></pre>
 
 Then we define a Picky index (two searchable categories, @name@ and @surname@) and two methods. One to @replace@ ("insert or update") indexed models and one to @remove@ indexed models with a given id:
 
-<pre class="ruby"><code>data = Picky::Index.new :models do
+<pre class="sh_ruby"><code>data = Picky::Index.new :models do
   category :name
   category :surname
 end
@@ -116,15 +116,15 @@ end</code></pre>
 Why am I using @define_method@ instead of @def@? I want to capture the @data@ (index) and the @models@ (search) in the block for these methods to use them later on.
 
 These two methods, since defined on the class' singleton class, are used like that:
-<pre class="ruby"><code>Model.replace model</code></pre>
+<pre class="sh_ruby"><code>Model.replace model</code></pre>
 and
-<pre class="ruby"><code>Model.remove model_id</code></pre>
+<pre class="sh_ruby"><code>Model.remove model_id</code></pre>
 
 These are all the methods that have to do with curating the index.
 
 Finally, we want the class to update the index as soon as it changes. We use AR 3.0+ @after_commit@ callback for that:
 
-<pre class="ruby"><code>after_commit do
+<pre class="sh_ruby"><code>after_commit do
   if destroyed?
     self.class.remove self
   else
@@ -149,7 +149,7 @@ If you're into trying to implement that have a go. If not, stay tuned! :)
 
 Another question for you: Is sticking the method on the @Model@ like
 
-<pre class="ruby"><code>Model.replace model</code></pre>
+<pre class="sh_ruby"><code>Model.replace model</code></pre>
 
 actually a good idea? What if, say Thinking Sphinx, reloads your models? Is your model – being an AR model – not already doing enough? What about the single responsibility principle?
 

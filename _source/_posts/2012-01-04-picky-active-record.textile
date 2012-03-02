@@ -37,7 +37,7 @@ h2. The Server
 
 Picky does not have a standard external interface beyond the @Picky::Index@ and @Picky::Search@, which searches over the indexes.
 
-<pre class="ruby"><code>index = Picky::Index.new(:name) do
+<pre class="sh_ruby"><code>index = Picky::Index.new(:name) do
   # ...
 end
 things = Picky::Search.new index
@@ -49,7 +49,7 @@ In the case of Sinatra, it will offer a HTTP interface, where the picky-activere
 
 Let's see how we would implement that. For updates, we will define a put action:
 
-<pre class="ruby"><code>put '/' do
+<pre class="sh_ruby"><code>put '/' do
   index_name = params['index']
   index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.
   index.replace_from params['data']
@@ -61,7 +61,7 @@ Then we can write up the DELETE action etc., wrap it into a nice module @Picky::
 
 Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that @Module@:
 
-<pre class="ruby"><code>class MyPickyServer < Sinatra::Base
+<pre class="sh_ruby"><code>class MyPickyServer < Sinatra::Base
   extend Picky::Interfaces::External
   
   # ...
@@ -88,15 +88,15 @@ Let's say you don't use the realtime @SQLite@ or @Redis@ persistent backend to s
 
 If we simply restarted, we would lose the indexes. We need a way to dump the data. One way to do this is simply dumping it when you quit Picky:
 
-<pre class="ruby"><code>at_exit { Picky::Indexes.dump }</code></pre>
+<pre class="sh_ruby"><code>at_exit { Picky::Indexes.dump }</code></pre>
 
 or a specific index:
 
-<pre class="ruby"><code>at_exit { the_index.dump }</code></pre>
+<pre class="sh_ruby"><code>at_exit { the_index.dump }</code></pre>
 
 And then, as you restart the server, you simply load the indexes. Probably in @config.ru@:
 
-<pre class="ruby"><code>Picky::Indexes.load</code></pre>
+<pre class="sh_ruby"><code>Picky::Indexes.load</code></pre>
 
 I'm quite excited about this!
 

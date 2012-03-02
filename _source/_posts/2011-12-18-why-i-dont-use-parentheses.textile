@@ -23,15 +23,15 @@ h3. Less noise
 
 Brackets introduce visual noise. Compare and contrast these two method signatures:
 
-<pre class="ruby"><code>def extract_from(text)</code></pre>
+<pre class="sh_ruby"><code>def extract_from(text)</code></pre>
 
 with
 
-<pre class="ruby"><code>def extract_from text</code></pre>
+<pre class="sh_ruby"><code>def extract_from text</code></pre>
 
 What do you gain by introducing brackets? Would you gain something by introducing them into text?
 
-<pre class="ruby"><code>My name is(Florian Hanke)</code></pre>
+<pre class="sh_ruby"><code>My name is(Florian Hanke)</code></pre>
 
 If you think this text example has nothing to do with code then we have different views on code readability. It's more legible to me.
 
@@ -43,17 +43,17 @@ Not wanting to use round brackets introduces a strain every time I am about to b
 
 Consider this code:
 
-<pre class="ruby"><code>text = extract other_text</code></pre>
+<pre class="sh_ruby"><code>text = extract other_text</code></pre>
 
 Now, if I wanted to call another method on the result, I'd have to write this:
 
-<pre class="ruby"><code>text = extract(other_text).process</code></pre>
+<pre class="sh_ruby"><code>text = extract(other_text).process</code></pre>
 
 Spotting violations is easy for me. I just look for the brackets. If I see brackets in my code, I instantly know that they are there for a good reason and that I actually had a reason to break the Law of Demeter.
 
 Code like
 
-<pre class="ruby"><code>a.b(c).d(e).f</code></pre>
+<pre class="sh_ruby"><code>a.b(c).d(e).f</code></pre>
 
 is simply impossible for me, and that's a good thing!
 
@@ -73,17 +73,17 @@ I use Rspec. Chances are, you use it as well.
 
 There's an expression that goes like this:
 
-<pre class="ruby"><code>thing.should_receive(:some_method).once.with</code></pre>
+<pre class="sh_ruby"><code>thing.should_receive(:some_method).once.with</code></pre>
 
 It's a fluid interface, so using parentheses is ok for me. One of the exceptions. However, I even add them explicitly to tell the future me that I really don't expect any parameters:
 
-<pre class="ruby"><code>thing.should_receive(:some_method).once.with()</code></pre>
+<pre class="sh_ruby"><code>thing.should_receive(:some_method).once.with()</code></pre>
 
 Equals "with nothing".
 
 Another exception is the "gobbler" * argument to a method, where Ruby needs brackets to know what it is looking at.
 
-<pre class="ruby"><code>def try(*) end</code></pre>
+<pre class="sh_ruby"><code>def try(*) end</code></pre>
 
 h3. But I'm used to it!
 

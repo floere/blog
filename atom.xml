@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T09:52:57+11:00</updated>
+ <updated>2012-03-03T10:02:12+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -37,7 +37,7 @@
 &lt;p&gt;The challenge was to have Picky automatically update the search index without restarting, and without polling.&lt;/p&gt;
 &lt;p&gt;The fact that the CocoaPods specs live in their own repository is fantastic – it means that we have the full power of Github&amp;#8217;s repo features at our disposal.&lt;/p&gt;
 &lt;p&gt;The feature we use is &lt;a href=&quot;http://help.github.com/post-receive-hooks/&quot;&gt;post receive hooks&lt;/a&gt;. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt;, as follows:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;post &quot;/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}&quot; do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;post &quot;/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}&quot; do
   # index updating code here
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Every time this &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; is called, Picky downloads the zip file from github, unzips it, and indexes the loaded specs. All while running. That&amp;#8217;s it.&lt;/p&gt;
@@ -49,10 +49,10 @@ or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downl
 &lt;p&gt;However, we want people to be able to find it when they type &lt;a href=&quot;http://cocoapods.org/?q=blocks%20kit&quot;&gt;blocks kit&lt;/a&gt;, or just &lt;a href=&quot;http://cocoapods.org/?q=kit&quot;&gt;kit&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;In Picky lingo: If the data contains &lt;code&gt;&quot;BlocksKit&quot;&lt;/code&gt;, how do we index it as &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;?&lt;/p&gt;
 &lt;p&gt;Turns out there is a snazzy Ruby regexp for that:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;&quot;BlocksKit&quot;.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;&quot;BlocksKit&quot;.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Nice, eh? As a bonus works fine with numbers :)&lt;/p&gt;
 &lt;p&gt;The Pod model offers a &lt;code&gt;prepared_name&lt;/code&gt; method, using the above &lt;code&gt;split&lt;/code&gt;, returning &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;, which Picky uses for the &lt;code&gt;name&lt;/code&gt; category and consequently indexes all three words.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :name,
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :name,
          similarity: Similarity::DoubleMetaphone.new(2),
          partial: Partial::Substring.new(from: 1),
          qualifiers: [:name, :pod],
@@ -76,16 +76,16 @@ runs a few JS callbacks, in the following order:&lt;/p&gt;
 &lt;p&gt;We need both &lt;code&gt;beforeInsert&lt;/code&gt; and &lt;code&gt;before&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;In &lt;code&gt;beforeInsert&lt;/code&gt;, we remove the &lt;code&gt;os&lt;/code&gt; part, before it is inserted into the search field. In &lt;code&gt;before&lt;/code&gt;, before sending it to the backend, we add the OS back into the query, taken from the radio button value.&lt;/p&gt;
 &lt;p&gt;In code (the Picky JS search client options), it looks like this:&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;// Before a query is inserted into the search field
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;// Before a query is inserted into the search field
 // we clean it of any platform terms.
 //
 beforeInsert: function(query) {
   return query.replace(platformRemoverRegexp, '');
 }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The regexp to remove the platform search term looks like this:&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And before sending the search request to the backend, Picky calls the &lt;code&gt;before&lt;/code&gt; callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values &lt;code&gt;on:ios on:osx&lt;/code&gt;, &lt;code&gt;on:ios&lt;/code&gt;, and &lt;code&gt;on:osx&lt;/code&gt;).&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;before: function(query, params) {
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;before: function(query, params) {
   query = query.replace(platformRemoverRegexp, ''); // Clean the query.
   var platformModifier = platformSelect.find(&quot;input:checked&quot;).val(); // Get the selected OS.
   return platformModifier + ' ' + query; // Prepend it to the query.
@@ -102,7 +102,7 @@ with results &lt;code&gt;1&lt;/code&gt;
 and &lt;code&gt;3&lt;/code&gt; occurring twice.&lt;/p&gt;
 &lt;p&gt;Since cocoapods.org only wants to show an uncategorized list of result pods, we wish to remove duplicates to not confuse searchers.&lt;/p&gt;
 &lt;p&gt;We achieve this by using Picky&amp;#8217;s JS &lt;code&gt;success&lt;/code&gt; callback. This goes through all combinations of categories (aka &lt;em&gt;allocations&lt;/em&gt;) and removes entries from the allocations if we&amp;#8217;ve already seen them previously. It ensures we only see unique results.&lt;/p&gt;
-&lt;pre class=&quot;javascript&quot;&gt;&lt;code&gt;// We filter duplicate ids here.
+&lt;pre class=&quot;sh_javascript&quot;&gt;&lt;code&gt;// We filter duplicate ids here.
 // (Not in the server as it might be
 // used for APIs etc.)
 //
@@ -170,7 +170,7 @@ success: function(data, query) {
 	&lt;li&gt;use the standard Picky &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;A quick reminder what the basic Picky &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; is:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :name do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :name do
   category :name
 end
 things = Picky::Search.new data
@@ -185,14 +185,14 @@ In fact, many people then start looking for search engine alternatives. This is 
 &lt;p&gt;The only way to do this is use a subset of the original &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; for the simpler one. However, since Picky is about giving &lt;strong&gt;you&lt;/strong&gt; the power, we will not constrict you, but instead make the whole &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; accessible.&lt;/p&gt;
 &lt;h2&gt;A first draft&lt;/h2&gt;
 &lt;p&gt;I am not the biggest fan of the following pattern:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   include Picky::ActiveRecord
   
   some_method_call_from_the included, module
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I am not sure why since it&amp;#8217;s perfectly ok Ruby. I believe it is because it usually consists of two lines, and only one really describes what is going on: &amp;#8220;I am using this&amp;#8221; and &amp;#8220;I am using it like this&amp;#8221;.&lt;/p&gt;
 &lt;p&gt;With this subgoal in mind, I started drafting the &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;. It turned out like this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   extend(Picky::ActiveRecord.new(:models) do
     Picky::Index.new :models do
       category :name
@@ -203,7 +203,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Don&amp;#8217;t judge me. It gets better.&lt;/p&gt;
 &lt;p&gt;Why do I use so many round parentheses, having declared them unnecessary not so long ago?&lt;/p&gt;
 &lt;p&gt;Turns out, &lt;code&gt;extend&lt;/code&gt; gobbles up my block. Try running the following code:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;module A; end
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;module A; end
 class B
   extend A do
   	# ...
@@ -214,7 +214,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;A better draft&lt;/h2&gt;
 &lt;p&gt;So, teeth grinding, we return back to the standard solution of having a separate include and declarations. However, I&amp;#8217;d like to be able to use the Picky &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;This is what I&amp;#8217;ve come up with:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   include Picky::ActiveRecord
   
   index = Picky::Index.new :models do
@@ -232,9 +232,9 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;First of all, note that no saving of indexes in instance variables is done. You can do it, should you need it, but Picky is not saving anything like &lt;code&gt;@__picky_index&lt;/code&gt; for you. Instead, the index and the search are both passed into the a method in which they are captured in a closure.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s look at the &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; code.&lt;/p&gt;
 &lt;p&gt;The line&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;include Picky::ActiveRecord&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;include Picky::ActiveRecord&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;does two things: First, it includes two other modules, &lt;code&gt;Picky::ActiveRecord::Indexing&lt;/code&gt; and &lt;code&gt;Picky::ActiveRecord::Searching&lt;/code&gt;, that are concerned with indexing and searching, respectively. It is well imaginable that one doesn&amp;#8217;t want realtime indexing, just searching, or vice versa.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new :models do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new :models do
   category :name
   category :surname
 end
@@ -242,19 +242,19 @@ end
 search = Picky::Search.new index&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This is the standard Picky &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;. You create an index (definition) and pass it into the search.&lt;/p&gt;
 &lt;p&gt;The line&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;updates_picky index&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;updates_picky index&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;tells this class to automatically update the given index as soon as the &lt;code&gt;after_commit&lt;/code&gt; method is called.&lt;/p&gt;
 &lt;p&gt;This method can also be called as follows:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;updates_picky :models&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;updates_picky :models&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;or&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;updates_picky&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;updates_picky&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The first one uses the index called &lt;code&gt;:models&lt;/code&gt; and the second one uses &lt;code&gt;model_class.name.tableize&lt;/code&gt; to find the model name.&lt;/p&gt;
 &lt;p&gt;Finally, the line&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;searches_picky search&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;searches_picky search&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;installs a &lt;code&gt;Model.search&lt;/code&gt; method using the given &lt;code&gt;search&lt;/code&gt;.&lt;/p&gt;
 &lt;h3&gt;Also of note&lt;/h3&gt;
 &lt;p&gt;This &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; does not really care where anything is set up. This is well possible:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   include Picky::ActiveRecord
 end
 
@@ -272,7 +272,7 @@ Model.searches_picky search
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;for the case where you&amp;#8217;d like your search code outside the model.&lt;/p&gt;
 &lt;p&gt;Also, you can call &lt;code&gt;updates_picky&lt;/code&gt; multiple times:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.updates_picky index
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Model.updates_picky index
 Model.updates_picky index2
 Model.updates_picky index3&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Any updates to the model will update each index.&lt;/p&gt;
@@ -301,13 +301,13 @@ Model.updates_picky index3&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;h3&gt;A quick example of 4.0.9 ActiveRecord integration&lt;/h3&gt;
 &lt;p&gt;First, configure a Sinatra Picky server to be open for external indexing.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class YourSearch &amp;lt; Sinatra::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class YourSearch &amp;lt; Sinatra::Base
   extend Sinatra::IndexActions
 
   # Configure indexes etc. as usual
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then, configure your AR model:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   # These are the default options.
   #
   extend Picky::Client::ActiveRecord.configure(host: 'localhost', port: 8080, path: '/')
@@ -325,7 +325,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;At this point I am incredibly glad to have designed Picky to work and run anywhere.&lt;/p&gt;
 &lt;p&gt;Since you already can stick it anywhere (a Sinatra server, a DRb server, a simple script, a &lt;span class=&quot;caps&quot;&gt;PORO&lt;/span&gt;, &amp;#8230;), you can relatively easily stick it into an active record model.&lt;/p&gt;
 &lt;p&gt;How, you ask? Let me show you &lt;a href=&quot;https://github.com/floere/picky/tree/master/server/prototypes/inside_active_record&quot;&gt;the whole thing&lt;/a&gt; and then pick it apart.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Model &amp;lt; ActiveRecord::Base
   
   class &amp;lt;&amp;lt; self
     data = Picky::Index.new :models do
@@ -359,9 +359,9 @@ end&lt;/code&gt;&lt;/pre&gt;
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Got that? If not, here&amp;#8217;s a step by step explanation:&lt;/p&gt;
 &lt;p&gt;We want the index and the search object to reside in the (singleton) class to define methods there, so we open it:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class &amp;lt;&amp;lt; self&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class &amp;lt;&amp;lt; self&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Then we define a Picky index (two searchable categories, &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;surname&lt;/code&gt;) and two methods. One to &lt;code&gt;replace&lt;/code&gt; (&amp;#8220;insert or update&amp;#8221;) indexed models and one to &lt;code&gt;remove&lt;/code&gt; indexed models with a given id:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :models do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :models do
   category :name
   category :surname
 end
@@ -375,12 +375,12 @@ define_method :remove do |id|
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Why am I using &lt;code&gt;define_method&lt;/code&gt; instead of &lt;code&gt;def&lt;/code&gt;? I want to capture the &lt;code&gt;data&lt;/code&gt; (index) and the &lt;code&gt;models&lt;/code&gt; (search) in the block for these methods to use them later on.&lt;/p&gt;
 &lt;p&gt;These two methods, since defined on the class&amp;#8217; singleton class, are used like that:
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
 and
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.remove model_id&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Model.remove model_id&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;These are all the methods that have to do with curating the index.&lt;/p&gt;
 &lt;p&gt;Finally, we want the class to update the index as soon as it changes. We use AR 3.0+ &lt;code&gt;after_commit&lt;/code&gt; callback for that:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;after_commit do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;after_commit do
   if destroyed?
     self.class.remove self
   else
@@ -399,7 +399,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;How do we do this? The dumping is relatively easy, but how do we get the data back into that index when restarting and loading the index?
 If you&amp;#8217;re into trying to implement that have a go. If not, stay tuned! :)&lt;/p&gt;
 &lt;p&gt;Another question for you: Is sticking the method on the &lt;code&gt;Model&lt;/code&gt; like&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Model.replace model&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;actually a good idea? What if, say Thinking Sphinx, reloads your models? Is your model – being an AR model – not already doing enough? What about the single responsibility principle?&lt;/p&gt;
 &lt;p&gt;It&amp;#8217;s already night here at Rails Camp X Adelaide, so good night. And good luck. Stay tuned!&lt;/p&gt;</content>
    
@@ -426,7 +426,7 @@ If you&amp;#8217;re into trying to implement that have a go. If not, stay tuned!
 &lt;p&gt;What are the challenges in the server?&lt;/p&gt;
 &lt;h2&gt;The Server&lt;/h2&gt;
 &lt;p&gt;Picky does not have a standard external interface beyond the &lt;code&gt;Picky::Index&lt;/code&gt; and &lt;code&gt;Picky::Search&lt;/code&gt;, which searches over the indexes.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new(:name) do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new(:name) do
   # ...
 end
 things = Picky::Search.new index
@@ -434,7 +434,7 @@ things.search 'something'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Of course, this is a very flexible approach, but comes with the problem that we need an implementation for all the different containers of Picky.&lt;/p&gt;
 &lt;p&gt;In the case of Sinatra, it will offer a &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; interface, where the picky-activerecord gem will send updates to.&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s see how we would implement that. For updates, we will define a put action:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;put '/' do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;put '/' do
   index_name = params['index']
   index = Picky::Indexes[index_name.to_sym] # Get the right index from the indexes.
   index.replace_from params['data']
@@ -442,7 +442,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The method &lt;code&gt;replace_from(hash)&lt;/code&gt; is available in edge currently. Error handling is omitted.&lt;/p&gt;
 &lt;p&gt;Then we can write up the &lt;span class=&quot;caps&quot;&gt;DELETE&lt;/span&gt; action etc., wrap it into a nice module &lt;code&gt;Picky::Interfaces::External&lt;/code&gt;, for example.&lt;/p&gt;
 &lt;p&gt;Finally, if someone wants their indexes updated by anything external, she would extend the Sinatra app with that &lt;code&gt;Module&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class MyPickyServer &amp;lt; Sinatra::Base
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class MyPickyServer &amp;lt; Sinatra::Base
   extend Picky::Interfaces::External
   
   # ...
@@ -461,11 +461,11 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;When Picky is restarted&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s say you don&amp;#8217;t use the realtime &lt;code&gt;SQLite&lt;/code&gt; or &lt;code&gt;Redis&lt;/code&gt; persistent backend to store your indexes, but the standard &lt;code&gt;Memory&lt;/code&gt; backend.&lt;/p&gt;
 &lt;p&gt;If we simply restarted, we would lose the indexes. We need a way to dump the data. One way to do this is simply dumping it when you quit Picky:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;at_exit { Picky::Indexes.dump }&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;at_exit { Picky::Indexes.dump }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;or a specific index:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;at_exit { the_index.dump }&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;at_exit { the_index.dump }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;And then, as you restart the server, you simply load the indexes. Probably in &lt;code&gt;config.ru&lt;/code&gt;:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Picky::Indexes.load&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Picky::Indexes.load&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I&amp;#8217;m quite excited about this!&lt;/p&gt;
 &lt;p&gt;Sure, you have to write this yourself, but … you also &lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;CAN&lt;/span&gt;&lt;/strong&gt; write it yourself. And control the behaviour of it. Dump it every X requests? Only on exit? I don&amp;#8217;t care! (I mean, I &lt;strong&gt;do&lt;/strong&gt;, but not how you do it :) )&lt;/p&gt;
 &lt;p&gt;In closing, I like that in a documentation, picky-activerecord will only need a single line for the server: Add &lt;code&gt;extend Picky::Interfaces::External&lt;/code&gt; to your Sinatra app.&lt;/p&gt;
@@ -515,12 +515,12 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Partial searches refer to somebody being able to search for &amp;#8220;flor&amp;#8221; and still finding &amp;#8220;florian&amp;#8221; (use &amp;#8220;flor*&amp;#8221; to explicitly search partially for that word).&lt;/p&gt;
 &lt;p&gt;Now what we want is to find only partial words whose length is even. This is the recipe for it: &lt;a href=&quot;https://github.com/floere/picky/blob/master/recipes/partial/customized.rb&quot;&gt;https://github.com/floere/picky/blob/master/recipes/partial/customized.rb&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;To use it, we just pass in our own partializer&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :people do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data = Picky::Index.new :people do
   category :first  
   category :last, partial: Partializer.new # &amp;lt;= Passed in here.
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;that is defined as&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Partializer
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Partializer
   def each_partial text
     temp = text.dup
     temp.length.times do
@@ -534,7 +534,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Wasn&amp;#8217;t that easy?&lt;/p&gt;
 &lt;h4&gt;With a Twist&lt;/h4&gt;
 &lt;p&gt;Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;class Partializer
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Partializer
   def initialize wrapped = Picky::Partial::Postfix.new(from: 1)
   	@wrapped = wrapped
   end	
@@ -578,7 +578,7 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To take away something from your code, it needs to transport information (into your brain that is) in the most efficient fashion.&lt;/p&gt;
 &lt;h3&gt;Contrast and compare&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s see what information can be gained by reading this code:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;require 'models/person'
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'models/person'
 require 'models/company'
 require 'server/auxiliary'
 require 'server/core'&lt;/code&gt;&lt;/pre&gt;
@@ -597,13 +597,13 @@ require 'server/core'&lt;/code&gt;&lt;/pre&gt;
 &lt;/ul&gt;
 &lt;p&gt;The * refers to the fact that the code, dynamically, might still not be independent (since it could refer to a constant in a method etc.). If it isn&amp;#8217;t, and is required before the &amp;#8220;dependency&amp;#8221;, ewwww.&lt;/p&gt;
 &lt;p&gt;So, why do I think this independence thing is so cool. Let me show you another example:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;require 'server/core'
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'server/core'
 require 'models/person'
 require 'models/company'
 require 'server/auxiliary'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This code tells me with a high probability that something might be awry in this code and I definitely need to take a closer look. Do the models refer to the server? Does the server not use the models at all? Does the &amp;#8220;auxiliary&amp;#8221; code use the models? Is this just a naming problem or do we have something at hand that needs to be trashed?&lt;/p&gt;
 &lt;p&gt;Now that we know that one can gain quite a bit of information by reading code (surprise! :) ), let&amp;#8217;s take a look at the autoloading example:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;module Server
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;module Server
   autoload :Core,      'server/core'
   autoload :Auxiliary, 'server/auxiliary'
 end
@@ -647,22 +647,22 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;There&amp;#8217;s a few good reasons why I don&amp;#8217;t use round brackets anymore.&lt;/p&gt;
 &lt;h3&gt;Less noise&lt;/h3&gt;
 &lt;p&gt;Brackets introduce visual noise. Compare and contrast these two method signatures:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def extract_from(text)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def extract_from(text)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;with&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def extract_from text&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def extract_from text&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;What do you gain by introducing brackets? Would you gain something by introducing them into text?&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;My name is(Florian Hanke)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;My name is(Florian Hanke)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If you think this text example has nothing to do with code then we have different views on code readability. It&amp;#8217;s more legible to me.&lt;/p&gt;
 &lt;h3&gt;Law of Demeter&lt;/h3&gt;
 &lt;p&gt;You&amp;#8217;ve probably heard of the &lt;a href=&quot;http://en.wikipedia.org/wiki/Law_of_Demeter&quot;&gt;Law of Demeter&lt;/a&gt;? If you haven&amp;#8217;t, please read about it :)&lt;/p&gt;
 &lt;p&gt;Not wanting to use round brackets introduces a strain every time I am about to break the Law of Demeter.&lt;/p&gt;
 &lt;p&gt;Consider this code:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;text = extract other_text&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;text = extract other_text&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now, if I wanted to call another method on the result, I&amp;#8217;d have to write this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;text = extract(other_text).process&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;text = extract(other_text).process&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Spotting violations is easy for me. I just look for the brackets. If I see brackets in my code, I instantly know that they are there for a good reason and that I actually had a reason to break the Law of Demeter.&lt;/p&gt;
 &lt;p&gt;Code like&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;a.b(c).d(e).f&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;a.b(c).d(e).f&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;is simply impossible for me, and that&amp;#8217;s a good thing!&lt;/p&gt;
 &lt;h3&gt;Typing&lt;/h3&gt;
 &lt;p&gt;This is not about typing speed. It is simply about comfort. The comfort of not having to do bracket acrobatics&amp;#8482;.&lt;/p&gt;
@@ -672,12 +672,12 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Two small counterpoints.&lt;/p&gt;
 &lt;p&gt;I use Rspec. Chances are, you use it as well.&lt;/p&gt;
 &lt;p&gt;There&amp;#8217;s an expression that goes like this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;It&amp;#8217;s a fluid interface, so using parentheses is ok for me. One of the exceptions. However, I even add them explicitly to tell the future me that I really don&amp;#8217;t expect any parameters:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;thing.should_receive(:some_method).once.with()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Equals &amp;#8220;with nothing&amp;#8221;.&lt;/p&gt;
 &lt;p&gt;Another exception is the &amp;#8220;gobbler&amp;#8221; * argument to a method, where Ruby needs brackets to know what it is looking at.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;def try(*) end&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def try(*) end&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;But I&amp;#8217;m used to it!&lt;/h3&gt;
 &lt;p&gt;Yes, and you&amp;#8217;re also trained on &lt;span class=&quot;caps&quot;&gt;QWERTY&lt;/span&gt;. Doesn&amp;#8217;t mean it was a good idea.&lt;/p&gt;
 &lt;h3&gt;But, but, I need to help Ruby with reading my code!&lt;/h3&gt;
@@ -727,7 +727,7 @@ the allocations &lt;code&gt;[ [:people, 0.0, 2, [ [:first, &quot;donald&quot;, &
 &lt;code&gt;[:first, &quot;donald&quot;, &quot;donald&quot;]&lt;/code&gt; is the category the query word was found in, together with the token and the original.&lt;/p&gt;
 &lt;p&gt;All clear?&lt;/p&gt;
 &lt;p&gt;Try searching for &amp;#8220;Niklaus&amp;#8221;:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You should find ids &lt;code&gt;[2, 4]&lt;/code&gt; and two allocations now, first in the first name, then in the last name.&lt;/p&gt;
 &lt;p&gt;Cool. Are there some options to fudge the search?&lt;/p&gt;
 &lt;p&gt;Sure!&lt;/p&gt;
@@ -735,74 +735,74 @@ the allocations &lt;code&gt;[ [:people, 0.0, 2, [ [:first, &quot;donald&quot;, &
 &lt;p&gt;To move an allocation up in the ranking, we used weights (see last post).&lt;/p&gt;
 &lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;
 &lt;p&gt;Look for:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;That&amp;#8217;s pretty useful to know what was found where.&lt;/p&gt;
 &lt;p&gt;As people usually look for the first name, then the last name, we want to give this more boost.&lt;/p&gt;
 &lt;p&gt;Replace this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;with this&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   boost [:first, :last] =&amp;gt; +3
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A whole 3 points more! Try it the other way around:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We don&amp;#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!&lt;/p&gt;
 &lt;h3&gt;max_allocations&lt;/h3&gt;
 &lt;p&gt;Sometimes you only want the best allocation to appear in the results.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This finds two ids and two allocations, once in the first name, once in the last name.&lt;/p&gt;
 &lt;p&gt;Replace:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   max_allocations 1
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now Picky only calculates 1 allocation. Try&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Only the best allocation is found.&lt;/p&gt;
 &lt;h3&gt;ignore_unassigned_tokens&lt;/h3&gt;
 &lt;p&gt;Did Donald Knuth ever have the nickname &amp;#8220;Popeye&amp;#8221;? Try this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Not really. But what if we want to find him even if one token cannot be assigned to a category?&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   ignore_unassigned_tokens
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Popeye Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Voilà!&lt;/p&gt;
 &lt;p&gt;This is incredibly useful for an advertisement search. Say in the ads index you only index the city where a person lives. If someone looks for &lt;code&gt;Florian Hanke Melbourne&lt;/code&gt;, you can show the person relevant ads from Melbourne.&lt;/p&gt;
 &lt;h3&gt;terminate_early&lt;/h3&gt;
 &lt;p&gt;Search for niklaus, and tell Picky you only want 1 id:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Yes, Picky only calculates 1 id, but still calculates and returns all valid allocations. if you only really need the ids (the Picky interface needs the allocations), then this is unnecessary and could be faster.&lt;/p&gt;
 &lt;p&gt;Replace:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   terminate_early
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus', 1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Hey presto! Just one allocation.&lt;/p&gt;
 &lt;p&gt;This code&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   terminate_early +2
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;will tell Picky to calculate all necessary allocations, plus 2 following ones, for good measure.&lt;/p&gt;
 &lt;h3&gt;ignore&lt;/h3&gt;
 &lt;p&gt;Try this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You&amp;#8217;ll get results in first and last name. If you only wanted results from the first name, you&amp;#8217;d search for this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'first:Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'first:Niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Cool. But let&amp;#8217;s say: You, the search engine designer, don&amp;#8217;t want anybody to find anything in a last name, for any reason. Using &lt;code&gt;first:&lt;/code&gt; will select only first. But you might only want to remove the &lt;code&gt;last&lt;/code&gt; category. Do this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   ignore :last
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Niklaus is not found in the last name again.&lt;/p&gt;
 &lt;p&gt;You can give it even more:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   ignore :first, :last
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;But that is pretty silly in this example. Picky won&amp;#8217;t find anything anymore!&lt;/p&gt;
@@ -847,27 +847,27 @@ the allocations &lt;code&gt;[ [:people, 0.0, 2, [ [:first, &quot;donald&quot;, &
 &lt;code&gt;[:first, &quot;donald&quot;, &quot;donald&quot;]&lt;/code&gt; is the category the query word was found in, together with the token and the original.&lt;/p&gt;
 &lt;p&gt;All clear?&lt;/p&gt;
 &lt;p&gt;Try searching for &amp;#8220;Niklaus&amp;#8221;:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'niklaus'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You should find ids &lt;code&gt;[2, 4]&lt;/code&gt; and two allocations now, first in the first name, then in the last name.&lt;/p&gt;
 &lt;p&gt;What if you want to find the last name first? We add some weight to it!&lt;/p&gt;
 &lt;h3&gt;Adding weight&lt;/h3&gt;
 &lt;p&gt;By default, Picky already weighs the categories with a logarithmic weight. That is, the more a token occurs in a category, the &amp;#8220;heavier&amp;#8221; it is.&lt;/p&gt;
 &lt;p&gt;So this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;is actually&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, weight: Weights::Logarithmic.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last, weight: Weights::Logarithmic.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;However, for &amp;#8220;Niklaus&amp;#8221;, that resolves to a weight of 0.0.&lt;/p&gt;
 &lt;p&gt;So let&amp;#8217;s add our own weight object. It just needs to respond to &lt;code&gt;#weight_for(amount_of_ids)&lt;/code&gt; and return a float.&lt;/p&gt;
 &lt;p&gt;We ignore the amount and return a flat 12.3. Copy this in your example:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Weight = Class.new do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Weight = Class.new do
   def weight_for amount
     12.3
   end
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;and replace&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, weight: Weight.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last, weight: Weight.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now the last name comes first, with a weight of 12.3, not surprisingly.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 12.3, 1, [[:last, &quot;niklaus&quot;, &quot;niklaus&quot;]], [4]], [:people, 0.0, 1, [[:first, &quot;niklaus&quot;, &quot;niklaus&quot;]], [2]]]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[[:people, 12.3, 1, [[:last, &quot;niklaus&quot;, &quot;niklaus&quot;]], [4]], [:people, 0.0, 1, [[:first, &quot;niklaus&quot;, &quot;niklaus&quot;]], [2]]]&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Picky provides a few weights itself:&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;&lt;code&gt;Picky::Weights::Logarithmic.new&lt;/code&gt; The default.&lt;/li&gt;
@@ -878,15 +878,15 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;h3&gt;Adding similarity&lt;/h3&gt;
 &lt;p&gt;By default, Picky does not look for similar words.&lt;/p&gt;
 &lt;p&gt;This:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;is actually&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity::None.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity::None.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now, look for &amp;#8220;warth~&amp;#8221; (the ~ tells Picky to look for similar words):&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You found nothing, right?&lt;/p&gt;
 &lt;p&gt;Picky only looks for similar words if the category enables it!&lt;/p&gt;
 &lt;p&gt;Let&amp;#8217;s write a similarity such that both will be found. Copy this in your example:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Similarity = Class.new do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Similarity = Class.new do
   def encode text
     text.gsub /[aeiou]/, ''
   end
@@ -897,24 +897,24 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We encode a text such that its vowels are removed. This will make &amp;#8220;wirth&amp;#8221; and &amp;#8220;worth&amp;#8221; resolve both to &amp;#8220;wrth&amp;#8221;, and that makes them similar.
 (The &lt;code&gt;prioritize&lt;/code&gt; method allows you to sort and trim the similars list)&lt;/p&gt;
 &lt;p&gt;and replace&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :last, similarity: Similarity.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Again, search for &amp;#8220;warth~&amp;#8221;.&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'warth~'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This time you found both, right?&lt;/p&gt;
 &lt;p&gt;Picky offers &lt;code&gt;Similarity::Soundex.new(amount_of_similar)&lt;/code&gt;, &lt;code&gt;Similarity::Metaphone.new(amount_of_similar)&lt;/code&gt; and &lt;code&gt;Similarity::DoubleMetaphone.new(amount_of_similar)&lt;/code&gt;. But rolling your own is easy, as you have seen.&lt;/p&gt;
 &lt;h3&gt;Adding partial searching&lt;/h3&gt;
 &lt;p&gt;Can you find Donald Knuth by entering &amp;#8220;Donal&amp;#8221;?&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'donal'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'donal'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You can. But why?&lt;/p&gt;
 &lt;p&gt;The word &amp;#8220;donal&amp;#8221; finds something because this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :first&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;is actually&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial::Postfix.new(from: -3)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial::Postfix.new(from: -3)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;That means it finds &amp;#8220;dona&amp;#8221;, &amp;#8220;donal&amp;#8221;, &amp;#8220;donald&amp;#8221;. Try them all!&lt;/p&gt;
 &lt;p&gt;Does it find &amp;#8220;don&amp;#8221;? Try it:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;No, it doesn&amp;#8217;t! We could use &lt;code&gt;Partial::Postfix.new(from: -4)&lt;/code&gt; to include this case, but let&amp;#8217;s write our own :)&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Partial = Class.new do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Partial = Class.new do
   def each_partial text
     text = text.dup
     (text.size - 1).times do
@@ -923,11 +923,11 @@ end&lt;/code&gt;&lt;/pre&gt;
   end
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;and replace&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial.new&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :first, partial: Partial.new&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'don'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now we find Donald. You can even do this with our partial code:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'd'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'd'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We still find him.&lt;/p&gt;
 &lt;p&gt;Now, Picky already offers a few partial behaviours:&lt;/p&gt;
 &lt;ul&gt;
@@ -941,26 +941,26 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;To move an allocation up in the ranking, we used weights.&lt;/p&gt;
 &lt;p&gt;Picky knows a trick that almost no search engine knows. It can &lt;strong&gt;boost combinations&lt;/strong&gt;!&lt;/p&gt;
 &lt;p&gt;Look for:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[[:people, 0.693, 1, [[:first, &quot;donald&quot;, &quot;donald&quot;], [:last, &quot;knuth&quot;, &quot;knuth&quot;]], [1]]]&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
 &lt;p&gt;That&amp;#8217;s pretty useful to know what was found where.&lt;/p&gt;
 &lt;p&gt;As people usually look for the first name, then the last name, we want to give this more boost.&lt;/p&gt;
 &lt;p&gt;Replace this:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;with this&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   boost [:first, :last] =&amp;gt; +3
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A whole 3 points more! Try it the other way around:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We don&amp;#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!&lt;/p&gt;
 &lt;p&gt;But how about we want to boost in a specific way?&lt;/p&gt;
 &lt;h3&gt;Custom Boosting&lt;/h3&gt;
 &lt;p&gt;Copy this into the example:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;Boosts = Class.new do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;Boosts = Class.new do
   def boost_for combinations
     @map ||= {
       [:first, :last] =&amp;gt; +5
@@ -970,13 +970,13 @@ end&lt;/code&gt;&lt;/pre&gt;
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;(A combination is basically a tuple of category and token)&lt;/p&gt;
 &lt;p&gt;and replace:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;people = Picky::Search.new data do
   boost Boosts.new
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now try again:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Donald Knuth'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A whole 5 points more! Try it the other way around:&lt;/p&gt;
-&lt;pre class=&quot;ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;results = people.search 'Knuth Donald'&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;A whopping -20, which would send this allocation back to the end of the list, was there more data.&lt;/p&gt;
 &lt;h3&gt;Conclusion&lt;/h3&gt;
 &lt;p&gt;I hope you&amp;#8217;re going to try Picky in your next project.&lt;/p&gt;

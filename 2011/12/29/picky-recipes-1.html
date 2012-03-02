@@ -26,27 +26,27 @@
   <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
     <ol class="nav">
       <li>
-        <a href="/../">home</a>
+        <a href="./../../../../">home</a>
         •
       </li>
       <li>
-        <a href="/../blog/">blog</a>
+        <a href="./../../../">blog</a>
         •
       </li>
       <li>
-        <a href="/../picky/">picky</a>
+        <a href="./../../../../picky/">picky</a>
         •
       </li>
       <li>
-        <a href="/../phd/">phd</a>
+        <a href="./../../../../phd/">phd</a>
         •
       </li>
       <li>
-        <a href="/../phony/">phony</a>
+        <a href="./../../../../phony/">phony</a>
         •
       </li>
       <li>
-        <a href="/../view_models/">view models</a>
+        <a href="./../../../../view_models/">view models</a>
       </li>
     </ol>
     <div class="post">
@@ -77,15 +77,15 @@
       <p>Partial searches refer to somebody being able to search for &#8220;flor&#8221; and still finding &#8220;florian&#8221; (use &#8220;flor*&#8221; to explicitly search partially for that word).</p>
       <p>Now what we want is to find only partial words whose length is even. This is the recipe for it: <a href="https://github.com/floere/picky/blob/master/recipes/partial/customized.rb">https://github.com/floere/picky/blob/master/recipes/partial/customized.rb</a>.</p>
       <p>To use it, we just pass in our own partializer</p>
-      <pre class="ruby"><code>data = Picky::Index.new :people do&#x000A;  category :first  &#x000A;  category :last, partial: Partializer.new # &lt;= Passed in here.&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>data = Picky::Index.new :people do&#x000A;  category :first  &#x000A;  category :last, partial: Partializer.new # &lt;= Passed in here.&#x000A;end</code></pre>
       <p>that is defined as</p>
-      <pre class="ruby"><code>class Partializer&#x000A;  def each_partial text&#x000A;    temp = text.dup&#x000A;    temp.length.times do&#x000A;      yield temp if temp.size.even?&#x000A;      temp.chop!&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Partializer&#x000A;  def each_partial text&#x000A;    temp = text.dup&#x000A;    temp.length.times do&#x000A;      yield temp if temp.size.even?&#x000A;      temp.chop!&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
       <p>Picky just needs an object with an <code>each_partial</code> method. Our special partializer chops the word apart until it is gone, and yields if the word is of even length.</p>
       <p>Thus we only find a partial if of even length.</p>
       <p>Wasn&#8217;t that easy?</p>
       <h4>With a Twist</h4>
       <p>Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.</p>
-      <pre class="ruby"><code>class Partializer&#x000A;  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)&#x000A;  	@wrapped = wrapped&#x000A;  end	&#x000A;  def each_partial text&#x000A;	  @wrapped.each_partial do |partial|&#x000A;	    yield partial if partial.size.even?&#x000A;	  end&#x000A;  end&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>class Partializer&#x000A;  def initialize wrapped = Picky::Partial::Postfix.new(from: 1)&#x000A;  	@wrapped = wrapped&#x000A;  end	&#x000A;  def each_partial text&#x000A;	  @wrapped.each_partial do |partial|&#x000A;	    yield partial if partial.size.even?&#x000A;	  end&#x000A;  end&#x000A;end</code></pre>
       <p>I like it! The partializer doesn&#8217;t really know what partializer it gets. However, it will still only yield partials that are of even length. Think of it as a filter when used in this style.</p>
       <h3>Context Sensitive Advertisements</h3>
       <p>Let&#8217;s say you want to search for people via name or location. In addition, you&#8217;d like to show an advertisement next to the search results corresponding to the location.</p>

@@ -46,14 +46,14 @@ Now what we want is to find only partial words whose length is even. This is the
 
 To use it, we just pass in our own partializer
 
-<pre class="ruby"><code>data = Picky::Index.new :people do
+<pre class="sh_ruby"><code>data = Picky::Index.new :people do
   category :first  
   category :last, partial: Partializer.new # <= Passed in here.
 end</code></pre>
 
 that is defined as
 
-<pre class="ruby"><code>class Partializer
+<pre class="sh_ruby"><code>class Partializer
   def each_partial text
     temp = text.dup
     temp.length.times do
@@ -73,7 +73,7 @@ h4. With a Twist
 
 Thanks to it yielding, we could have just wrapped one of the given partializers to do the work for us.
 
-<pre class="ruby"><code>class Partializer
+<pre class="sh_ruby"><code>class Partializer
   def initialize wrapped = Picky::Partial::Postfix.new(from: 1)
   	@wrapped = wrapped
   end	

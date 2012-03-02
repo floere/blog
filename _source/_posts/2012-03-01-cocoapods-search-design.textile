@@ -39,7 +39,7 @@ The fact that the CocoaPods specs live in their own repository is fantastic – 
 
 The feature we use is "post receive hooks":http://help.github.com/post-receive-hooks/. Every time someone pushes a new spec, or updates a spec, the search engine sinatra app is notified via a garbled URL, as follows:
 
-<pre class="ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do
+<pre class="sh_ruby"><code>post "/my_example_hook_url/#{ENV['GARBLED_HOOK_PATH']}" do
   # index updating code here
 end</code></pre>
 
@@ -59,13 +59,13 @@ In Picky lingo: If the data contains @"BlocksKit"@, how do we index it as @"Bloc
 
 Turns out there is a snazzy Ruby regexp for that:
 
-<pre class="ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # => ["", "Blocks", "", "Kit"]</code></pre>
+<pre class="sh_ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # => ["", "Blocks", "", "Kit"]</code></pre>
 
 Nice, eh? As a bonus works fine with numbers :)
 
 The Pod model offers a @prepared_name@ method, using the above @split@, returning @"BlocksKit Blocks Kit"@, which Picky uses for the @name@ category and consequently indexes all three words.
 
-<pre class="ruby"><code>category :name,
+<pre class="sh_ruby"><code>category :name,
          similarity: Similarity::DoubleMetaphone.new(2),
          partial: Partial::Substring.new(from: 1),
          qualifiers: [:name, :pod],
@@ -101,7 +101,7 @@ In @beforeInsert@, we remove the @os@ part, before it is inserted into the searc
 
 In code (the Picky JS search client options), it looks like this:
 
-<pre class="javascript"><code>// Before a query is inserted into the search field
+<pre class="sh_javascript"><code>// Before a query is inserted into the search field
 // we clean it of any platform terms.
 //
 beforeInsert: function(query) {
@@ -110,11 +110,11 @@ beforeInsert: function(query) {
 
 The regexp to remove the platform search term looks like this:
 
-<pre class="javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
+<pre class="sh_javascript"><code>var platformRemoverRegexp = /(platform|on\:\w+\s?)+/;</code></pre>
 
 And before sending the search request to the backend, Picky calls the @before@ callback where we remove any OS parts, prepending the selected one (the iOS style radio buttons have the values @on:ios on:osx@, @on:ios@, and @on:osx@).
 
-<pre class="javascript"><code>before: function(query, params) {
+<pre class="sh_javascript"><code>before: function(query, params) {
   query = query.replace(platformRemoverRegexp, ''); // Clean the query.
   var platformModifier = platformSelect.find("input:checked").val(); // Get the selected OS.
   return platformModifier + ' ' + query; // Prepend it to the query.
@@ -142,7 +142,7 @@ Since cocoapods.org only wants to show an uncategorized list of result pods, we 
 
 We achieve this by using Picky's JS @success@ callback. This goes through all combinations of categories (aka _allocations_) and removes entries from the allocations if we've already seen them previously. It ensures we only see unique results.
 
-<pre class="javascript"><code>// We filter duplicate ids here.
+<pre class="sh_javascript"><code>// We filter duplicate ids here.
 // (Not in the server as it might be
 // used for APIs etc.)
 //

@@ -77,7 +77,7 @@ h2(#callbacks). Filtering by OS
 
 This is a more advanced Picky trick, which might only be interesting to pros.
 
-Like Ruby gems, pods can run on multiple OSs. Either on iOS or on OS X.
+Like Ruby gems, pods can run on multiple OSs: On iOS and/or on OS X.
 
 We always want to filter by either both (AND), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: @"on:some_platform rest of the query"@.
 

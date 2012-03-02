@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T00:34:54+11:00</updated>
+ <updated>2012-03-03T01:03:18+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -60,7 +60,7 @@ or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downl
 &lt;p&gt;Try it with &lt;a href=&quot;http://cocoapods.org/?q=dynamic%20delegate&quot;&gt;dynamic delegate&lt;/a&gt;! :)&lt;/p&gt;
 &lt;h2 id=&quot;callbacks&quot;&gt;Filtering by OS&lt;/h2&gt;
 &lt;p&gt;This is a more advanced Picky trick, which might only be interesting to pros.&lt;/p&gt;
-&lt;p&gt;Like Ruby gems, pods can run on multiple OSs. Either on iOS or on OS X.&lt;/p&gt;
+&lt;p&gt;Like Ruby gems, pods can run on multiple OSs: On iOS and/or on OS X.&lt;/p&gt;
 &lt;p&gt;We always want to filter by either both (&lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt;), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: &lt;code&gt;&quot;on:some_platform rest of the query&quot;&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;This is problematic since it uses a lot of input field space, and also confuses the user.&lt;/p&gt;
 &lt;p&gt;We would like to not show the OS in the search field, but use the value from the iOS style radio buttons.&lt;/p&gt;

@@ -53,7 +53,9 @@ h2(#composites). Making composite names searchable
 
 Pod names do not use spaces but are camelcased, e.g. "BlocksKit". Like most search engines, Picky would index this as one word.
 
-However, we want people to be able to find it when they type "blocks kit":http://cocoapods.org/?q=blocks%20kit, or just "kit":http://cocoapods.org/?q=kit.
+Another issue with pod names is that authors sometimes prepend their initials to it. So, for example, "Mocky" would actually be called "LRMocky".
+
+However, getting back to the "BlocksKit" example, we want people to be able to find it when they type "blocks kit":http://cocoapods.org/?q=blocks%20kit, or just "kit":http://cocoapods.org/?q=kit.
 
 In Picky lingo: If the data contains @"BlocksKit"@, how do we index it as @"BlocksKit Blocks Kit"@?
 
@@ -79,7 +81,7 @@ This is a more advanced Picky trick, which might only be interesting to pros.
 
 Like Ruby gems, pods can run on multiple OSs: On iOS and/or on OS X.
 
-We always want to filter by either both (AND), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: @"on:some_platform rest of the query"@.
+We always want to filter by either both (AND), iOS, or OS X. This means we always prepend the platform filter to the query like so: @"on:some_platform rest of the query"@.
 
 This is problematic since it uses a lot of input field space, and also confuses the user.
 

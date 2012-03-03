@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-03T10:02:12+11:00</updated>
+ <updated>2012-03-03T11:23:22+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -46,7 +46,8 @@ or &lt;code&gt;tar&lt;/code&gt;,
 or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downloads the zip file.&lt;/p&gt;
 &lt;h2 id=&quot;composites&quot;&gt;Making composite names searchable&lt;/h2&gt;
 &lt;p&gt;Pod names do not use spaces but are camelcased, e.g. &amp;#8220;BlocksKit&amp;#8221;. Like most search engines, Picky would index this as one word.&lt;/p&gt;
-&lt;p&gt;However, we want people to be able to find it when they type &lt;a href=&quot;http://cocoapods.org/?q=blocks%20kit&quot;&gt;blocks kit&lt;/a&gt;, or just &lt;a href=&quot;http://cocoapods.org/?q=kit&quot;&gt;kit&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Another issue with pod names is that authors sometimes prepend their initials to it. So, for example, &amp;#8220;Mocky&amp;#8221; would actually be called &amp;#8220;LRMocky&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;However, getting back to the &amp;#8220;BlocksKit&amp;#8221; example, we want people to be able to find it when they type &lt;a href=&quot;http://cocoapods.org/?q=blocks%20kit&quot;&gt;blocks kit&lt;/a&gt;, or just &lt;a href=&quot;http://cocoapods.org/?q=kit&quot;&gt;kit&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;In Picky lingo: If the data contains &lt;code&gt;&quot;BlocksKit&quot;&lt;/code&gt;, how do we index it as &lt;code&gt;&quot;BlocksKit Blocks Kit&quot;&lt;/code&gt;?&lt;/p&gt;
 &lt;p&gt;Turns out there is a snazzy Ruby regexp for that:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;&quot;BlocksKit&quot;.split /([A-Z]?[a-z]+)/ # =&amp;gt; [&quot;&quot;, &quot;Blocks&quot;, &quot;&quot;, &quot;Kit&quot;]&lt;/code&gt;&lt;/pre&gt;
@@ -61,7 +62,7 @@ or &lt;code&gt;gunzip&lt;/code&gt;. So currently, the search engine always downl
 &lt;h2 id=&quot;callbacks&quot;&gt;Filtering by OS&lt;/h2&gt;
 &lt;p&gt;This is a more advanced Picky trick, which might only be interesting to pros.&lt;/p&gt;
 &lt;p&gt;Like Ruby gems, pods can run on multiple OSs: On iOS and/or on OS X.&lt;/p&gt;
-&lt;p&gt;We always want to filter by either both (&lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt;), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: &lt;code&gt;&quot;on:some_platform rest of the query&quot;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We always want to filter by either both (&lt;span class=&quot;caps&quot;&gt;AND&lt;/span&gt;), iOS, or OS X. This means we always prepend the platform filter to the query like so: &lt;code&gt;&quot;on:some_platform rest of the query&quot;&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;This is problematic since it uses a lot of input field space, and also confuses the user.&lt;/p&gt;
 &lt;p&gt;We would like to not show the OS in the search field, but use the value from the iOS style radio buttons.&lt;/p&gt;
 &lt;p&gt;Picky helps us by offering multiple JS callbacks. If you copy a search link like &lt;a href=&quot;http://cocoapods.org/?q=on:osx%20Kiwi&quot;&gt;http://cocoapods.org/?q=on:osx%20Kiwi&lt;/a&gt; into the &lt;span class=&quot;caps&quot;&gt;URL&lt;/span&gt; bar, Picky

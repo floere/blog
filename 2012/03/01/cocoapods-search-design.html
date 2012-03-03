@@ -83,7 +83,8 @@
       or <code>gunzip</code>. So currently, the search engine always downloads the zip file.</p>
       <h2 id="composites">Making composite names searchable</h2>
       <p>Pod names do not use spaces but are camelcased, e.g. &#8220;BlocksKit&#8221;. Like most search engines, Picky would index this as one word.</p>
-      <p>However, we want people to be able to find it when they type <a href="http://cocoapods.org/?q=blocks%20kit">blocks kit</a>, or just <a href="http://cocoapods.org/?q=kit">kit</a>.</p>
+      <p>Another issue with pod names is that authors sometimes prepend their initials to it. So, for example, &#8220;Mocky&#8221; would actually be called &#8220;LRMocky&#8221;.</p>
+      <p>However, getting back to the &#8220;BlocksKit&#8221; example, we want people to be able to find it when they type <a href="http://cocoapods.org/?q=blocks%20kit">blocks kit</a>, or just <a href="http://cocoapods.org/?q=kit">kit</a>.</p>
       <p>In Picky lingo: If the data contains <code>"BlocksKit"</code>, how do we index it as <code>"BlocksKit Blocks Kit"</code>?</p>
       <p>Turns out there is a snazzy Ruby regexp for that:</p>
       <pre class="sh_ruby"><code>"BlocksKit".split /([A-Z]?[a-z]+)/ # =&gt; ["", "Blocks", "", "Kit"]</code></pre>
@@ -94,7 +95,7 @@
       <h2 id="callbacks">Filtering by OS</h2>
       <p>This is a more advanced Picky trick, which might only be interesting to pros.</p>
       <p>Like Ruby gems, pods can run on multiple OSs: On iOS and/or on OS X.</p>
-      <p>We always want to filter by either both (<span class="caps">AND</span>), iOS only, or OS X only. This means we always prepend the platform filter to the query like so: <code>"on:some_platform rest of the query"</code>.</p>
+      <p>We always want to filter by either both (<span class="caps">AND</span>), iOS, or OS X. This means we always prepend the platform filter to the query like so: <code>"on:some_platform rest of the query"</code>.</p>
       <p>This is problematic since it uses a lot of input field space, and also confuses the user.</p>
       <p>We would like to not show the OS in the search field, but use the value from the iOS style radio buttons.</p>
       <p>Picky helps us by offering multiple JS callbacks. If you copy a search link like <a href="http://cocoapods.org/?q=on:osx%20Kiwi">http://cocoapods.org/?q=on:osx%20Kiwi</a> into the <span class="caps">URL</span> bar, Picky

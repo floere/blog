@@ -3,8 +3,8 @@
   %head
     %meta{ :'http-equiv' => "Content-type", :content => "text/html; charset=utf-8" }
     %link{ :rel => 'shortcut icon', :href => '../../../favico.ico' }
-    / Ugh.
     %script{ :type => 'text/javascript', :src => '../../../javascripts/shjs-0.6/sh_main.min.js' }
+    %script{ :type => "text/javascript", :src => "http://platform.twitter.com/widgets.js" }
     %link{ :type => 'text/css', :rel => 'stylesheet', :href => '../../../javascripts/shjs-0.6/css/sh_nedit.min.css' }
     %link{ :rel => 'stylesheet', :href => '../../../stylesheets/basic.css', :type => 'text/css' }
     %link{ :rel => 'stylesheet', :href => '../../../stylesheets/specific.css', :type => 'text/css' }
@@ -39,7 +39,10 @@
       %li
         %a{ :href => './../../../../view_models/' } view models
     %div.post
-      %h1= page.title
+      - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
+      %h1
+        = page.title
+        %a{ :href => "http://twitter.com/share", :class => "twitter-share-button", :'data-url' => permalink, :'data-text' => page.title, :'data-count' => "none", 'data-via' => "hanke", :'data-width' => "55px" } Tweet
       .categories
         = page.categories.join(" / ")
       //  - page.categories.each do |category|
@@ -53,7 +56,6 @@
         Previous
         %a.previous{ :href => "../../..#{page.previous.url}", :title => "Previous post: #{page.previous.title}" }= page.previous.title
       %h2 Comments?
-      - permalink = 'http://florianhanke.com/blog' + page.id + '.html'
       #disqus_thread
       :javascript
         var disqus_shortname = 'florianhanke';

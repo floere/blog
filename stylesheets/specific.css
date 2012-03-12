@@ -29,8 +29,6 @@ div.post a:before { content: "☛ "; }
 div.post a.previous:before { content: "☚ "; }
 div.post a:hover { background-color: #abcdef; }
 
-.twitter-share-button { margin-left: 22%; }
-
 #disqus_thread a:before { content: ""; }
 
 div.gist { font-size: 0.9em; }

@@ -29,9 +29,11 @@ The usage is very simple. Just pass a 2d array of regexps and replacement terms 
 
 <pre class="sh_ruby"><code>index = Picky::Index.new :normalized do
   indexing normalizes_words: [
+    [/\+/, 'plus'], # + -> plus
     [/\&/, 'and'], # & -> and
-    ['/\w\//', 'with'], # w/ -> with
-    ['\+', 'plus'] # + -> plus
+    [/\w\//, 'with'], # w/ -> with
+    [/abbr(ev)?/, 'abbreviation'], # abbr, abbrev -> abbreviation
+    [/e\.g\./, 'example given'] # e.g. -> example given (note that the . have to survive)
   ]
 end</code></pre>
 

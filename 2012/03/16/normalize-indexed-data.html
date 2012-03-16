@@ -69,7 +69,7 @@
       <h2>Tokenizer option &#8220;normalizes_words&#8221;</h2>
       <p>This option makes the tokenizer normalize words before indexing them.</p>
       <p>The usage is very simple. Just pass a 2d array of regexps and replacement terms into the <code>normalizes_words</code> option, like so:</p>
-      <pre class="sh_ruby"><code>index = Picky::Index.new :normalized do&#x000A;  indexing normalizes_words: [&#x000A;    [/\&amp;/, 'and'], # &amp; -&gt; and&#x000A;    ['/\w\//', 'with'], # w/ -&gt; with&#x000A;    ['\+', 'plus'] # + -&gt; plus&#x000A;  ]&#x000A;end</code></pre>
+      <pre class="sh_ruby"><code>index = Picky::Index.new :normalized do&#x000A;  indexing normalizes_words: [&#x000A;    [/\+/, 'plus'], # + -&gt; plus&#x000A;    [/\&amp;/, 'and'], # &amp; -&gt; and&#x000A;    [/\w\//, 'with'], # w/ -&gt; with&#x000A;    [/abbr(ev)?/, 'abbreviation'], # abbr, abbrev -&gt; abbreviation&#x000A;    [/e\.g\./, 'example given'] # e.g. -&gt; example given (note that the . have to survive)&#x000A;  ]&#x000A;end</code></pre>
       <p>Note that</p>
       <ul>
       	<li>stopwords</li>

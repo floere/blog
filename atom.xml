@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-16T14:54:02+11:00</updated>
+ <updated>2012-03-16T15:03:47+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -29,9 +29,11 @@
 &lt;p&gt;The usage is very simple. Just pass a 2d array of regexps and replacement terms into the &lt;code&gt;normalizes_words&lt;/code&gt; option, like so:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new :normalized do
   indexing normalizes_words: [
+    [/\+/, 'plus'], # + -&amp;gt; plus
     [/\&amp;amp;/, 'and'], # &amp;amp; -&amp;gt; and
-    ['/\w\//', 'with'], # w/ -&amp;gt; with
-    ['\+', 'plus'] # + -&amp;gt; plus
+    [/\w\//, 'with'], # w/ -&amp;gt; with
+    [/abbr(ev)?/, 'abbreviation'], # abbr, abbrev -&amp;gt; abbreviation
+    [/e\.g\./, 'example given'] # e.g. -&amp;gt; example given (note that the . have to survive)
   ]
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that&lt;/p&gt;

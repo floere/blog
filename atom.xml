@@ -4,13 +4,57 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-03-12T12:15:34+11:00</updated>
+ <updated>2012-03-16T14:54:02+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Normalizing&amp;nbsp;Indexed&amp;nbsp;Data</title>
+   <link href="http://florianhanke.com/blog/2012/03/16/normalize-indexed-data.html"/>
+   <updated>2012-03-16T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/03/16/normalize-indexed-data</id>
+   <content type="html">&lt;p&gt;A quick blog post on a Picky tokenizer option.&lt;/p&gt;
+&lt;h2&gt;Intro / Problem&lt;/h2&gt;
+&lt;p&gt;On mobile devices it can be a bit annoying to enter special symbols, like &lt;code&gt;+&lt;/code&gt;, or &lt;code&gt;&amp;amp;&lt;/code&gt;, and it would be easier to just enter &lt;code&gt;plus&lt;/code&gt;, or &lt;code&gt;and&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Or maybe there are a lot of abbreviations, like &lt;code&gt;abbrev&lt;/code&gt;, or &lt;code&gt;e.g.&lt;/code&gt;, but you&amp;#8217;d still like to find the item when searching for &lt;code&gt;abbreviation&lt;/code&gt;, or &lt;code&gt;example&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Or maybe you&amp;#8217;d like number &lt;code&gt;1&lt;/code&gt; to be findable with &lt;code&gt;one&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In the search engine domain, this is one part of &lt;a href=&quot;https://en.wikipedia.org/wiki/Text_normalization&quot;&gt;text normalization&lt;/a&gt;, the examples being expanding abbreviations and converting numbers.&lt;/p&gt;
+&lt;p&gt;In Picky, this is done using the tokenizer option &lt;code&gt;normalizes_words&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Tokenizer option &amp;#8220;normalizes_words&amp;#8221;&lt;/h2&gt;
+&lt;p&gt;This option makes the tokenizer normalize words before indexing them.&lt;/p&gt;
+&lt;p&gt;The usage is very simple. Just pass a 2d array of regexps and replacement terms into the &lt;code&gt;normalizes_words&lt;/code&gt; option, like so:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new :normalized do
+  indexing normalizes_words: [
+    [/\&amp;amp;/, 'and'], # &amp;amp; -&amp;gt; and
+    ['/\w\//', 'with'], # w/ -&amp;gt; with
+    ['\+', 'plus'] # + -&amp;gt; plus
+  ]
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;stopwords&lt;/li&gt;
+	&lt;li&gt;case&lt;/li&gt;
+	&lt;li&gt;character removal&lt;/li&gt;
+	&lt;li&gt;character replacement&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;are specifically handled in options&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;code&gt;stopwords: /\b(word1|word2|...)\b/&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;case_sensitive: true/false&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;remove_characters: /[characters]/&lt;/code&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;code&gt;substitutes_characters_with: Picky::CharacterSubstituters::WestEuropean.new&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;and should be handled there.&lt;/p&gt;
+&lt;h2&gt;Alternatives&lt;/h2&gt;
+&lt;p&gt;What if this doesn&amp;#8217;t work for you?&lt;/p&gt;
+&lt;p&gt;No problemo! Picky is all Ruby, so feel free to either monkey patch, or probably better: Preprocess the data to your heart&amp;#8217;s content.&lt;/p&gt;
+&lt;p&gt;Have fun!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">CocoaPods&amp;nbsp;Search&amp;nbsp;Design</title>

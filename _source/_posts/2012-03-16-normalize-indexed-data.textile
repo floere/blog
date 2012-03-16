@@ -1,0 +1,60 @@
+---
+layout: post
+title: Normalizing&nbsp;Indexed&nbsp;Data
+categories:
+  - ruby
+  - picky
+  - indexing
+---
+
+A quick blog post on a Picky tokenizer option.
+
+h2. Intro / Problem
+
+On mobile devices it can be a bit annoying to enter special symbols, like @+@, or @&@, and it would be easier to just enter @plus@, or @and@.
+
+Or maybe there are a lot of abbreviations, like @abbrev@, or @e.g.@, but you'd still like to find the item when searching for @abbreviation@, or @example@.
+
+Or maybe you'd like number @1@ to be findable with @one@. 
+
+In the search engine domain, this is one part of "text normalization":https://en.wikipedia.org/wiki/Text_normalization, the examples being expanding abbreviations and converting numbers.
+
+In Picky, this is done using the tokenizer option @normalizes_words@.
+
+h2. Tokenizer option "normalizes_words"
+
+This option makes the tokenizer normalize words before indexing them.
+
+The usage is very simple. Just pass a 2d array of regexps and replacement terms into the @normalizes_words@ option, like so:
+
+<pre class="sh_ruby"><code>index = Picky::Index.new :normalized do
+  indexing normalizes_words: [
+    [/\&/, 'and'], # & -> and
+    ['/\w\//', 'with'], # w/ -> with
+    ['\+', 'plus'] # + -> plus
+  ]
+end</code></pre>
+
+Note that
+
+* stopwords
+* case
+* character removal
+* character replacement
+
+are specifically handled in options
+
+* @stopwords: /\b(word1|word2|...)\b/@
+* @case_sensitive: true/false@
+* @remove_characters: /[characters]/@
+* @substitutes_characters_with: Picky::CharacterSubstituters::WestEuropean.new@
+
+and should be handled there.
+
+h2. Alternatives
+
+What if this doesn't work for you?
+
+No problemo! Picky is all Ruby, so feel free to either monkey patch, or probably better: Preprocess the data to your heart's content.
+
+Have fun!

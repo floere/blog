@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Normalizing&nbsp;Indexed&nbsp;Data</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        Normalizing&nbsp;Indexed&nbsp;Data
+        <a class="twitter-share-button" data-count="none" data-text="Normalizing&amp;nbsp;Indexed&amp;nbsp;Data" data-url="http://florianhanke.com/blog/2012/03/16/normalize-indexed-data.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        ruby / picky / indexing
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>A quick blog post on a Picky tokenizer option.</p>
+      <h2>Intro / Problem</h2>
+      <p>On mobile devices it can be a bit annoying to enter special symbols, like <code>+</code>, or <code>&amp;</code>, and it would be easier to just enter <code>plus</code>, or <code>and</code>.</p>
+      <p>Or maybe there are a lot of abbreviations, like <code>abbrev</code>, or <code>e.g.</code>, but you&#8217;d still like to find the item when searching for <code>abbreviation</code>, or <code>example</code>.</p>
+      <p>Or maybe you&#8217;d like number <code>1</code> to be findable with <code>one</code>.</p>
+      <p>In the search engine domain, this is one part of <a href="https://en.wikipedia.org/wiki/Text_normalization">text normalization</a>, the examples being expanding abbreviations and converting numbers.</p>
+      <p>In Picky, this is done using the tokenizer option <code>normalizes_words</code>.</p>
+      <h2>Tokenizer option &#8220;normalizes_words&#8221;</h2>
+      <p>This option makes the tokenizer normalize words before indexing them.</p>
+      <p>The usage is very simple. Just pass a 2d array of regexps and replacement terms into the <code>normalizes_words</code> option, like so:</p>
+      <pre class="sh_ruby"><code>index = Picky::Index.new :normalized do&#x000A;  indexing normalizes_words: [&#x000A;    [/\&amp;/, 'and'], # &amp; -&gt; and&#x000A;    ['/\w\//', 'with'], # w/ -&gt; with&#x000A;    ['\+', 'plus'] # + -&gt; plus&#x000A;  ]&#x000A;end</code></pre>
+      <p>Note that</p>
+      <ul>
+      	<li>stopwords</li>
+      	<li>case</li>
+      	<li>character removal</li>
+      	<li>character replacement</li>
+      </ul>
+      <p>are specifically handled in options</p>
+      <ul>
+      	<li><code>stopwords: /\b(word1|word2|...)\b/</code></li>
+      	<li><code>case_sensitive: true/false</code></li>
+      	<li><code>remove_characters: /[characters]/</code></li>
+      	<li><code>substitutes_characters_with: Picky::CharacterSubstituters::WestEuropean.new</code></li>
+      </ul>
+      <p>and should be handled there.</p>
+      <h2>Alternatives</h2>
+      <p>What if this doesn&#8217;t work for you?</p>
+      <p>No problemo! Picky is all Ruby, so feel free to either monkey patch, or probably better: Preprocess the data to your heart&#8217;s content.</p>
+      <p>Have fun!</p>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="Normalizing&amp;nbsp;Indexed&amp;nbsp;Data" data-url="http://florianhanke.com/blog/2012/03/16/normalize-indexed-data.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/03/01/cocoapods-search-design.html" title="Previous post: CocoaPods&amp;nbsp;Search&amp;nbsp;Design">CocoaPods&nbsp;Search&nbsp;Design</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/03/16/normalize-indexed-data';
+          var disqus_url = 'http://florianhanke.com/blog/2012/03/16/normalize-indexed-data.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

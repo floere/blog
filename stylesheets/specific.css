@@ -29,6 +29,8 @@ div.post a:before { content: "☛ "; }
 div.post a.previous:before { content: "☚ "; }
 div.post a:hover { background-color: #abcdef; }
 
+div.twitter-tweet-rendered { margin: 0 auto !important; max-width: 500px !important; }
+
 #disqus_thread a:before { content: ""; }
 
 div.gist { font-size: 0.9em; }

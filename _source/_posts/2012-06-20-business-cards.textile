@@ -1,0 +1,57 @@
+---
+layout: post
+title: Business&nbsp;Cards
+categories:
+  - technology astronauts
+  - business
+---
+
+Last year, "Kaspar Schiess":http://absurd.li/ and I opened our own business: "Technology Astronauts":http://technologyastronauts.ch! This May, we started in earnest. Hooray!
+
+(Wait until crowd's cheers calm down)
+
+However, we found ourselves too many times short one business card when friendly exchanges were in order. Only one way to rectify this:
+
+h2. Technology Astronauts Business Cards
+
+We opted to go for a very simple, striking high-contrast "xylography":https://en.wikipedia.org/wiki/Woodcut design with a modern font and subjects that are indirectly or directly related to the rough business of astronauting.
+
+First, the moon:
+
+!{float:none}/blog/images/2012-06-25-moon.png!
+
+On the northern hemisphere, our main area of operations (apart from, you know, space) if the moon is seen in this configuration, it is filling up, mere days away from blasting earth with photons. Its craters remind us of its resilience towards hits, its striking character and its ability to accumulate new material without changing too much: Moon stays moon, born from the earth itself.
+
+Second, coding astronaut:
+
+!{float:none}/blog/images/2012-06-25-astronaut.png!
+
+Joel Spolsky for example "sees the astronaut as running out of oxygen":http://www.joelonsoftware.com/articles/fog0000000018.html.
+
+I disagree: The astronaut represents the ultimate in human achievement in engineering, they itself are operating in an extreme environment, focusing on a specific number of tasks and performing above the rest of us.
+
+This is fairly standard in business cards. Where do we differentiate us?
+
+h2. "Put a face on it"
+
+I haven't found any business cards with faces on them, but there must be some out there!
+
+In any case, after dozens of conferences and business meetings I have accumulated about a hundred business cards. Looking at them, I can't remember the person behind them, if I don't communicate regularly.
+
+Up to about three weeks after a meeting a face is fresh in my mind. After that? Not so much. If the business card has been handed to me with an accompanying anecdote, I can remember.
+
+Now, this might be just my brain. But chances are, this might be your brain and memory as well.
+
+To bring it up to speed much faster, we decided to "put a face on it":
+
+!{float:none}/blog/images/2012-06-25-florian.png!
+
+This is me laughing uselessly into space. But: We believe that this jogs your memory much better than just mere text. How do you like it?
+
+Say "Hi!" either to Kaspar or me if you want one too :)
+
+P.S: We like it even better if you say "Hi, I have this fantastic project for you!".
+
+P.P.S: The "Put a face on it" is a reference to "this YouTube episode of Portlandia":http://www.youtube.com/watch?v=iHmLljk2t8M.
+
+P.P.P.S: Joel, you know who is much more about oxygen than astronauts? Divers.

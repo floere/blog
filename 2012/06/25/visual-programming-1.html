@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Visual&nbsp;Programming&nbsp;1</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        Visual&nbsp;Programming&nbsp;1
+        <a class="twitter-share-button" data-count="none" data-text="Visual&amp;nbsp;Programming&amp;nbsp;1" data-url="http://florianhanke.com/blog/2012/06/25/visual-programming-1.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        visual programming / experiments / UIs
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>Have you ever heard of <a href="https://en.wikipedia.org/wiki/Visual_programming_language">visual programming</a>?</p>
+      <p>It&#8217;s about &#8220;writing&#8221;, or rather, drawing programs by using a graphical language, where programs aren&#8217;t codified as text, but mostly using boxes and lines, with only little text.</p>
+      <p>It&#8217;s one of my favorite hobby horses.</p>
+      <h2>Designing a visual programming language</h2>
+      <p>As an exercise, I&#8217;d like to design a visual programming language top-down. By top–down I mean that first we are going to sketch out the visual interface, and how it would work.</p>
+      <p>We will be looking at whether we can interface the program with its running counterpart, to display debugging information and other information normally hard to look at. Also, can we make a running program changeable, so we can play with the program, as Bret Victor has shown in one of his latest presentations, <a href="http://vimeo.com/36579366">Inventing on Principle</a>.</p>
+      <p>If the design proves feasible, we will start working on an implementation. I&#8217;d like to do it in Ruby, but I get a strong feeling that Haskell would be far more suited. Why? Because it&#8217;s a purely functional language. But more on that later. We&#8217;ll see.</p>
+      <h2>Dataflow programming</h2>
+      <p>Let&#8217;s look at some ideas. <a href="https://en.wikipedia.org/wiki/Dataflow_programming">Dataflow programming</a> is an often used paradigm in visual programming environments where graphics are processed. In dataflow programming, all operations on data are represented by boxes with multiple inputs. If all inputs are &#8220;ready&#8221;, ie. have valid data to offer, the operation will run.</p>
+      <p>One famous example of this is <a href="https://en.wikipedia.org/wiki/Quartz_Composer">Quartz Composer</a>. If you haven&#8217;t seen it and own <span class="caps">OSX</span>, you should type cmd-space quartz composer right now and have a look. It&#8217;s great to play with. Some people even used it to make a 24 hours music video stream once… (ah, the memories).</p>
+      <p>The data in dataflow programming comes from various sources, always positioned on the left hand side, and flowing to the right, where the sinks are. A sink might be a display of some sort, or a loudspeaker.</p>
+      <h2>This language</h2>
+      <p>However, in my imagination, programs look more like <a href="https://en.wikipedia.org/wiki/Tree_structure">trees</a>, or a forest (a set of trees), that are traversed according to rules set in the nodes.</p>
+      <p>&#8220;Huh?&#8221;, you wonder, &#8220;Tree? What?&#8221;. Consider this piece of Ruby code:</p>
+      <pre class="sh_ruby"><code>def this_or_that thing&#x000A;  if thing&#x000A;    this thing&#x000A;  else&#x000A;    that thing&#x000A;  end&#x000A;end</code></pre>
+      <p>Let&#8217;s assume the tree grows from the left to the right.</p>
+      <p>This method would be represented by a node, with two branches growing to the right. One branch would be traversed if the thing wasn&#8217;t nil or false, and the other if it was.</p>
+      <p>In fact, the <code>this_or_that</code> method could be considered a tree itself, with a root and two branches, that can be grafted onto other trees. The newly formed tree would represent a new program.</p>
+      <p>So instead of flowing from left to right, a – let&#8217;s say – <a href="https://en.wikipedia.org/wiki/Logo_(programming_language">turtle</a> would traverse the tree down to its branches, and return, following instructions along the way.</p>
+      <p>Going right would represent function calls, and left returning from them.</p>
+      <p>The tree metaphor is fitting in other ways. Perhaps you&#8217;ve seen the <a href="http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/">fantastic video series by Abelson and Sussman</a>? In the first lession they talk about interfaces.
+      Let&#8217;s say you collapse a subtree of a program – if you then are looking at a useful set of inputs, you know your interface is fine.
+      If you still understand the program when collapsing a subtree, chances are you did a good job of designing the interfaces.</p>
+      <p>Let&#8217;s look at a quick example. The program is about cleaning your house.</p>
+      <p><img src="/blog/images/2012-06-25-program.png" style="float:none;" alt="" /></p>
+      <p>(The instructions for <code>Clean Kitchen</code> and <code>Clean Garage</code> are collapsed)</p>
+      <p>If you collapsed everything that was &#8220;inside&#8221; <code>Clean Bedroom</code>, ie. <code>Clean Bed</code>, <code>Clean Floor</code>, <code>Clean Windows</code>, would you still understand the program itself?</p>
+      <p>Yes you would! Whoever is going to do the actual work on cleaning the bedroom would need the detailed instructions, but you know that one of the things that will be cleaned will be the bedroom (well, assuming your kid is actually doing the work – if it&#8217;s the compiler, the work will be done). You still understand the program itself: Possibly well designed.</p>
+      <p>You can already see that naming the nodes is very important, and that it <em>might</em> be easier designing APIs using a visual programming language than text.</p>
+      <h2>So far</h2>
+      <p>Without really designing anything, we already made a lot of assumptions on how this language is going to look.</p>
+      <p>Let&#8217;s just throw our example element up there:</p>
+      <p><img src="/blog/images/2012-06-25-exists.png" style="float:none;" alt="" /></p>
+      <p>That looks ok. There&#8217;s an input and two function calls. We&#8217;ve come suprisingly far already, since before looking at simple components, we&#8217;ve already built our more complex component.</p>
+      <p>Did you notice anything? Do we have to use constrained method names like (<code>does_it_exist?</code>)? Do we have to use <code>true</code> or <code>false</code>? Is the underlying language in any way important on how we <em>name</em> things?</p>
+      <p>No, no, and no: Luckily this is not important anymore. You ask: &#8220;How is this possible, when this is incredibly important in <em>my favorite programming language</em>?&#8221; Magic?</p>
+      <h2>Possibly next</h2>
+      <p>Knowing a bit about visual programming languages:</p>
+      <ul>
+      	<li>How would you design a <code>for</code> loop? Would it be easy to do? (My guess: Hard.)</li>
+      	<li>How about a <code>map</code> operation? (Easy)</li>
+      	<li>How would you combine functions? (Super easy)</li>
+      	<li>What does it mean to have a higher-order function? (Uh-oh)</li>
+      </ul>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="Visual&amp;nbsp;Programming&amp;nbsp;1" data-url="http://florianhanke.com/blog/2012/06/25/visual-programming-1.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/06/20/business-cards.html" title="Previous post: Business&amp;nbsp;Cards">Business&nbsp;Cards</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/06/25/visual-programming-1';
+          var disqus_url = 'http://florianhanke.com/blog/2012/06/25/visual-programming-1.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

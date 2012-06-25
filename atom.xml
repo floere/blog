@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-06-15T20:12:46+10:00</updated>
+ <updated>2012-06-26T00:25:36+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -13,10 +13,68 @@
 
  
  <entry>
-   <title type="html">Business&amp;nbsp;Cards</title>
-   <link href="http://florianhanke.com/blog/2012/06/25/business-cards.html"/>
+   <title type="html">Visual&amp;nbsp;Programming&amp;nbsp;1</title>
+   <link href="http://florianhanke.com/blog/2012/06/25/visual-programming-1.html"/>
    <updated>2012-06-25T00:00:00+10:00</updated>
-   <id>http://florianhanke.com/blog/2012/06/25/business-cards</id>
+   <id>http://florianhanke.com/blog/2012/06/25/visual-programming-1</id>
+   <content type="html">&lt;p&gt;Have you ever heard of &lt;a href=&quot;https://en.wikipedia.org/wiki/Visual_programming_language&quot;&gt;visual programming&lt;/a&gt;?&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s about &amp;#8220;writing&amp;#8221;, or rather, drawing programs by using a graphical language, where programs aren&amp;#8217;t codified as text, but mostly using boxes and lines, with only little text.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s one of my favorite hobby horses.&lt;/p&gt;
+&lt;h2&gt;Designing a visual programming language&lt;/h2&gt;
+&lt;p&gt;As an exercise, I&amp;#8217;d like to design a visual programming language top-down. By top–down I mean that first we are going to sketch out the visual interface, and how it would work.&lt;/p&gt;
+&lt;p&gt;We will be looking at whether we can interface the program with its running counterpart, to display debugging information and other information normally hard to look at. Also, can we make a running program changeable, so we can play with the program, as Bret Victor has shown in one of his latest presentations, &lt;a href=&quot;http://vimeo.com/36579366&quot;&gt;Inventing on Principle&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If the design proves feasible, we will start working on an implementation. I&amp;#8217;d like to do it in Ruby, but I get a strong feeling that Haskell would be far more suited. Why? Because it&amp;#8217;s a purely functional language. But more on that later. We&amp;#8217;ll see.&lt;/p&gt;
+&lt;h2&gt;Dataflow programming&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s look at some ideas. &lt;a href=&quot;https://en.wikipedia.org/wiki/Dataflow_programming&quot;&gt;Dataflow programming&lt;/a&gt; is an often used paradigm in visual programming environments where graphics are processed. In dataflow programming, all operations on data are represented by boxes with multiple inputs. If all inputs are &amp;#8220;ready&amp;#8221;, ie. have valid data to offer, the operation will run.&lt;/p&gt;
+&lt;p&gt;One famous example of this is &lt;a href=&quot;https://en.wikipedia.org/wiki/Quartz_Composer&quot;&gt;Quartz Composer&lt;/a&gt;. If you haven&amp;#8217;t seen it and own &lt;span class=&quot;caps&quot;&gt;OSX&lt;/span&gt;, you should type cmd-space quartz composer right now and have a look. It&amp;#8217;s great to play with. Some people even used it to make a 24 hours music video stream once… (ah, the memories).&lt;/p&gt;
+&lt;p&gt;The data in dataflow programming comes from various sources, always positioned on the left hand side, and flowing to the right, where the sinks are. A sink might be a display of some sort, or a loudspeaker.&lt;/p&gt;
+&lt;h2&gt;This language&lt;/h2&gt;
+&lt;p&gt;However, in my imagination, programs look more like &lt;a href=&quot;https://en.wikipedia.org/wiki/Tree_structure&quot;&gt;trees&lt;/a&gt;, or a forest (a set of trees), that are traversed according to rules set in the nodes.&lt;/p&gt;
+&lt;p&gt;&amp;#8220;Huh?&amp;#8221;, you wonder, &amp;#8220;Tree? What?&amp;#8221;. Consider this piece of Ruby code:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def this_or_that thing
+  if thing
+    this thing
+  else
+    that thing
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s assume the tree grows from the left to the right.&lt;/p&gt;
+&lt;p&gt;This method would be represented by a node, with two branches growing to the right. One branch would be traversed if the thing wasn&amp;#8217;t nil or false, and the other if it was.&lt;/p&gt;
+&lt;p&gt;In fact, the &lt;code&gt;this_or_that&lt;/code&gt; method could be considered a tree itself, with a root and two branches, that can be grafted onto other trees. The newly formed tree would represent a new program.&lt;/p&gt;
+&lt;p&gt;So instead of flowing from left to right, a – let&amp;#8217;s say – &lt;a href=&quot;https://en.wikipedia.org/wiki/Logo_(programming_language&quot;&gt;turtle&lt;/a&gt; would traverse the tree down to its branches, and return, following instructions along the way.&lt;/p&gt;
+&lt;p&gt;Going right would represent function calls, and left returning from them.&lt;/p&gt;
+&lt;p&gt;The tree metaphor is fitting in other ways. Perhaps you&amp;#8217;ve seen the &lt;a href=&quot;http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/&quot;&gt;fantastic video series by Abelson and Sussman&lt;/a&gt;? In the first lession they talk about interfaces.
+Let&amp;#8217;s say you collapse a subtree of a program – if you then are looking at a useful set of inputs, you know your interface is fine.
+If you still understand the program when collapsing a subtree, chances are you did a good job of designing the interfaces.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s look at a quick example. The program is about cleaning your house.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/images/2012-06-25-program.png&quot; style=&quot;float:none;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;(The instructions for &lt;code&gt;Clean Kitchen&lt;/code&gt; and &lt;code&gt;Clean Garage&lt;/code&gt; are collapsed)&lt;/p&gt;
+&lt;p&gt;If you collapsed everything that was &amp;#8220;inside&amp;#8221; &lt;code&gt;Clean Bedroom&lt;/code&gt;, ie. &lt;code&gt;Clean Bed&lt;/code&gt;, &lt;code&gt;Clean Floor&lt;/code&gt;, &lt;code&gt;Clean Windows&lt;/code&gt;, would you still understand the program itself?&lt;/p&gt;
+&lt;p&gt;Yes you would! Whoever is going to do the actual work on cleaning the bedroom would need the detailed instructions, but you know that one of the things that will be cleaned will be the bedroom (well, assuming your kid is actually doing the work – if it&amp;#8217;s the compiler, the work will be done). You still understand the program itself: Possibly well designed.&lt;/p&gt;
+&lt;p&gt;You can already see that naming the nodes is very important, and that it &lt;em&gt;might&lt;/em&gt; be easier designing APIs using a visual programming language than text.&lt;/p&gt;
+&lt;h2&gt;So far&lt;/h2&gt;
+&lt;p&gt;Without really designing anything, we already made a lot of assumptions on how this language is going to look.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s just throw our example element up there:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/images/2012-06-25-exists.png&quot; style=&quot;float:none;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;That looks ok. There&amp;#8217;s an input and two function calls. We&amp;#8217;ve come suprisingly far already, since before looking at simple components, we&amp;#8217;ve already built our more complex component.&lt;/p&gt;
+&lt;p&gt;Did you notice anything? Do we have to use constrained method names like (&lt;code&gt;does_it_exist?&lt;/code&gt;)? Do we have to use &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;? Is the underlying language in any way important on how we &lt;em&gt;name&lt;/em&gt; things?&lt;/p&gt;
+&lt;p&gt;No, no, and no: Luckily this is not important anymore. You ask: &amp;#8220;How is this possible, when this is incredibly important in &lt;em&gt;my favorite programming language&lt;/em&gt;?&amp;#8221; Magic?&lt;/p&gt;
+&lt;h2&gt;Possibly next&lt;/h2&gt;
+&lt;p&gt;Knowing a bit about visual programming languages:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;How would you design a &lt;code&gt;for&lt;/code&gt; loop? Would it be easy to do? (My guess: Hard.)&lt;/li&gt;
+	&lt;li&gt;How about a &lt;code&gt;map&lt;/code&gt; operation? (Easy)&lt;/li&gt;
+	&lt;li&gt;How would you combine functions? (Super easy)&lt;/li&gt;
+	&lt;li&gt;What does it mean to have a higher-order function? (Uh-oh)&lt;/li&gt;
+&lt;/ul&gt;</content>
+   
+ </entry>
+ 
+ <entry>
+   <title type="html">Business&amp;nbsp;Cards</title>
+   <link href="http://florianhanke.com/blog/2012/06/20/business-cards.html"/>
+   <updated>2012-06-20T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2012/06/20/business-cards</id>
    <content type="html">&lt;p&gt;Last year, &lt;a href=&quot;http://absurd.li/&quot;&gt;Kaspar Schiess&lt;/a&gt; and I opened our own business: &lt;a href=&quot;http://technologyastronauts.ch&quot;&gt;Technology Astronauts&lt;/a&gt;! This May, we started in earnest. Hooray!&lt;/p&gt;
 &lt;p&gt;(Wait until crowd&amp;#8217;s cheers calm down)&lt;/p&gt;
 &lt;p&gt;However, we found ourselves too many times short one business card when friendly exchanges were in order. Only one way to rectify this:&lt;/p&gt;

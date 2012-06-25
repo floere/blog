@@ -1,0 +1,93 @@
+---
+layout: post
+title: Visual&nbsp;Programming&nbsp;1
+categories:
+  - visual programming
+  - experiments
+  - UIs
+---
+
+Have you ever heard of "visual programming":https://en.wikipedia.org/wiki/Visual_programming_language?
+
+It's about "writing", or rather, drawing programs by using a graphical language, where programs aren't codified as text, but mostly using boxes and lines, with only little text.
+
+It's one of my favorite hobby horses.
+
+h2. Designing a visual programming language
+
+As an exercise, I'd like to design a visual programming language top-down. By top–down I mean that first we are going to sketch out the visual interface, and how it would work.
+
+We will be looking at whether we can interface the program with its running counterpart, to display debugging information and other information normally hard to look at. Also, can we make a running program changeable, so we can play with the program, as Bret Victor has shown in one of his latest presentations, "Inventing on Principle":http://vimeo.com/36579366.
+
+If the design proves feasible, we will start working on an implementation. I'd like to do it in Ruby, but I get a strong feeling that Haskell would be far more suited. Why? Because it's a purely functional language. But more on that later. We'll see.
+
+h2. Dataflow programming
+
+Let's look at some ideas. "Dataflow programming":https://en.wikipedia.org/wiki/Dataflow_programming is an often used paradigm in visual programming environments where graphics are processed. In dataflow programming, all operations on data are represented by boxes with multiple inputs. If all inputs are "ready", ie. have valid data to offer, the operation will run.
+
+One famous example of this is "Quartz Composer":https://en.wikipedia.org/wiki/Quartz_Composer. If you haven't seen it and own OSX, you should type cmd-space quartz composer right now and have a look. It's great to play with. Some people even used it to make a 24 hours music video stream once… (ah, the memories).
+
+The data in dataflow programming comes from various sources, always positioned on the left hand side, and flowing to the right, where the sinks are. A sink might be a display of some sort, or a loudspeaker.
+
+h2. This language
+
+However, in my imagination, programs look more like "trees":https://en.wikipedia.org/wiki/Tree_structure, or a forest (a set of trees), that are traversed according to rules set in the nodes.
+
+"Huh?", you wonder, "Tree? What?". Consider this piece of Ruby code:
+
+<pre class="sh_ruby"><code>def this_or_that thing
+  if thing
+    this thing
+  else
+    that thing
+  end
+end</code></pre>
+
+Let's assume the tree grows from the left to the right.
+
+This method would be represented by a node, with two branches growing to the right. One branch would be traversed if the thing wasn't nil or false, and the other if it was.
+
+In fact, the @this_or_that@ method could be considered a tree itself, with a root and two branches, that can be grafted onto other trees. The newly formed tree would represent a new program.
+
+So instead of flowing from left to right, a – let's say – "turtle":https://en.wikipedia.org/wiki/Logo_(programming_language would traverse the tree down to its branches, and return, following instructions along the way.
+
+Going right would represent function calls, and left returning from them.
+
+The tree metaphor is fitting in other ways. Perhaps you've seen the "fantastic video series by Abelson and Sussman":http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/? In the first lession they talk about interfaces.
+Let's say you collapse a subtree of a program – if you then are looking at a useful set of inputs, you know your interface is fine.
+If you still understand the program when collapsing a subtree, chances are you did a good job of designing the interfaces.
+
+Let's look at a quick example. The program is about cleaning your house.
+
+!{float:none}/blog/images/2012-06-25-program.png!
+
+(The instructions for @Clean Kitchen@ and @Clean Garage@ are collapsed)
+
+If you collapsed everything that was "inside" @Clean Bedroom@, ie. @Clean Bed@, @Clean Floor@, @Clean Windows@, would you still understand the program itself?
+
+Yes you would! Whoever is going to do the actual work on cleaning the bedroom would need the detailed instructions, but you know that one of the things that will be cleaned will be the bedroom (well, assuming your kid is actually doing the work – if it's the compiler, the work will be done). You still understand the program itself: Possibly well designed.
+
+You can already see that naming the nodes is very important, and that it _might_ be easier designing APIs using a visual programming language than text.
+
+h2. So far
+
+Without really designing anything, we already made a lot of assumptions on how this language is going to look.
+
+Let's just throw our example element up there:
+
+!{float:none}/blog/images/2012-06-25-exists.png!
+
+That looks ok. There's an input and two function calls. We've come suprisingly far already, since before looking at simple components, we've already built our more complex component.
+
+Did you notice anything? Do we have to use constrained method names like (@does_it_exist?@)? Do we have to use @true@ or @false@? Is the underlying language in any way important on how we _name_ things?
+
+No, no, and no: Luckily this is not important anymore. You ask: "How is this possible, when this is incredibly important in _my favorite programming language_?" Magic?
+
+h2. Possibly next
+
+Knowing a bit about visual programming languages:
+
+* How would you design a @for@ loop? Would it be easy to do? (My guess: Hard.)
+* How about a @map@ operation? (Easy)
+* How would you combine functions? (Super easy)
+* What does it mean to have a higher-order function? (Uh-oh)

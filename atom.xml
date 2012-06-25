@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-06-26T00:25:36+10:00</updated>
+ <updated>2012-06-26T00:40:22+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -62,7 +62,7 @@ If you still understand the program when collapsing a subtree, chances are you d
 &lt;h2&gt;Possibly next&lt;/h2&gt;
 &lt;p&gt;Knowing a bit about visual programming languages:&lt;/p&gt;
 &lt;ul&gt;
-	&lt;li&gt;How would you design a &lt;code&gt;for&lt;/code&gt; loop? Would it be easy to do? (My guess: Hard.)&lt;/li&gt;
+	&lt;li&gt;How would you design a &lt;code&gt;for&lt;/code&gt; loop? Would it be easy to do? (My guess: Hard.) Is it needed? (No.)&lt;/li&gt;
 	&lt;li&gt;How about a &lt;code&gt;map&lt;/code&gt; operation? (Easy)&lt;/li&gt;
 	&lt;li&gt;How would you combine functions? (Super easy)&lt;/li&gt;
 	&lt;li&gt;What does it mean to have a higher-order function? (Uh-oh)&lt;/li&gt;

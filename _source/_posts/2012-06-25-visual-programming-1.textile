@@ -87,7 +87,7 @@ h2. Possibly next
 
 Knowing a bit about visual programming languages:
 
-* How would you design a @for@ loop? Would it be easy to do? (My guess: Hard.)
+* How would you design a @for@ loop? Would it be easy to do? (My guess: Hard.) Is it needed? (No.)
 * How about a @map@ operation? (Easy)
 * How would you combine functions? (Super easy)
 * What does it mean to have a higher-order function? (Uh-oh)

@@ -60,49 +60,49 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <p>Let me start off by saying that it&#8217;s embarrassing that this topic is discussed only as Picky 2.3.0 is released. Especially as a proponent of test driven design. (Picky has 1300 tests and 50% more spec code than normal code)</p>
-      <p>So let&#8217;s check out how you can write the most beautifully tested Picky servers. Oh yeah.</p>
-      <h2>Doin&#8217; it</h2>
-      <p>As of 2.3.0, if you use <code>picky generate unicorn_server</code>, you&#8217;ll get a <code>rake spec</code> for free which already runs integration specs on the example data.</p>
-      <p>Let&#8217;s look at the example, and after that, at each separate part.</p>
-      <pre class="sh_ruby"><code>require 'spec_helper'&#x000A;require 'picky-client/spec'&#x000A;&#x000A;describe 'Integration Tests' do&#x000A;&#x000A;  before(:all) do&#x000A;    Indexes.index_for_tests&#x000A;    Indexes.load_from_cache&#x000A;  end&#x000A;&#x000A;  let(:books) { Picky::TestClient.new(PickySearch, :path =&gt; '/books') }&#x000A;&#x000A;  # Testing a count of results.&#x000A;  #&#x000A;  it { books.search('a s').total.should == 42 }&#x000A;&#x000A;  # Testing a specific order of result ids.&#x000A;  #&#x000A;  it { books.search('alan').ids.should == [259, 307, 449] }&#x000A;&#x000A;  # Testing an order of result categories.&#x000A;  #&#x000A;  it { books.search('alan').should have_categories(['author'], ['title']) }&#x000A;  it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }&#x000A;&#x000A;end</code></pre>
-      <p>It starts off like any RSpec file, by requiring <code>spec_helper</code>. Then we require the spec part of the picky client.</p>
-      <p>What does it do? It provides us with the testing counterpart of the client&#8217;s <code>Picky::Client</code>, which is <code>Picky::TestClient</code>.</p>
-      <p>The test client works almost exactly like the real client, with the exception that the test client never sends <span class="caps">HTTP</span> requests, but uses your app&#8217;s Rack adapter. But more about that later.</p>
-      <pre class="sh_ruby"><code>require 'spec_helper'&#x000A;require 'picky-client/spec'</code></pre>
-      <p>Next, we set up the environment for the tests, i.e. get the indexes up and running.</p>
-      <p><code>Indexes.index_for_tests</code> is a special index method that does not fork and runs silently (to not disturb the deadly test bugs that trawl the area).</p>
-      <pre class="sh_ruby"><code>before(:all) do&#x000A;  Indexes.index_for_tests&#x000A;  Indexes.load_from_cache&#x000A;end</code></pre>
-      <p><code>Indexes.load_from_cache</code> loads the generated index (caches) into memory (or just leaves them alone in Redis).</p>
-      <p>Now we&#8217;re ready to do some testing!</p>
-      <pre class="sh_ruby"><code>let(:books) { Picky::TestClient.new(PickySearch, :path =&gt; '/books') }</code></pre>
-      <p>This sets up an accessor for your tests. You give the <code>TestClient</code> your Application&#8217;s constant, <code>PickySearch</code> here, and give it the path to send queries to, here <code>'/books'</code>. This only works if you <code>route</code> the path <code>'/books'</code> to a <code>Search</code> in your <code>application/app.rb</code>, of course.</p>
-      <p>That&#8217;s it! Easy so far, right?</p>
-      <pre class="sh_ruby"><code># Testing a count of results.&#x000A;#&#x000A;it { books.search('a s').total.should == 42 }</code></pre>
-      <p><code>books</code> is the test client we defined with the <code>let</code>, above. As with the normal <code>Picky::Client</code>, it offers a <code>#search(text, options = {})</code> method.</p>
-      <p>As return value, we get a hash with the result data. However, it has already been enriched through <code>Picky::Convenience</code>, which you might know if you&#8217;ve set up a client webapp already.</p>
-      <p>This means we get a <code>#total</code> method, but also <code>#ids</code>, <code>#empty?</code>, <code>#allocations</code> and more which are less useful for testing.</p>
-      <p>So to test the count of results, just use <code>#total</code> on the result of the search.</p>
-      <p>To get a sorted array of the top ids, use &#8211; surprise &#8211; <code>#ids</code>.</p>
-      <pre class="sh_ruby"><code># Testing a specific order of result ids.&#x000A;#&#x000A;it { books.search('alan').ids.should == [259, 307, 449] }</code></pre>
-      <p>Also useful is to test if the category combination boosting/weights are correct. So if <code>author</code>, like in the first example below, should be boosted, use the <code>have_categories</code> matcher to check for that.</p>
-      <pre class="sh_ruby"><code># Testing an order of result categories.&#x000A;#&#x000A;it { books.search('alan').should have_categories(['author'], ['title']) }&#x000A;it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }</code></pre>
-      <p>And that&#8217;s how you do integration testing in Picky.</p>
-      <p>About time. Test away!</p>
-      <h2>spec_helper and Rakefile</h2>
-      <p>This is what your <code>spec/spec_helper.rb</code> would look like:</p>
-      <pre class="sh_ruby"><code>ENV['PICKY_ENV'] = 'test'&#x000A;&#x000A;require 'picky'&#x000A;&#x000A;SearchLog = Loggers::Search.new ::Logger.new(STDOUT)&#x000A;puts "Using STDOUT as test log."&#x000A;&#x000A;Loader.load_application</code></pre>
-      <p>In the <code>Rakefile</code> just add</p>
-      <pre class="sh_ruby"><code>require 'rspec'&#x000A;require 'rspec/core/rake_task'&#x000A;&#x000A;RSpec::Core::RakeTask.new :spec</code></pre>
-      <p>if you haven&#8217;t done this already.</p>
-      <h2>Sidenote</h2>
-      <p>Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)</p>
-      <h2>Conclusion</h2>
-      <p>So we&#8217;ve seen</p>
-      <ol>
-      	<li>how you do integration testing in Picky</li>
-      </ol>
-      <p>Hope you learnt something new!</p>
+<p>Let me start off by saying that it&#8217;s embarrassing that this topic is discussed only as Picky 2.3.0 is released. Especially as a proponent of test driven design. (Picky has 1300 tests and 50% more spec code than normal code)</p>
+<p>So let&#8217;s check out how you can write the most beautifully tested Picky servers. Oh yeah.</p>
+<h2>Doin&#8217; it</h2>
+<p>As of 2.3.0, if you use <code>picky generate unicorn_server</code>, you&#8217;ll get a <code>rake spec</code> for free which already runs integration specs on the example data.</p>
+<p>Let&#8217;s look at the example, and after that, at each separate part.</p>
+<pre class="sh_ruby"><code>require 'spec_helper'&#x000A;require 'picky-client/spec'&#x000A;&#x000A;describe 'Integration Tests' do&#x000A;&#x000A;  before(:all) do&#x000A;    Indexes.index_for_tests&#x000A;    Indexes.load_from_cache&#x000A;  end&#x000A;&#x000A;  let(:books) { Picky::TestClient.new(PickySearch, :path =&gt; '/books') }&#x000A;&#x000A;  # Testing a count of results.&#x000A;  #&#x000A;  it { books.search('a s').total.should == 42 }&#x000A;&#x000A;  # Testing a specific order of result ids.&#x000A;  #&#x000A;  it { books.search('alan').ids.should == [259, 307, 449] }&#x000A;&#x000A;  # Testing an order of result categories.&#x000A;  #&#x000A;  it { books.search('alan').should have_categories(['author'], ['title']) }&#x000A;  it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }&#x000A;&#x000A;end</code></pre>
+<p>It starts off like any RSpec file, by requiring <code>spec_helper</code>. Then we require the spec part of the picky client.</p>
+<p>What does it do? It provides us with the testing counterpart of the client&#8217;s <code>Picky::Client</code>, which is <code>Picky::TestClient</code>.</p>
+<p>The test client works almost exactly like the real client, with the exception that the test client never sends <span class="caps">HTTP</span> requests, but uses your app&#8217;s Rack adapter. But more about that later.</p>
+<pre class="sh_ruby"><code>require 'spec_helper'&#x000A;require 'picky-client/spec'</code></pre>
+<p>Next, we set up the environment for the tests, i.e. get the indexes up and running.</p>
+<p><code>Indexes.index_for_tests</code> is a special index method that does not fork and runs silently (to not disturb the deadly test bugs that trawl the area).</p>
+<pre class="sh_ruby"><code>before(:all) do&#x000A;  Indexes.index_for_tests&#x000A;  Indexes.load_from_cache&#x000A;end</code></pre>
+<p><code>Indexes.load_from_cache</code> loads the generated index (caches) into memory (or just leaves them alone in Redis).</p>
+<p>Now we&#8217;re ready to do some testing!</p>
+<pre class="sh_ruby"><code>let(:books) { Picky::TestClient.new(PickySearch, :path =&gt; '/books') }</code></pre>
+<p>This sets up an accessor for your tests. You give the <code>TestClient</code> your Application&#8217;s constant, <code>PickySearch</code> here, and give it the path to send queries to, here <code>'/books'</code>. This only works if you <code>route</code> the path <code>'/books'</code> to a <code>Search</code> in your <code>application/app.rb</code>, of course.</p>
+<p>That&#8217;s it! Easy so far, right?</p>
+<pre class="sh_ruby"><code># Testing a count of results.&#x000A;#&#x000A;it { books.search('a s').total.should == 42 }</code></pre>
+<p><code>books</code> is the test client we defined with the <code>let</code>, above. As with the normal <code>Picky::Client</code>, it offers a <code>#search(text, options = {})</code> method.</p>
+<p>As return value, we get a hash with the result data. However, it has already been enriched through <code>Picky::Convenience</code>, which you might know if you&#8217;ve set up a client webapp already.</p>
+<p>This means we get a <code>#total</code> method, but also <code>#ids</code>, <code>#empty?</code>, <code>#allocations</code> and more which are less useful for testing.</p>
+<p>So to test the count of results, just use <code>#total</code> on the result of the search.</p>
+<p>To get a sorted array of the top ids, use &#8211; surprise &#8211; <code>#ids</code>.</p>
+<pre class="sh_ruby"><code># Testing a specific order of result ids.&#x000A;#&#x000A;it { books.search('alan').ids.should == [259, 307, 449] }</code></pre>
+<p>Also useful is to test if the category combination boosting/weights are correct. So if <code>author</code>, like in the first example below, should be boosted, use the <code>have_categories</code> matcher to check for that.</p>
+<pre class="sh_ruby"><code># Testing an order of result categories.&#x000A;#&#x000A;it { books.search('alan').should have_categories(['author'], ['title']) }&#x000A;it { books.search('alan p').should have_categories(['author', 'title'], ['title', 'author']) }</code></pre>
+<p>And that&#8217;s how you do integration testing in Picky.</p>
+<p>About time. Test away!</p>
+<h2>spec_helper and Rakefile</h2>
+<p>This is what your <code>spec/spec_helper.rb</code> would look like:</p>
+<pre class="sh_ruby"><code>ENV['PICKY_ENV'] = 'test'&#x000A;&#x000A;require 'picky'&#x000A;&#x000A;SearchLog = Loggers::Search.new ::Logger.new(STDOUT)&#x000A;puts "Using STDOUT as test log."&#x000A;&#x000A;Loader.load_application</code></pre>
+<p>In the <code>Rakefile</code> just add</p>
+<pre class="sh_ruby"><code>require 'rspec'&#x000A;require 'rspec/core/rake_task'&#x000A;&#x000A;RSpec::Core::RakeTask.new :spec</code></pre>
+<p>if you haven&#8217;t done this already.</p>
+<h2>Sidenote</h2>
+<p>Should any RSpec vs. Test::Unit controversy erupt around Picky… just kidding ;)</p>
+<h2>Conclusion</h2>
+<p>So we&#8217;ve seen</p>
+<ol>
+	<li>how you do integration testing in Picky</li>
+</ol>
+<p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/04/18/picky-environmental-considerations.html" title="Next post: Picky&amp;#58;&amp;nbsp;Environmental&amp;nbsp;Considerations">Picky&#58;&nbsp;Environmental&nbsp;Considerations</a>
       <h2>Share</h2>

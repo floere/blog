@@ -60,133 +60,133 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <p>In this post, I want you to peek over my shoulder as I go through some of my thoughts regarding Picky <span class="caps">ORM</span> integration.</p>
-      <h2>tl;dr</h2>
-      <p>Picky needs to be more accessible. How can we do this? We provide a simple <span class="caps">API</span> to be used in an ActiveModel which provides indexing and searching.</p>
-      <p>The result: A possible Picky <span class="caps">API</span>.</p>
-      <h2>Intro</h2>
-      <p>Now Picky is cool, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that &#8220;Generic Search Engine X&#8221; and &#8220;Hyperfast Russian Text Looker-Througher&#8221; (I write this lovingly) do not address. Etc etc, yadda yadda.</p>
-      <p>So what is the problem I&#8217;m addressing?</p>
-      <p>El problemo: Picky is not as <strong>accessible</strong> as other search engines.</p>
-      <p>What do I mean by accessible?</p>
-      <h2>Accessibility?</h2>
-      <p>One example for accessibility is <a href="http://karmi.cz">Karel Minařik&#8217;s</a> <a href="http://github.com/karmi/tire">Tire frontend</a> for ElasticSearch.</p>
-      <p>He did a great job in making it accessible through <a href="http://gist.github.com/951343">this script</a>. The gist installs Rails &amp; ElasticSearch in one fell swoop.
-      Let&#8217;s call this kind of accessibility the &#8220;Boom&#8221; factor.</p>
-      <p>Remember Steve Jobs? &#8220;Boom&#8221; this and &#8220;Boom&#8221; that. Magique!</p>
-      <p>Now, sure, Picky does have a <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> that does exactly that in 5 minutes, including an in-site manual. And to be fair, it <em>also</em> generates the views including a full search interface.</p>
-      <p>But still. The question remains: If I have an existing Rails app, how does this work? Can&#8217;t I just add Picky to my model and have a search?</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  pickify&#x000A;end</code></pre>
-      <p>and then</p>
-      <pre class="sh_ruby"><code>Person.indexes(:mi5, :cia, :kgb).offset(30).search 'bond, james'</code></pre>
-      <p>Not yet. I do have my reservations about this approach (see last post), but I see its appeal: People have a nice starting point to get into the finer details of searching (which is exactly what I want people to do – build better searches!).</p>
-      <p>In short: Picky needs to up its Boom Factor!</p>
-      <h2>The Boom Factor</h2>
-      <p>Between us and going to Boom Factor 11 stands a lot of code.</p>
-      <p>But before the code, a lot of thinking of how the code is supposed to look.</p>
-      <p>And before we can even begin to think, we should know what we want, and what information we need in the <span class="caps">API</span>.</p>
-      <h2>What do we want?</h2>
-      <p>A few things:</p>
-      <ul>
-      	<li>We want a nice <span class="caps">API</span>, which &#8220;helps the user find what he wants&#8221; (The sacred Picky design goal).</li>
-      	<li>We want it to interact nicely with <a href="http://yehudakatz.com/2010/01/10/activemodel-make-any-ruby-object-feel-like-activerecord/">ActiveModel</a>.</li>
-      	<li>We also want to make it easy in a controller to interact with the Picky Javascript interface.</li>
-      	<li>We&#8217;d also like to have the juiciest food the whole of France has to offer, but this is another story completely.</li>
-      </ul>
-      <p>That is what we want. What information do we need?</p>
-      <h2>What do we need?</h2>
-      <p>We need different things for searching and for indexing.</p>
-      <p>For searching, we need to be able to tell Picky:</p>
-      <ul>
-      	<li>how to prepare the search text.</li>
-      	<li>which indexes to search.</li>
-      	<li>the offset the results should have.</li>
-      	<li>what to search (obviously).</li>
-      </ul>
-      <p>Quite a bit of information!</p>
-      <p>For indexing, we need to be able to tell Picky:</p>
-      <ul>
-      	<li>how to prepare the text to be indexed.</li>
-      	<li>which index(es) to save it to.</li>
-      	<li>how to categorize the data.</li>
-      </ul>
-      <p>Not bad either…</p>
-      <p>Let&#8217;s try a few variations!</p>
-      <h2><span class="caps">API</span> Designs</h2>
-      <p>All this goes into a special gem called <code>picky-activemodel</code>.</p>
-      <p>Let&#8217;s say we start with the obvious, telling the class that it can be pickified.</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;end</code></pre>
-      <p>This is snappy and short. Maybe too short? Let&#8217;s take a look at indexing.</p>
-      <h3>Indexing</h3>
-      <p>Since Picky does not yet offer incremental indexing (most people don&#8217;t need it even if they think so), we&#8217;d have to provide an explicit <code>index!</code> method of sorts.</p>
-      <pre class="sh_ruby"><code>Person.index!</code></pre>
-      <p>But how would we define the indexing? In Picky you can define index text preparation for all indexes, for each index separately, even for each category separately.</p>
-      <p>Let&#8217;s see. (Using just split_on in the example)</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index.split_on /[\s]/&#x000A;&#x000A;  index do&#x000A;    split_on /\W/&#x000A;&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;      partial :substring, 1&#x000A;    end&#x000A;    category :name do&#x000A;      from :last_name&#x000A;    end&#x000A;  end&#x000A;&#x000A;  index :advertisements do&#x000A;    split_on /\s/&#x000A;    category :last_name do&#x000A;      qualifiers [:ad_name, :an]&#x000A;    end&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.index!</code></pre>
-      <p>That means that generally, index text is split on <code>/\s/</code>. Then, make an index with the implicitly pluralized name <code>"persons"</code>, which splits on <code>/\W/</code>. It indexes two categories, the first name which is specially split, and indexed for partial searching.</p>
-      <pre class="sh_ruby"><code>category :first_name do&#x000A;  split_on /\s/&#x000A;  partial :substring, 1&#x000A;end</code></pre>
-      <p>There&#8217;s an interesting question there: Should it be</p>
-      <pre class="sh_ruby"><code>partial :substring, 1</code></pre>
-      <p>using a weak symbol/number parameter based config or a more powerful</p>
-      <pre class="sh_ruby"><code>partial Picky::Partial::Substring.new(1)</code></pre>
-      <p>with the problem that we now need the Substring class defined not only in Picky, but also in the <code>picky-activemodel</code> gem.</p>
-      <p>Not too easy indeed. I&#8217;m not a big fan of String definitions. It&#8217;s just so incredibly weak.</p>
-      <p>Anyway, back to the example.</p>
-      <pre class="sh_ruby"><code>category :name do&#x000A;  from :last_name&#x000A;end</code></pre>
-      <p>What does this mean? It means that the data for category <code>:name</code> is taken from the attribute <code>:last_name</code>.</p>
-      <p>Further down, we have another index definition, <code>:advertisements</code>, which is explicitly named.</p>
-      <pre class="sh_ruby"><code>index :advertisements do</code></pre>
-      <p>Last but not least, we index explicitly using <pre class="sh_ruby"><code>Person.index!</code></pre></p>
-      <h3>Searching</h3>
-      <p>Searching is quite interesting.</p>
-      <p>On the one hand, we could have a fluent interface for which indexes to search, and with what parameters. Let&#8217;s look at it:</p>
-      <pre class="sh_ruby"><code>Person.search.indexes(:advertisements).offset(30).ids(20).with("Bond, James")</code></pre>
-      <p>to search with text &#8220;Bond, James&#8221; in index :advertisements, getting 20 result ids starting after the first 30.</p>
-      <p>The short form</p>
-      <pre class="sh_ruby"><code>Person.search("Bond, James")</code></pre>
-      <p>would be much more crisp, searching in the default, unnamed index with offset 0 and 20 result ids.</p>
-      <p>This would not return an array of ids, but the Picky result hash, which contains weights, categories, totals, search duration.</p>
-      <p>An alternative would be</p>
-      <pre class="sh_ruby"><code>Person.search do&#x000A;  indexes :advertisements&#x000A;  offset  30&#x000A;  ids     20&#x000A;  with    "Bond, James"&#x000A;end</code></pre>
-      <p>or any combination thereof. I&#8217;m inclined to allow both, or a combination of all.</p>
-      <p>This was the easy part. But where do I tell Picky how to prepare the search text? (How to split and so on?)</p>
-      <p>One idea is to put this in the model as well.</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  searching do&#x000A;    split_on /\s/&#x000A;  end&#x000A;&#x000A;end</code></pre>
-      <p>Sound good, but is the way we prepare the search text really model-specific?</p>
-      <p>Not really. Let&#8217;s try the search request:</p>
-      <pre class="sh_ruby"><code>Person.search("Bond, James") do&#x000A;  split_on /\s/&#x000A;end</code></pre>
-      <p>Not too sexy either. Perhaps also chained?</p>
-      <pre class="sh_ruby"><code>Person.search.split_on(/\s/).with("Bond, James")</code></pre>
-      <p>Could work but is too wordy.</p>
-      <p>How about we use a simple method?</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  def self.simple_splitting_search&#x000A;    @simple_splitting_search ||= search.split_on(/\s/).removes_characters(/[\&amp;\-]/)&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.simple_splitting_search.with("Bond, James")</code></pre>
-      <p>Now this would be Ruby-esque! Methods and stuff. Who needs scopes? :)</p>
-      <p>Also, the truly dynamic part would be exposed, the semi-fixed part would be summarized in the method name. Also one could decide to memoize it, as above.</p>
-      <p>I think we can work with something like that.</p>
-      <p>But the case where we just index a Person is the easy case. What if we also want to index its addresses, which are saved as a separate model, together in a single index?</p>
-      <h3>Indexing relations</h3>
-      <p>The best way in my humble opinion would be to define a very specific model, just for searching – to avoid cluttering the normal model, obey the <acronym title="Single Responsibility Principle"><span class="caps">SRP</span></acronym>.</p>
-      <p>But probably this is not what many people would want.</p>
-      <p>So let&#8217;s give it a go with the abovementioned addresses relation:</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index do&#x000A;    category :first_name do&#x000A;      # ...&#x000A;    end&#x000A;    category :street do&#x000A;      from { addresses.map(&amp;:street).join(" ") }&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
-      <p>Yep. I wouldn&#8217;t conjure up a complicated <span class="caps">DSL</span>, but use the trusty <code>from</code> method, and then just give it a block which is evaluated in each model instance, just taking the data the block returns.</p>
-      <h3>Possible problems</h3>
-      <p>The <code>search</code> and <code>index</code> methods could already have been installed by other libraries. So what could we do in this case?</p>
-      <p>The Picky way of doing things would be to play nice:</p>
-      <pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  picky.index do&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
-      <p>So if the <code>index</code>, <code>index!</code> or <code>search</code> method was already installed, it would just install a – presumably yet uninstalled method named <code>picky</code> that acts as a proxy.</p>
-      <p>Also in searching,</p>
-      <pre class="sh_ruby"><code>Person.picky.search("Bond, James")</code></pre>
-      <p>reads quite ok.</p>
-      <p>One idea might be to call it <code>picky_search</code>, but not too partial to that.</p>
-      <p>So yeah, hope you enjoyed looking over my shoulder. There&#8217;s a lot to do still, but this looks like a hopeful start. I&#8217;d give it a Boom Factor of 10 :)</p>
-      <p>If you find any problems or have ideas, let me know in the comments!</p>
-      <h2>Conclusion</h2>
-      <p>So we&#8217;ve seen</p>
-      <ol>
-      	<li>how you might go about designing an <span class="caps">API</span>.</li>
-      </ol>
-      <p>Hope you learnt something new!</p>
+<p>In this post, I want you to peek over my shoulder as I go through some of my thoughts regarding Picky <span class="caps">ORM</span> integration.</p>
+<h2>tl;dr</h2>
+<p>Picky needs to be more accessible. How can we do this? We provide a simple <span class="caps">API</span> to be used in an ActiveModel which provides indexing and searching.</p>
+<p>The result: A possible Picky <span class="caps">API</span>.</p>
+<h2>Intro</h2>
+<p>Now Picky is cool, sports quite a few features, and is written in Ruby so you can easily extend it. I also think it fills a feature gap that &#8220;Generic Search Engine X&#8221; and &#8220;Hyperfast Russian Text Looker-Througher&#8221; (I write this lovingly) do not address. Etc etc, yadda yadda.</p>
+<p>So what is the problem I&#8217;m addressing?</p>
+<p>El problemo: Picky is not as <strong>accessible</strong> as other search engines.</p>
+<p>What do I mean by accessible?</p>
+<h2>Accessibility?</h2>
+<p>One example for accessibility is <a href="http://karmi.cz">Karel Minařik&#8217;s</a> <a href="http://github.com/karmi/tire">Tire frontend</a> for ElasticSearch.</p>
+<p>He did a great job in making it accessible through <a href="http://gist.github.com/951343">this script</a>. The gist installs Rails &amp; ElasticSearch in one fell swoop.
+Let&#8217;s call this kind of accessibility the &#8220;Boom&#8221; factor.</p>
+<p>Remember Steve Jobs? &#8220;Boom&#8221; this and &#8220;Boom&#8221; that. Magique!</p>
+<p>Now, sure, Picky does have a <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> that does exactly that in 5 minutes, including an in-site manual. And to be fair, it <em>also</em> generates the views including a full search interface.</p>
+<p>But still. The question remains: If I have an existing Rails app, how does this work? Can&#8217;t I just add Picky to my model and have a search?</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  pickify&#x000A;end</code></pre>
+<p>and then</p>
+<pre class="sh_ruby"><code>Person.indexes(:mi5, :cia, :kgb).offset(30).search 'bond, james'</code></pre>
+<p>Not yet. I do have my reservations about this approach (see last post), but I see its appeal: People have a nice starting point to get into the finer details of searching (which is exactly what I want people to do – build better searches!).</p>
+<p>In short: Picky needs to up its Boom Factor!</p>
+<h2>The Boom Factor</h2>
+<p>Between us and going to Boom Factor 11 stands a lot of code.</p>
+<p>But before the code, a lot of thinking of how the code is supposed to look.</p>
+<p>And before we can even begin to think, we should know what we want, and what information we need in the <span class="caps">API</span>.</p>
+<h2>What do we want?</h2>
+<p>A few things:</p>
+<ul>
+	<li>We want a nice <span class="caps">API</span>, which &#8220;helps the user find what he wants&#8221; (The sacred Picky design goal).</li>
+	<li>We want it to interact nicely with <a href="http://yehudakatz.com/2010/01/10/activemodel-make-any-ruby-object-feel-like-activerecord/">ActiveModel</a>.</li>
+	<li>We also want to make it easy in a controller to interact with the Picky Javascript interface.</li>
+	<li>We&#8217;d also like to have the juiciest food the whole of France has to offer, but this is another story completely.</li>
+</ul>
+<p>That is what we want. What information do we need?</p>
+<h2>What do we need?</h2>
+<p>We need different things for searching and for indexing.</p>
+<p>For searching, we need to be able to tell Picky:</p>
+<ul>
+	<li>how to prepare the search text.</li>
+	<li>which indexes to search.</li>
+	<li>the offset the results should have.</li>
+	<li>what to search (obviously).</li>
+</ul>
+<p>Quite a bit of information!</p>
+<p>For indexing, we need to be able to tell Picky:</p>
+<ul>
+	<li>how to prepare the text to be indexed.</li>
+	<li>which index(es) to save it to.</li>
+	<li>how to categorize the data.</li>
+</ul>
+<p>Not bad either…</p>
+<p>Let&#8217;s try a few variations!</p>
+<h2><span class="caps">API</span> Designs</h2>
+<p>All this goes into a special gem called <code>picky-activemodel</code>.</p>
+<p>Let&#8217;s say we start with the obvious, telling the class that it can be pickified.</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;end</code></pre>
+<p>This is snappy and short. Maybe too short? Let&#8217;s take a look at indexing.</p>
+<h3>Indexing</h3>
+<p>Since Picky does not yet offer incremental indexing (most people don&#8217;t need it even if they think so), we&#8217;d have to provide an explicit <code>index!</code> method of sorts.</p>
+<pre class="sh_ruby"><code>Person.index!</code></pre>
+<p>But how would we define the indexing? In Picky you can define index text preparation for all indexes, for each index separately, even for each category separately.</p>
+<p>Let&#8217;s see. (Using just split_on in the example)</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index.split_on /[\s]/&#x000A;&#x000A;  index do&#x000A;    split_on /\W/&#x000A;&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;      partial :substring, 1&#x000A;    end&#x000A;    category :name do&#x000A;      from :last_name&#x000A;    end&#x000A;  end&#x000A;&#x000A;  index :advertisements do&#x000A;    split_on /\s/&#x000A;    category :last_name do&#x000A;      qualifiers [:ad_name, :an]&#x000A;    end&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.index!</code></pre>
+<p>That means that generally, index text is split on <code>/\s/</code>. Then, make an index with the implicitly pluralized name <code>"persons"</code>, which splits on <code>/\W/</code>. It indexes two categories, the first name which is specially split, and indexed for partial searching.</p>
+<pre class="sh_ruby"><code>category :first_name do&#x000A;  split_on /\s/&#x000A;  partial :substring, 1&#x000A;end</code></pre>
+<p>There&#8217;s an interesting question there: Should it be</p>
+<pre class="sh_ruby"><code>partial :substring, 1</code></pre>
+<p>using a weak symbol/number parameter based config or a more powerful</p>
+<pre class="sh_ruby"><code>partial Picky::Partial::Substring.new(1)</code></pre>
+<p>with the problem that we now need the Substring class defined not only in Picky, but also in the <code>picky-activemodel</code> gem.</p>
+<p>Not too easy indeed. I&#8217;m not a big fan of String definitions. It&#8217;s just so incredibly weak.</p>
+<p>Anyway, back to the example.</p>
+<pre class="sh_ruby"><code>category :name do&#x000A;  from :last_name&#x000A;end</code></pre>
+<p>What does this mean? It means that the data for category <code>:name</code> is taken from the attribute <code>:last_name</code>.</p>
+<p>Further down, we have another index definition, <code>:advertisements</code>, which is explicitly named.</p>
+<pre class="sh_ruby"><code>index :advertisements do</code></pre>
+<p>Last but not least, we index explicitly using <pre class="sh_ruby"><code>Person.index!</code></pre></p>
+<h3>Searching</h3>
+<p>Searching is quite interesting.</p>
+<p>On the one hand, we could have a fluent interface for which indexes to search, and with what parameters. Let&#8217;s look at it:</p>
+<pre class="sh_ruby"><code>Person.search.indexes(:advertisements).offset(30).ids(20).with("Bond, James")</code></pre>
+<p>to search with text &#8220;Bond, James&#8221; in index :advertisements, getting 20 result ids starting after the first 30.</p>
+<p>The short form</p>
+<pre class="sh_ruby"><code>Person.search("Bond, James")</code></pre>
+<p>would be much more crisp, searching in the default, unnamed index with offset 0 and 20 result ids.</p>
+<p>This would not return an array of ids, but the Picky result hash, which contains weights, categories, totals, search duration.</p>
+<p>An alternative would be</p>
+<pre class="sh_ruby"><code>Person.search do&#x000A;  indexes :advertisements&#x000A;  offset  30&#x000A;  ids     20&#x000A;  with    "Bond, James"&#x000A;end</code></pre>
+<p>or any combination thereof. I&#8217;m inclined to allow both, or a combination of all.</p>
+<p>This was the easy part. But where do I tell Picky how to prepare the search text? (How to split and so on?)</p>
+<p>One idea is to put this in the model as well.</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  searching do&#x000A;    split_on /\s/&#x000A;  end&#x000A;&#x000A;end</code></pre>
+<p>Sound good, but is the way we prepare the search text really model-specific?</p>
+<p>Not really. Let&#8217;s try the search request:</p>
+<pre class="sh_ruby"><code>Person.search("Bond, James") do&#x000A;  split_on /\s/&#x000A;end</code></pre>
+<p>Not too sexy either. Perhaps also chained?</p>
+<pre class="sh_ruby"><code>Person.search.split_on(/\s/).with("Bond, James")</code></pre>
+<p>Could work but is too wordy.</p>
+<p>How about we use a simple method?</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  def self.simple_splitting_search&#x000A;    @simple_splitting_search ||= search.split_on(/\s/).removes_characters(/[\&amp;\-]/)&#x000A;  end&#x000A;end&#x000A;&#x000A;Person.simple_splitting_search.with("Bond, James")</code></pre>
+<p>Now this would be Ruby-esque! Methods and stuff. Who needs scopes? :)</p>
+<p>Also, the truly dynamic part would be exposed, the semi-fixed part would be summarized in the method name. Also one could decide to memoize it, as above.</p>
+<p>I think we can work with something like that.</p>
+<p>But the case where we just index a Person is the easy case. What if we also want to index its addresses, which are saved as a separate model, together in a single index?</p>
+<h3>Indexing relations</h3>
+<p>The best way in my humble opinion would be to define a very specific model, just for searching – to avoid cluttering the normal model, obey the <acronym title="Single Responsibility Principle"><span class="caps">SRP</span></acronym>.</p>
+<p>But probably this is not what many people would want.</p>
+<p>So let&#8217;s give it a go with the abovementioned addresses relation:</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  index do&#x000A;    category :first_name do&#x000A;      # ...&#x000A;    end&#x000A;    category :street do&#x000A;      from { addresses.map(&amp;:street).join(" ") }&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
+<p>Yep. I wouldn&#8217;t conjure up a complicated <span class="caps">DSL</span>, but use the trusty <code>from</code> method, and then just give it a block which is evaluated in each model instance, just taking the data the block returns.</p>
+<h3>Possible problems</h3>
+<p>The <code>search</code> and <code>index</code> methods could already have been installed by other libraries. So what could we do in this case?</p>
+<p>The Picky way of doing things would be to play nice:</p>
+<pre class="sh_ruby"><code>class Person&#x000A;  include Picky&#x000A;&#x000A;  picky.index do&#x000A;    category :first_name do&#x000A;      split_on /\s/&#x000A;    end&#x000A;  end&#x000A;&#x000A;end</code></pre>
+<p>So if the <code>index</code>, <code>index!</code> or <code>search</code> method was already installed, it would just install a – presumably yet uninstalled method named <code>picky</code> that acts as a proxy.</p>
+<p>Also in searching,</p>
+<pre class="sh_ruby"><code>Person.picky.search("Bond, James")</code></pre>
+<p>reads quite ok.</p>
+<p>One idea might be to call it <code>picky_search</code>, but not too partial to that.</p>
+<p>So yeah, hope you enjoyed looking over my shoulder. There&#8217;s a lot to do still, but this looks like a hopeful start. I&#8217;d give it a Boom Factor of 10 :)</p>
+<p>If you find any problems or have ideas, let me know in the comments!</p>
+<h2>Conclusion</h2>
+<p>So we&#8217;ve seen</p>
+<ol>
+	<li>how you might go about designing an <span class="caps">API</span>.</li>
+</ol>
+<p>Hope you learnt something new!</p>
       Next
       <a href="/blog/2011/06/15/james.html" title="Next post: James">James</a>
       <h2>Share</h2>

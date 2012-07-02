@@ -60,59 +60,59 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <p>This is about running a Picky search on a single server on Heroku.</p>
-      <p>Skipping options:</p>
-      <ul>
-      	<li><a href="#heroku">Skip the Intro, but what is Heroku?</a>.</li>
-      	<li><a href="#singleserverapp">Skip the Intro, I know what Heroku is.</a>.</li>
-      </ul>
-      <h2>Intro</h2>
-      <p>Last night you got together with your friends. Beer flowed freely, smoothly moved over to wine, Caipirinhas. The sizzling of meat on a grill. Chicken hearts. Entrecôtes.</p>
-      <p>Then, pure Vodka, shots, maybe even as far as <a href="http://www.drinksmixer.com/drink1026.html">Baltimore Zoos</a>. Women. Making out.</p>
-      <p>The night drags on. One of your friends mistakes the kitchen for a toilet. Dancing on tables. The police visits multiple times. Sausages.</p>
-      <p>The policemen decide to join you. Vomit. Promises. Friendships.</p>
-      <p>And dares. You are the computer dude of the group.</p>
-      <p>&#8220;Make a new Google in a day!&#8221; someone shouts. &#8220;I dare you!&#8221;</p>
-      <p>That&#8217;s the last thing you remember as you dive nose first into an Aperol Spritz.</p>
-      <p>Make that &#8220;eye first&#8221;.</p>
-      <h3>The next day</h3>
-      <p>You wake up with a grandmother of a hangover. A lingering smell of meat and vomit, caked on your lips. Ketchup stains. Who is that girl on the floor?</p>
-      <p>Blearily, you wander to your computer, take a look at your emails, a swig of water, a munch on raw bacon. Shit.</p>
-      <p>There is it. The email you&#8217;ve been dreading. A dare and promise forged in blood: &#8220;Make a drinks search engine. You have until midnight.&#8221;</p>
-      <h3>Picky</h3>
-      <p>You barely remember a blog post by a crazy dude called Florian Hanke, always touting a search engine&#8217;s simplicity and usability, on using it with Heroku. Man, that guy is crazy. Fucking foaming at the mouth.</p>
-      <p>What was it called again? &#8220;Pinky&#8221;? What a silly name.</p>
-      <p>Maybe he&#8217;s right, though. Let&#8217;s see.</p>
-      <p>You try to navigate Google, but the search bar keeps moving. It&#8217;s like being seasick, but on the interwebs. Man, totally netsick. Heh, netsick. <strong>snort</strong></p>
-      <p>There it is. Found it. Man, thank goodness it&#8217;s rather short.</p>
-      <h2 id="heroku">Heroku</h2>
-      <p>This use case uses Heroku.</p>
-      <p><a href="http://www.heroku.com/">Heroku</a> is a great place to host your small search engine. They are very generous in offering free servers for your projects.</p>
-      <p>The original <a href="http://gemsearch.heroku.com/">GemSearch</a> was running on two servers. One for running the web app, one for running the actual Picky server. Read more about it <a href="http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html">here</a>.</p>
-      <p>This was problematic, since the data for the index needed to be on both servers. Once as an index, and once for rendering, in the web app.</p>
-      <p>Another thing was that free Heroku servers are started up on demand. This meant waiting a little for the web app, then waiting for the search server. Many people were wondering why their search was taking so long.</p>
-      <p>We can speed this up by moving the web app and the search server into a single Heroku server.</p>
-      <h2 id="singleserverapp">Single Server App</h2>
-      <p>Picky 3.0+ offers the possibility of generating single server apps (aka &#8220;all in one&#8221;). Just type:</p>
-      <pre class="sh_bash"><code>$ picky generate all_in_one drinks</code></pre>
-      <p>to generate such an app in the <code>drinks</code> directory. This app combines the Picky server with the web app.</p>
-      <p>The <code>app.rb</code> represents the web app and the search server in one (the separate areas are clearly marked). The <code>images</code>, <code>javascripts</code>, <code>stylesheets</code> and <code>views</code> directories belong to the web app. And the <code>index</code> directory is from the server.</p>
-      <p>With this in mind, adapt it to your needs.</p>
-      <h2>Herokuizing this Single Server App</h2>
-      <p>Four simple steps:</p>
-      <ol>
-      	<li>First, make it a Heroku app: <a href="http://devcenter.heroku.com/articles/quickstart">http://devcenter.heroku.com/articles/quickstart</a></li>
-      	<li>Index your data: <pre class="sh_bash"><code>$ PICKY_ENV=production bundle exec rake index</code></pre></li>
-      	<li>Then, check the production index into git. The app loads the index from there.</li>
-      	<li>Finally, let it loose: <pre class="sh_bash"><code>git push heroku master</code></pre></li>
-      </ol>
-      <p>One example of this is the <a href="http://gemsearch.heroku.com/">Gem search</a>. The code is <a href="https://github.com/floere/gemsearch">here</a>.</p>
-      <h2>Outro</h2>
-      <p>After two hours you&#8217;re done. A bit of sun next to the lake does you good. Over the iPhone you look up that crazy drink you&#8217;re having, <a href="http://www.drinksmixer.com/drink6373.html">The Ricky Martini</a>. Man, where do they find these bartenders?</p>
-      <p>Smooth. It works. Rose&#8217;s Lime Juice? It&#8217;s good, though.</p>
-      <p>Your end of the dare is met.</p>
-      <p>With a broad grin you type your friend&#8217;s email address. Your dare. His turn.</p>
-      <p>You&#8217;re wondering though where he&#8217;s going to get a <a href="http://en.wikipedia.org/wiki/Ballet_tutu">Tutu</a> and a <a href="http://en.wikipedia.org/wiki/Kick_scooter">Scooter</a> on a Sunday…</p>
+<p>This is about running a Picky search on a single server on Heroku.</p>
+<p>Skipping options:</p>
+<ul>
+	<li><a href="#heroku">Skip the Intro, but what is Heroku?</a>.</li>
+	<li><a href="#singleserverapp">Skip the Intro, I know what Heroku is.</a>.</li>
+</ul>
+<h2>Intro</h2>
+<p>Last night you got together with your friends. Beer flowed freely, smoothly moved over to wine, Caipirinhas. The sizzling of meat on a grill. Chicken hearts. Entrecôtes.</p>
+<p>Then, pure Vodka, shots, maybe even as far as <a href="http://www.drinksmixer.com/drink1026.html">Baltimore Zoos</a>. Women. Making out.</p>
+<p>The night drags on. One of your friends mistakes the kitchen for a toilet. Dancing on tables. The police visits multiple times. Sausages.</p>
+<p>The policemen decide to join you. Vomit. Promises. Friendships.</p>
+<p>And dares. You are the computer dude of the group.</p>
+<p>&#8220;Make a new Google in a day!&#8221; someone shouts. &#8220;I dare you!&#8221;</p>
+<p>That&#8217;s the last thing you remember as you dive nose first into an Aperol Spritz.</p>
+<p>Make that &#8220;eye first&#8221;.</p>
+<h3>The next day</h3>
+<p>You wake up with a grandmother of a hangover. A lingering smell of meat and vomit, caked on your lips. Ketchup stains. Who is that girl on the floor?</p>
+<p>Blearily, you wander to your computer, take a look at your emails, a swig of water, a munch on raw bacon. Shit.</p>
+<p>There is it. The email you&#8217;ve been dreading. A dare and promise forged in blood: &#8220;Make a drinks search engine. You have until midnight.&#8221;</p>
+<h3>Picky</h3>
+<p>You barely remember a blog post by a crazy dude called Florian Hanke, always touting a search engine&#8217;s simplicity and usability, on using it with Heroku. Man, that guy is crazy. Fucking foaming at the mouth.</p>
+<p>What was it called again? &#8220;Pinky&#8221;? What a silly name.</p>
+<p>Maybe he&#8217;s right, though. Let&#8217;s see.</p>
+<p>You try to navigate Google, but the search bar keeps moving. It&#8217;s like being seasick, but on the interwebs. Man, totally netsick. Heh, netsick. <strong>snort</strong></p>
+<p>There it is. Found it. Man, thank goodness it&#8217;s rather short.</p>
+<h2 id="heroku">Heroku</h2>
+<p>This use case uses Heroku.</p>
+<p><a href="http://www.heroku.com/">Heroku</a> is a great place to host your small search engine. They are very generous in offering free servers for your projects.</p>
+<p>The original <a href="http://gemsearch.heroku.com/">GemSearch</a> was running on two servers. One for running the web app, one for running the actual Picky server. Read more about it <a href="http://florianhanke.com/blog/2011/02/13/a-better-rubygems-search.html">here</a>.</p>
+<p>This was problematic, since the data for the index needed to be on both servers. Once as an index, and once for rendering, in the web app.</p>
+<p>Another thing was that free Heroku servers are started up on demand. This meant waiting a little for the web app, then waiting for the search server. Many people were wondering why their search was taking so long.</p>
+<p>We can speed this up by moving the web app and the search server into a single Heroku server.</p>
+<h2 id="singleserverapp">Single Server App</h2>
+<p>Picky 3.0+ offers the possibility of generating single server apps (aka &#8220;all in one&#8221;). Just type:</p>
+<pre class="sh_bash"><code>$ picky generate all_in_one drinks</code></pre>
+<p>to generate such an app in the <code>drinks</code> directory. This app combines the Picky server with the web app.</p>
+<p>The <code>app.rb</code> represents the web app and the search server in one (the separate areas are clearly marked). The <code>images</code>, <code>javascripts</code>, <code>stylesheets</code> and <code>views</code> directories belong to the web app. And the <code>index</code> directory is from the server.</p>
+<p>With this in mind, adapt it to your needs.</p>
+<h2>Herokuizing this Single Server App</h2>
+<p>Four simple steps:</p>
+<ol>
+	<li>First, make it a Heroku app: <a href="http://devcenter.heroku.com/articles/quickstart">http://devcenter.heroku.com/articles/quickstart</a></li>
+	<li>Index your data: <pre class="sh_bash"><code>$ PICKY_ENV=production bundle exec rake index</code></pre></li>
+	<li>Then, check the production index into git. The app loads the index from there.</li>
+	<li>Finally, let it loose: <pre class="sh_bash"><code>git push heroku master</code></pre></li>
+</ol>
+<p>One example of this is the <a href="http://gemsearch.heroku.com/">Gem search</a>. The code is <a href="https://github.com/floere/gemsearch">here</a>.</p>
+<h2>Outro</h2>
+<p>After two hours you&#8217;re done. A bit of sun next to the lake does you good. Over the iPhone you look up that crazy drink you&#8217;re having, <a href="http://www.drinksmixer.com/drink6373.html">The Ricky Martini</a>. Man, where do they find these bartenders?</p>
+<p>Smooth. It works. Rose&#8217;s Lime Juice? It&#8217;s good, though.</p>
+<p>Your end of the dare is met.</p>
+<p>With a broad grin you type your friend&#8217;s email address. Your dare. His turn.</p>
+<p>You&#8217;re wondering though where he&#8217;s going to get a <a href="http://en.wikipedia.org/wiki/Ballet_tutu">Tutu</a> and a <a href="http://en.wikipedia.org/wiki/Kick_scooter">Scooter</a> on a Sunday…</p>
       Next
       <a href="/blog/2011/10/23/designing-realtime-indexes.html" title="Next post: Designing&amp;nbsp;Realtime&amp;nbsp;Indexes">Designing&nbsp;Realtime&nbsp;Indexes</a>
       <h2>Share</h2>

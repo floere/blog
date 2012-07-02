@@ -60,121 +60,121 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>A few examples of how to inject your own functionality into <a href="http://florianhanke.com/picky/">Picky</a>.</p>
-      <p>We&#8217;re going to look at a simple example and how to customize it with Picky 4.0!</p>
-      <h2>The Copy &amp; Paste Example</h2>
-      <p>The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a <code>Search</code> object on the index to search on it.</p>
-      <p>Go ahead, copy it into TextMate 2 Alpha or similar!</p>
-      <pre class="sh_ruby"><code>require 'picky'&#x000A;&#x000A;Person = Struct.new :id, :first, :last&#x000A;&#x000A;data = Picky::Index.new :people do&#x000A;  category :first&#x000A;  category :last&#x000A;end&#x000A;&#x000A;data.replace Person.new(1, 'Donald', 'Knuth')&#x000A;data.replace Person.new(2, 'Niklaus', 'Wirth')&#x000A;data.replace Person.new(3, 'Donald', 'Worth')&#x000A;data.replace Person.new(4, 'Peter', 'Niklaus')&#x000A;&#x000A;people = Picky::Search.new data&#x000A;&#x000A;results = people.search 'donald'&#x000A;&#x000A;p results.ids&#x000A;p results.allocations</code></pre>
-      <p>This returns ids <code>[3, 1]</code> and
-      the allocations <code>[ [:people, 0.0, 2, [ [:first, "donald", "donald"] ], [3, 1]] ]</code>. That might look a little funny, so let me explain: <code>:people</code> is the index name where it was found. <code>0.0</code> is the total weight. <code>2</code> is the total number of ids in this &#8220;allocation&#8221; (combination of categories).
-      <code>[:first, "donald", "donald"]</code> is the category the query word was found in, together with the token and the original.</p>
-      <p>All clear?</p>
-      <p>Try searching for &#8220;Niklaus&#8221;:</p>
-      <pre class="sh_ruby"><code>results = people.search 'niklaus'</code></pre>
-      <p>You should find ids <code>[2, 4]</code> and two allocations now, first in the first name, then in the last name.</p>
-      <p>What if you want to find the last name first? We add some weight to it!</p>
-      <h3>Adding weight</h3>
-      <p>By default, Picky already weighs the categories with a logarithmic weight. That is, the more a token occurs in a category, the &#8220;heavier&#8221; it is.</p>
-      <p>So this:</p>
-      <pre class="sh_ruby"><code>category :last</code></pre>
-      <p>is actually</p>
-      <pre class="sh_ruby"><code>category :last, weight: Weights::Logarithmic.new</code></pre>
-      <p>However, for &#8220;Niklaus&#8221;, that resolves to a weight of 0.0.</p>
-      <p>So let&#8217;s add our own weight object. It just needs to respond to <code>#weight_for(amount_of_ids)</code> and return a float.</p>
-      <p>We ignore the amount and return a flat 12.3. Copy this in your example:</p>
-      <pre class="sh_ruby"><code>Weight = Class.new do&#x000A;  def weight_for amount&#x000A;    12.3&#x000A;  end&#x000A;end</code></pre>
-      <p>and replace</p>
-      <pre class="sh_ruby"><code>category :last, weight: Weight.new</code></pre>
-      <p>Now the last name comes first, with a weight of 12.3, not surprisingly.</p>
-      <pre class="sh_ruby"><code>[[:people, 12.3, 1, [[:last, "niklaus", "niklaus"]], [4]], [:people, 0.0, 1, [[:first, "niklaus", "niklaus"]], [2]]]</code></pre>
-      <p>Picky provides a few weights itself:</p>
-      <ul>
-      	<li><code>Picky::Weights::Logarithmic.new</code> The default.</li>
-      	<li><code>Picky::Weights::Constant.new</code> (with 0.0) or <code>Picky::Weights::Constant.new(1.23)</code> (with 1.23)</li>
-      	<li><code>Picky::Weights::Dynamic.new { |str_or_sym| str_or_sym.size }</code></li>
-      </ul>
-      <p>What if we want &#8220;Wirth&#8221; and &#8220;Worth&#8221; be found at the same time?</p>
-      <h3>Adding similarity</h3>
-      <p>By default, Picky does not look for similar words.</p>
-      <p>This:</p>
-      <pre class="sh_ruby"><code>category :last</code></pre>
-      <p>is actually</p>
-      <pre class="sh_ruby"><code>category :last, similarity: Similarity::None.new</code></pre>
-      <p>Now, look for &#8220;warth~&#8221; (the ~ tells Picky to look for similar words):</p>
-      <pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
-      <p>You found nothing, right?</p>
-      <p>Picky only looks for similar words if the category enables it!</p>
-      <p>Let&#8217;s write a similarity such that both will be found. Copy this in your example:</p>
-      <pre class="sh_ruby"><code>Similarity = Class.new do&#x000A;  def encode text&#x000A;    text.gsub /[aeiou]/, ''&#x000A;  end&#x000A;  def prioritize ary, encoded&#x000A;&#x000A;  end&#x000A;end</code></pre>
-      <p>We encode a text such that its vowels are removed. This will make &#8220;wirth&#8221; and &#8220;worth&#8221; resolve both to &#8220;wrth&#8221;, and that makes them similar.
-      (The <code>prioritize</code> method allows you to sort and trim the similars list)</p>
-      <p>and replace</p>
-      <pre class="sh_ruby"><code>category :last, similarity: Similarity.new</code></pre>
-      <p>Again, search for &#8220;warth~&#8221;.</p>
-      <pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
-      <p>This time you found both, right?</p>
-      <p>Picky offers <code>Similarity::Soundex.new(amount_of_similar)</code>, <code>Similarity::Metaphone.new(amount_of_similar)</code> and <code>Similarity::DoubleMetaphone.new(amount_of_similar)</code>. But rolling your own is easy, as you have seen.</p>
-      <h3>Adding partial searching</h3>
-      <p>Can you find Donald Knuth by entering &#8220;Donal&#8221;?</p>
-      <pre class="sh_ruby"><code>results = people.search 'donal'</code></pre>
-      <p>You can. But why?</p>
-      <p>The word &#8220;donal&#8221; finds something because this:</p>
-      <pre class="sh_ruby"><code>category :first</code></pre>
-      <p>is actually</p>
-      <pre class="sh_ruby"><code>category :first, partial: Partial::Postfix.new(from: -3)</code></pre>
-      <p>That means it finds &#8220;dona&#8221;, &#8220;donal&#8221;, &#8220;donald&#8221;. Try them all!</p>
-      <p>Does it find &#8220;don&#8221;? Try it:</p>
-      <pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
-      <p>No, it doesn&#8217;t! We could use <code>Partial::Postfix.new(from: -4)</code> to include this case, but let&#8217;s write our own :)</p>
-      <pre class="sh_ruby"><code>Partial = Class.new do&#x000A;  def each_partial text&#x000A;    text = text.dup&#x000A;    (text.size - 1).times do&#x000A;      yield text.chop!&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
-      <p>and replace</p>
-      <pre class="sh_ruby"><code>category :first, partial: Partial.new</code></pre>
-      <p>Try again:</p>
-      <pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
-      <p>Now we find Donald. You can even do this with our partial code:</p>
-      <pre class="sh_ruby"><code>results = people.search 'd'</code></pre>
-      <p>We still find him.</p>
-      <p>Now, Picky already offers a few partial behaviours:</p>
-      <ul>
-      	<li><code>Partial::None.new</code> (Do not search for a partial)</li>
-      	<li><code>Partial::Postfix.new(from: position)</code></li>
-      	<li><code>Partial::Substring.new(from: position, to: position)</code></li>
-      	<li><code>Partial::Infix.new(min: size, max: size)</code></li>
-      </ul>
-      <p>One important note: Picky always searches for the last token in the partial index, even without the asterisk next to the word. If it&#8217;s not the last word, you need an asterisk: &#8220;Don* Knuth&#8221;.</p>
-      <h3>Boosting</h3>
-      <p>To move an allocation up in the ranking, we used weights.</p>
-      <p>Picky knows a trick that almost no search engine knows. It can <strong>boost combinations</strong>!</p>
-      <p>Look for:</p>
-      <pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
-      <p>Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
-      <pre class="sh_ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre></p>
-      <p>That&#8217;s pretty useful to know what was found where.</p>
-      <p>As people usually look for the first name, then the last name, we want to give this more boost.</p>
-      <p>Replace this:</p>
-      <pre class="sh_ruby"><code>people = Picky::Search.new data</code></pre>
-      <p>with this</p>
-      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  boost [:first, :last] =&gt; +3&#x000A;end</code></pre>
-      <p>Now try again:</p>
-      <pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
-      <p>A whole 3 points more! Try it the other way around:</p>
-      <pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
-      <p>We don&#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!</p>
-      <p>But how about we want to boost in a specific way?</p>
-      <h3>Custom Boosting</h3>
-      <p>Copy this into the example:</p>
-      <pre class="sh_ruby"><code>Boosts = Class.new do&#x000A;  def boost_for combinations&#x000A;    @map ||= {&#x000A;      [:first, :last] =&gt; +5&#x000A;    }&#x000A;    @map[combinations.map(&amp;:category_name)] || -20&#x000A;  end&#x000A;end</code></pre>
-      <p>(A combination is basically a tuple of category and token)</p>
-      <p>and replace:</p>
-      <pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  boost Boosts.new&#x000A;end</code></pre>
-      <p>Now try again:</p>
-      <pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
-      <p>A whole 5 points more! Try it the other way around:</p>
-      <pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
-      <p>A whopping -20, which would send this allocation back to the end of the list, was there more data.</p>
-      <h3>Conclusion</h3>
-      <p>I hope you&#8217;re going to try Picky in your next project.</p>
-      <p>See the next post for some fancy search options.</p>
+<p>We&#8217;re going to look at a simple example and how to customize it with Picky 4.0!</p>
+<h2>The Copy &amp; Paste Example</h2>
+<p>The example is simple. We have an index of 4 persons (you might recognize the two famous ones). Each person has a first and a last name. Then we use a <code>Search</code> object on the index to search on it.</p>
+<p>Go ahead, copy it into TextMate 2 Alpha or similar!</p>
+<pre class="sh_ruby"><code>require 'picky'&#x000A;&#x000A;Person = Struct.new :id, :first, :last&#x000A;&#x000A;data = Picky::Index.new :people do&#x000A;  category :first&#x000A;  category :last&#x000A;end&#x000A;&#x000A;data.replace Person.new(1, 'Donald', 'Knuth')&#x000A;data.replace Person.new(2, 'Niklaus', 'Wirth')&#x000A;data.replace Person.new(3, 'Donald', 'Worth')&#x000A;data.replace Person.new(4, 'Peter', 'Niklaus')&#x000A;&#x000A;people = Picky::Search.new data&#x000A;&#x000A;results = people.search 'donald'&#x000A;&#x000A;p results.ids&#x000A;p results.allocations</code></pre>
+<p>This returns ids <code>[3, 1]</code> and
+the allocations <code>[ [:people, 0.0, 2, [ [:first, "donald", "donald"] ], [3, 1]] ]</code>. That might look a little funny, so let me explain: <code>:people</code> is the index name where it was found. <code>0.0</code> is the total weight. <code>2</code> is the total number of ids in this &#8220;allocation&#8221; (combination of categories).
+<code>[:first, "donald", "donald"]</code> is the category the query word was found in, together with the token and the original.</p>
+<p>All clear?</p>
+<p>Try searching for &#8220;Niklaus&#8221;:</p>
+<pre class="sh_ruby"><code>results = people.search 'niklaus'</code></pre>
+<p>You should find ids <code>[2, 4]</code> and two allocations now, first in the first name, then in the last name.</p>
+<p>What if you want to find the last name first? We add some weight to it!</p>
+<h3>Adding weight</h3>
+<p>By default, Picky already weighs the categories with a logarithmic weight. That is, the more a token occurs in a category, the &#8220;heavier&#8221; it is.</p>
+<p>So this:</p>
+<pre class="sh_ruby"><code>category :last</code></pre>
+<p>is actually</p>
+<pre class="sh_ruby"><code>category :last, weight: Weights::Logarithmic.new</code></pre>
+<p>However, for &#8220;Niklaus&#8221;, that resolves to a weight of 0.0.</p>
+<p>So let&#8217;s add our own weight object. It just needs to respond to <code>#weight_for(amount_of_ids)</code> and return a float.</p>
+<p>We ignore the amount and return a flat 12.3. Copy this in your example:</p>
+<pre class="sh_ruby"><code>Weight = Class.new do&#x000A;  def weight_for amount&#x000A;    12.3&#x000A;  end&#x000A;end</code></pre>
+<p>and replace</p>
+<pre class="sh_ruby"><code>category :last, weight: Weight.new</code></pre>
+<p>Now the last name comes first, with a weight of 12.3, not surprisingly.</p>
+<pre class="sh_ruby"><code>[[:people, 12.3, 1, [[:last, "niklaus", "niklaus"]], [4]], [:people, 0.0, 1, [[:first, "niklaus", "niklaus"]], [2]]]</code></pre>
+<p>Picky provides a few weights itself:</p>
+<ul>
+	<li><code>Picky::Weights::Logarithmic.new</code> The default.</li>
+	<li><code>Picky::Weights::Constant.new</code> (with 0.0) or <code>Picky::Weights::Constant.new(1.23)</code> (with 1.23)</li>
+	<li><code>Picky::Weights::Dynamic.new { |str_or_sym| str_or_sym.size }</code></li>
+</ul>
+<p>What if we want &#8220;Wirth&#8221; and &#8220;Worth&#8221; be found at the same time?</p>
+<h3>Adding similarity</h3>
+<p>By default, Picky does not look for similar words.</p>
+<p>This:</p>
+<pre class="sh_ruby"><code>category :last</code></pre>
+<p>is actually</p>
+<pre class="sh_ruby"><code>category :last, similarity: Similarity::None.new</code></pre>
+<p>Now, look for &#8220;warth~&#8221; (the ~ tells Picky to look for similar words):</p>
+<pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
+<p>You found nothing, right?</p>
+<p>Picky only looks for similar words if the category enables it!</p>
+<p>Let&#8217;s write a similarity such that both will be found. Copy this in your example:</p>
+<pre class="sh_ruby"><code>Similarity = Class.new do&#x000A;  def encode text&#x000A;    text.gsub /[aeiou]/, ''&#x000A;  end&#x000A;  def prioritize ary, encoded&#x000A;&#x000A;  end&#x000A;end</code></pre>
+<p>We encode a text such that its vowels are removed. This will make &#8220;wirth&#8221; and &#8220;worth&#8221; resolve both to &#8220;wrth&#8221;, and that makes them similar.
+(The <code>prioritize</code> method allows you to sort and trim the similars list)</p>
+<p>and replace</p>
+<pre class="sh_ruby"><code>category :last, similarity: Similarity.new</code></pre>
+<p>Again, search for &#8220;warth~&#8221;.</p>
+<pre class="sh_ruby"><code>results = people.search 'warth~'</code></pre>
+<p>This time you found both, right?</p>
+<p>Picky offers <code>Similarity::Soundex.new(amount_of_similar)</code>, <code>Similarity::Metaphone.new(amount_of_similar)</code> and <code>Similarity::DoubleMetaphone.new(amount_of_similar)</code>. But rolling your own is easy, as you have seen.</p>
+<h3>Adding partial searching</h3>
+<p>Can you find Donald Knuth by entering &#8220;Donal&#8221;?</p>
+<pre class="sh_ruby"><code>results = people.search 'donal'</code></pre>
+<p>You can. But why?</p>
+<p>The word &#8220;donal&#8221; finds something because this:</p>
+<pre class="sh_ruby"><code>category :first</code></pre>
+<p>is actually</p>
+<pre class="sh_ruby"><code>category :first, partial: Partial::Postfix.new(from: -3)</code></pre>
+<p>That means it finds &#8220;dona&#8221;, &#8220;donal&#8221;, &#8220;donald&#8221;. Try them all!</p>
+<p>Does it find &#8220;don&#8221;? Try it:</p>
+<pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
+<p>No, it doesn&#8217;t! We could use <code>Partial::Postfix.new(from: -4)</code> to include this case, but let&#8217;s write our own :)</p>
+<pre class="sh_ruby"><code>Partial = Class.new do&#x000A;  def each_partial text&#x000A;    text = text.dup&#x000A;    (text.size - 1).times do&#x000A;      yield text.chop!&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
+<p>and replace</p>
+<pre class="sh_ruby"><code>category :first, partial: Partial.new</code></pre>
+<p>Try again:</p>
+<pre class="sh_ruby"><code>results = people.search 'don'</code></pre>
+<p>Now we find Donald. You can even do this with our partial code:</p>
+<pre class="sh_ruby"><code>results = people.search 'd'</code></pre>
+<p>We still find him.</p>
+<p>Now, Picky already offers a few partial behaviours:</p>
+<ul>
+	<li><code>Partial::None.new</code> (Do not search for a partial)</li>
+	<li><code>Partial::Postfix.new(from: position)</code></li>
+	<li><code>Partial::Substring.new(from: position, to: position)</code></li>
+	<li><code>Partial::Infix.new(min: size, max: size)</code></li>
+</ul>
+<p>One important note: Picky always searches for the last token in the partial index, even without the asterisk next to the word. If it&#8217;s not the last word, you need an asterisk: &#8220;Don* Knuth&#8221;.</p>
+<h3>Boosting</h3>
+<p>To move an allocation up in the ranking, we used weights.</p>
+<p>Picky knows a trick that almost no search engine knows. It can <strong>boost combinations</strong>!</p>
+<p>Look for:</p>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<p>Looking at the allocations, we see that Picky tells us that Donald was found in a first name, and Knuth in a last name:
+<pre class="sh_ruby"><code>[[:people, 0.693, 1, [[:first, "donald", "donald"], [:last, "knuth", "knuth"]], [1]]]</code></pre></p>
+<p>That&#8217;s pretty useful to know what was found where.</p>
+<p>As people usually look for the first name, then the last name, we want to give this more boost.</p>
+<p>Replace this:</p>
+<pre class="sh_ruby"><code>people = Picky::Search.new data</code></pre>
+<p>with this</p>
+<pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  boost [:first, :last] =&gt; +3&#x000A;end</code></pre>
+<p>Now try again:</p>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<p>A whole 3 points more! Try it the other way around:</p>
+<pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+<p>We don&#8217;t get the boost. This is incredibly useful: If you look at how people search and then support them this way, they will find relevant results even easier!</p>
+<p>But how about we want to boost in a specific way?</p>
+<h3>Custom Boosting</h3>
+<p>Copy this into the example:</p>
+<pre class="sh_ruby"><code>Boosts = Class.new do&#x000A;  def boost_for combinations&#x000A;    @map ||= {&#x000A;      [:first, :last] =&gt; +5&#x000A;    }&#x000A;    @map[combinations.map(&amp;:category_name)] || -20&#x000A;  end&#x000A;end</code></pre>
+<p>(A combination is basically a tuple of category and token)</p>
+<p>and replace:</p>
+<pre class="sh_ruby"><code>people = Picky::Search.new data do&#x000A;  boost Boosts.new&#x000A;end</code></pre>
+<p>Now try again:</p>
+<pre class="sh_ruby"><code>results = people.search 'Donald Knuth'</code></pre>
+<p>A whole 5 points more! Try it the other way around:</p>
+<pre class="sh_ruby"><code>results = people.search 'Knuth Donald'</code></pre>
+<p>A whopping -20, which would send this allocation back to the end of the list, was there more data.</p>
+<h3>Conclusion</h3>
+<p>I hope you&#8217;re going to try Picky in your next project.</p>
+<p>See the next post for some fancy search options.</p>
       Next
       <a href="/blog/2011/12/18/picky-search-options.html" title="Next post: Picky&amp;nbsp;Search&amp;nbsp;Options">Picky&nbsp;Search&nbsp;Options</a>
       <h2>Share</h2>

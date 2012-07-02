@@ -8,7 +8,7 @@
     <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
     <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
     <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
-    <title>Oh yeah, Amazon?</title>
+    <title>Picky&nbsp;Statistics&nbsp;Interface</title>
     <script type="text/javascript">
       //<![CDATA[
         var _gaq = _gaq || [];
@@ -51,35 +51,50 @@
     </ol>
     <div class="post">
       <h1>
-        Oh yeah, Amazon?
-        <a class="twitter-share-button" data-count="none" data-text="Oh yeah, Amazon?" data-url="http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+        Picky&nbsp;Statistics&nbsp;Interface
+        <a class="twitter-share-button" data-count="none" data-text="Picky&amp;nbsp;Statistics&amp;nbsp;Interface" data-url="http://florianhanke.com/blog/2012/07/02/picky-statistics-interface.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
       </h1>
       <div class="categories">
-        marketing
+        ruby / picky
       </div>
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
-      <p>From the latest Newsletter:</p>
-<p><code>Support for Session Stickiness in Elastic Load Balancing Amazon Elastic MapReduce Introduces Custom Cluster Configuration Option</code></p>
-<p>They also have Gurble Blurble Fickleness, introducing Jambawambing Lordle Figuconation Schnorptions.</p>
-<p>At least that&#8217;s what I hear when I read stuff like that.</p>
-      Next
-      <a href="/blog/2010/04/18/a-hole-in-the-wall.html" title="Next post: A hole in the wall">A hole in the wall</a>
+      <p>This is a post in the <a href="http://florianhanke.com/picky/index.html">Picky</a> series on its workings. If you haven&#8217;t tried it yet, do so in the <a href="http://florianhanke.com/picky/getting_started.html">Getting Started</a> section. It&#8217;s quick and painless :)</p>
+<p>This post is about a fun statistics interface I&#8217;ve been working on, including a video. Download 4.5.2+, and enter this in your preferred shell.</p>
+<pre class="sh_shell"><code>picky stats path/to/log/file.log</code></pre>
+<p>This will tell you this:</p>
+<pre class="sh_shell"><code>Logfile path/to/log/file.log found.&#x000A;Clam, Picky's friend, is looking at Picky's logfile&#x000A;path/to/log/file.log&#x000A;and showing results on port 4567.&#x000A;== Sinatra/1.3.2 has taken the stage on 4567 for development with backup from Thin&#x000A;&gt;&gt; Thin web server (v1.3.1 codename Triple Espresso)&#x000A;&gt;&gt; Maximum connections set to 1024&#x000A;&gt;&gt; Listening on 0.0.0.0:4567, CTRL+C to stop</code></pre>
+<p>Then, in another shell, enter</p>
+<pre class="sh_shell"><code>open localhost:4567</code></pre>
+<p>(on <span class="caps">OSX</span>) and have fun!.</p>
+<h2>Video Demo</h2>
+<p>See this short video (it&#8217;s best to full-screen it):</p>
+<p><iframe src="http://player.vimeo.com/video/45051903" width="600" height="387" frameborder="0"></iframe></p>
+<p>The interface uses this great JS lib: <a href="http://square.github.com/crossfilter/">http://square.github.com/crossfilter/</a>. Check it out :)</p>
+<h2>Interface Usage Ideas</h2>
+<p>Slice and dice your data:</p>
+<ol>
+	<li>What queries are slowest?</li>
+	<li>Are they suspiciously slow in the morning?</li>
+	<li>How many return more than 1 allocation?</li>
+	<li>Does more allocations also mean slower? Or more results?</li>
+</ol>
+<p>Etc.</p>
       <h2>Share</h2>
       <p>
-        <a class="twitter-share-button" data-count="none" data-text="Oh yeah, Amazon?" data-url="http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+        <a class="twitter-share-button" data-count="none" data-text="Picky&amp;nbsp;Statistics&amp;nbsp;Interface" data-url="http://florianhanke.com/blog/2012/07/02/picky-statistics-interface.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
       </p>
       <br />
       Previous
-      <a class="previous" href="../../../2010/04/13/ie-didnt-get-the-css3-memo-question-mark.html" title="Previous post: IE didn't get the CSS3 memo?">IE didn't get the CSS3 memo?</a>
+      <a class="previous" href="../../../2012/06/25/visual-programming-1.html" title="Previous post: Visual&amp;nbsp;Programming&amp;nbsp;1">Visual&nbsp;Programming&nbsp;1</a>
       <h2>Comments?</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         //<![CDATA[
           var disqus_shortname = 'florianhanke';
           var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
-          var disqus_identifier = '/2010/04/14/oh-yeah-amazon-question-mark';
-          var disqus_url = 'http://florianhanke.com/blog/2010/04/14/oh-yeah-amazon-question-mark.html';
+          var disqus_identifier = '/2012/07/02/picky-statistics-interface';
+          var disqus_url = 'http://florianhanke.com/blog/2012/07/02/picky-statistics-interface.html';
           
           /* * * DON'T EDIT BELOW THIS LINE * * */
           (function() {

@@ -60,30 +60,30 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <h2>Intro</h2>
-      <p>The picky generators, for example <code>picky generate server &lt;dirname&gt;</code> only generate web server examples, like the <a href="http://sinatrarb.com">Sinatra</a> server.</p>
-      <p>However, who tells you to always sing in the rain? Sometimes it is much more prudent to just use a <a href="http://segment7.net/projects/ruby/drb/introduction.html">DRb (Distributed Ruby) Server</a>.</p>
-      <p>How can we have one run our searches? Not much different than in the Sinatra server. Or the classic server.
-      (With the exception on how the access is defined. In the classic server, it&#8217;s <code>route</code>, in Sinatra it&#8217;s probably <code>get</code>, and here it&#8217;s starting the service)</p>
-      <h2>Server</h2>
-      <p>So, copy-and-paste away, into a file called <code>app.rb</code>:</p>
-      <pre class="sh_ruby"><code>require 'activesupport'&#x000A;require 'yajl'&#x000A;require 'picky'&#x000A;require 'drb/drb'&#x000A;&#x000A;# "Model".&#x000A;#&#x000A;class Item&#x000A;  attr_reader :id, :name&#x000A;  def initialize id, name&#x000A;    @id, @name = id, name&#x000A;  end&#x000A;end&#x000A;&#x000A;# Server.&#x000A;#&#x000A;class Server&#x000A;&#x000A;  items = [&#x000A;    Item.new(1, 'picky'),&#x000A;    Item.new(2, 'drb'),&#x000A;    Item.new(3, 'test'),&#x000A;  ]&#x000A;&#x000A;  drb_index = Picky::Index.new(:drb) do&#x000A;    source   items&#x000A;    category :name&#x000A;  end&#x000A;  drb_index.reindex&#x000A;&#x000A;  drb_search = Picky::Search.new drb_index&#x000A;&#x000A;  define_method :search do |*args|&#x000A;    drb_search.search(*args).to_json&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;DRb.start_service 'druby://localhost:8787', Server.new&#x000A;DRb.thread.join</code></pre>
-      <p>And that&#8217;s it for the server. Note that you don&#8217;t need to index right in the server. I only do that for your copy-paste convenience.</p>
-      <p>You could, for example, add a</p>
-      <pre class="sh_ruby"><code>Signal.trap('USR1') do&#x000A;  drb_index.reindex&#x000A;end</code></pre>
-      <p>to have the server index on receiving the <code>USR1</code> signal (<code>kill -USR1 &lt;pid&gt;</code>).</p>
-      <h2>Client</h2>
-      <p>The <code>client.rb</code> is much easier:</p>
-      <pre class="sh_ruby"><code>require 'drb/drb'&#x000A;&#x000A;search_server = DRbObject.new_with_uri 'druby://localhost:8787'&#x000A;1_000.times do&#x000A;  puts search_server.search 'test'&#x000A;end</code></pre>
-      <p>And that&#8217;s it.</p>
-      <h2>Running it</h2>
-      <p>Start the server</p>
-      <pre class="sh_bash"><code>$ ruby app.rb</code></pre>
-      <p>and in another Terminal window you enter</p>
-      <pre class="sh_bash"><code>$ ruby client.rb</code></pre>
-      <p>to see the queries fly.</p>
-      <p>On my MacBook Pro I get 1600 &#8220;requests&#8221; per second. An that is on a single core!</p>
-      <p>… perhaps it could even be faster using <a href="http://msgpack.org/">http://msgpack.org/</a>?</p>
+<h2>Intro</h2>
+<p>The picky generators, for example <code>picky generate server &lt;dirname&gt;</code> only generate web server examples, like the <a href="http://sinatrarb.com">Sinatra</a> server.</p>
+<p>However, who tells you to always sing in the rain? Sometimes it is much more prudent to just use a <a href="http://segment7.net/projects/ruby/drb/introduction.html">DRb (Distributed Ruby) Server</a>.</p>
+<p>How can we have one run our searches? Not much different than in the Sinatra server. Or the classic server.
+(With the exception on how the access is defined. In the classic server, it&#8217;s <code>route</code>, in Sinatra it&#8217;s probably <code>get</code>, and here it&#8217;s starting the service)</p>
+<h2>Server</h2>
+<p>So, copy-and-paste away, into a file called <code>app.rb</code>:</p>
+<pre class="sh_ruby"><code>require 'activesupport'&#x000A;require 'yajl'&#x000A;require 'picky'&#x000A;require 'drb/drb'&#x000A;&#x000A;# "Model".&#x000A;#&#x000A;class Item&#x000A;  attr_reader :id, :name&#x000A;  def initialize id, name&#x000A;    @id, @name = id, name&#x000A;  end&#x000A;end&#x000A;&#x000A;# Server.&#x000A;#&#x000A;class Server&#x000A;&#x000A;  items = [&#x000A;    Item.new(1, 'picky'),&#x000A;    Item.new(2, 'drb'),&#x000A;    Item.new(3, 'test'),&#x000A;  ]&#x000A;&#x000A;  drb_index = Picky::Index.new(:drb) do&#x000A;    source   items&#x000A;    category :name&#x000A;  end&#x000A;  drb_index.reindex&#x000A;&#x000A;  drb_search = Picky::Search.new drb_index&#x000A;&#x000A;  define_method :search do |*args|&#x000A;    drb_search.search(*args).to_json&#x000A;  end&#x000A;&#x000A;end&#x000A;&#x000A;DRb.start_service 'druby://localhost:8787', Server.new&#x000A;DRb.thread.join</code></pre>
+<p>And that&#8217;s it for the server. Note that you don&#8217;t need to index right in the server. I only do that for your copy-paste convenience.</p>
+<p>You could, for example, add a</p>
+<pre class="sh_ruby"><code>Signal.trap('USR1') do&#x000A;  drb_index.reindex&#x000A;end</code></pre>
+<p>to have the server index on receiving the <code>USR1</code> signal (<code>kill -USR1 &lt;pid&gt;</code>).</p>
+<h2>Client</h2>
+<p>The <code>client.rb</code> is much easier:</p>
+<pre class="sh_ruby"><code>require 'drb/drb'&#x000A;&#x000A;search_server = DRbObject.new_with_uri 'druby://localhost:8787'&#x000A;1_000.times do&#x000A;  puts search_server.search 'test'&#x000A;end</code></pre>
+<p>And that&#8217;s it.</p>
+<h2>Running it</h2>
+<p>Start the server</p>
+<pre class="sh_bash"><code>$ ruby app.rb</code></pre>
+<p>and in another Terminal window you enter</p>
+<pre class="sh_bash"><code>$ ruby client.rb</code></pre>
+<p>to see the queries fly.</p>
+<p>On my MacBook Pro I get 1600 &#8220;requests&#8221; per second. An that is on a single core!</p>
+<p>… perhaps it could even be faster using <a href="http://msgpack.org/">http://msgpack.org/</a>?</p>
       Next
       <a href="/blog/2011/09/04/a-quick-note-on-apis.html" title="Next post: A&amp;nbsp;quick&amp;nbsp;note&amp;nbsp;on&amp;nbsp;APIs">A&nbsp;quick&nbsp;note&nbsp;on&nbsp;APIs</a>
       <h2>Share</h2>

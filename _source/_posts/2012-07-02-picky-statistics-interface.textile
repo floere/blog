@@ -1,0 +1,48 @@
+---
+layout: post
+title: Picky&nbsp;Statistics&nbsp;Interface
+categories:
+  - ruby
+  - picky
+---
+This is a post in the "Picky":http://florianhanke.com/picky/index.html series on its workings. If you haven't tried it yet, do so in the "Getting Started":http://florianhanke.com/picky/getting_started.html section. It's quick and painless :)
+
+This post is about a fun statistics interface I've been working on, including a video. Download 4.5.2+, and enter this in your preferred shell.
+
+<pre class="sh_shell"><code>picky stats path/to/log/file.log</code></pre>
+
+This will tell you this:
+
+<pre class="sh_shell"><code>Logfile path/to/log/file.log found.
+Clam, Picky's friend, is looking at Picky's logfile
+path/to/log/file.log
+and showing results on port 4567.
+== Sinatra/1.3.2 has taken the stage on 4567 for development with backup from Thin
+>> Thin web server (v1.3.1 codename Triple Espresso)
+>> Maximum connections set to 1024
+>> Listening on 0.0.0.0:4567, CTRL+C to stop</code></pre>
+
+Then, in another shell, enter
+
+<pre class="sh_shell"><code>open localhost:4567</code></pre>
+
+(on OSX) and have fun!.
+
+h2. Video Demo
+
+See this short video (it's best to full-screen it):
+
+<iframe src="http://player.vimeo.com/video/45051903" width="600" height="387" frameborder="0"></iframe>
+
+The interface uses this great JS lib: "http://square.github.com/crossfilter/":http://square.github.com/crossfilter/. Check it out :)
+
+h2. Interface Usage Ideas
+
+Slice and dice your data:
+
+# What queries are slowest?
+# Are they suspiciously slow in the morning?
+# How many return more than 1 allocation?
+# Does more allocations also mean slower? Or more results?
+
+Etc.

@@ -60,35 +60,35 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>A quick blog post on a Picky tokenizer option.</p>
-      <h2>Intro / Problem</h2>
-      <p>On mobile devices it can be a bit annoying to enter special symbols, like <code>+</code>, or <code>&amp;</code>, and it would be easier to just enter <code>plus</code>, or <code>and</code>.</p>
-      <p>Or maybe there are a lot of abbreviations, like <code>abbrev</code>, or <code>e.g.</code>, but you&#8217;d still like to find the item when searching for <code>abbreviation</code>, or <code>example</code>.</p>
-      <p>Or maybe you&#8217;d like number <code>1</code> to be findable with <code>one</code>.</p>
-      <p>In the search engine domain, this is one part of <a href="https://en.wikipedia.org/wiki/Text_normalization">text normalization</a>, the examples being expanding abbreviations and converting numbers.</p>
-      <p>In Picky, this is done using the tokenizer option <code>normalizes_words</code>.</p>
-      <h2>Tokenizer option &#8220;normalizes_words&#8221;</h2>
-      <p>This option makes the tokenizer normalize words before indexing them.</p>
-      <p>The usage is very simple. Just pass a 2d array of regexps and replacement terms into the <code>normalizes_words</code> option, like so:</p>
-      <pre class="sh_ruby"><code>index = Picky::Index.new :normalized do&#x000A;  indexing normalizes_words: [&#x000A;    [/\+/, 'plus'], # + -&gt; plus&#x000A;    [/\&amp;/, 'and'], # &amp; -&gt; and&#x000A;    [/\w\//, 'with'], # w/ -&gt; with&#x000A;    [/abbr(ev)?/, 'abbreviation'], # abbr, abbrev -&gt; abbreviation&#x000A;    [/e\.g\./, 'example given'] # e.g. -&gt; example given (note that the . have to survive)&#x000A;  ]&#x000A;end</code></pre>
-      <p>Note that</p>
-      <ul>
-      	<li>stopwords</li>
-      	<li>case</li>
-      	<li>character removal</li>
-      	<li>character replacement</li>
-      </ul>
-      <p>are specifically handled in options</p>
-      <ul>
-      	<li><code>stopwords: /\b(word1|word2|...)\b/</code></li>
-      	<li><code>case_sensitive: true/false</code></li>
-      	<li><code>remove_characters: /[characters]/</code></li>
-      	<li><code>substitutes_characters_with: Picky::CharacterSubstituters::WestEuropean.new</code></li>
-      </ul>
-      <p>and should be handled there.</p>
-      <h2>Alternatives</h2>
-      <p>What if this doesn&#8217;t work for you?</p>
-      <p>No problemo! Picky is all Ruby, so feel free to either monkey patch, or probably better: Preprocess the data to your heart&#8217;s content.</p>
-      <p>Have fun!</p>
+<h2>Intro / Problem</h2>
+<p>On mobile devices it can be a bit annoying to enter special symbols, like <code>+</code>, or <code>&amp;</code>, and it would be easier to just enter <code>plus</code>, or <code>and</code>.</p>
+<p>Or maybe there are a lot of abbreviations, like <code>abbrev</code>, or <code>e.g.</code>, but you&#8217;d still like to find the item when searching for <code>abbreviation</code>, or <code>example</code>.</p>
+<p>Or maybe you&#8217;d like number <code>1</code> to be findable with <code>one</code>.</p>
+<p>In the search engine domain, this is one part of <a href="https://en.wikipedia.org/wiki/Text_normalization">text normalization</a>, the examples being expanding abbreviations and converting numbers.</p>
+<p>In Picky, this is done using the tokenizer option <code>normalizes_words</code>.</p>
+<h2>Tokenizer option &#8220;normalizes_words&#8221;</h2>
+<p>This option makes the tokenizer normalize words before indexing them.</p>
+<p>The usage is very simple. Just pass a 2d array of regexps and replacement terms into the <code>normalizes_words</code> option, like so:</p>
+<pre class="sh_ruby"><code>index = Picky::Index.new :normalized do&#x000A;  indexing normalizes_words: [&#x000A;    [/\+/, 'plus'], # + -&gt; plus&#x000A;    [/\&amp;/, 'and'], # &amp; -&gt; and&#x000A;    [/\w\//, 'with'], # w/ -&gt; with&#x000A;    [/abbr(ev)?/, 'abbreviation'], # abbr, abbrev -&gt; abbreviation&#x000A;    [/e\.g\./, 'example given'] # e.g. -&gt; example given (note that the . have to survive)&#x000A;  ]&#x000A;end</code></pre>
+<p>Note that</p>
+<ul>
+	<li>stopwords</li>
+	<li>case</li>
+	<li>character removal</li>
+	<li>character replacement</li>
+</ul>
+<p>are specifically handled in options</p>
+<ul>
+	<li><code>stopwords: /\b(word1|word2|...)\b/</code></li>
+	<li><code>case_sensitive: true/false</code></li>
+	<li><code>remove_characters: /[characters]/</code></li>
+	<li><code>substitutes_characters_with: Picky::CharacterSubstituters::WestEuropean.new</code></li>
+</ul>
+<p>and should be handled there.</p>
+<h2>Alternatives</h2>
+<p>What if this doesn&#8217;t work for you?</p>
+<p>No problemo! Picky is all Ruby, so feel free to either monkey patch, or probably better: Preprocess the data to your heart&#8217;s content.</p>
+<p>Have fun!</p>
       Next
       <a href="/blog/2012/03/20/guest-post-chris-corbyn.html" title="Next post: Guest&amp;nbsp;Post:&amp;nbsp;Chris&amp;nbsp;Corbyn&amp;nbsp;of&amp;nbsp;Flippa">Guest&nbsp;Post:&nbsp;Chris&nbsp;Corbyn&nbsp;of&nbsp;Flippa</a>
       <h2>Share</h2>

@@ -60,67 +60,67 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <h2>tl; dr</h2>
-      <p>This post is about engineers, our pride in information gathering and organizing, and how we often fail in information searching.</p>
-      <p>Also about different types of search engines.</p>
-      <h2>Engineering</h2>
-      <p>Imagine a structural engineer planning a bridge.</p>
-      <p>How do you think does he approach the problem? Does he just build a standard concrete/steel bridge?</p>
-      <p>Probably not. He analyzes the constraints put on it by various factors, monetary, environmental, political, and last but not least – time, and sets out to build the bridge that fits as many of these constraints as possible.</p>
-      <p>Similarly with software engineering: We analyze various options, plan, code, release. (In this magical dream world I am conjuring up. But bear with me.)</p>
-      <p>And most of the time, we do this well. An incredible number of blog posts, books etc. describe various options and tools in the software world that can be used as blueprints, tools, or inspiration to build our specific &#8220;bridges&#8221;.</p>
-      <h2>Information gathering and structuring</h2>
-      <p>When it is about collecting information, we are world masters.</p>
-      <p>There is an enormous wealth of information regarding how to structure data, which database/key-value-store/glorified-hash etc. to use, when, and how.</p>
-      <p>How to acquire users, how to aqcuire information from these users, also how to access this information through APIs and how to make information accessible and so on.</p>
-      <p>Tell me the size of your valley, the amount and color of cars expected, and I can provide you a set of blueprints in a nice price range.</p>
-      <p>This is great. But what happens when it is about making this information searchable? Not so great in my humble opinion.</p>
-      <h2>Information searching</h2>
-      <p>I&#8217;ve recently experienced a few cases where the analysis for which search engine to use went something like this:</p>
-      <ul>
-      	<li>&#8220;Oh, we&#8217;ve used it for project X, it will be great in project Y (totally different project).&#8221;</li>
-      	<li>&#8220;Just use the gem in ActiveRecord, and it takes care of everything.&#8221;</li>
-      	<li>&#8220;Search engine X is cool, Y recommended it on his blog yesterday!&#8221;</li>
-      </ul>
-      <p>While I appreciate the strict time constraints often involved in projects, the above reasons should not be used by an engineer worth his salt.</p>
-      <p>Yes, using search engine X will not end in disaster, and yes, it will return some results to the user.</p>
-      <p>But instead of building an elegant bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.</p>
-      <p>Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of its money on it.</p>
-      <p>What I am saying is: While you arrived through lots of reasoning why you use e.g. Redis over MongoDB, and can and will defend it if asked for your reasons – in information searching, this is often not the case.</p>
-      <p>Or can you tell me why you used search engine X in your last project?</p>
-      <p>I know that often the first step is information acquiring, and towards the end, project managers notice that they were so busy acquiring all this information, that they totally forgot to think about making this information properly searchable. Time constraints then trash sensible search engine selection.</p>
-      <p>There are other reasons as to why searching is neglected, but this is one I most often experienced.</p>
-      <h2>The resulting problem</h2>
-      <p>Often the end result of our careless choice is that the coders are quite happy, and the end users are relatively happy. But not a good happy, more of an accepting happy. Yes, we can search, and we should be grateful for it.</p>
-      <p>But are you really happy? Did you really put your engineering savvy into it to help your users advance?</p>
-      <p>Not really, right?</p>
-      <h2>What we need to do</h2>
-      <p>Know your problem domain, your information structure. Know your options and tools too.</p>
-      <p>Do you specifically need a realtime indexing search? There&#8217;s <a href="http://masanjin.net/whistlepig/">one written in Ruby</a> (just as an example for a rather special/specific search engine – not sure how far it is yet).</p>
-      <p>Do you really need a full-text search? Do you know <a href="http://en.wikipedia.org/wiki/Full_text_search">what a full text search</a> is? Do you know when to use one and also, when not? When is a <a href="http://en.wikipedia.org/wiki/Semantic_search">semantic search engine</a> the better choice?</p>
-      <p>Do you know the answers?</p>
-      <p>Btw, not dissing full-text search engines to promote <a href="http://florianhanke.com/picky/">Picky</a> (the semantic search engine) here ;) They&#8217;re great.</p>
-      <p>What I&#8217;m criticizing is the indiscriminate choice by many of my peers. I&#8217;m just trying to bring the point across that one should weigh the options, and decide based on reason.</p>
-      <h2>Fallacy: Search Engines are hard</h2>
-      <p>I guess that sometimes the problem is just that search engines seem like magic. Sure you most of the time know which knob to turn, but when something unexpected happens, you feel like a wet dog out in the wind.</p>
-      <p>Search engines are easy, actually. Take some time and <a href="http://en.wikipedia.org/wiki/Search_engine_(computing)">read all about them</a>, especially by following the links.</p>
-      <p>Mind, blown?</p>
-      <h2>Sidenote: Computer Science vs. &#8220;Informatik&#8221;</h2>
-      <p>&#8220;We want information. In-for-mation!&#8221; <a href="http://en.wikipedia.org/wiki/The_Prisoner">(The Prisoner)</a></p>
-      <p>German speaking countries got it right: They got computer science pegged.</p>
-      <p>I love the start of this <a href="http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/">set of lectures</a> by Abelson and Sussman. In it, one of the guys casually strikes through &#8220;Computer&#8221;, then &#8220;Science&#8221;.</p>
-      <p>Watch them and be enlightened. And they are so right.</p>
-      <p>Why? Our work is not about computers, it&#8217;s about information. Acquiring, analyzing, understanding, searching, offering: Information.</p>
-      <p>In german, <a href="http://de.wikipedia.org/wiki/Informatik">Informatik</a> is a combination of &#8220;Information&#8221; and &#8220;Mathematik&#8221;. That&#8217;s calling a horse a horse!</p>
-      <p>Actually, in english the term exists as well, <a href="http://en.wikipedia.org/wiki/Informatics">Informatics</a> – but I&#8217;ve never heard it used.</p>
-      <h2>Conclusion</h2>
-      <p>So we&#8217;ve seen</p>
-      <ol>
-      	<li>that in information searching we sometimes forget we&#8217;re engineers.</li>
-      	<li>that there are many different types of search engines.</li>
-      	<li>that we perhaps should be talking about &#8220;informatics&#8221; from now on.</li>
-      </ol>
-      <p>Hope you learnt something new :)</p>
-      <p>Comments and feedback, as usual, are appreciated.</p>
+<p>This post is about engineers, our pride in information gathering and organizing, and how we often fail in information searching.</p>
+<p>Also about different types of search engines.</p>
+<h2>Engineering</h2>
+<p>Imagine a structural engineer planning a bridge.</p>
+<p>How do you think does he approach the problem? Does he just build a standard concrete/steel bridge?</p>
+<p>Probably not. He analyzes the constraints put on it by various factors, monetary, environmental, political, and last but not least – time, and sets out to build the bridge that fits as many of these constraints as possible.</p>
+<p>Similarly with software engineering: We analyze various options, plan, code, release. (In this magical dream world I am conjuring up. But bear with me.)</p>
+<p>And most of the time, we do this well. An incredible number of blog posts, books etc. describe various options and tools in the software world that can be used as blueprints, tools, or inspiration to build our specific &#8220;bridges&#8221;.</p>
+<h2>Information gathering and structuring</h2>
+<p>When it is about collecting information, we are world masters.</p>
+<p>There is an enormous wealth of information regarding how to structure data, which database/key-value-store/glorified-hash etc. to use, when, and how.</p>
+<p>How to acquire users, how to aqcuire information from these users, also how to access this information through APIs and how to make information accessible and so on.</p>
+<p>Tell me the size of your valley, the amount and color of cars expected, and I can provide you a set of blueprints in a nice price range.</p>
+<p>This is great. But what happens when it is about making this information searchable? Not so great in my humble opinion.</p>
+<h2>Information searching</h2>
+<p>I&#8217;ve recently experienced a few cases where the analysis for which search engine to use went something like this:</p>
+<ul>
+	<li>&#8220;Oh, we&#8217;ve used it for project X, it will be great in project Y (totally different project).&#8221;</li>
+	<li>&#8220;Just use the gem in ActiveRecord, and it takes care of everything.&#8221;</li>
+	<li>&#8220;Search engine X is cool, Y recommended it on his blog yesterday!&#8221;</li>
+</ul>
+<p>While I appreciate the strict time constraints often involved in projects, the above reasons should not be used by an engineer worth his salt.</p>
+<p>Yes, using search engine X will not end in disaster, and yes, it will return some results to the user.</p>
+<p>But instead of building an elegant bamboo bridge over the wide jungle river, perfect for one person, you built a concrete bridge.</p>
+<p>Yes, it works. Yes, a person can safely cross the river. But most of the jungle is destroyed. Nobody feels comfortable using it. The town next to it had to spend most of its money on it.</p>
+<p>What I am saying is: While you arrived through lots of reasoning why you use e.g. Redis over MongoDB, and can and will defend it if asked for your reasons – in information searching, this is often not the case.</p>
+<p>Or can you tell me why you used search engine X in your last project?</p>
+<p>I know that often the first step is information acquiring, and towards the end, project managers notice that they were so busy acquiring all this information, that they totally forgot to think about making this information properly searchable. Time constraints then trash sensible search engine selection.</p>
+<p>There are other reasons as to why searching is neglected, but this is one I most often experienced.</p>
+<h2>The resulting problem</h2>
+<p>Often the end result of our careless choice is that the coders are quite happy, and the end users are relatively happy. But not a good happy, more of an accepting happy. Yes, we can search, and we should be grateful for it.</p>
+<p>But are you really happy? Did you really put your engineering savvy into it to help your users advance?</p>
+<p>Not really, right?</p>
+<h2>What we need to do</h2>
+<p>Know your problem domain, your information structure. Know your options and tools too.</p>
+<p>Do you specifically need a realtime indexing search? There&#8217;s <a href="http://masanjin.net/whistlepig/">one written in Ruby</a> (just as an example for a rather special/specific search engine – not sure how far it is yet).</p>
+<p>Do you really need a full-text search? Do you know <a href="http://en.wikipedia.org/wiki/Full_text_search">what a full text search</a> is? Do you know when to use one and also, when not? When is a <a href="http://en.wikipedia.org/wiki/Semantic_search">semantic search engine</a> the better choice?</p>
+<p>Do you know the answers?</p>
+<p>Btw, not dissing full-text search engines to promote <a href="http://florianhanke.com/picky/">Picky</a> (the semantic search engine) here ;) They&#8217;re great.</p>
+<p>What I&#8217;m criticizing is the indiscriminate choice by many of my peers. I&#8217;m just trying to bring the point across that one should weigh the options, and decide based on reason.</p>
+<h2>Fallacy: Search Engines are hard</h2>
+<p>I guess that sometimes the problem is just that search engines seem like magic. Sure you most of the time know which knob to turn, but when something unexpected happens, you feel like a wet dog out in the wind.</p>
+<p>Search engines are easy, actually. Take some time and <a href="http://en.wikipedia.org/wiki/Search_engine_(computing)">read all about them</a>, especially by following the links.</p>
+<p>Mind, blown?</p>
+<h2>Sidenote: Computer Science vs. &#8220;Informatik&#8221;</h2>
+<p>&#8220;We want information. In-for-mation!&#8221; <a href="http://en.wikipedia.org/wiki/The_Prisoner">(The Prisoner)</a></p>
+<p>German speaking countries got it right: They got computer science pegged.</p>
+<p>I love the start of this <a href="http://groups.csail.mit.edu/mac/classes/6.001/abelson-sussman-lectures/">set of lectures</a> by Abelson and Sussman. In it, one of the guys casually strikes through &#8220;Computer&#8221;, then &#8220;Science&#8221;.</p>
+<p>Watch them and be enlightened. And they are so right.</p>
+<p>Why? Our work is not about computers, it&#8217;s about information. Acquiring, analyzing, understanding, searching, offering: Information.</p>
+<p>In german, <a href="http://de.wikipedia.org/wiki/Informatik">Informatik</a> is a combination of &#8220;Information&#8221; and &#8220;Mathematik&#8221;. That&#8217;s calling a horse a horse!</p>
+<p>Actually, in english the term exists as well, <a href="http://en.wikipedia.org/wiki/Informatics">Informatics</a> – but I&#8217;ve never heard it used.</p>
+<h2>Conclusion</h2>
+<p>So we&#8217;ve seen</p>
+<ol>
+	<li>that in information searching we sometimes forget we&#8217;re engineers.</li>
+	<li>that there are many different types of search engines.</li>
+	<li>that we perhaps should be talking about &#8220;informatics&#8221; from now on.</li>
+</ol>
+<p>Hope you learnt something new :)</p>
+<p>Comments and feedback, as usual, are appreciated.</p>
       Next
       <a href="/blog/2011/04/09/searching-with-picky-area-search.html" title="Next post: Searching with Picky&amp;#58; Range/Area/Volume&amp;nbsp;etc.&amp;nbsp;Search">Searching with Picky&#58; Range/Area/Volume&nbsp;etc.&nbsp;Search</a>
       <h2>Share</h2>

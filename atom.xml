@@ -4,13 +4,49 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-06-26T00:40:22+10:00</updated>
+ <updated>2012-07-02T18:18:49+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Statistics&amp;nbsp;Interface</title>
+   <link href="http://florianhanke.com/blog/2012/07/02/picky-statistics-interface.html"/>
+   <updated>2012-07-02T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2012/07/02/picky-statistics-interface</id>
+   <content type="html">&lt;p&gt;This is a post in the &lt;a href=&quot;http://florianhanke.com/picky/index.html&quot;&gt;Picky&lt;/a&gt; series on its workings. If you haven&amp;#8217;t tried it yet, do so in the &lt;a href=&quot;http://florianhanke.com/picky/getting_started.html&quot;&gt;Getting Started&lt;/a&gt; section. It&amp;#8217;s quick and painless :)&lt;/p&gt;
+&lt;p&gt;This post is about a fun statistics interface I&amp;#8217;ve been working on, including a video. Download 4.5.2+, and enter this in your preferred shell.&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;picky stats path/to/log/file.log&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This will tell you this:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;Logfile path/to/log/file.log found.
+Clam, Picky's friend, is looking at Picky's logfile
+path/to/log/file.log
+and showing results on port 4567.
+== Sinatra/1.3.2 has taken the stage on 4567 for development with backup from Thin
+&amp;gt;&amp;gt; Thin web server (v1.3.1 codename Triple Espresso)
+&amp;gt;&amp;gt; Maximum connections set to 1024
+&amp;gt;&amp;gt; Listening on 0.0.0.0:4567, CTRL+C to stop&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Then, in another shell, enter&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;open localhost:4567&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(on &lt;span class=&quot;caps&quot;&gt;OSX&lt;/span&gt;) and have fun!.&lt;/p&gt;
+&lt;h2&gt;Video Demo&lt;/h2&gt;
+&lt;p&gt;See this short video (it&amp;#8217;s best to full-screen it):&lt;/p&gt;
+&lt;p&gt;&lt;iframe src=&quot;http://player.vimeo.com/video/45051903&quot; width=&quot;600&quot; height=&quot;387&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;
+&lt;p&gt;The interface uses this great JS lib: &lt;a href=&quot;http://square.github.com/crossfilter/&quot;&gt;http://square.github.com/crossfilter/&lt;/a&gt;. Check it out :)&lt;/p&gt;
+&lt;h2&gt;Interface Usage Ideas&lt;/h2&gt;
+&lt;p&gt;Slice and dice your data:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;What queries are slowest?&lt;/li&gt;
+	&lt;li&gt;Are they suspiciously slow in the morning?&lt;/li&gt;
+	&lt;li&gt;How many return more than 1 allocation?&lt;/li&gt;
+	&lt;li&gt;Does more allocations also mean slower? Or more results?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Etc.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Visual&amp;nbsp;Programming&amp;nbsp;1</title>

@@ -60,45 +60,45 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>This is a post in the <a href="http://florianhanke.com/picky/">Picky</a> series on its workings.</p>
-      <h2>Intro</h2>
-      <p>Let&#8217;s say we offered a search engine where we could search stores using a name and/or location. A location could be a zipcode or suburb.</p>
-      <pre class="sh_ruby"><code>class Store&#x000A; attr_reader :id,&#x000A;             :name,&#x000A;             :location&#x000A;end</code></pre>
-      <p>Now, when users search a store using a name and location, it should also show us what other stores are there, in a sidebar, to help with exploration and show the user what else is there.</p>
-      <p>So, when you&#8217;d look for &#8220;Barbershop Brooklyn&#8221;, you&#8217;d also get other nice stores that are located in &#8220;Brooklyn&#8221;.</p>
-      <p>It&#8217;s tricky. Without Picky.</p>
-      <p>We could define two indexes. Both index all stores. But one just has the <code>location</code> category, and the other has <code>name</code> and <code>location</code>.</p>
-      <p>But that is a waste of precious memory space.</p>
-      <p>That&#8217;s what the new Picky version can help with.</p>
-      <h2>Picky 3.1.3</h2>
-      <p>Version 3.1.3 introduces the <code>ignore</code> option in the search definition block:</p>
-      <pre class="sh_ruby"><code>stores = Index.new :stores do&#x000A;  source { Store.order('name DESC') }&#x000A;  category :name&#x000A;  category :location&#x000A;end&#x000A;&#x000A;search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
-      <p>The <code>ignore :name</code> makes that <code>Search</code> throw away (<code>ignore</code>) any tokens that map to that category. So if Picky finds that the word &#8220;barbershop&#8221; in &#8220;barbershop brooklyn&#8221; maps to the <code>:name</code> category, such that both would map to <code>[:name, :location]</code>,
-      then Picky throws away the &#8220;barbershop&#8221;, such that only <code>:location</code> brooklyn remains.</p>
-      <h2>Location-based Ads</h2>
-      <p>For our example, we would define the main search like this</p>
-      <pre class="sh_ruby"><code>main_search = Search.new stores</code></pre>
-      <p>because we want it to not ignore anything. If the user enters &#8220;barbershop brooklyn&#8221;, it must be found in the name (barbershop) and location (brooklyn), or Picky won&#8217;t return it.</p>
-      <p>Now, the ads search works a little differently. Whatever search word maps to name, we ignore it. We are only interested in words matching the location</p>
-      <pre class="sh_ruby"><code>ads_search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
-      <p>In the webapp, we would then search twice: Once for the &#8220;real&#8221; search, and once just for the ads to show on the side, using the same search.*</p>
-      <p>Because wouldn&#8217;t you just love to try Vinnie&#8217;s Pizza after Uncle Joe&#8217;s Barbershop? I would.</p>
-      <h2>Examples</h2>
-      <p>Not following? Let me give you a few examples:</p>
-      <p>Searching for &#8220;Barbershop&#8221; will yield results in the main search, but none in the ads, since &#8220;Barbershop&#8221; does not match any location.</p>
-      <p>Searching for &#8220;Santa Barbara&#8221; will probably yield something like &#8220;Santa Lucia Pizzeria, Santa Barbara&#8221; for the main results, and return ads from Santa Barbara, since &#8220;Santa&#8221; or &#8220;Barbara&#8221; matching as names is ignored.</p>
-      <p>Searching for &#8220;Chicago&#8221; will return basically the same for the main result and the ads. But who searches just for &#8220;Chicago&#8221;?</p>
-      <h2>Advanced*</h2>
-      <p>If you think calling the Picky server a second time just for the ads is too much, you can use the <em>piggybacking</em> technique:</p>
-      <p>In the Sinatra server, search the main search, but at the same time, search the ads. Then, stick the results for the ads onto the main results.</p>
-      <pre class="sh_ruby"><code>get '/stores' do&#x000A;  query = params[:query]&#x000A;&#x000A;  main_results = main_search.search query # etc.&#x000A;  ads_results  = ads_search.search query # etc.&#x000A;&#x000A;  results_hash = main_results.to_hash&#x000A;  results_hash[:ads] = ads_results.to_hash&#x000A;&#x000A;  results_hash.to_json&#x000A;end</code></pre>
-      <p>Then, in the app server, de-piggyback the ad results and render separately. As usual, it&#8217;s all Ruby.</p>
-      <h2>Note</h2>
-      <p>You could of course use a real geosearch instead of the simple location above. But it&#8217;s just more understandable like this.</p>
-      <p>Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.</p>
-      <h2>Note 2</h2>
-      <p>I recommend not to use this in the normal search. It&#8217;s just too surprising for users to have their precious search words thrown away like this.</p>
-      <p>As if they were just mere strings. To be tentacled away.</p>
-      <p>That reminds me… one of the next blog posts really <strong>has to be</strong> called &#8220;Day of the Tentacle&#8221;! <strong>cough</strong></p>
+<h2>Intro</h2>
+<p>Let&#8217;s say we offered a search engine where we could search stores using a name and/or location. A location could be a zipcode or suburb.</p>
+<pre class="sh_ruby"><code>class Store&#x000A; attr_reader :id,&#x000A;             :name,&#x000A;             :location&#x000A;end</code></pre>
+<p>Now, when users search a store using a name and location, it should also show us what other stores are there, in a sidebar, to help with exploration and show the user what else is there.</p>
+<p>So, when you&#8217;d look for &#8220;Barbershop Brooklyn&#8221;, you&#8217;d also get other nice stores that are located in &#8220;Brooklyn&#8221;.</p>
+<p>It&#8217;s tricky. Without Picky.</p>
+<p>We could define two indexes. Both index all stores. But one just has the <code>location</code> category, and the other has <code>name</code> and <code>location</code>.</p>
+<p>But that is a waste of precious memory space.</p>
+<p>That&#8217;s what the new Picky version can help with.</p>
+<h2>Picky 3.1.3</h2>
+<p>Version 3.1.3 introduces the <code>ignore</code> option in the search definition block:</p>
+<pre class="sh_ruby"><code>stores = Index.new :stores do&#x000A;  source { Store.order('name DESC') }&#x000A;  category :name&#x000A;  category :location&#x000A;end&#x000A;&#x000A;search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
+<p>The <code>ignore :name</code> makes that <code>Search</code> throw away (<code>ignore</code>) any tokens that map to that category. So if Picky finds that the word &#8220;barbershop&#8221; in &#8220;barbershop brooklyn&#8221; maps to the <code>:name</code> category, such that both would map to <code>[:name, :location]</code>,
+then Picky throws away the &#8220;barbershop&#8221;, such that only <code>:location</code> brooklyn remains.</p>
+<h2>Location-based Ads</h2>
+<p>For our example, we would define the main search like this</p>
+<pre class="sh_ruby"><code>main_search = Search.new stores</code></pre>
+<p>because we want it to not ignore anything. If the user enters &#8220;barbershop brooklyn&#8221;, it must be found in the name (barbershop) and location (brooklyn), or Picky won&#8217;t return it.</p>
+<p>Now, the ads search works a little differently. Whatever search word maps to name, we ignore it. We are only interested in words matching the location</p>
+<pre class="sh_ruby"><code>ads_search = Search.new stores do&#x000A;  ignore :name&#x000A;end</code></pre>
+<p>In the webapp, we would then search twice: Once for the &#8220;real&#8221; search, and once just for the ads to show on the side, using the same search.*</p>
+<p>Because wouldn&#8217;t you just love to try Vinnie&#8217;s Pizza after Uncle Joe&#8217;s Barbershop? I would.</p>
+<h2>Examples</h2>
+<p>Not following? Let me give you a few examples:</p>
+<p>Searching for &#8220;Barbershop&#8221; will yield results in the main search, but none in the ads, since &#8220;Barbershop&#8221; does not match any location.</p>
+<p>Searching for &#8220;Santa Barbara&#8221; will probably yield something like &#8220;Santa Lucia Pizzeria, Santa Barbara&#8221; for the main results, and return ads from Santa Barbara, since &#8220;Santa&#8221; or &#8220;Barbara&#8221; matching as names is ignored.</p>
+<p>Searching for &#8220;Chicago&#8221; will return basically the same for the main result and the ads. But who searches just for &#8220;Chicago&#8221;?</p>
+<h2>Advanced*</h2>
+<p>If you think calling the Picky server a second time just for the ads is too much, you can use the <em>piggybacking</em> technique:</p>
+<p>In the Sinatra server, search the main search, but at the same time, search the ads. Then, stick the results for the ads onto the main results.</p>
+<pre class="sh_ruby"><code>get '/stores' do&#x000A;  query = params[:query]&#x000A;&#x000A;  main_results = main_search.search query # etc.&#x000A;  ads_results  = ads_search.search query # etc.&#x000A;&#x000A;  results_hash = main_results.to_hash&#x000A;  results_hash[:ads] = ads_results.to_hash&#x000A;&#x000A;  results_hash.to_json&#x000A;end</code></pre>
+<p>Then, in the app server, de-piggyback the ad results and render separately. As usual, it&#8217;s all Ruby.</p>
+<h2>Note</h2>
+<p>You could of course use a real geosearch instead of the simple location above. But it&#8217;s just more understandable like this.</p>
+<p>Also, sometimes this is enough, and anything more correct is simply unnecessary and costs too much time.</p>
+<h2>Note 2</h2>
+<p>I recommend not to use this in the normal search. It&#8217;s just too surprising for users to have their precious search words thrown away like this.</p>
+<p>As if they were just mere strings. To be tentacled away.</p>
+<p>That reminds me… one of the next blog posts really <strong>has to be</strong> called &#8220;Day of the Tentacle&#8221;! <strong>cough</strong></p>
       Next
       <a href="/blog/2011/09/01/picky-case-study-not-singing-in-the-rain.html" title="Next post: Picky&amp;nbsp;Case&amp;nbsp;Study&amp;#58;&amp;nbsp;Running&amp;nbsp;it&amp;nbsp;in&amp;nbsp;a&amp;nbsp;DRb&amp;nbsp;Server">Picky&nbsp;Case&nbsp;Study&#58;&nbsp;Running&nbsp;it&nbsp;in&nbsp;a&nbsp;DRb&nbsp;Server</a>
       <h2>Share</h2>

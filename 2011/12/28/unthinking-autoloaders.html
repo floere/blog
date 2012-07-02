@@ -60,58 +60,58 @@
       <!-- /  - page.categories.each do |category| -->
       <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
       <p>Let me inform you that the original title was &#8220;Autoloading Is Cancer&#8221;. That basically sets the scene.</p>
-      <p>Don&#8217;t know what autoloading is? Check out <a href="http://www.rubyinside.com/ruby-techniques-revealed-autoload-1652.html">Peter Cooper&#8217;s quick intro</a>.</p>
-      <h2>Intro</h2>
-      <p>I believe that autoloading is used for all the wrong reasons, and I posit that coders who use autoloading don&#8217;t really know why they use it.</p>
-      <p>If you <strong>are</strong> using it: Do you know why? Maybe I am unfair here, but this is a blog post to shake you up a little bit. You filthy autoloading pig.</p>
-      <h2>Readable and clean code</h2>
-      <p>After years of coding, one of the most important functions of code for me is <strong>its readability</strong>. I do it for <strong>myself</strong>, but first for <strong>everyone</strong> who has a problem with my lib&#8217;s functionality and/or simply wants to know how something works.</p>
-      <p>After all, code is the best documentation, and is used most as such (apart from its <em>raison d&#8217;être</em> of being run).</p>
-      <p>If others can go in and read your code, and even enjoy it, and are learning something from it, then you know that you have a great lib.</p>
-      <p>Even if the reader can&#8217;t use it right away, he/she can take away something from it.</p>
-      <h2>Information transportation</h2>
-      <p>To take away something from your code, it needs to transport information (into your brain that is) in the most efficient fashion.</p>
-      <h3>Contrast and compare</h3>
-      <p>Let&#8217;s see what information can be gained by reading this code:</p>
-      <pre class="sh_ruby"><code>require 'models/person'&#x000A;require 'models/company'&#x000A;require 'server/auxiliary'&#x000A;require 'server/core'</code></pre>
-      <p>From this code, I can take away a lot of things!</p>
-      <p>In order of importance:</p>
-      <ul>
-      	<li>4 files are required (obvious)</li>
-      	<li>Apparently we have model-related code and server related code (obvious since someone has done his/her naming homework)</li>
-      </ul>
-      <p>But much cooler:</p>
-      <ul>
-      	<li>The <code>Person</code> model is probably* most independent.</li>
-      	<li>The <code>Company</code> model might depend on the <code>Person</code>, but the <code>Person</code> model is independent* of the <code>Company</code> model.</li>
-      	<li>The server code might use the models.</li>
-      	<li>The auxiliary server code is probably* independent of the core server code.</li>
-      </ul>
-      <p>The * refers to the fact that the code, dynamically, might still not be independent (since it could refer to a constant in a method etc.). If it isn&#8217;t, and is required before the &#8220;dependency&#8221;, ewwww.</p>
-      <p>So, why do I think this independence thing is so cool. Let me show you another example:</p>
-      <pre class="sh_ruby"><code>require 'server/core'&#x000A;require 'models/person'&#x000A;require 'models/company'&#x000A;require 'server/auxiliary'</code></pre>
-      <p>This code tells me with a high probability that something might be awry in this code and I definitely need to take a closer look. Do the models refer to the server? Does the server not use the models at all? Does the &#8220;auxiliary&#8221; code use the models? Is this just a naming problem or do we have something at hand that needs to be trashed?</p>
-      <p>Now that we know that one can gain quite a bit of information by reading code (surprise! :) ), let&#8217;s take a look at the autoloading example:</p>
-      <pre class="sh_ruby"><code>module Server&#x000A;  autoload :Core,      'server/core'&#x000A;  autoload :Auxiliary, 'server/auxiliary'&#x000A;end&#x000A;module Models&#x000A;  autoload :Person,  'models/person'&#x000A;  autoload :Company, 'models/company'&#x000A;end</code></pre>
-      <p>From this code we can take away the following things that are non-obvious:</p>
-      <ul>
-      	<li>Jack shit.</li>
-      </ul>
-      <p>I have no clue as to who needs what, and why. No hints.</p>
-      <p>This code fails me in readability on so many levels. Never mind introduces unneeded complexity. Also, can you tell me what happens when code like this is run in forked child processes? What about threads? What about both?</p>
-      <h2>Conclusion</h2>
-      <p>I noticed that many people use autoloading for three reasons:</p>
-      <ul>
-      	<li>It&#8217;s a cool Ruby technique. (I am ignoring this one)</li>
-      	<li>They don&#8217;t want to think about dependencies in their code. (Also ignoring this one)</li>
-      	<li>It enhances startup time.</li>
-      </ul>
-      <h3>Startup Time</h3>
-      <p>Although it might help a bit by spreading the loading code over the run time of your program, believe me: This is not the place to solve this problem.</p>
-      <p>A long startup time hints at deeper problems with code structure, unnecessary precaching, etc. in your lib or the libs you are using.</p>
-      <p>Autoloading is not a solution for slow startup time. It is, at best, a quick fix for a problem which really is begging for some brains to be applied.</p>
-      <h2>Final Question</h2>
-      <p>Why do you use autoloading? Do you have good reasons that I haven&#8217;t considered?</p>
+<p>Don&#8217;t know what autoloading is? Check out <a href="http://www.rubyinside.com/ruby-techniques-revealed-autoload-1652.html">Peter Cooper&#8217;s quick intro</a>.</p>
+<h2>Intro</h2>
+<p>I believe that autoloading is used for all the wrong reasons, and I posit that coders who use autoloading don&#8217;t really know why they use it.</p>
+<p>If you <strong>are</strong> using it: Do you know why? Maybe I am unfair here, but this is a blog post to shake you up a little bit. You filthy autoloading pig.</p>
+<h2>Readable and clean code</h2>
+<p>After years of coding, one of the most important functions of code for me is <strong>its readability</strong>. I do it for <strong>myself</strong>, but first for <strong>everyone</strong> who has a problem with my lib&#8217;s functionality and/or simply wants to know how something works.</p>
+<p>After all, code is the best documentation, and is used most as such (apart from its <em>raison d&#8217;être</em> of being run).</p>
+<p>If others can go in and read your code, and even enjoy it, and are learning something from it, then you know that you have a great lib.</p>
+<p>Even if the reader can&#8217;t use it right away, he/she can take away something from it.</p>
+<h2>Information transportation</h2>
+<p>To take away something from your code, it needs to transport information (into your brain that is) in the most efficient fashion.</p>
+<h3>Contrast and compare</h3>
+<p>Let&#8217;s see what information can be gained by reading this code:</p>
+<pre class="sh_ruby"><code>require 'models/person'&#x000A;require 'models/company'&#x000A;require 'server/auxiliary'&#x000A;require 'server/core'</code></pre>
+<p>From this code, I can take away a lot of things!</p>
+<p>In order of importance:</p>
+<ul>
+	<li>4 files are required (obvious)</li>
+	<li>Apparently we have model-related code and server related code (obvious since someone has done his/her naming homework)</li>
+</ul>
+<p>But much cooler:</p>
+<ul>
+	<li>The <code>Person</code> model is probably* most independent.</li>
+	<li>The <code>Company</code> model might depend on the <code>Person</code>, but the <code>Person</code> model is independent* of the <code>Company</code> model.</li>
+	<li>The server code might use the models.</li>
+	<li>The auxiliary server code is probably* independent of the core server code.</li>
+</ul>
+<p>The * refers to the fact that the code, dynamically, might still not be independent (since it could refer to a constant in a method etc.). If it isn&#8217;t, and is required before the &#8220;dependency&#8221;, ewwww.</p>
+<p>So, why do I think this independence thing is so cool. Let me show you another example:</p>
+<pre class="sh_ruby"><code>require 'server/core'&#x000A;require 'models/person'&#x000A;require 'models/company'&#x000A;require 'server/auxiliary'</code></pre>
+<p>This code tells me with a high probability that something might be awry in this code and I definitely need to take a closer look. Do the models refer to the server? Does the server not use the models at all? Does the &#8220;auxiliary&#8221; code use the models? Is this just a naming problem or do we have something at hand that needs to be trashed?</p>
+<p>Now that we know that one can gain quite a bit of information by reading code (surprise! :) ), let&#8217;s take a look at the autoloading example:</p>
+<pre class="sh_ruby"><code>module Server&#x000A;  autoload :Core,      'server/core'&#x000A;  autoload :Auxiliary, 'server/auxiliary'&#x000A;end&#x000A;module Models&#x000A;  autoload :Person,  'models/person'&#x000A;  autoload :Company, 'models/company'&#x000A;end</code></pre>
+<p>From this code we can take away the following things that are non-obvious:</p>
+<ul>
+	<li>Jack shit.</li>
+</ul>
+<p>I have no clue as to who needs what, and why. No hints.</p>
+<p>This code fails me in readability on so many levels. Never mind introduces unneeded complexity. Also, can you tell me what happens when code like this is run in forked child processes? What about threads? What about both?</p>
+<h2>Conclusion</h2>
+<p>I noticed that many people use autoloading for three reasons:</p>
+<ul>
+	<li>It&#8217;s a cool Ruby technique. (I am ignoring this one)</li>
+	<li>They don&#8217;t want to think about dependencies in their code. (Also ignoring this one)</li>
+	<li>It enhances startup time.</li>
+</ul>
+<h3>Startup Time</h3>
+<p>Although it might help a bit by spreading the loading code over the run time of your program, believe me: This is not the place to solve this problem.</p>
+<p>A long startup time hints at deeper problems with code structure, unnecessary precaching, etc. in your lib or the libs you are using.</p>
+<p>Autoloading is not a solution for slow startup time. It is, at best, a quick fix for a problem which really is begging for some brains to be applied.</p>
+<h2>Final Question</h2>
+<p>Why do you use autoloading? Do you have good reasons that I haven&#8217;t considered?</p>
       Next
       <a href="/blog/2011/12/29/picky-recipes-1.html" title="Next post: Picky&amp;nbsp;Recipes">Picky&nbsp;Recipes</a>
       <h2>Share</h2>

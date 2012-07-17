@@ -1,0 +1,16 @@
+---
+published: false
+layout: post
+title: Object&nbsp;Pool&nbsp;Pattern
+categories:
+  - ruby
+  - patterns
+---
+
+Rails allocates soandso many objects per request.
+Sinatra allocates soandso many objects per request.
+
+https://en.wikipedia.org/wiki/Object_pool_pattern#Criticism
+https://gist.github.com/3121579
+
+TODO Add specs

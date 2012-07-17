@@ -1,0 +1,69 @@
+---
+layout: post
+title: And&nbsp;faster&nbsp;still
+categories:
+  - ruby
+  - picky
+  - performance
+---
+Lately I've been obsessed with making Picky as fast as possible (while not sacrificing any flexibility).
+
+This post is all about exploiting Picky's flexibility to gain speed. We'll also push towards its extremes to see how to sacrifice some of the flexibility to gain even more speed!
+
+So if you need a high performance Picky, or simply like to see big numbers: This is the post for you!
+
+h2. Webrick
+
+a: {"allocations":[["books",18.439999999999998,74,[["author","a","a"]],[4,7,8,11,18,38,48,51,55,80,97,108,117,119,125,126,132,134,138,140]]],"offset":0,"duration":0.000163,"total":74}
+
+a*-a: {"allocations":[["books",9.872,36,[["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.00019,"total":36}
+
+a*-a*-a: {"allocations":[["books",15.44,36,[["author","a*","a"],["title","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",9.872,36,[["title","a*","a"],["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.000226,"total":36}
+
+h2. Thin (with Sinatra)
+
+1 core:
+1262 1213 1270 1244 1269
+1091  993 1042 1097 1074
+ 872  931  946  975  954
+
+h2. Unicorn
+
+1 core:
+600 632 625 620 619
+595 585 580 596 584
+561 537 425 552 562
+
+h2. Ricer (with Sinatra)
+
+Ricer is a ...
+
+1 core:
+1374 1381 1384 1374 1337
+1243 1153 1088 1072 1115
+1143 1081 1081 1080 1084
+
+h2. Pen (with Ricer)
+
+2 ricers:
+2140 1915 1901 2142 1869
+1798 1735 1631 1644 1673
+1256 1546 1541 1542 1565
+
+h2. Nginx (with Ricer)
+
+2 ricers:
+2078 1993 1790 2177 2203
+1660 1843 1830 1684 1808
+1549 1456 1463 1473 1503
+
+h2. Sinatra?
+
+2 ricers. nginx, no sinatra:
+3855 3900 4203 3574 4329
+2246 2352 2337 2294 2245
+1157 1157 1155 1166 1232
+
+h2. Rack?
+
+h2. Conclusion

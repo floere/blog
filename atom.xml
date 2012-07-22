@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-07-22T22:10:52+10:00</updated>
+ <updated>2012-07-22T22:12:02+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -208,7 +208,7 @@ define_method :call do |env|
   result_array
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Note that we manually extract the parameters from the query_string, and thus reduce the work done to only what we actually need. We don&amp;#8217;t need routing or any other processing.&lt;/p&gt;
-&lt;p&gt;However, we now can only call our app with a query string in the form (and lose the flexibility afforded to us by Sinatra):&lt;/p&gt;
+&lt;p&gt;However, we now can only call our app with a strictly ordered query string (and lose the flexibility afforded to us by Sinatra):&lt;/p&gt;
 &lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;?query=S&amp;amp;ids=N&amp;amp;offset=M&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;(However, we still get Rack conform data)&lt;/p&gt;
 &lt;p&gt;We run it the exact same way as the Sinatra app:&lt;/p&gt;

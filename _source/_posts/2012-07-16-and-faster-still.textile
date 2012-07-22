@@ -25,6 +25,8 @@ We will modify that example slightly to adapt it to use different servers, howev
 We run three queries of varying complexity. First, just "a" (which means "a*"), complexity 1, then "a* a", complexity 2, then "a* a* a" (see below for results of these queries). This covers more than 99% of all usual Picky search cases.
 As Picky is a combinatorial search engine, we expect a nonlinearly increasing query duration.
 
+Numbers denote requests per second.
+
 How much we will find out :)
 
 h2. Unicorn

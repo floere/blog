@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>And&nbsp;faster&nbsp;still</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        And&nbsp;faster&nbsp;still
+        <a class="twitter-share-button" data-count="none" data-text="And&amp;nbsp;faster&amp;nbsp;still" data-url="http://florianhanke.com/blog/2012/07/16/and-faster-still.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        ruby / picky / performance
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>Lately I&#8217;ve been obsessed with making Picky as fast as possible (while not sacrificing any flexibility).</p>
+<p>This post is all about exploiting Picky&#8217;s flexibility to gain speed. We&#8217;ll also push towards its extremes to see how to sacrifice some of the flexibility to gain even more speed!</p>
+<p>So if you need a high performance Picky, or simply like to see big numbers: This is the post for you!</p>
+<p>As is the trade off of the high priests of speed: On the altar of performance, they are going to sacrifice flexibility…</p>
+<h2>The tests</h2>
+<p>All tests are run on my MacBook Pro 2010 model with 2 cores. They are all based on the standard Picky example you get when you run:</p>
+<pre class="sh_shell"><code>$ picky generate server some_server_directory</code></pre>
+<p>We will modify that example slightly to adapt it to use different servers, however.</p>
+<p>We run three queries of varying complexity. First, just &#8220;a&#8221; (which means &#8220;a*&#8221;), complexity 1, then &#8220;a* a&#8221;, complexity 2, then &#8220;a* a* a&#8221; (see below for results of these queries). This covers more than 99% of all usual Picky search cases.
+As Picky is a combinatorial search engine, we expect a nonlinearly increasing query duration.</p>
+<p>How much we will find out :)</p>
+<h2>Unicorn</h2>
+<p><a href="http://unicorn.bogomips.org/">Unicorn</a> is the workhorse of the web servers. It is reliable, can use multiple cores, and has so far been the recommended server for Picky, also because it weakens the impact of GC runs.</p>
+<p>Let&#8217;s see how it fares:</p>
+<table>
+	<tr>
+		<td> Complexity 1: </td>
+		<td> <strong>619</strong> </td>
+		<td> = (600 + 632 + 625 + 620 + 619)/5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 2: </td>
+		<td> <strong>588</strong> </td>
+		<td> = (595 + 585 + 580 + 596 + 584)/5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 3: </td>
+		<td> <strong>527</strong> </td>
+		<td> = (561 + 537 + 425 + 552 + 562)/5 </td>
+	</tr>
+</table>
+<p>Quite respectably. But we don&#8217;t want a workhorse. We want an arabian horse that shoots fire out of its nostrils! (and anywhere else, for that matter)</p>
+<h2>Thin (with Sinatra)</h2>
+<p><a href="http://code.macournoyer.com/thin/">Thin</a> is a very well known event machine based server. It is fast.</p>
+<p>How fast?</p>
+<table>
+	<tr>
+		<td> Complexity 1: </td>
+		<td> <strong>1252</strong> </td>
+		<td> = (1262 + 1213 + 1270 + 1244 + 1269) / 5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 2: </td>
+		<td> <strong>1059</strong> </td>
+		<td> = (1091 +  993 + 1042 + 1097 + 1074) / 5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 3: </td>
+		<td>  <strong>936</strong> </td>
+		<td> =  (872 +  931 +  946 +  975 +  954) / 5 </td>
+	</tr>
+</table>
+<p>That is impressive, given that these are the numbers from one core.</p>
+<p>Two weeks ago, this happened:</p>
+<p><img src="http://174.142.61.111/forum/files/a-challenger-appears-nignog_178.png" style="float:none;" alt="" /></p>
+<h2>Ricer (with Sinatra)</h2>
+<p><a href="http://github.com/charliesome/ricer">Ricer</a> by <a href="http://twitter.com/charliesome">Charlie Somerville</a> is a &#8220;Rack compliant Ruby web server&#8221;. It is mainly based on <a href="http://github.com/joyent/libuv">libuv</a>. According to its <a href="http://github.com/charliesome/ricer/blob/master/README.md"><span class="caps">README</span></a> (worth a look just for the image ;) ), it is twice as fast as thin using a &#8220;Hello world!&#8221; app.</p>
+<p>As Picky performs a bit more work than a simple &#8220;Hello world!&#8221;, it won&#8217;t be twice as fast. But how much faster will it be? Let&#8217;s see…</p>
+<table>
+	<tr>
+		<td> Complexity 1: </td>
+		<td> <strong>1370</strong> </td>
+		<td> = (1374 + 1381 + 1384 + 1374 + 1337)/5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 2: </td>
+		<td> <strong>1134</strong> </td>
+		<td> = (1243 + 1153 + 1088 + 1072 + 1115)/5 </td>
+	</tr>
+	<tr>
+		<td> Complexity 3: </td>
+		<td> <strong>1094</strong> </td>
+		<td> = (1143 + 1081 + 1081 + 1080 + 1084)/5 </td>
+	</tr>
+</table>
+<p>Now, why don&#8217;t we get double the speed as with thin, as shown on <a href="https://github.com/charliesome/ricer">Ricer&#8217;s webpage</a>, but just 10%? The thing is, instead of just returning &#8220;hello world&#8221;, Picky needs to do a bit of work.</p>
+<h2>Picky vs. Ricer</h2>
+<p>To calculate how much of this time is needed by Picky, let&#8217;s assume &#8220;hello world&#8221; takes no time at all, and Ricer is double as fast as thin. With Picky, Ricer is only 10% faster than thin. What does this tell us about Picky?</p>
+<p>Let&#8217;s calculate a bit. With the time from &#8220;hello world&#8221; ignored we know:</p>
+<table>
+	<tr>
+		<td> 1: </td>
+		<td> T(thin) / T(ricer) == 2 </td>
+	</tr>
+	<tr>
+		<td> 2: </td>
+		<td> (T(thin) + T(picky)) / (T(ricer) + T(picky)) == 1.1 </td>
+	</tr>
+</table>
+<p>Rewriting:</p>
+<table>
+	<tr>
+		<td> 3: </td>
+		<td> T(thin) + T(picky) == 1.1*T(ricer) + 1.1*T(picky) </td>
+		<td> from 2. </td>
+	</tr>
+	<tr>
+		<td> 4: </td>
+		<td> T(thin) &#8211; 1.1*T(ricer) == 0.1*T(picky) </td>
+		<td> from 3. </td>
+	</tr>
+	<tr>
+		<td> 5: </td>
+		<td> T(thin) == 2*T(ricer) </td>
+		<td> from 1. </td>
+	</tr>
+	<tr>
+		<td> 6: </td>
+		<td> 0.9*T(ricer) == 0.1*T(picky) </td>
+		<td> from 4, 5. </td>
+	</tr>
+	<tr>
+		<td> 7: </td>
+		<td> T(picky) == 9*T(ricer) </td>
+		<td> from 6. </td>
+	</tr>
+</table>
+<p>So, Picky (including Sinatra) takes around 9 times longer than Ricer. Let&#8217;s remember this for our conclusion.</p>
+<h2>Multiple processes</h2>
+<p>In the Ruby web app world, to get more speed, we usually run more processes.</p>
+<p>As Ricer cannot yet accept on file descriptors, I am going to use http load balancers <a href="http://siag.nu/pen/">Pen</a> and <a href="http://www.nginx.org/">Nginx</a> and see how they fare on my 2 core <span class="caps">MBP</span>.</p>
+<h2>Pen (with Ricer)</h2>
+<table>
+	<tr>
+		<td> Compl. 1: </td>
+		<td> <strong>1993</strong> </td>
+		<td> = (2140 + 1915 + 1901 + 2142 + 1869)/5 </td>
+		<td> <strong>1370</strong> (1 core) </td>
+	</tr>
+	<tr>
+		<td> Compl. 2: </td>
+		<td> <strong>1696</strong> </td>
+		<td> = (1798 + 1735 + 1631 + 1644 + 1673)/5 </td>
+		<td> <strong>1134</strong> (1 core) </td>
+	</tr>
+	<tr>
+		<td> Compl. 3: </td>
+		<td> <strong>1490</strong> </td>
+		<td> = (1256 + 1546 + 1541 + 1542 + 1565)/5 </td>
+		<td> <strong>1094</strong> (1 core) </td>
+	</tr>
+</table>
+<p>Certainly a good result, and plausible since it is not 2x as fast.</p>
+<h2>Nginx (with Ricer)</h2>
+<table>
+	<tr>
+		<td> Compl. 1: </td>
+		<td> <strong>2048</strong> </td>
+		<td> = (2078 + 1993 + 1790 + 2177 + 2203)/5 </td>
+		<td> <strong>1370</strong> (1 core) </td>
+	</tr>
+	<tr>
+		<td> Compl. 2: </td>
+		<td> <strong>1765</strong> </td>
+		<td> = (1660 + 1843 + 1830 + 1684 + 1808)/5 </td>
+		<td> <strong>1134</strong> (1 core) </td>
+	</tr>
+	<tr>
+		<td> Compl. 3: </td>
+		<td> <strong>1489</strong> </td>
+		<td> = (1549 + 1456 + 1463 + 1473 + 1503)/5 </td>
+		<td> <strong>1094</strong> (1 core) </td>
+	</tr>
+</table>
+<p>Nginx seems to be a bit more speed-stable than Pen, but otherwise in the same ball-park.</p>
+<h2>Sacrificing flexibility</h2>
+<p>A high priest of speed approaches us to remind us of a good rule:</p>
+<p><strong>To gain speed, one must often sacrifice an abstraction layer and its inherent flexibility. Evaluate if this flexibility is needed, and if not, sacrifice without remorse.</strong></p>
+<p>The question here is: Do we really need the routing etc. capabilities of Sinatra? (while still keeping the abstraction given to us by Rack)</p>
+<p>Let&#8217;s assume we don&#8217;t and rewrite our app a bit. To remove Sinatra, we simply do not inherit from <code>Sinatra::Base</code> and install a <code>#call</code> method on our class.</p>
+<pre class="sh_ruby"><code># Prepare a few pseudo-constants.&#x000A;#&#x000A;query_string = "QUERY_STRING".freeze&#x000A;result_array = [200, { "Content-Type" =&gt; "text/html" }, []]&#x000A;regexp       = /\Aquery=([^&amp;]+)&amp;ids=([^&amp;]+)&amp;offset=([^\z]+)/&#x000A;&#x000A;# Define #call method.&#x000A;#&#x000A;define_method :call do |env|&#x000A;  # Extract relevant parameters.&#x000A;  #&#x000A;  _, query, ids, offset = *env[query_string].match(regexp)&#x000A;  results = books.search query, ids || 20, offset || 0&#x000A;  &#x000A;  # Put together result.&#x000A;  #&#x000A;  result_array[2][0] = results.to_json&#x000A;  &#x000A;  result_array&#x000A;end</code></pre>
+<p>Note that we manually extract the parameters from the query_string, and thus reduce the work done to only what we actually need. We don&#8217;t need routing or any other processing.</p>
+<p>However, we now can only call our app with a query string in the form:</p>
+<pre class="sh_shell"><code>?query=S&amp;ids=N&amp;offset=M</code></pre>
+<p>We run it the exact same way as the Sinatra app:</p>
+<pre class="sh_ruby"><code>run BookSearch.new</code></pre>
+<p>(We can do this since we still use the abstraction defined by Rack)</p>
+<h2>Removing Sinatra</h2>
+<p>Let&#8217;s see how our nosinatra approach turns out to be and compare:</p>
+<table>
+	<tr>
+		<td> Compl. 1: </td>
+		<td> <strong>3972</strong> </td>
+		<td> = (3855 + 3900 + 4203 + 3574 + 4329)/5 </td>
+		<td> <strong>2048</strong> (Sinatra) </td>
+	</tr>
+	<tr>
+		<td> Compl. 2: </td>
+		<td> <strong>2295</strong> </td>
+		<td> = (2246 + 2352 + 2337 + 2294 + 2245)/5 </td>
+		<td> <strong>1765</strong> (Sinatra) </td>
+	</tr>
+	<tr>
+		<td> Compl. 3: </td>
+		<td> <strong>1173</strong> </td>
+		<td> = (1157 + 1157 + 1155 + 1166 + 1232)/5 </td>
+		<td> <strong>1489</strong> (Sinatra) </td>
+	</tr>
+</table>
+<p>Quite breathtaking, especially in the low complexity case!</p>
+<p>Let&#8217;s calculate again a bit. We know that:</p>
+<table>
+	<tr>
+		<td> 1: </td>
+		<td> T(picky + sinatra) == 9*T(ricer) == 1/2000 (roughly) </td>
+	</tr>
+	<tr>
+		<td> 2: </td>
+		<td> T(picky) == ?*T(ricer) == 1/4000 (roughly) </td>
+	</tr>
+</table>
+<p>Rewriting:</p>
+<table>
+	<tr>
+		<td> 3: </td>
+		<td> T(picky + sinatra) == 2*T(picky) </td>
+		<td> from 1, 2. </td>
+	</tr>
+</table>
+<p>This was easier!</p>
+<p>From this we see that Sinatra takes as much time as does Picky in the low complexity case. For the highest complexity, Sinatra takes about 30% of the time that Picky takes.</p>
+<h2>Conclusion</h2>
+<p>Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Ricer does – is it prudent to try many fast servers, or should one simply not use Sinatra?</p>
+<p>We arrive at:</p>
+<p><strong>Which app server to choose is not as relevant as deciding whether to use Sinatra.</strong></p>
+<p>Surprised?</p>
+<p>Note (especially to Sinatra fans): Remember, this is always under the assumption that speed is the ultimate goal, and that flexibility can be sacrificed.</p>
+<p>However:</p>
+<p><strong>If the ultimate speed is what you need, choosing a fast server also becomes important.</strong></p>
+<p>That one is pretty obvious.</p>
+<p>What if we go one step further?</p>
+<h2>Next up: Sacrificing Rack?</h2>
+<p>The big question is:</p>
+<p><strong>What happens when we give up the flexibility afforded by Rack?</strong></p>
+<p>Let&#8217;s say we were to rewrite Ricer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).</p>
+<p>How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Ricer for ultimate speed.</p>
+<h2>Footnote 1: The pinnacle of ultimate speed</h2>
+<p>To compare: How fast would this be without app servers?</p>
+<p>Let&#8217;s first see how fast we can get: In pure Ruby</p>
+<pre class="sh_ruby"><code>p Benchmark.measure {&#x000A;  5000.times {&#x000A;    results = books.search 'a', 20, 0 # and "a* a", and "a* a* a", as above.&#x000A;    results.to_json&#x000A;  }&#x000A;}</code></pre>
+<p>Running this on a single core yields us the following (rounded) numbers:</p>
+<table>
+	<tr>
+		<td> Complexity 1: </td>
+		<td> <strong>6250</strong> </td>
+	</tr>
+	<tr>
+		<td> Complexity 2: </td>
+		<td> <strong>3000</strong> </td>
+	</tr>
+	<tr>
+		<td> Complexity 3: </td>
+		<td> <strong>1500</strong> </td>
+	</tr>
+</table>
+<p>Impressive.</p>
+<h2>Footnote 2: Results</h2>
+<p><span class="caps">FYI</span>, these are the <span class="caps">JSON</span> results Picky put together for each <span class="caps">HTTP</span> response:</p>
+<p>a: <pre class="sh_json"><code>{"allocations":[["books",18.439999999999998,74,[["author","a","a"]],[4,7,8,11,18,38,48,51,55,80,97,108,117,119,125,126,132,134,138,140]]],"offset":0,"duration":0.000163,"total":74}</code></pre></p>
+<p>a*-a: <pre class="sh_json"><code>{"allocations":[["books",9.872,36,[["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.00019,"total":36}</code></pre></p>
+<p>a*-a*-a: <pre class="sh_json"><code>{"allocations":[["books",15.44,36,[["author","a*","a"],["title","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",9.872,36,[["title","a*","a"],["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.000226,"total":36}</code></pre></p>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="And&amp;nbsp;faster&amp;nbsp;still" data-url="http://florianhanke.com/blog/2012/07/16/and-faster-still.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/07/02/picky-statistics-interface.html" title="Previous post: Picky&amp;nbsp;Statistics&amp;nbsp;Interface">Picky&nbsp;Statistics&nbsp;Interface</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/07/16/and-faster-still';
+          var disqus_url = 'http://florianhanke.com/blog/2012/07/16/and-faster-still.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

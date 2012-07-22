@@ -4,13 +4,306 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-07-02T18:18:49+10:00</updated>
+ <updated>2012-07-22T21:53:25+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">And&amp;nbsp;faster&amp;nbsp;still</title>
+   <link href="http://florianhanke.com/blog/2012/07/16/and-faster-still.html"/>
+   <updated>2012-07-16T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2012/07/16/and-faster-still</id>
+   <content type="html">&lt;p&gt;Lately I&amp;#8217;ve been obsessed with making Picky as fast as possible (while not sacrificing any flexibility).&lt;/p&gt;
+&lt;p&gt;This post is all about exploiting Picky&amp;#8217;s flexibility to gain speed. We&amp;#8217;ll also push towards its extremes to see how to sacrifice some of the flexibility to gain even more speed!&lt;/p&gt;
+&lt;p&gt;So if you need a high performance Picky, or simply like to see big numbers: This is the post for you!&lt;/p&gt;
+&lt;p&gt;As is the trade off of the high priests of speed: On the altar of performance, they are going to sacrifice flexibility…&lt;/p&gt;
+&lt;h2&gt;The tests&lt;/h2&gt;
+&lt;p&gt;All tests are run on my MacBook Pro 2010 model with 2 cores. They are all based on the standard Picky example you get when you run:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;$ picky generate server some_server_directory&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We will modify that example slightly to adapt it to use different servers, however.&lt;/p&gt;
+&lt;p&gt;We run three queries of varying complexity. First, just &amp;#8220;a&amp;#8221; (which means &amp;#8220;a*&amp;#8221;), complexity 1, then &amp;#8220;a* a&amp;#8221;, complexity 2, then &amp;#8220;a* a* a&amp;#8221; (see below for results of these queries). This covers more than 99% of all usual Picky search cases.
+As Picky is a combinatorial search engine, we expect a nonlinearly increasing query duration.&lt;/p&gt;
+&lt;p&gt;How much we will find out :)&lt;/p&gt;
+&lt;h2&gt;Unicorn&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;Unicorn&lt;/a&gt; is the workhorse of the web servers. It is reliable, can use multiple cores, and has so far been the recommended server for Picky, also because it weakens the impact of GC runs.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s see how it fares:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;619&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (600 + 632 + 625 + 620 + 619)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;588&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (595 + 585 + 580 + 596 + 584)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;527&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (561 + 537 + 425 + 552 + 562)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Quite respectably. But we don&amp;#8217;t want a workhorse. We want an arabian horse that shoots fire out of its nostrils! (and anywhere else, for that matter)&lt;/p&gt;
+&lt;h2&gt;Thin (with Sinatra)&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://code.macournoyer.com/thin/&quot;&gt;Thin&lt;/a&gt; is a very well known event machine based server. It is fast.&lt;/p&gt;
+&lt;p&gt;How fast?&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1252&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1262 + 1213 + 1270 + 1244 + 1269) / 5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1059&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1091 +  993 + 1042 + 1097 + 1074) / 5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 3: &lt;/td&gt;
+		&lt;td&gt;  &lt;strong&gt;936&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; =  (872 +  931 +  946 +  975 +  954) / 5 &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;That is impressive, given that these are the numbers from one core.&lt;/p&gt;
+&lt;p&gt;Two weeks ago, this happened:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://174.142.61.111/forum/files/a-challenger-appears-nignog_178.png&quot; style=&quot;float:none;&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h2&gt;Ricer (with Sinatra)&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://github.com/charliesome/ricer&quot;&gt;Ricer&lt;/a&gt; by &lt;a href=&quot;http://twitter.com/charliesome&quot;&gt;Charlie Somerville&lt;/a&gt; is a &amp;#8220;Rack compliant Ruby web server&amp;#8221;. It is mainly based on &lt;a href=&quot;http://github.com/joyent/libuv&quot;&gt;libuv&lt;/a&gt;. According to its &lt;a href=&quot;http://github.com/charliesome/ricer/blob/master/README.md&quot;&gt;&lt;span class=&quot;caps&quot;&gt;README&lt;/span&gt;&lt;/a&gt; (worth a look just for the image ;) ), it is twice as fast as thin using a &amp;#8220;Hello world!&amp;#8221; app.&lt;/p&gt;
+&lt;p&gt;As Picky performs a bit more work than a simple &amp;#8220;Hello world!&amp;#8221;, it won&amp;#8217;t be twice as fast. But how much faster will it be? Let&amp;#8217;s see…&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1370&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1374 + 1381 + 1384 + 1374 + 1337)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1134&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1243 + 1153 + 1088 + 1072 + 1115)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1094&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1143 + 1081 + 1081 + 1080 + 1084)/5 &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Now, why don&amp;#8217;t we get double the speed as with thin, as shown on &lt;a href=&quot;https://github.com/charliesome/ricer&quot;&gt;Ricer&amp;#8217;s webpage&lt;/a&gt;, but just 10%? The thing is, instead of just returning &amp;#8220;hello world&amp;#8221;, Picky needs to do a bit of work.&lt;/p&gt;
+&lt;h2&gt;Picky vs. Ricer&lt;/h2&gt;
+&lt;p&gt;To calculate how much of this time is needed by Picky, let&amp;#8217;s assume &amp;#8220;hello world&amp;#8221; takes no time at all, and Ricer is double as fast as thin. With Picky, Ricer is only 10% faster than thin. What does this tell us about Picky?&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s calculate a bit. With the time from &amp;#8220;hello world&amp;#8221; ignored we know:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 1: &lt;/td&gt;
+		&lt;td&gt; T(thin) / T(ricer) == 2 &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 2: &lt;/td&gt;
+		&lt;td&gt; (T(thin) + T(picky)) / (T(ricer) + T(picky)) == 1.1 &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Rewriting:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 3: &lt;/td&gt;
+		&lt;td&gt; T(thin) + T(picky) == 1.1*T(ricer) + 1.1*T(picky) &lt;/td&gt;
+		&lt;td&gt; from 2. &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 4: &lt;/td&gt;
+		&lt;td&gt; T(thin) &amp;#8211; 1.1*T(ricer) == 0.1*T(picky) &lt;/td&gt;
+		&lt;td&gt; from 3. &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 5: &lt;/td&gt;
+		&lt;td&gt; T(thin) == 2*T(ricer) &lt;/td&gt;
+		&lt;td&gt; from 1. &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 6: &lt;/td&gt;
+		&lt;td&gt; 0.9*T(ricer) == 0.1*T(picky) &lt;/td&gt;
+		&lt;td&gt; from 4, 5. &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 7: &lt;/td&gt;
+		&lt;td&gt; T(picky) == 9*T(ricer) &lt;/td&gt;
+		&lt;td&gt; from 6. &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;So, Picky (including Sinatra) takes around 9 times longer than Ricer. Let&amp;#8217;s remember this for our conclusion.&lt;/p&gt;
+&lt;h2&gt;Multiple processes&lt;/h2&gt;
+&lt;p&gt;In the Ruby web app world, to get more speed, we usually run more processes.&lt;/p&gt;
+&lt;p&gt;As Ricer cannot yet accept on file descriptors, I am going to use http load balancers &lt;a href=&quot;http://siag.nu/pen/&quot;&gt;Pen&lt;/a&gt; and &lt;a href=&quot;http://www.nginx.org/&quot;&gt;Nginx&lt;/a&gt; and see how they fare on my 2 core &lt;span class=&quot;caps&quot;&gt;MBP&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Pen (with Ricer)&lt;/h2&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1993&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (2140 + 1915 + 1901 + 2142 + 1869)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1370&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1696&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1798 + 1735 + 1631 + 1644 + 1673)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1134&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1490&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1256 + 1546 + 1541 + 1542 + 1565)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1094&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Certainly a good result, and plausible since it is not 2x as fast.&lt;/p&gt;
+&lt;h2&gt;Nginx (with Ricer)&lt;/h2&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;2048&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (2078 + 1993 + 1790 + 2177 + 2203)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1370&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1765&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1660 + 1843 + 1830 + 1684 + 1808)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1134&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1489&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1549 + 1456 + 1463 + 1473 + 1503)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1094&lt;/strong&gt; (1 core) &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Nginx seems to be a bit more speed-stable than Pen, but otherwise in the same ball-park.&lt;/p&gt;
+&lt;h2&gt;Sacrificing flexibility&lt;/h2&gt;
+&lt;p&gt;A high priest of speed approaches us to remind us of a good rule:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;To gain speed, one must often sacrifice an abstraction layer and its inherent flexibility. Evaluate if this flexibility is needed, and if not, sacrifice without remorse.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The question here is: Do we really need the routing etc. capabilities of Sinatra? (while still keeping the abstraction given to us by Rack)&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s assume we don&amp;#8217;t and rewrite our app a bit. To remove Sinatra, we simply do not inherit from &lt;code&gt;Sinatra::Base&lt;/code&gt; and install a &lt;code&gt;#call&lt;/code&gt; method on our class.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Prepare a few pseudo-constants.
+#
+query_string = &quot;QUERY_STRING&quot;.freeze
+result_array = [200, { &quot;Content-Type&quot; =&amp;gt; &quot;text/html&quot; }, []]
+regexp       = /\Aquery=([^&amp;amp;]+)&amp;amp;ids=([^&amp;amp;]+)&amp;amp;offset=([^\z]+)/
+
+# Define #call method.
+#
+define_method :call do |env|
+  # Extract relevant parameters.
+  #
+  _, query, ids, offset = *env[query_string].match(regexp)
+  results = books.search query, ids || 20, offset || 0
+  
+  # Put together result.
+  #
+  result_array[2][0] = results.to_json
+  
+  result_array
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Note that we manually extract the parameters from the query_string, and thus reduce the work done to only what we actually need. We don&amp;#8217;t need routing or any other processing.&lt;/p&gt;
+&lt;p&gt;However, we now can only call our app with a query string in the form:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;?query=S&amp;amp;ids=N&amp;amp;offset=M&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We run it the exact same way as the Sinatra app:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;run BookSearch.new&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(We can do this since we still use the abstraction defined by Rack)&lt;/p&gt;
+&lt;h2&gt;Removing Sinatra&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s see how our nosinatra approach turns out to be and compare:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;3972&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (3855 + 3900 + 4203 + 3574 + 4329)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;2048&lt;/strong&gt; (Sinatra) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;2295&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (2246 + 2352 + 2337 + 2294 + 2245)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1765&lt;/strong&gt; (Sinatra) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Compl. 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1173&lt;/strong&gt; &lt;/td&gt;
+		&lt;td&gt; = (1157 + 1157 + 1155 + 1166 + 1232)/5 &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1489&lt;/strong&gt; (Sinatra) &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Quite breathtaking, especially in the low complexity case!&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s calculate again a bit. We know that:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 1: &lt;/td&gt;
+		&lt;td&gt; T(picky + sinatra) == 9*T(ricer) == 1/2000 (roughly) &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 2: &lt;/td&gt;
+		&lt;td&gt; T(picky) == ?*T(ricer) == 1/4000 (roughly) &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Rewriting:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; 3: &lt;/td&gt;
+		&lt;td&gt; T(picky + sinatra) == 2*T(picky) &lt;/td&gt;
+		&lt;td&gt; from 1, 2. &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;This was easier!&lt;/p&gt;
+&lt;p&gt;From this we see that Sinatra takes as much time as does Picky in the low complexity case. For the highest complexity, Sinatra takes about 30% of the time that Picky takes.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Ricer does – is it prudent to try many fast servers, or should one simply not use Sinatra?&lt;/p&gt;
+&lt;p&gt;We arrive at:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Which app server to choose is not as relevant as deciding whether to use Sinatra.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Surprised?&lt;/p&gt;
+&lt;p&gt;Note (especially to Sinatra fans): Remember, this is always under the assumption that speed is the ultimate goal, and that flexibility can be sacrificed.&lt;/p&gt;
+&lt;p&gt;However:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;If the ultimate speed is what you need, choosing a fast server also becomes important.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;That one is pretty obvious.&lt;/p&gt;
+&lt;p&gt;What if we go one step further?&lt;/p&gt;
+&lt;h2&gt;Next up: Sacrificing Rack?&lt;/h2&gt;
+&lt;p&gt;The big question is:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What happens when we give up the flexibility afforded by Rack?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s say we were to rewrite Ricer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).&lt;/p&gt;
+&lt;p&gt;How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Ricer for ultimate speed.&lt;/p&gt;
+&lt;h2&gt;Footnote 1: The pinnacle of ultimate speed&lt;/h2&gt;
+&lt;p&gt;To compare: How fast would this be without app servers?&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s first see how fast we can get: In pure Ruby&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;p Benchmark.measure {
+  5000.times {
+    results = books.search 'a', 20, 0 # and &quot;a* a&quot;, and &quot;a* a* a&quot;, as above.
+    results.to_json
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Running this on a single core yields us the following (rounded) numbers:&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 1: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;6250&lt;/strong&gt; &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 2: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;3000&lt;/strong&gt; &lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt; Complexity 3: &lt;/td&gt;
+		&lt;td&gt; &lt;strong&gt;1500&lt;/strong&gt; &lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;Impressive.&lt;/p&gt;
+&lt;h2&gt;Footnote 2: Results&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&quot;caps&quot;&gt;FYI&lt;/span&gt;, these are the &lt;span class=&quot;caps&quot;&gt;JSON&lt;/span&gt; results Picky put together for each &lt;span class=&quot;caps&quot;&gt;HTTP&lt;/span&gt; response:&lt;/p&gt;
+&lt;p&gt;a: &lt;pre class=&quot;sh_json&quot;&gt;&lt;code&gt;{&quot;allocations&quot;:[[&quot;books&quot;,18.439999999999998,74,[[&quot;author&quot;,&quot;a&quot;,&quot;a&quot;]],[4,7,8,11,18,38,48,51,55,80,97,108,117,119,125,126,132,134,138,140]]],&quot;offset&quot;:0,&quot;duration&quot;:0.000163,&quot;total&quot;:74}&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;a*-a: &lt;pre class=&quot;sh_json&quot;&gt;&lt;code&gt;{&quot;allocations&quot;:[[&quot;books&quot;,9.872,36,[[&quot;author&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a&quot;,&quot;a&quot;]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],[&quot;books&quot;,6.568,262,[[&quot;title&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a&quot;,&quot;a&quot;]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],&quot;offset&quot;:0,&quot;duration&quot;:0.00019,&quot;total&quot;:36}&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;a*-a*-a: &lt;pre class=&quot;sh_json&quot;&gt;&lt;code&gt;{&quot;allocations&quot;:[[&quot;books&quot;,15.44,36,[[&quot;author&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a&quot;,&quot;a&quot;]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],[&quot;books&quot;,9.872,36,[[&quot;title&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;author&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a&quot;,&quot;a&quot;]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],[&quot;books&quot;,6.568,262,[[&quot;title&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a*&quot;,&quot;a&quot;],[&quot;title&quot;,&quot;a&quot;,&quot;a&quot;]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],&quot;offset&quot;:0,&quot;duration&quot;:0.000226,&quot;total&quot;:36}&lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Statistics&amp;nbsp;Interface</title>

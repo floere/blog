@@ -12,58 +12,225 @@ This post is all about exploiting Picky's flexibility to gain speed. We'll also 
 
 So if you need a high performance Picky, or simply like to see big numbers: This is the post for you!
 
-h2. Webrick
+As is the trade off of the high priests of speed: On the altar of performance, they are going to sacrifice flexibility…
 
-a: {"allocations":[["books",18.439999999999998,74,[["author","a","a"]],[4,7,8,11,18,38,48,51,55,80,97,108,117,119,125,126,132,134,138,140]]],"offset":0,"duration":0.000163,"total":74}
+h2. The tests
 
-a*-a: {"allocations":[["books",9.872,36,[["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.00019,"total":36}
+All tests are run on my MacBook Pro 2010 model with 2 cores. They are all based on the standard Picky example you get when you run:
 
-a*-a*-a: {"allocations":[["books",15.44,36,[["author","a*","a"],["title","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",9.872,36,[["title","a*","a"],["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.000226,"total":36}
+<pre class="sh_shell"><code>$ picky generate server some_server_directory</code></pre>
 
-h2. Thin (with Sinatra)
+We will modify that example slightly to adapt it to use different servers, however.
 
-1 core:
-1262 1213 1270 1244 1269
-1091  993 1042 1097 1074
- 872  931  946  975  954
+We run three queries of varying complexity. First, just "a" (which means "a*"), complexity 1, then "a* a", complexity 2, then "a* a* a" (see below for results of these queries). This covers more than 99% of all usual Picky search cases.
+As Picky is a combinatorial search engine, we expect a nonlinearly increasing query duration.
+
+How much we will find out :)
 
 h2. Unicorn
 
-1 core:
-600 632 625 620 619
-595 585 580 596 584
-561 537 425 552 562
+"Unicorn":http://unicorn.bogomips.org/ is the workhorse of the web servers. It is reliable, can use multiple cores, and has so far been the recommended server for Picky, also because it weakens the impact of GC runs.
+
+Let's see how it fares:
+
+| Complexity 1: | *619* | = (600 + 632 + 625 + 620 + 619)/5 |
+| Complexity 2: | *588* | = (595 + 585 + 580 + 596 + 584)/5 |
+| Complexity 3: | *527* | = (561 + 537 + 425 + 552 + 562)/5 |
+
+Quite respectably. But we don't want a workhorse. We want an arabian horse that shoots fire out of its nostrils! (and anywhere else, for that matter)
+
+h2. Thin (with Sinatra)
+
+"Thin":http://code.macournoyer.com/thin/ is a very well known event machine based server. It is fast.
+
+How fast?
+
+| Complexity 1: | *1252* | = (1262 + 1213 + 1270 + 1244 + 1269) / 5 |
+| Complexity 2: | *1059* | = (1091 +  993 + 1042 + 1097 + 1074) / 5 |
+| Complexity 3: |  *936* | =  (872 +  931 +  946 +  975 +  954) / 5 |
+
+That is impressive, given that these are the numbers from one core.
+
+Two weeks ago, this happened:
+
+!{float:none}http://174.142.61.111/forum/files/a-challenger-appears-nignog_178.png!
 
 h2. Ricer (with Sinatra)
 
-Ricer is a ...
+"Ricer":http://github.com/charliesome/ricer by "Charlie Somerville":http://twitter.com/charliesome is a "Rack compliant Ruby web server". It is mainly based on "libuv":http://github.com/joyent/libuv. According to its "README":http://github.com/charliesome/ricer/blob/master/README.md (worth a look just for the image ;) ), it is twice as fast as thin using a "Hello world!" app.
 
-1 core:
-1374 1381 1384 1374 1337
-1243 1153 1088 1072 1115
-1143 1081 1081 1080 1084
+As Picky performs a bit more work than a simple "Hello world!", it won't be twice as fast. But how much faster will it be? Let's see…
+
+| Complexity 1: | *1370* | = (1374 + 1381 + 1384 + 1374 + 1337)/5 |
+| Complexity 2: | *1134* | = (1243 + 1153 + 1088 + 1072 + 1115)/5 |
+| Complexity 3: | *1094* | = (1143 + 1081 + 1081 + 1080 + 1084)/5 |
+
+Now, why don't we get double the speed as with thin, as shown on "Ricer's webpage":https://github.com/charliesome/ricer, but just 10%? The thing is, instead of just returning "hello world", Picky needs to do a bit of work.
+
+h2. Picky vs. Ricer
+
+To calculate how much of this time is needed by Picky, let's assume "hello world" takes no time at all, and Ricer is double as fast as thin. With Picky, Ricer is only 10% faster than thin. What does this tell us about Picky?
+
+Let's calculate a bit. With the time from "hello world" ignored we know:
+
+| 1: | T(thin) / T(ricer) == 2 |
+| 2: | (T(thin) + T(picky)) / (T(ricer) + T(picky)) == 1.1 |
+
+Rewriting:
+
+| 3: | T(thin) + T(picky) == 1.1*T(ricer) + 1.1*T(picky) | from 2. |
+| 4: | T(thin) - 1.1*T(ricer) == 0.1*T(picky) | from 3. |
+| 5: | T(thin) == 2*T(ricer) | from 1. |
+| 6: | 0.9*T(ricer) == 0.1*T(picky) | from 4, 5. |
+| 7: | T(picky) == 9*T(ricer) | from 6. |
+
+So, Picky (including Sinatra) takes around 9 times longer than Ricer. Let's remember this for our conclusion.
+
+h2. Multiple processes
+
+In the Ruby web app world, to get more speed, we usually run more processes.
+
+As Ricer cannot yet accept on file descriptors, I am going to use http load balancers "Pen":http://siag.nu/pen/ and "Nginx":http://www.nginx.org/ and see how they fare on my 2 core MBP.
 
 h2. Pen (with Ricer)
 
-2 ricers:
-2140 1915 1901 2142 1869
-1798 1735 1631 1644 1673
-1256 1546 1541 1542 1565
+| Compl. 1: | *1993* | = (2140 + 1915 + 1901 + 2142 + 1869)/5 | *1370* (1 core) |
+| Compl. 2: | *1696* | = (1798 + 1735 + 1631 + 1644 + 1673)/5 | *1134* (1 core) |
+| Compl. 3: | *1490* | = (1256 + 1546 + 1541 + 1542 + 1565)/5 | *1094* (1 core) |
+
+Certainly a good result, and plausible since it is not 2x as fast.
 
 h2. Nginx (with Ricer)
 
-2 ricers:
-2078 1993 1790 2177 2203
-1660 1843 1830 1684 1808
-1549 1456 1463 1473 1503
+| Compl. 1: | *2048* | = (2078 + 1993 + 1790 + 2177 + 2203)/5 | *1370* (1 core) |
+| Compl. 2: | *1765* | = (1660 + 1843 + 1830 + 1684 + 1808)/5 | *1134* (1 core) |
+| Compl. 3: | *1489* | = (1549 + 1456 + 1463 + 1473 + 1503)/5 | *1094* (1 core) |
 
-h2. Sinatra?
+Nginx seems to be a bit more speed-stable than Pen, but otherwise in the same ball-park.
 
-2 ricers. nginx, no sinatra:
-3855 3900 4203 3574 4329
-2246 2352 2337 2294 2245
-1157 1157 1155 1166 1232
+h2. Sacrificing flexibility
 
-h2. Rack?
+A high priest of speed approaches us to remind us of a good rule:
+
+*To gain speed, one must often sacrifice an abstraction layer and its inherent flexibility. Evaluate if this flexibility is needed, and if not, sacrifice without remorse.*
+
+The question here is: Do we really need the routing etc. capabilities of Sinatra? (while still keeping the abstraction given to us by Rack)
+
+Let's assume we don't and rewrite our app a bit. To remove Sinatra, we simply do not inherit from @Sinatra::Base@ and install a @#call@ method on our class.
+
+<pre class="sh_ruby"><code># Prepare a few pseudo-constants.
+#
+query_string = "QUERY_STRING".freeze
+result_array = [200, { "Content-Type" => "text/html" }, []]
+regexp       = /\Aquery=([^&]+)&ids=([^&]+)&offset=([^\z]+)/
+
+# Define #call method.
+#
+define_method :call do |env|
+  # Extract relevant parameters.
+  #
+  _, query, ids, offset = *env[query_string].match(regexp)
+  results = books.search query, ids || 20, offset || 0
+  
+  # Put together result.
+  #
+  result_array[2][0] = results.to_json
+  
+  result_array
+end</code></pre>
+
+Note that we manually extract the parameters from the query_string, and thus reduce the work done to only what we actually need. We don't need routing or any other processing.
+
+However, we now can only call our app with a query string in the form:
+
+<pre class="sh_shell"><code>?query=S&ids=N&offset=M</code></pre>
+
+We run it the exact same way as the Sinatra app:
+
+<pre class="sh_ruby"><code>run BookSearch.new</code></pre>
+
+(We can do this since we still use the abstraction defined by Rack)
+
+h2. Removing Sinatra
+
+Let's see how our nosinatra approach turns out to be and compare:
+
+| Compl. 1: | *3972* | = (3855 + 3900 + 4203 + 3574 + 4329)/5 | *2048* (Sinatra) |
+| Compl. 2: | *2295* | = (2246 + 2352 + 2337 + 2294 + 2245)/5 | *1765* (Sinatra) |
+| Compl. 3: | *1173* | = (1157 + 1157 + 1155 + 1166 + 1232)/5 | *1489* (Sinatra) |
+
+Quite breathtaking, especially in the low complexity case!
+
+Let's calculate again a bit. We know that:
+
+| 1: | T(picky + sinatra) == 9*T(ricer) == 1/2000 (roughly) |
+| 2: | T(picky) == ?*T(ricer) == 1/4000 (roughly) |
+
+Rewriting:
+
+| 3: | T(picky + sinatra) == 2*T(picky) | from 1, 2. |
+
+This was easier!
+
+From this we see that Sinatra takes as much time as does Picky in the low complexity case. For the highest complexity, Sinatra takes about 30% of the time that Picky takes.
 
 h2. Conclusion
+
+Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Ricer does – is it prudent to try many fast servers, or should one simply not use Sinatra?
+
+We arrive at:
+
+*Which app server to choose is not as relevant as deciding whether to use Sinatra.*
+
+Surprised?
+
+Note (especially to Sinatra fans): Remember, this is always under the assumption that speed is the ultimate goal, and that flexibility can be sacrificed.
+
+However:
+
+*If the ultimate speed is what you need, choosing a fast server also becomes important.*
+
+That one is pretty obvious.
+
+What if we go one step further?
+
+h2. Next up: Sacrificing Rack?
+
+The big question is:
+
+*What happens when we give up the flexibility afforded by Rack?*
+
+Let's say we were to rewrite Ricer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).
+
+How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Ricer for ultimate speed.
+
+h2. Footnote 1: The pinnacle of ultimate speed
+
+To compare: How fast would this be without app servers?
+
+Let's first see how fast we can get: In pure Ruby
+
+<pre class="sh_ruby"><code>p Benchmark.measure {
+  5000.times {
+    results = books.search 'a', 20, 0 # and "a* a", and "a* a* a", as above.
+    results.to_json
+  }
+}</code></pre>
+
+Running this on a single core yields us the following (rounded) numbers:
+
+| Complexity 1: | *6250* |
+| Complexity 2: | *3000* |
+| Complexity 3: | *1500* |
+
+Impressive.
+
+h2. Footnote 2: Results
+
+FYI, these are the JSON results Picky put together for each HTTP response:
+
+a: <pre class="sh_json"><code>{"allocations":[["books",18.439999999999998,74,[["author","a","a"]],[4,7,8,11,18,38,48,51,55,80,97,108,117,119,125,126,132,134,138,140]]],"offset":0,"duration":0.000163,"total":74}</code></pre>
+
+a*-a: <pre class="sh_json"><code>{"allocations":[["books",9.872,36,[["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.00019,"total":36}</code></pre>
+
+a*-a*-a: <pre class="sh_json"><code>{"allocations":[["books",15.44,36,[["author","a*","a"],["title","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",9.872,36,[["title","a*","a"],["author","a*","a"],["title","a","a"]],[4,7,8,11,18,38,48,51,55,80,117,119,132,134,138,142,165,184,227,239]],["books",6.568,262,[["title","a*","a"],["title","a*","a"],["title","a","a"]],[2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]]],"offset":0,"duration":0.000226,"total":36}</code></pre>

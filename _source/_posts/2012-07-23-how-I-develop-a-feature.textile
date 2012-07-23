@@ -1,12 +1,12 @@
 ---
 layout: post
-title: How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature
+title: How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature&nbsp;for&nbsp;Picky
 categories:
   - ruby
   - picky
   - development
 ---
-How do I add a feature to a framework, for example "Picky":http://florianhanke.com/picky? When? Why?
+How do I add a feature – here: "Facets":https://en.wikipedia.org/wiki/Faceted_search – to "Picky":http://florianhanke.com/picky? When? Why?
 
 Starting out 2 years ago, I had a relatively clear picture of what I was going to do in the original "roadmap":https://github.com/floere/picky/wiki/Roadmap.
 

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-07-23T19:17:31+10:00</updated>
+ <updated>2012-07-23T19:23:19+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -13,11 +13,11 @@
 
  
  <entry>
-   <title type="html">How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature</title>
+   <title type="html">How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature&amp;nbsp;for&amp;nbsp;Picky</title>
    <link href="http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature.html"/>
    <updated>2012-07-23T00:00:00+10:00</updated>
    <id>http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature</id>
-   <content type="html">&lt;p&gt;How do I add a feature to a framework, for example &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt;? When? Why?&lt;/p&gt;
+   <content type="html">&lt;p&gt;How do I add a feature – here: &lt;a href=&quot;https://en.wikipedia.org/wiki/Faceted_search&quot;&gt;Facets&lt;/a&gt; – to &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt;? When? Why?&lt;/p&gt;
 &lt;p&gt;Starting out 2 years ago, I had a relatively clear picture of what I was going to do in the original &lt;a href=&quot;https://github.com/floere/picky/wiki/Roadmap&quot;&gt;roadmap&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The last 3 points are:&lt;/p&gt;
 &lt;ul&gt;

@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-07-23T09:37:54+10:00</updated>
+ <updated>2012-07-23T09:40:44+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -27,7 +27,7 @@
 &lt;p&gt;We will modify that example slightly to adapt it to use different servers, however.&lt;/p&gt;
 &lt;p&gt;We run three queries of varying complexity. First, just &amp;#8220;a&amp;#8221; (which means &amp;#8220;a*&amp;#8221;), complexity 1, then &amp;#8220;a* a&amp;#8221;, complexity 2, then &amp;#8220;a* a* a&amp;#8221; (see below for results of these queries). This covers more than 99% of all usual Picky search cases.
 As Picky is a combinatorial search engine, we expect a nonlinearly increasing query duration.&lt;/p&gt;
-&lt;p&gt;Numbers denote requests per second.&lt;/p&gt;
+&lt;p&gt;All numbers are in requests per second.&lt;/p&gt;
 &lt;p&gt;How much we will find out :)&lt;/p&gt;
 &lt;h2&gt;Unicorn&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&quot;http://unicorn.bogomips.org/&quot;&gt;Unicorn&lt;/a&gt; is the workhorse of the web servers. It is reliable, can use multiple cores, and has so far been the recommended server for Picky, also because it weakens the impact of GC runs.&lt;/p&gt;

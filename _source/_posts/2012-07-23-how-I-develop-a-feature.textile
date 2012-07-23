@@ -1,0 +1,210 @@
+---
+layout: post
+title: How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature
+categories:
+  - ruby
+  - picky
+  - development
+---
+How do I add a feature to a framework, for example "Picky":http://florianhanke.com/picky? When? Why?
+
+Starting out 2 years ago, I had a relatively clear picture of what I was going to do in the original "roadmap":https://github.com/floere/picky/wiki/Roadmap.
+
+The last 3 points are:
+
+* Obtain real live octopus. Call it Picky and teach it searching tricks.
+* Become mayor of Krakow. Hold more Ruby conferences there. Eat all the available polish food.
+* Implement coffee making capabilities.
+
+Pets aren't allowed by my landlord. Also, as you can see I'm still working on becoming the mayor of Krakow. Regarding the coffee making capabilities, I am still evaluating several brands of coffee, converging on Papua New Guinean blue mountain sun roasted beans.
+
+Thankfully, world domination is already achieved. Or can you show me one of the seven seas which is not yet filled with octopi?
+
+But seriously: Where do you go from here? Total chaos, burning lines of code? Software pattern anarchy? Class warfare?
+
+h2. UNDD: User Need Driven Development
+
+I find myself often without direction regarding Picky – since I don't use it myself for any especially challenging projects (with Picky, too, no project is challenging - just kidding), how does it get to push its own boundaries?
+
+Thankfully, Picky has a few helpful users to push it a bit:
+
+*UNDD*, aka User Need Driven Development!
+(Coincidentally almost the German word for "and", ie. "und" – UNDD expressed as a sentence: "We'd like this and that and and and and…", it basically never ends)
+
+A week ago, UNDD happened: "https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME":https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME
+
+David Lowenfels asked: "I am wondering if Picky can do facets?"
+
+As with any case of UNDD, if there is no philosophical reason against including it in a framework, the answer is always:
+
+*Not yet, but…*
+
+h2. Example: Facets
+
+Facets – as I understand them – is slicing the available data into categories and category-facets.
+
+David gave a good example with "this hiking boot page":http://www.trailspace.com/gear/boots/midweight/. On the left facets are used to refine (filter) the results. In "Brand" we find "Salomon", "Merrell", "Timberland", etc.
+
+If you then choose eg. "Salomon", only Salomon shoes are shown. And, more importantly, not all Gender refinements are available anymore, but only the ones that are relevant to the brand "Salomon".
+
+So, should I add that to Picky? Let's review the _official feature policy_ (TM):
+
+h2. Feature Philosophy
+
+Picky's "Feature Philosophy":https://github.com/floere/picky/wiki/Feature-Philosophy, reprinted here:
+
+<pre class="sh_shell"><code>1. If it is relatively easy to do, I write a feature myself.
+2. If it is relatively easy to do, but not perfect, I write it myself too, with the option of adding an adapter to another search engine later.
+3. If it is hard to do (and it is too much against Picky’s structure and way of doing things), I write a Query object that uses another search engine.</code></pre>
+
+Is it easy to do?
+
+My first reaction to David's question was: Of course! Facets are all about filtering – and Picky is all about filtering.
+
+Eeeeeasy. *Right?*
+
+Not necessarily. Although Picky's inverted indexes (eg. { 'florian' => [1, 4, 5, 19] }) already contain the right structure to get facets, it's not so clear cut in the case where a facet already was applied as a filter.
+
+Initially I thought that this is a #1 case, but due to the multiple facets applied filtering, it's squarely in #2: I can write it myself, but it might not be _that_ easy.
+
+How do we go about implementing this feature?
+
+h2. Write first
+
+Write first. Before your code reaches perfection, just write. This could be rewritten as *Stupid and works > Perfect and doesn't*.
+
+I always write a very simple solution first, and even though it might be slow, I am happy.
+
+h3. Straightforward facets on the Index instance
+
+The first stab at facets for class @Picky::Index@ was ultra simple:
+
+<pre class="sh_ruby"><code>def facets category_identifier
+  self[category_identifier].exact.weights
+end</code></pre>
+
+So I simply get the right category from the index and extract the right index. In this case the weights.
+
+It is used like so (@data@ is the index):
+
+<pre class="sh_ruby"><code>data.facets :brand</code></pre>
+
+This code eg. results in:
+
+<pre class="sh_ruby"><code>{
+  'salomon' => 3.14,
+  'merell' => 1.61,
+  …
+}</code></pre>
+
+Nice, eh?
+
+The actual method signature is now @facets(:category, more_than: N)@ with the @more_than@ option a filter for only including facets with weight higher than @N@.
+
+This is, of course, blazingly fast.
+
+What about facet filtering?
+
+h3. Filtered facets on the Search instance
+
+This one was a bit of a head scratcher. Picky does not have any indexes that would allow it to easily extract filtered facets.
+
+What was I to do?
+
+Remembering "write first" I simply made it work, disregarding all performance issues. Some details are omitted:
+
+<pre class="sh_ruby"><code>def facets category_identifier, options = {}
+  weights = index.facets category_identifier, options
+  
+  return weights unless filter_query = options[:filter]
+  
+  weights.select do |key, weight|
+    search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total > 0
+  end
+end</code></pre>
+
+This is used like so:
+
+<pre class="sh_ruby"><code>search.facets :brand, filter: 'gender:unisex', more_than: 3.14</code></pre>
+
+Let's look at the code pieces in turn:
+
+<pre class="sh_ruby"><code>weights = index.facets category_identifier, options</code></pre>
+
+Get the facet hash we got from the facets method in the last section.
+
+If we don't filter:
+
+<pre class="sh_ruby"><code>return weights unless filter_query = options[:filter]</code></pre>
+
+we simply return it as-is, as in the @facets@ method on an index.
+
+If we need to filter, go over all facets, and remove the ones where we get zero results when applying the filter:
+
+<pre class="sh_ruby"><code>weights.select do |key, weight|
+  search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total > 0
+end</code></pre>
+
+This returns a facet hash as in the other method.
+
+Note that Picky actually runs a query for each facet.
+
+Is this a problem? It was for David, as he had more than 100 facets. So for each of the 100 facets, a query was run.
+
+However, facets usually number only in extreme cases over 20. I'd say a more useful range is 3 to 10 (see "http://www.trailspace.com/gear/boots/midweight/":http://www.trailspace.com/gear/boots/midweight/).
+
+In addition to that, facet results are highly cacheable. There is no reason not to cache this result – except, of course, if the data is highly dynamic. But even then, I'd cache it for half an hour.
+
+If you look at the last piece of code, you notice something: @filter_query@ is passed into that search multiple times. Couldn't that be optimized? 
+
+h2. Clean up later
+
+Indeed it can. But remember, we wanted to get it out and working first. This serves a dual purpose:
+
+* A user can already work with it, with the promise of it getting faster.
+* I am now under pressure of improving it.
+
+The above code then resulted in this mini roadmap for facets:
+
+# -Write first simple implementation.- (This can be released as "experimental")
+# Improve the code by not tokenizing the filter query each time. (This can be released officially)
+# Optimize the code by either redefining the API, or only partially run the query. (This can be released in a white paper)
+
+What do I mean by #2? Again, for each facet, Picky does the work of tokenizing the @filter_query@ that is interpolated into the query. See:
+
+<pre class="sh_ruby"><code>search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total > 0</code></pre>
+
+This is bad, of course. So we could rewrite the method to either only accept a pretokenized filter, something like:
+
+<pre class="sh_ruby"><code>search.facets :brand, filter: [['gender'], 'unisex', ['price', 'age'], 50], more_than: 3.14</code></pre>
+
+So, a filter would be an array of pairs, @filter categories@ and @filter value@. This would reduce the impact on Picky a lot already. However, I like the flexibility of passing in a search string to filter.
+
+So #2 means that Picky will process the string once, and we will then use the tokenized results to put together an optimized query. Something akin to:
+
+<pre class="sh_ruby"><code>filter_tokens = tokenize filter_query
+facets.select do |key, _|
+  query_tokens = tokenize "#{category_identifier}:#{key}"
+  search_with(filter_tokens + query_tokens, 0, 0).total > 0
+end</code></pre>
+
+Suddenly we don't do as much work anymore. Nice.
+
+Point #3 is a bit harder, and usually, this is optional, or a coding/thinking goodie for later. Here, I could partially evaluate the filter query, and then use the halfway evaluated query to inject it with the variable parts (each facet), and continue running it for the final result. If this just sounded like garbled blah to you - it's fine. It just means I have no idea how to specifically do this. Yet.
+
+h2. In short
+
+This is how I develop Picky features:
+
+# Listen to the needs of your users.
+# Check if the need goes against the Picky grain.
+# Say "Not yet."
+# Implement stupidly.
+# Release experimentally.
+# Say "Please try."
+# Refine cleverly.
+# Release officially.
+# Leave ultra-cool rewrite for a glorious future.
+# Wait for next user request.
+
+And that is it.

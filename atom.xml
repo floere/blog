@@ -4,13 +4,149 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-07-23T13:55:06+10:00</updated>
+ <updated>2012-07-23T19:17:31+10:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature</title>
+   <link href="http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature.html"/>
+   <updated>2012-07-23T00:00:00+10:00</updated>
+   <id>http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature</id>
+   <content type="html">&lt;p&gt;How do I add a feature to a framework, for example &lt;a href=&quot;http://florianhanke.com/picky&quot;&gt;Picky&lt;/a&gt;? When? Why?&lt;/p&gt;
+&lt;p&gt;Starting out 2 years ago, I had a relatively clear picture of what I was going to do in the original &lt;a href=&quot;https://github.com/floere/picky/wiki/Roadmap&quot;&gt;roadmap&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The last 3 points are:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Obtain real live octopus. Call it Picky and teach it searching tricks.&lt;/li&gt;
+	&lt;li&gt;Become mayor of Krakow. Hold more Ruby conferences there. Eat all the available polish food.&lt;/li&gt;
+	&lt;li&gt;Implement coffee making capabilities.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Pets aren&amp;#8217;t allowed by my landlord. Also, as you can see I&amp;#8217;m still working on becoming the mayor of Krakow. Regarding the coffee making capabilities, I am still evaluating several brands of coffee, converging on Papua New Guinean blue mountain sun roasted beans.&lt;/p&gt;
+&lt;p&gt;Thankfully, world domination is already achieved. Or can you show me one of the seven seas which is not yet filled with octopi?&lt;/p&gt;
+&lt;p&gt;But seriously: Where do you go from here? Total chaos, burning lines of code? Software pattern anarchy? Class warfare?&lt;/p&gt;
+&lt;h2&gt;&lt;span class=&quot;caps&quot;&gt;UNDD&lt;/span&gt;: User Need Driven Development&lt;/h2&gt;
+&lt;p&gt;I find myself often without direction regarding Picky – since I don&amp;#8217;t use it myself for any especially challenging projects (with Picky, too, no project is challenging &amp;#8211; just kidding), how does it get to push its own boundaries?&lt;/p&gt;
+&lt;p&gt;Thankfully, Picky has a few helpful users to push it a bit:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;span class=&quot;caps&quot;&gt;UNDD&lt;/span&gt;&lt;/strong&gt;, aka User Need Driven Development!
+(Coincidentally almost the German word for &amp;#8220;and&amp;#8221;, ie. &amp;#8220;und&amp;#8221; – &lt;span class=&quot;caps&quot;&gt;UNDD&lt;/span&gt; expressed as a sentence: &amp;#8220;We&amp;#8217;d like this and that and and and and…&amp;#8221;, it basically never ends)&lt;/p&gt;
+&lt;p&gt;A week ago, &lt;span class=&quot;caps&quot;&gt;UNDD&lt;/span&gt; happened: &lt;a href=&quot;https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME&quot;&gt;https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;David Lowenfels asked: &amp;#8220;I am wondering if Picky can do facets?&amp;#8221;&lt;/p&gt;
+&lt;p&gt;As with any case of &lt;span class=&quot;caps&quot;&gt;UNDD&lt;/span&gt;, if there is no philosophical reason against including it in a framework, the answer is always:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Not yet, but…&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;Example: Facets&lt;/h2&gt;
+&lt;p&gt;Facets – as I understand them – is slicing the available data into categories and category-facets.&lt;/p&gt;
+&lt;p&gt;David gave a good example with &lt;a href=&quot;http://www.trailspace.com/gear/boots/midweight/&quot;&gt;this hiking boot page&lt;/a&gt;. On the left facets are used to refine (filter) the results. In &amp;#8220;Brand&amp;#8221; we find &amp;#8220;Salomon&amp;#8221;, &amp;#8220;Merrell&amp;#8221;, &amp;#8220;Timberland&amp;#8221;, etc.&lt;/p&gt;
+&lt;p&gt;If you then choose eg. &amp;#8220;Salomon&amp;#8221;, only Salomon shoes are shown. And, more importantly, not all Gender refinements are available anymore, but only the ones that are relevant to the brand &amp;#8220;Salomon&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;So, should I add that to Picky? Let&amp;#8217;s review the &lt;em&gt;official feature policy&lt;/em&gt;&amp;#8482;:&lt;/p&gt;
+&lt;h2&gt;Feature Philosophy&lt;/h2&gt;
+&lt;p&gt;Picky&amp;#8217;s &lt;a href=&quot;https://github.com/floere/picky/wiki/Feature-Philosophy&quot;&gt;Feature Philosophy&lt;/a&gt;, reprinted here:&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;1. If it is relatively easy to do, I write a feature myself.
+2. If it is relatively easy to do, but not perfect, I write it myself too, with the option of adding an adapter to another search engine later.
+3. If it is hard to do (and it is too much against Picky’s structure and way of doing things), I write a Query object that uses another search engine.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Is it easy to do?&lt;/p&gt;
+&lt;p&gt;My first reaction to David&amp;#8217;s question was: Of course! Facets are all about filtering – and Picky is all about filtering.&lt;/p&gt;
+&lt;p&gt;Eeeeeasy. &lt;strong&gt;Right?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Not necessarily. Although Picky&amp;#8217;s inverted indexes (eg. { &amp;#8216;florian&amp;#8217; =&amp;gt; [1, 4, 5, 19] }) already contain the right structure to get facets, it&amp;#8217;s not so clear cut in the case where a facet already was applied as a filter.&lt;/p&gt;
+&lt;p&gt;Initially I thought that this is a #1 case, but due to the multiple facets applied filtering, it&amp;#8217;s squarely in #2: I can write it myself, but it might not be &lt;em&gt;that&lt;/em&gt; easy.&lt;/p&gt;
+&lt;p&gt;How do we go about implementing this feature?&lt;/p&gt;
+&lt;h2&gt;Write first&lt;/h2&gt;
+&lt;p&gt;Write first. Before your code reaches perfection, just write. This could be rewritten as &lt;strong&gt;Stupid and works &amp;gt; Perfect and doesn&amp;#8217;t&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;I always write a very simple solution first, and even though it might be slow, I am happy.&lt;/p&gt;
+&lt;h3&gt;Straightforward facets on the Index instance&lt;/h3&gt;
+&lt;p&gt;The first stab at facets for class &lt;code&gt;Picky::Index&lt;/code&gt; was ultra simple:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def facets category_identifier
+  self[category_identifier].exact.weights
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So I simply get the right category from the index and extract the right index. In this case the weights.&lt;/p&gt;
+&lt;p&gt;It is used like so (&lt;code&gt;data&lt;/code&gt; is the index):&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;data.facets :brand&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This code eg. results in:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;{
+  'salomon' =&amp;gt; 3.14,
+  'merell' =&amp;gt; 1.61,
+  …
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Nice, eh?&lt;/p&gt;
+&lt;p&gt;The actual method signature is now &lt;code&gt;facets(:category, more_than: N)&lt;/code&gt; with the &lt;code&gt;more_than&lt;/code&gt; option a filter for only including facets with weight higher than &lt;code&gt;N&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This is, of course, blazingly fast.&lt;/p&gt;
+&lt;p&gt;What about facet filtering?&lt;/p&gt;
+&lt;h3&gt;Filtered facets on the Search instance&lt;/h3&gt;
+&lt;p&gt;This one was a bit of a head scratcher. Picky does not have any indexes that would allow it to easily extract filtered facets.&lt;/p&gt;
+&lt;p&gt;What was I to do?&lt;/p&gt;
+&lt;p&gt;Remembering &amp;#8220;write first&amp;#8221; I simply made it work, disregarding all performance issues. Some details are omitted:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def facets category_identifier, options = {}
+  weights = index.facets category_identifier, options
+  
+  return weights unless filter_query = options[:filter]
+  
+  weights.select do |key, weight|
+    search(&quot;#{filter_query} #{category_identifier}:#{key}&quot;, 0, 0).total &amp;gt; 0
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is used like so:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;search.facets :brand, filter: 'gender:unisex', more_than: 3.14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let&amp;#8217;s look at the code pieces in turn:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;weights = index.facets category_identifier, options&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Get the facet hash we got from the facets method in the last section.&lt;/p&gt;
+&lt;p&gt;If we don&amp;#8217;t filter:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;return weights unless filter_query = options[:filter]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;we simply return it as-is, as in the &lt;code&gt;facets&lt;/code&gt; method on an index.&lt;/p&gt;
+&lt;p&gt;If we need to filter, go over all facets, and remove the ones where we get zero results when applying the filter:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;weights.select do |key, weight|
+  search(&quot;#{filter_query} #{category_identifier}:#{key}&quot;, 0, 0).total &amp;gt; 0
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This returns a facet hash as in the other method.&lt;/p&gt;
+&lt;p&gt;Note that Picky actually runs a query for each facet.&lt;/p&gt;
+&lt;p&gt;Is this a problem? It was for David, as he had more than 100 facets. So for each of the 100 facets, a query was run.&lt;/p&gt;
+&lt;p&gt;However, facets usually number only in extreme cases over 20. I&amp;#8217;d say a more useful range is 3 to 10 (see &lt;a href=&quot;http://www.trailspace.com/gear/boots/midweight/&quot;&gt;http://www.trailspace.com/gear/boots/midweight/&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In addition to that, facet results are highly cacheable. There is no reason not to cache this result – except, of course, if the data is highly dynamic. But even then, I&amp;#8217;d cache it for half an hour.&lt;/p&gt;
+&lt;p&gt;If you look at the last piece of code, you notice something: &lt;code&gt;filter_query&lt;/code&gt; is passed into that search multiple times. Couldn&amp;#8217;t that be optimized?&lt;/p&gt;
+&lt;h2&gt;Clean up later&lt;/h2&gt;
+&lt;p&gt;Indeed it can. But remember, we wanted to get it out and working first. This serves a dual purpose:&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;A user can already work with it, with the promise of it getting faster.&lt;/li&gt;
+	&lt;li&gt;I am now under pressure of improving it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The above code then resulted in this mini roadmap for facets:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;&lt;del&gt;Write first simple implementation.&lt;/del&gt; (This can be released as &amp;#8220;experimental&amp;#8221;)&lt;/li&gt;
+	&lt;li&gt;Improve the code by not tokenizing the filter query each time. (This can be released officially)&lt;/li&gt;
+	&lt;li&gt;Optimize the code by either redefining the &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt;, or only partially run the query. (This can be released in a white paper)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;What do I mean by #2? Again, for each facet, Picky does the work of tokenizing the &lt;code&gt;filter_query&lt;/code&gt; that is interpolated into the query. See:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;search(&quot;#{filter_query} #{category_identifier}:#{key}&quot;, 0, 0).total &amp;gt; 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is bad, of course. So we could rewrite the method to either only accept a pretokenized filter, something like:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;search.facets :brand, filter: [['gender'], 'unisex', ['price', 'age'], 50], more_than: 3.14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So, a filter would be an array of pairs, &lt;code&gt;filter categories&lt;/code&gt; and &lt;code&gt;filter value&lt;/code&gt;. This would reduce the impact on Picky a lot already. However, I like the flexibility of passing in a search string to filter.&lt;/p&gt;
+&lt;p&gt;So #2 means that Picky will process the string once, and we will then use the tokenized results to put together an optimized query. Something akin to:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;filter_tokens = tokenize filter_query
+facets.select do |key, _|
+  query_tokens = tokenize &quot;#{category_identifier}:#{key}&quot;
+  search_with(filter_tokens + query_tokens, 0, 0).total &amp;gt; 0
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Suddenly we don&amp;#8217;t do as much work anymore. Nice.&lt;/p&gt;
+&lt;p&gt;Point #3 is a bit harder, and usually, this is optional, or a coding/thinking goodie for later. Here, I could partially evaluate the filter query, and then use the halfway evaluated query to inject it with the variable parts (each facet), and continue running it for the final result. If this just sounded like garbled blah to you &amp;#8211; it&amp;#8217;s fine. It just means I have no idea how to specifically do this. Yet.&lt;/p&gt;
+&lt;h2&gt;In short&lt;/h2&gt;
+&lt;p&gt;This is how I develop Picky features:&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;Listen to the needs of your users.&lt;/li&gt;
+	&lt;li&gt;Check if the need goes against the Picky grain.&lt;/li&gt;
+	&lt;li&gt;Say &amp;#8220;Not yet.&amp;#8221;&lt;/li&gt;
+	&lt;li&gt;Implement stupidly.&lt;/li&gt;
+	&lt;li&gt;Release experimentally.&lt;/li&gt;
+	&lt;li&gt;Say &amp;#8220;Please try.&amp;#8221;&lt;/li&gt;
+	&lt;li&gt;Refine cleverly.&lt;/li&gt;
+	&lt;li&gt;Release officially.&lt;/li&gt;
+	&lt;li&gt;Leave ultra-cool rewrite for a glorious future.&lt;/li&gt;
+	&lt;li&gt;Wait for next user request.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And that is it.&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">And&amp;nbsp;faster&amp;nbsp;still</title>

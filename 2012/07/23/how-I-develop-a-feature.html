@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature
+        <a class="twitter-share-button" data-count="none" data-text="How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature" data-url="http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        ruby / picky / development
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>How do I add a feature to a framework, for example <a href="http://florianhanke.com/picky">Picky</a>? When? Why?</p>
+<p>Starting out 2 years ago, I had a relatively clear picture of what I was going to do in the original <a href="https://github.com/floere/picky/wiki/Roadmap">roadmap</a>.</p>
+<p>The last 3 points are:</p>
+<ul>
+	<li>Obtain real live octopus. Call it Picky and teach it searching tricks.</li>
+	<li>Become mayor of Krakow. Hold more Ruby conferences there. Eat all the available polish food.</li>
+	<li>Implement coffee making capabilities.</li>
+</ul>
+<p>Pets aren&#8217;t allowed by my landlord. Also, as you can see I&#8217;m still working on becoming the mayor of Krakow. Regarding the coffee making capabilities, I am still evaluating several brands of coffee, converging on Papua New Guinean blue mountain sun roasted beans.</p>
+<p>Thankfully, world domination is already achieved. Or can you show me one of the seven seas which is not yet filled with octopi?</p>
+<p>But seriously: Where do you go from here? Total chaos, burning lines of code? Software pattern anarchy? Class warfare?</p>
+<h2><span class="caps">UNDD</span>: User Need Driven Development</h2>
+<p>I find myself often without direction regarding Picky – since I don&#8217;t use it myself for any especially challenging projects (with Picky, too, no project is challenging &#8211; just kidding), how does it get to push its own boundaries?</p>
+<p>Thankfully, Picky has a few helpful users to push it a bit:</p>
+<p><strong><span class="caps">UNDD</span></strong>, aka User Need Driven Development!
+(Coincidentally almost the German word for &#8220;and&#8221;, ie. &#8220;und&#8221; – <span class="caps">UNDD</span> expressed as a sentence: &#8220;We&#8217;d like this and that and and and and…&#8221;, it basically never ends)</p>
+<p>A week ago, <span class="caps">UNDD</span> happened: <a href="https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME">https://groups.google.com/forum/?fromgroups#!topic/picky-ruby/UvIxg4d1PME</a></p>
+<p>David Lowenfels asked: &#8220;I am wondering if Picky can do facets?&#8221;</p>
+<p>As with any case of <span class="caps">UNDD</span>, if there is no philosophical reason against including it in a framework, the answer is always:</p>
+<p><strong>Not yet, but…</strong></p>
+<h2>Example: Facets</h2>
+<p>Facets – as I understand them – is slicing the available data into categories and category-facets.</p>
+<p>David gave a good example with <a href="http://www.trailspace.com/gear/boots/midweight/">this hiking boot page</a>. On the left facets are used to refine (filter) the results. In &#8220;Brand&#8221; we find &#8220;Salomon&#8221;, &#8220;Merrell&#8221;, &#8220;Timberland&#8221;, etc.</p>
+<p>If you then choose eg. &#8220;Salomon&#8221;, only Salomon shoes are shown. And, more importantly, not all Gender refinements are available anymore, but only the ones that are relevant to the brand &#8220;Salomon&#8221;.</p>
+<p>So, should I add that to Picky? Let&#8217;s review the <em>official feature policy</em>&#8482;:</p>
+<h2>Feature Philosophy</h2>
+<p>Picky&#8217;s <a href="https://github.com/floere/picky/wiki/Feature-Philosophy">Feature Philosophy</a>, reprinted here:</p>
+<pre class="sh_shell"><code>1. If it is relatively easy to do, I write a feature myself.&#x000A;2. If it is relatively easy to do, but not perfect, I write it myself too, with the option of adding an adapter to another search engine later.&#x000A;3. If it is hard to do (and it is too much against Picky’s structure and way of doing things), I write a Query object that uses another search engine.</code></pre>
+<p>Is it easy to do?</p>
+<p>My first reaction to David&#8217;s question was: Of course! Facets are all about filtering – and Picky is all about filtering.</p>
+<p>Eeeeeasy. <strong>Right?</strong></p>
+<p>Not necessarily. Although Picky&#8217;s inverted indexes (eg. { &#8216;florian&#8217; =&gt; [1, 4, 5, 19] }) already contain the right structure to get facets, it&#8217;s not so clear cut in the case where a facet already was applied as a filter.</p>
+<p>Initially I thought that this is a #1 case, but due to the multiple facets applied filtering, it&#8217;s squarely in #2: I can write it myself, but it might not be <em>that</em> easy.</p>
+<p>How do we go about implementing this feature?</p>
+<h2>Write first</h2>
+<p>Write first. Before your code reaches perfection, just write. This could be rewritten as <strong>Stupid and works &gt; Perfect and doesn&#8217;t</strong>.</p>
+<p>I always write a very simple solution first, and even though it might be slow, I am happy.</p>
+<h3>Straightforward facets on the Index instance</h3>
+<p>The first stab at facets for class <code>Picky::Index</code> was ultra simple:</p>
+<pre class="sh_ruby"><code>def facets category_identifier&#x000A;  self[category_identifier].exact.weights&#x000A;end</code></pre>
+<p>So I simply get the right category from the index and extract the right index. In this case the weights.</p>
+<p>It is used like so (<code>data</code> is the index):</p>
+<pre class="sh_ruby"><code>data.facets :brand</code></pre>
+<p>This code eg. results in:</p>
+<pre class="sh_ruby"><code>{&#x000A;  'salomon' =&gt; 3.14,&#x000A;  'merell' =&gt; 1.61,&#x000A;  …&#x000A;}</code></pre>
+<p>Nice, eh?</p>
+<p>The actual method signature is now <code>facets(:category, more_than: N)</code> with the <code>more_than</code> option a filter for only including facets with weight higher than <code>N</code>.</p>
+<p>This is, of course, blazingly fast.</p>
+<p>What about facet filtering?</p>
+<h3>Filtered facets on the Search instance</h3>
+<p>This one was a bit of a head scratcher. Picky does not have any indexes that would allow it to easily extract filtered facets.</p>
+<p>What was I to do?</p>
+<p>Remembering &#8220;write first&#8221; I simply made it work, disregarding all performance issues. Some details are omitted:</p>
+<pre class="sh_ruby"><code>def facets category_identifier, options = {}&#x000A;  weights = index.facets category_identifier, options&#x000A;  &#x000A;  return weights unless filter_query = options[:filter]&#x000A;  &#x000A;  weights.select do |key, weight|&#x000A;    search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total &gt; 0&#x000A;  end&#x000A;end</code></pre>
+<p>This is used like so:</p>
+<pre class="sh_ruby"><code>search.facets :brand, filter: 'gender:unisex', more_than: 3.14</code></pre>
+<p>Let&#8217;s look at the code pieces in turn:</p>
+<pre class="sh_ruby"><code>weights = index.facets category_identifier, options</code></pre>
+<p>Get the facet hash we got from the facets method in the last section.</p>
+<p>If we don&#8217;t filter:</p>
+<pre class="sh_ruby"><code>return weights unless filter_query = options[:filter]</code></pre>
+<p>we simply return it as-is, as in the <code>facets</code> method on an index.</p>
+<p>If we need to filter, go over all facets, and remove the ones where we get zero results when applying the filter:</p>
+<pre class="sh_ruby"><code>weights.select do |key, weight|&#x000A;  search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total &gt; 0&#x000A;end</code></pre>
+<p>This returns a facet hash as in the other method.</p>
+<p>Note that Picky actually runs a query for each facet.</p>
+<p>Is this a problem? It was for David, as he had more than 100 facets. So for each of the 100 facets, a query was run.</p>
+<p>However, facets usually number only in extreme cases over 20. I&#8217;d say a more useful range is 3 to 10 (see <a href="http://www.trailspace.com/gear/boots/midweight/">http://www.trailspace.com/gear/boots/midweight/</a>).</p>
+<p>In addition to that, facet results are highly cacheable. There is no reason not to cache this result – except, of course, if the data is highly dynamic. But even then, I&#8217;d cache it for half an hour.</p>
+<p>If you look at the last piece of code, you notice something: <code>filter_query</code> is passed into that search multiple times. Couldn&#8217;t that be optimized?</p>
+<h2>Clean up later</h2>
+<p>Indeed it can. But remember, we wanted to get it out and working first. This serves a dual purpose:</p>
+<ul>
+	<li>A user can already work with it, with the promise of it getting faster.</li>
+	<li>I am now under pressure of improving it.</li>
+</ul>
+<p>The above code then resulted in this mini roadmap for facets:</p>
+<ol>
+	<li><del>Write first simple implementation.</del> (This can be released as &#8220;experimental&#8221;)</li>
+	<li>Improve the code by not tokenizing the filter query each time. (This can be released officially)</li>
+	<li>Optimize the code by either redefining the <span class="caps">API</span>, or only partially run the query. (This can be released in a white paper)</li>
+</ol>
+<p>What do I mean by #2? Again, for each facet, Picky does the work of tokenizing the <code>filter_query</code> that is interpolated into the query. See:</p>
+<pre class="sh_ruby"><code>search("#{filter_query} #{category_identifier}:#{key}", 0, 0).total &gt; 0</code></pre>
+<p>This is bad, of course. So we could rewrite the method to either only accept a pretokenized filter, something like:</p>
+<pre class="sh_ruby"><code>search.facets :brand, filter: [['gender'], 'unisex', ['price', 'age'], 50], more_than: 3.14</code></pre>
+<p>So, a filter would be an array of pairs, <code>filter categories</code> and <code>filter value</code>. This would reduce the impact on Picky a lot already. However, I like the flexibility of passing in a search string to filter.</p>
+<p>So #2 means that Picky will process the string once, and we will then use the tokenized results to put together an optimized query. Something akin to:</p>
+<pre class="sh_ruby"><code>filter_tokens = tokenize filter_query&#x000A;facets.select do |key, _|&#x000A;  query_tokens = tokenize "#{category_identifier}:#{key}"&#x000A;  search_with(filter_tokens + query_tokens, 0, 0).total &gt; 0&#x000A;end</code></pre>
+<p>Suddenly we don&#8217;t do as much work anymore. Nice.</p>
+<p>Point #3 is a bit harder, and usually, this is optional, or a coding/thinking goodie for later. Here, I could partially evaluate the filter query, and then use the halfway evaluated query to inject it with the variable parts (each facet), and continue running it for the final result. If this just sounded like garbled blah to you &#8211; it&#8217;s fine. It just means I have no idea how to specifically do this. Yet.</p>
+<h2>In short</h2>
+<p>This is how I develop Picky features:</p>
+<ol>
+	<li>Listen to the needs of your users.</li>
+	<li>Check if the need goes against the Picky grain.</li>
+	<li>Say &#8220;Not yet.&#8221;</li>
+	<li>Implement stupidly.</li>
+	<li>Release experimentally.</li>
+	<li>Say &#8220;Please try.&#8221;</li>
+	<li>Refine cleverly.</li>
+	<li>Release officially.</li>
+	<li>Leave ultra-cool rewrite for a glorious future.</li>
+	<li>Wait for next user request.</li>
+</ol>
+<p>And that is it.</p>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature" data-url="http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/07/16/and-faster-still.html" title="Previous post: And&amp;nbsp;faster&amp;nbsp;still">And&nbsp;faster&nbsp;still</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/07/23/how-I-develop-a-feature';
+          var disqus_url = 'http://florianhanke.com/blog/2012/07/23/how-I-develop-a-feature.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

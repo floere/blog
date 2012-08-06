@@ -57,9 +57,9 @@ Two weeks ago, this happened:
 
 !{float:none}http://174.142.61.111/forum/files/a-challenger-appears-nignog_178.png!
 
-h2. Ricer (with Sinatra)
+h2. Racer (with Sinatra)
 
-"Ricer":http://github.com/charliesome/ricer by "Charlie Somerville":http://twitter.com/charliesome is a "Rack compliant Ruby web server". It is mainly based on "libuv":http://github.com/joyent/libuv. According to its "README":http://github.com/charliesome/ricer/blob/master/README.md (worth a look just for the image ;) ), it is twice as fast as thin using a "Hello world!" app.
+"Racer":http://github.com/charliesome/racer by "Charlie Somerville":http://twitter.com/charliesome is a "Rack compliant Ruby web server". It is mainly based on "libuv":http://github.com/joyent/libuv. According to its "README":http://github.com/charliesome/racer/blob/master/README.md (worth a look just for the image ;) ), it is twice as fast as thin using a "Hello world!" app.
 
 As Picky performs a bit more work than a simple "Hello world!", it won't be twice as fast. But how much faster will it be? Let's see…
 
@@ -67,34 +67,34 @@ As Picky performs a bit more work than a simple "Hello world!", it won't be twic
 | Complexity 2: | *1134* | = (1243 + 1153 + 1088 + 1072 + 1115)/5 |
 | Complexity 3: | *1094* | = (1143 + 1081 + 1081 + 1080 + 1084)/5 |
 
-Now, why don't we get double the speed as with thin, as shown on "Ricer's webpage":https://github.com/charliesome/ricer, but just 10%? The thing is, instead of just returning "hello world", Picky needs to do a bit of work.
+Now, why don't we get double the speed as with thin, as shown on "Racer's webpage":https://github.com/charliesome/racer, but just 10%? The thing is, instead of just returning "hello world", Picky needs to do a bit of work.
 
-h2. Picky vs. Ricer
+h2. Picky vs. Racer
 
-To calculate how much of this time is needed by Picky, let's assume "hello world" takes no time at all, and Ricer is double as fast as thin. With Picky, Ricer is only 10% faster than thin. What does this tell us about Picky?
+To calculate how much of this time is needed by Picky, let's assume "hello world" takes no time at all, and Racer is double as fast as thin. With Picky, Racer is only 10% faster than thin. What does this tell us about Picky?
 
 Let's calculate a bit. With the time from "hello world" ignored we know:
 
-| 1: | T(thin) / T(ricer) == 2 |
-| 2: | (T(thin) + T(picky)) / (T(ricer) + T(picky)) == 1.1 |
+| 1: | T(thin) / T(racer) == 2 |
+| 2: | (T(thin) + T(picky)) / (T(racer) + T(picky)) == 1.1 |
 
 Rewriting:
 
-| 3: | T(thin) + T(picky) == 1.1*T(ricer) + 1.1*T(picky) | from 2. |
-| 4: | T(thin) - 1.1*T(ricer) == 0.1*T(picky) | from 3. |
-| 5: | T(thin) == 2*T(ricer) | from 1. |
-| 6: | 0.9*T(ricer) == 0.1*T(picky) | from 4, 5. |
-| 7: | T(picky) == 9*T(ricer) | from 6. |
+| 3: | T(thin) + T(picky) == 1.1*T(racer) + 1.1*T(picky) | from 2. |
+| 4: | T(thin) - 1.1*T(racer) == 0.1*T(picky) | from 3. |
+| 5: | T(thin) == 2*T(racer) | from 1. |
+| 6: | 0.9*T(racer) == 0.1*T(picky) | from 4, 5. |
+| 7: | T(picky) == 9*T(racer) | from 6. |
 
-So, Picky (including Sinatra) takes around 9 times longer than Ricer. Let's remember this for our conclusion.
+So, Picky (including Sinatra) takes around 9 times longer than Racer. Let's remember this for our conclusion.
 
 h2. Multiple processes
 
 In the Ruby web app world, to get more speed, we usually run more processes.
 
-As Ricer cannot yet accept on file descriptors, I am going to use http load balancers "Pen":http://siag.nu/pen/ and "Nginx":http://www.nginx.org/ and see how they fare on my 2 core MBP.
+As Racer cannot yet accept on file descriptors, I am going to use http load balancers "Pen":http://siag.nu/pen/ and "Nginx":http://www.nginx.org/ and see how they fare on my 2 core MBP.
 
-h2. Pen (with Ricer)
+h2. Pen (with Racer)
 
 | Compl. 1: | *1993* | = (2140 + 1915 + 1901 + 2142 + 1869)/5 | *1370* (1 core) |
 | Compl. 2: | *1696* | = (1798 + 1735 + 1631 + 1644 + 1673)/5 | *1134* (1 core) |
@@ -102,7 +102,7 @@ h2. Pen (with Ricer)
 
 Certainly a good result, and plausible since it is not 2x as fast.
 
-h2. Nginx (with Ricer)
+h2. Nginx (with Racer)
 
 | Compl. 1: | *2048* | = (2078 + 1993 + 1790 + 2177 + 2203)/5 | *1370* (1 core) |
 | Compl. 2: | *1765* | = (1660 + 1843 + 1830 + 1684 + 1808)/5 | *1134* (1 core) |
@@ -167,8 +167,8 @@ Quite breathtaking, especially in the low complexity case!
 
 Let's calculate again a bit. We know that:
 
-| 1: | T(picky + sinatra) == 9*T(ricer) == 1/2000 (roughly) |
-| 2: | T(picky) == ?*T(ricer) == 1/4000 (roughly) |
+| 1: | T(picky + sinatra) == 9*T(racer) == 1/2000 (roughly) |
+| 2: | T(picky) == ?*T(racer) == 1/4000 (roughly) |
 
 Rewriting:
 
@@ -180,7 +180,7 @@ From this we see that Sinatra takes as much time as does Picky in the low comple
 
 h2. Conclusion
 
-Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Ricer does – is it prudent to try many fast servers, or should one simply not use Sinatra?
+Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Racer does – is it prudent to try many fast servers, or should one simply not use Sinatra?
 
 We arrive at:
 
@@ -204,9 +204,9 @@ The big question is:
 
 *What happens when we give up the flexibility afforded by Rack?*
 
-Let's say we were to rewrite Ricer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).
+Let's say we were to rewrite Racer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).
 
-How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Ricer for ultimate speed.
+How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Racer for ultimate speed.
 
 h2. Footnote 1: The pinnacle of ultimate speed
 

@@ -115,8 +115,8 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 <p>That is impressive, given that these are the numbers from one core.</p>
 <p>Two weeks ago, this happened:</p>
 <p><img src="http://174.142.61.111/forum/files/a-challenger-appears-nignog_178.png" style="float:none;" alt="" /></p>
-<h2>Ricer (with Sinatra)</h2>
-<p><a href="http://github.com/charliesome/ricer">Ricer</a> by <a href="http://twitter.com/charliesome">Charlie Somerville</a> is a &#8220;Rack compliant Ruby web server&#8221;. It is mainly based on <a href="http://github.com/joyent/libuv">libuv</a>. According to its <a href="http://github.com/charliesome/ricer/blob/master/README.md"><span class="caps">README</span></a> (worth a look just for the image ;) ), it is twice as fast as thin using a &#8220;Hello world!&#8221; app.</p>
+<h2>Racer (with Sinatra)</h2>
+<p><a href="http://github.com/charliesome/racer">Racer</a> by <a href="http://twitter.com/charliesome">Charlie Somerville</a> is a &#8220;Rack compliant Ruby web server&#8221;. It is mainly based on <a href="http://github.com/joyent/libuv">libuv</a>. According to its <a href="http://github.com/charliesome/racer/blob/master/README.md"><span class="caps">README</span></a> (worth a look just for the image ;) ), it is twice as fast as thin using a &#8220;Hello world!&#8221; app.</p>
 <p>As Picky performs a bit more work than a simple &#8220;Hello world!&#8221;, it won&#8217;t be twice as fast. But how much faster will it be? Let&#8217;s see…</p>
 <table>
 	<tr>
@@ -135,53 +135,53 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 		<td> = (1143 + 1081 + 1081 + 1080 + 1084)/5 </td>
 	</tr>
 </table>
-<p>Now, why don&#8217;t we get double the speed as with thin, as shown on <a href="https://github.com/charliesome/ricer">Ricer&#8217;s webpage</a>, but just 10%? The thing is, instead of just returning &#8220;hello world&#8221;, Picky needs to do a bit of work.</p>
-<h2>Picky vs. Ricer</h2>
-<p>To calculate how much of this time is needed by Picky, let&#8217;s assume &#8220;hello world&#8221; takes no time at all, and Ricer is double as fast as thin. With Picky, Ricer is only 10% faster than thin. What does this tell us about Picky?</p>
+<p>Now, why don&#8217;t we get double the speed as with thin, as shown on <a href="https://github.com/charliesome/racer">Racer&#8217;s webpage</a>, but just 10%? The thing is, instead of just returning &#8220;hello world&#8221;, Picky needs to do a bit of work.</p>
+<h2>Picky vs. Racer</h2>
+<p>To calculate how much of this time is needed by Picky, let&#8217;s assume &#8220;hello world&#8221; takes no time at all, and Racer is double as fast as thin. With Picky, Racer is only 10% faster than thin. What does this tell us about Picky?</p>
 <p>Let&#8217;s calculate a bit. With the time from &#8220;hello world&#8221; ignored we know:</p>
 <table>
 	<tr>
 		<td> 1: </td>
-		<td> T(thin) / T(ricer) == 2 </td>
+		<td> T(thin) / T(racer) == 2 </td>
 	</tr>
 	<tr>
 		<td> 2: </td>
-		<td> (T(thin) + T(picky)) / (T(ricer) + T(picky)) == 1.1 </td>
+		<td> (T(thin) + T(picky)) / (T(racer) + T(picky)) == 1.1 </td>
 	</tr>
 </table>
 <p>Rewriting:</p>
 <table>
 	<tr>
 		<td> 3: </td>
-		<td> T(thin) + T(picky) == 1.1*T(ricer) + 1.1*T(picky) </td>
+		<td> T(thin) + T(picky) == 1.1*T(racer) + 1.1*T(picky) </td>
 		<td> from 2. </td>
 	</tr>
 	<tr>
 		<td> 4: </td>
-		<td> T(thin) &#8211; 1.1*T(ricer) == 0.1*T(picky) </td>
+		<td> T(thin) &#8211; 1.1*T(racer) == 0.1*T(picky) </td>
 		<td> from 3. </td>
 	</tr>
 	<tr>
 		<td> 5: </td>
-		<td> T(thin) == 2*T(ricer) </td>
+		<td> T(thin) == 2*T(racer) </td>
 		<td> from 1. </td>
 	</tr>
 	<tr>
 		<td> 6: </td>
-		<td> 0.9*T(ricer) == 0.1*T(picky) </td>
+		<td> 0.9*T(racer) == 0.1*T(picky) </td>
 		<td> from 4, 5. </td>
 	</tr>
 	<tr>
 		<td> 7: </td>
-		<td> T(picky) == 9*T(ricer) </td>
+		<td> T(picky) == 9*T(racer) </td>
 		<td> from 6. </td>
 	</tr>
 </table>
-<p>So, Picky (including Sinatra) takes around 9 times longer than Ricer. Let&#8217;s remember this for our conclusion.</p>
+<p>So, Picky (including Sinatra) takes around 9 times longer than Racer. Let&#8217;s remember this for our conclusion.</p>
 <h2>Multiple processes</h2>
 <p>In the Ruby web app world, to get more speed, we usually run more processes.</p>
-<p>As Ricer cannot yet accept on file descriptors, I am going to use http load balancers <a href="http://siag.nu/pen/">Pen</a> and <a href="http://www.nginx.org/">Nginx</a> and see how they fare on my 2 core <span class="caps">MBP</span>.</p>
-<h2>Pen (with Ricer)</h2>
+<p>As Racer cannot yet accept on file descriptors, I am going to use http load balancers <a href="http://siag.nu/pen/">Pen</a> and <a href="http://www.nginx.org/">Nginx</a> and see how they fare on my 2 core <span class="caps">MBP</span>.</p>
+<h2>Pen (with Racer)</h2>
 <table>
 	<tr>
 		<td> Compl. 1: </td>
@@ -203,7 +203,7 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 	</tr>
 </table>
 <p>Certainly a good result, and plausible since it is not 2x as fast.</p>
-<h2>Nginx (with Ricer)</h2>
+<h2>Nginx (with Racer)</h2>
 <table>
 	<tr>
 		<td> Compl. 1: </td>
@@ -265,11 +265,11 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 <table>
 	<tr>
 		<td> 1: </td>
-		<td> T(picky + sinatra) == 9*T(ricer) == 1/2000 (roughly) </td>
+		<td> T(picky + sinatra) == 9*T(racer) == 1/2000 (roughly) </td>
 	</tr>
 	<tr>
 		<td> 2: </td>
-		<td> T(picky) == ?*T(ricer) == 1/4000 (roughly) </td>
+		<td> T(picky) == ?*T(racer) == 1/4000 (roughly) </td>
 	</tr>
 </table>
 <p>Rewriting:</p>
@@ -283,7 +283,7 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 <p>This was easier!</p>
 <p>From this we see that Sinatra takes as much time as does Picky in the low complexity case. For the highest complexity, Sinatra takes about 30% of the time that Picky takes.</p>
 <h2>Conclusion</h2>
-<p>Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Ricer does – is it prudent to try many fast servers, or should one simply not use Sinatra?</p>
+<p>Given that we want speed, and only speed: Knowing that Sinatra and Picky each take about 4.5x the time that Racer does – is it prudent to try many fast servers, or should one simply not use Sinatra?</p>
 <p>We arrive at:</p>
 <p><strong>Which app server to choose is not as relevant as deciding whether to use Sinatra.</strong></p>
 <p>Surprised?</p>
@@ -295,8 +295,8 @@ As Picky is a combinatorial search engine, we expect a nonlinearly increasing qu
 <h2>Next up: Sacrificing Rack?</h2>
 <p>The big question is:</p>
 <p><strong>What happens when we give up the flexibility afforded by Rack?</strong></p>
-<p>Let&#8217;s say we were to rewrite Ricer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).</p>
-<p>How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Ricer for ultimate speed.</p>
+<p>Let&#8217;s say we were to rewrite Racer such that it would not call our app anymore with Rack conform data, but only with minimally processed data (eg. we would not process the domain, for example, but only extract the query string).</p>
+<p>How fast can we get this thing? Please tune in in the next blog post, where we explore rewriting Racer for ultimate speed.</p>
 <h2>Footnote 1: The pinnacle of ultimate speed</h2>
 <p>To compare: How fast would this be without app servers?</p>
 <p>Let&#8217;s first see how fast we can get: In pure Ruby</p>

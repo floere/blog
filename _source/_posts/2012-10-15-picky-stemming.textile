@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How&nbsp;I&nbsp;develop&nbsp;a&nbsp;feature&nbsp;for&nbsp;Picky
+title: Picky&nbsp;Stemming
 categories:
   - ruby
   - picky
@@ -11,7 +11,7 @@ h2. Stemming
 
 Stemming is used in information retrieval, and basically serves the purpose of "finding the thing" in an index, even if the appearance of the thing was different in the original.
 
-In other words: if we had saved the word "arguing" in the index, then when somebody searches for "argued", the saved document should still show up, even though "arguing" and "argued" is not exactly the same. However, both are about the fact that somebody argued (a point, with somebody, themself or others). The words "argued" and "arguing" both resolve to the stem "argu", which is not a word itself. This stem is what ends up in the index.
+In other words: if we had saved the word "arguing" in the index, then when somebody searches for "argued", the saved document should still show up, even though "arguing" and "argued" are not exactly the same word. However, both are about the fact that somebody argued (a point, with somebody, themself or others). The words "argued" and "arguing" both resolve to the stem "argu", which is not a word itself. This stem is what ends up in the index.
 
 This was not yet possible in Picky.
 
@@ -23,7 +23,7 @@ h2. Usage
 
 Let's make this simple: how do you use this in Picky?
 
-Look up "the current spec":https://github.com/floere/picky/blob/c73bec8b01acb44dcb3a4a437fef1940fd03a08d/server/spec/functional/stemming_spec.rb, if that is most convenient to you.
+(Look up "the current spec":https://github.com/floere/picky/blob/c73bec8b01acb44dcb3a4a437fef1940fd03a08d/server/spec/functional/stemming_spec.rb, if that is most convenient to you.)
 
 It is very easy. Both @Index#indexing@ and @Search#searching@ methods offer the option @stems_with@.
 
@@ -42,10 +42,10 @@ Usually, if you use stemming, you also want search terms to be stemmed when sear
   searching stems_with: Lingua::Stemmer.new
 end</code></pre>
 
-But as usual, the flexibility of Picky leaves that decision up to you. It could be that you are writing a stem-search, where you don't stem in the search. Or you already only get stems for the index, no stemming needed (or even allowed), and you only need to stem on the user's input.
+But as usual, the flexibility of Picky leaves that decision up to you: it could be that you are writing a stem-search, where you don't stem in the search. Or you already only get stems for the index, no stemming needed (or even allowed), and you only need to stem on the user's input.
 
-h2. Word of caution
+h2. A word of caution
 
 If somebody searches for e.g. "Arguing!", and you don't remove the "!" (either by declaring it illegal in the tokenizer, or split on it), then Picky won't stem it, since the stemmer doesn't know what to do with "Arguing!". It, however, would be perfectly able to stem "Arguing". Consider yourself warned so we don't have to argue later on.
 
-Why anybody would search for "Arguing!", I don't know. I could for example see Paul Ryan search for: "Arguing and debating, how does it work?"
+Why anybody would search for "Arguing!", I don't know. I could for example see "Paul Ryan":https://twitter.com/billmaher/status/256568696212967424 search for: "Arguing and debating, how does it work?"

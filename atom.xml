@@ -4,13 +4,46 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-08-06T17:00:10+10:00</updated>
+ <updated>2012-10-15T19:10:03+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Stemming</title>
+   <link href="http://florianhanke.com/blog/2012/10/15/picky-stemming.html"/>
+   <updated>2012-10-15T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/10/15/picky-stemming</id>
+   <content type="html">&lt;p&gt;This is a quick post about a new feature in Picky 4.6.6+: &lt;a href=&quot;http://en.wikipedia.org/wiki/Stemming&quot;&gt;stemming&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Stemming&lt;/h2&gt;
+&lt;p&gt;Stemming is used in information retrieval, and basically serves the purpose of &amp;#8220;finding the thing&amp;#8221; in an index, even if the appearance of the thing was different in the original.&lt;/p&gt;
+&lt;p&gt;In other words: if we had saved the word &amp;#8220;arguing&amp;#8221; in the index, then when somebody searches for &amp;#8220;argued&amp;#8221;, the saved document should still show up, even though &amp;#8220;arguing&amp;#8221; and &amp;#8220;argued&amp;#8221; are not exactly the same word. However, both are about the fact that somebody argued (a point, with somebody, themself or others). The words &amp;#8220;argued&amp;#8221; and &amp;#8220;arguing&amp;#8221; both resolve to the stem &amp;#8220;argu&amp;#8221;, which is not a word itself. This stem is what ends up in the index.&lt;/p&gt;
+&lt;p&gt;This was not yet possible in Picky.&lt;/p&gt;
+&lt;p&gt;And surprisingly, it did not seem urgent, as nobody complained.&lt;/p&gt;
+&lt;p&gt;Until, of course, &lt;a href=&quot;http://goodfil.ms&quot;&gt;somebody&lt;/a&gt; did.&lt;/p&gt;
+&lt;h2&gt;Usage&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s make this simple: how do you use this in Picky?&lt;/p&gt;
+&lt;p&gt;(Look up &lt;a href=&quot;https://github.com/floere/picky/blob/c73bec8b01acb44dcb3a4a437fef1940fd03a08d/server/spec/functional/stemming_spec.rb&quot;&gt;the current spec&lt;/a&gt;, if that is most convenient to you.)&lt;/p&gt;
+&lt;p&gt;It is very easy. Both &lt;code&gt;Index#indexing&lt;/code&gt; and &lt;code&gt;Search#searching&lt;/code&gt; methods offer the option &lt;code&gt;stems_with&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;You give it an object that responds to &lt;code&gt;stem(word)&lt;/code&gt;, which gets a tokenized word, and returns a stemmed word. One such stemmer is &lt;code&gt;Lingua::Stemmer&lt;/code&gt;. In the tokenization pipeline, &lt;a href=&quot;https://github.com/floere/picky/blob/c73bec8b01acb44dcb3a4a437fef1940fd03a08d/server/lib/picky/tokenizer.rb#L275&quot;&gt;it is the last step&lt;/a&gt; to be executed.&lt;/p&gt;
+&lt;p&gt;Therefore, if you want stemmed words in the index, use this:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Index.new :stemming do
+  indexing stems_with: Lingua::Stemmer.new
+  category :some_text_that_needs_to_be_stemmed
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Usually, if you use stemming, you also want search terms to be stemmed when searching (otherwise your search for &amp;#8220;arguing&amp;#8221; will not find &amp;#8220;argued&amp;#8221; in the index).&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;index = Picky::Search.new index do
+  searching stems_with: Lingua::Stemmer.new
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;But as usual, the flexibility of Picky leaves that decision up to you: it could be that you are writing a stem-search, where you don&amp;#8217;t stem in the search. Or you already only get stems for the index, no stemming needed (or even allowed), and you only need to stem on the user&amp;#8217;s input.&lt;/p&gt;
+&lt;h2&gt;A word of caution&lt;/h2&gt;
+&lt;p&gt;If somebody searches for e.g. &amp;#8220;Arguing!&amp;#8221;, and you don&amp;#8217;t remove the &amp;#8220;!&amp;#8221; (either by declaring it illegal in the tokenizer, or split on it), then Picky won&amp;#8217;t stem it, since the stemmer doesn&amp;#8217;t know what to do with &amp;#8220;Arguing!&amp;#8221;. It, however, would be perfectly able to stem &amp;#8220;Arguing&amp;#8221;. Consider yourself warned so we don&amp;#8217;t have to argue later on.&lt;/p&gt;
+&lt;p&gt;Why anybody would search for &amp;#8220;Arguing!&amp;#8221;, I don&amp;#8217;t know. I could for example see &lt;a href=&quot;https://twitter.com/billmaher/status/256568696212967424&quot;&gt;Paul Ryan&lt;/a&gt; search for: &amp;#8220;Arguing and debating, how does it work?&amp;#8221;&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">How&amp;nbsp;I&amp;nbsp;develop&amp;nbsp;a&amp;nbsp;feature&amp;nbsp;for&amp;nbsp;Picky</title>

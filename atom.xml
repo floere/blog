@@ -4,13 +4,113 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-10-15T19:10:03+11:00</updated>
+ <updated>2012-11-20T17:39:32+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Experimental&amp;nbsp;Features&amp;nbsp;for&amp;nbsp;Picky&amp;nbsp;5</title>
+   <link href="http://florianhanke.com/blog/2012/11/20/experimental-features-for-picky-5.html"/>
+   <updated>2012-11-20T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/11/20/experimental-features-for-picky-5</id>
+   <content type="html">&lt;p&gt;This is a quick post about two experimental features in Picky 4.11+ that will be available stably in Picky 5.&lt;/p&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;Picky is very much driven by its users.&lt;/p&gt;
+&lt;p&gt;After adding &lt;a href=&quot;http://en.wikipedia.org/wiki/Stemming&quot;&gt;stemming&lt;/a&gt; in Picky 4.6.6 from a push I got by &lt;a href=&quot;http://twitter.com/johnbarton&quot;&gt;John Barton&lt;/a&gt; and &lt;a href=&quot;http://twitter.com/glenmaddern&quot;&gt;Glen Maddern&lt;/a&gt; of &lt;a href=&quot;http://goodfil.ms&quot;&gt;goodfil.ms&lt;/a&gt; fame, &lt;a href=&quot;http://twitter.com/auastro&quot;&gt;Andy Kitchen&lt;/a&gt; supplied a piece of code for &lt;a href=&quot;http://norvig.com/ngrams/ch14.pdf&quot;&gt;automatic word segmentation&lt;/a&gt;, while also mentioning that he needs a range queries.&lt;/p&gt;
+&lt;p&gt;They are now both available as experimental features.&lt;/p&gt;
+&lt;h2&gt;Range queries&lt;/h2&gt;
+&lt;p&gt;Let&amp;#8217;s say you&amp;#8217;d like to find all people born in 1977, 1978, and 1979. Previously, this was not too easy to do in Picky.&lt;/p&gt;
+&lt;p&gt;Now you can. Let&amp;#8217;s look at a full copy-and-paste-able example:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;require 'picky'
+  
+index = Picky::Index.new :people do
+  key_format :to_s
+  category :year
+end
+
+Person = Struct.new :id, :year
+
+index.add Person.new('Picky',   2008)
+index.add Person.new('Kaspar',  1978)
+index.add Person.new('Florian', 1977)
+index.add Person.new('Joe',     1955)
+
+people = Picky::Search.new index
+
+p people.search('1977-1979').ids
+p people.search('year:1977-1979').ids
+p people.search('year:1900-2010').ids&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first result will be&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[&quot;Florian&quot;, &quot;Kaspar&quot;]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;since I was born in 1977, and Kaspar was born in 1978. If you categorize it with &lt;code&gt;year:1977-1979&lt;/code&gt; it will yield the same result. If you only want results for a specific category, remember to categorize it by prefixing a search term or range &lt;code&gt;category_name:&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;By going over the whole range, as in the third result, you&amp;#8217;ll get&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;[&quot;Joe&quot;, &quot;Florian&quot;, &quot;Kaspar&quot;, &quot;Picky&quot;]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;as the range &lt;code&gt;year:1900-2010&lt;/code&gt; includes all the results.&lt;/p&gt;
+&lt;h2&gt;Range queries the Ruby way&lt;/h2&gt;
+&lt;p&gt;Picky internally uses &lt;code&gt;Enumerable#inject&lt;/code&gt;, so any range will work. For example, &lt;code&gt;initial:a-d&lt;/code&gt; will yield results for each &lt;code&gt;&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, and &quot;d&quot;&lt;/code&gt;. Cool, eh?&lt;/p&gt;
+&lt;p&gt;Not impressed? Read on…&lt;/p&gt;
+&lt;h2&gt;Custom ranges!&lt;/h2&gt;
+&lt;p&gt;Andy Kitchen was happy with the range queries, however he needed range queries that were wrapping. If somebody wanted to find eg. an event that was on between 10pm and 2am in the morning, the current range query implementation did not allow that, as &lt;code&gt;event_start:10-2&lt;/code&gt; did not work (&lt;code&gt;#each&lt;/code&gt; or &lt;code&gt;#inject&lt;/code&gt; will yield nothing).&lt;/p&gt;
+&lt;p&gt;Because Picky accepts any kind of range, he implemented a wrapping range (the version here is a slight rewrite of the original):&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;class Wrap12Hours
+  include Enumerable
+
+  def initialize(min, max)
+    @hours = 12
+    @min   = min.to_i
+    @top   = max.to_i
+    @top   += @hours if @top &amp;lt; @min
+  end
+
+  def each
+    @min.upto(@top).each do |i|
+      yield (i % @hours).to_s
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is then passed into an index category like this&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;category :hour, ranging: Wrap12Hours&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;to make Picky use this &amp;#8220;ranging&amp;#8221; for that category.&lt;/p&gt;
+&lt;p&gt;The result: If &lt;code&gt;Wrap12Hours&lt;/code&gt; is given a range like &lt;code&gt;10-2&lt;/code&gt;, it will &lt;code&gt;#each&lt;/code&gt; this: &lt;code&gt;[10, 11, 0, 1, 2]&lt;/code&gt;, which is exactly what he needed.&lt;/p&gt;
+&lt;p&gt;Picky range queries use &lt;code&gt;#inject&lt;/code&gt;, but there is no &lt;code&gt;#inject&lt;/code&gt; on &lt;code&gt;Wrap12Hours&lt;/code&gt; – so why does it work? Note that Andy does an &lt;code&gt;include Enumerable&lt;/code&gt;. &lt;code&gt;Enumerable#inject&lt;/code&gt; uses the &lt;code&gt;#each&lt;/code&gt; method which is already there to implement &lt;code&gt;#inject&lt;/code&gt; and some other methods. Pretty snazzy! (And, I might add, the Ruby way of doing things)&lt;/p&gt;
+&lt;p&gt;The ability to implement custom ranges is very powerful and underlines the flexibility of Picky.&lt;/p&gt;
+&lt;h2&gt;Automatic word segmentation&lt;/h2&gt;
+&lt;p&gt;Just a quick note on this as it is just a sketch, currently. A fully functional sketch, though.&lt;/p&gt;
+&lt;p&gt;What if you want to not split on a regexp as you would usually, but you&amp;#8217;d like Picky to split on words in the index.&lt;/p&gt;
+&lt;p&gt;So if you had &amp;#8220;purple&amp;#8221;, &amp;#8220;rainbow&amp;#8221;, and &amp;#8220;pony&amp;#8221; (don&amp;#8217;t ask) in your index, then you&amp;#8217;d want Picky to automatically split a query like &amp;#8220;purplerainbowpony&amp;#8221; into &amp;#8220;purple&amp;#8221;, &amp;#8220;rainbow&amp;#8221;, &amp;#8220;pony&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;This can be achieved by giving the search category option &lt;code&gt;splits_text_on&lt;/code&gt; an automatic splitter rather than a regexp. The automatic splitter is initialized with the index category you&amp;#8217;d like to use for the splitter.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;automatic_splitter = Picky::Splitters::Automatic.new index[:text]
+
+some_search = Picky::Search.new index do
+  searching splits_text_on: automatic_splitter
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That&amp;#8217;s it!&lt;/p&gt;
+&lt;p&gt;Note that if you want to test the spitter itself you can simply call &lt;code&gt;#split&lt;/code&gt; on it, as this is the method called by the Picky &lt;code&gt;Tokenizer&lt;/code&gt; to split incoming queries:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;automatic_splitter.split 'hellopicky' # =&amp;gt; ['hello', 'picky']&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Please give it a go and report back!&lt;/p&gt;
+&lt;h3&gt;The partial option&lt;/h3&gt;
+&lt;p&gt;The automatic splitter supports a &lt;code&gt;partial&lt;/code&gt; option. This will make Picky also use the partial index.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;automatic_splitter = Picky::Splitters::Automatic.new index[:text], partial: true&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What does it mean? It means that it will&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;automatic_splitter.split 'hellopic' # =&amp;gt; ['hello', 'pic']&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;correctly split off the partial &amp;#8216;pic&amp;#8217;. The non-partial version would simply split off &amp;#8216;hello&amp;#8217;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;automatic_splitter.split 'hellopic' # =&amp;gt; ['hello']&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Have fun!&lt;/h2&gt;
+&lt;p&gt;As Picky grows and grows, I am especially happy that Picky is fed well by its enthusiastic and helpful users.&lt;/p&gt;
+&lt;p&gt;This is much appreciated, amigos! Keep it coming :D&lt;/p&gt;
+&lt;h2&gt;Outlook for Picky 5&lt;/h2&gt;
+&lt;p&gt;The above features will – after some polishing and feedback – be included into Picky 5.&lt;/p&gt;
+&lt;h3&gt;Environments&lt;/h3&gt;
+&lt;p&gt;After a discussion with &lt;a href=&quot;http://twitter.com/kasparschiess&quot;&gt;Kaspar Schiess&lt;/a&gt; (my cofounder at &lt;a href=&quot;http://technologyastronauts.ch&quot;&gt;The Technology Astronauts&lt;/a&gt;), I am very inclined to drop environments (ie. &lt;em&gt;development&lt;/em&gt;, &lt;em&gt;test&lt;/em&gt;, &lt;em&gt;production&lt;/em&gt;) in the next Picky.&lt;/p&gt;
+&lt;p&gt;Have you ever asked yourself if you really need environments?&lt;/p&gt;
+&lt;p&gt;I hope to cover this topic in the next post.&lt;/p&gt;
+&lt;p&gt;Cheers, and have (pink, tentacly) fun!&lt;/p&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Picky&amp;nbsp;Stemming</title>

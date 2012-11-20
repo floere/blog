@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Experimental&nbsp;Features&nbsp;for&nbsp;Picky&nbsp;5</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        Experimental&nbsp;Features&nbsp;for&nbsp;Picky&nbsp;5
+        <a class="twitter-share-button" data-count="none" data-text="Experimental&amp;nbsp;Features&amp;nbsp;for&amp;nbsp;Picky&amp;nbsp;5" data-url="http://florianhanke.com/blog/2012/11/20/experimental-features-for-picky-5.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        ruby / picky
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>This is a quick post about two experimental features in Picky 4.11+ that will be available stably in Picky 5.</p>
+<h2>Intro</h2>
+<p>Picky is very much driven by its users.</p>
+<p>After adding <a href="http://en.wikipedia.org/wiki/Stemming">stemming</a> in Picky 4.6.6 from a push I got by <a href="http://twitter.com/johnbarton">John Barton</a> and <a href="http://twitter.com/glenmaddern">Glen Maddern</a> of <a href="http://goodfil.ms">goodfil.ms</a> fame, <a href="http://twitter.com/auastro">Andy Kitchen</a> supplied a piece of code for <a href="http://norvig.com/ngrams/ch14.pdf">automatic word segmentation</a>, while also mentioning that he needs a range queries.</p>
+<p>They are now both available as experimental features.</p>
+<h2>Range queries</h2>
+<p>Let&#8217;s say you&#8217;d like to find all people born in 1977, 1978, and 1979. Previously, this was not too easy to do in Picky.</p>
+<p>Now you can. Let&#8217;s look at a full copy-and-paste-able example:</p>
+<pre class="sh_ruby"><code>require 'picky'&#x000A;  &#x000A;index = Picky::Index.new :people do&#x000A;  key_format :to_s&#x000A;  category :year&#x000A;end&#x000A;&#x000A;Person = Struct.new :id, :year&#x000A;&#x000A;index.add Person.new('Picky',   2008)&#x000A;index.add Person.new('Kaspar',  1978)&#x000A;index.add Person.new('Florian', 1977)&#x000A;index.add Person.new('Joe',     1955)&#x000A;&#x000A;people = Picky::Search.new index&#x000A;&#x000A;p people.search('1977-1979').ids&#x000A;p people.search('year:1977-1979').ids&#x000A;p people.search('year:1900-2010').ids</code></pre>
+<p>The first result will be</p>
+<pre class="sh_ruby"><code>["Florian", "Kaspar"]</code></pre>
+<p>since I was born in 1977, and Kaspar was born in 1978. If you categorize it with <code>year:1977-1979</code> it will yield the same result. If you only want results for a specific category, remember to categorize it by prefixing a search term or range <code>category_name:</code>.</p>
+<p>By going over the whole range, as in the third result, you&#8217;ll get</p>
+<pre class="sh_ruby"><code>["Joe", "Florian", "Kaspar", "Picky"]</code></pre>
+<p>as the range <code>year:1900-2010</code> includes all the results.</p>
+<h2>Range queries the Ruby way</h2>
+<p>Picky internally uses <code>Enumerable#inject</code>, so any range will work. For example, <code>initial:a-d</code> will yield results for each <code>"a", "b", "c", and "d"</code>. Cool, eh?</p>
+<p>Not impressed? Read on…</p>
+<h2>Custom ranges!</h2>
+<p>Andy Kitchen was happy with the range queries, however he needed range queries that were wrapping. If somebody wanted to find eg. an event that was on between 10pm and 2am in the morning, the current range query implementation did not allow that, as <code>event_start:10-2</code> did not work (<code>#each</code> or <code>#inject</code> will yield nothing).</p>
+<p>Because Picky accepts any kind of range, he implemented a wrapping range (the version here is a slight rewrite of the original):</p>
+<pre class="sh_ruby"><code>class Wrap12Hours&#x000A;  include Enumerable&#x000A;&#x000A;  def initialize(min, max)&#x000A;    @hours = 12&#x000A;    @min   = min.to_i&#x000A;    @top   = max.to_i&#x000A;    @top   += @hours if @top &lt; @min&#x000A;  end&#x000A;&#x000A;  def each&#x000A;    @min.upto(@top).each do |i|&#x000A;      yield (i % @hours).to_s&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
+<p>This is then passed into an index category like this</p>
+<pre class="sh_ruby"><code>category :hour, ranging: Wrap12Hours</code></pre>
+<p>to make Picky use this &#8220;ranging&#8221; for that category.</p>
+<p>The result: If <code>Wrap12Hours</code> is given a range like <code>10-2</code>, it will <code>#each</code> this: <code>[10, 11, 0, 1, 2]</code>, which is exactly what he needed.</p>
+<p>Picky range queries use <code>#inject</code>, but there is no <code>#inject</code> on <code>Wrap12Hours</code> – so why does it work? Note that Andy does an <code>include Enumerable</code>. <code>Enumerable#inject</code> uses the <code>#each</code> method which is already there to implement <code>#inject</code> and some other methods. Pretty snazzy! (And, I might add, the Ruby way of doing things)</p>
+<p>The ability to implement custom ranges is very powerful and underlines the flexibility of Picky.</p>
+<h2>Automatic word segmentation</h2>
+<p>Just a quick note on this as it is just a sketch, currently. A fully functional sketch, though.</p>
+<p>What if you want to not split on a regexp as you would usually, but you&#8217;d like Picky to split on words in the index.</p>
+<p>So if you had &#8220;purple&#8221;, &#8220;rainbow&#8221;, and &#8220;pony&#8221; (don&#8217;t ask) in your index, then you&#8217;d want Picky to automatically split a query like &#8220;purplerainbowpony&#8221; into &#8220;purple&#8221;, &#8220;rainbow&#8221;, &#8220;pony&#8221;.</p>
+<p>This can be achieved by giving the search category option <code>splits_text_on</code> an automatic splitter rather than a regexp. The automatic splitter is initialized with the index category you&#8217;d like to use for the splitter.</p>
+<pre class="sh_ruby"><code>automatic_splitter = Picky::Splitters::Automatic.new index[:text]&#x000A;&#x000A;some_search = Picky::Search.new index do&#x000A;  searching splits_text_on: automatic_splitter&#x000A;end</code></pre>
+<p>That&#8217;s it!</p>
+<p>Note that if you want to test the spitter itself you can simply call <code>#split</code> on it, as this is the method called by the Picky <code>Tokenizer</code> to split incoming queries:</p>
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopicky' # =&gt; ['hello', 'picky']</code></pre>
+<p>Please give it a go and report back!</p>
+<h3>The partial option</h3>
+<p>The automatic splitter supports a <code>partial</code> option. This will make Picky also use the partial index.</p>
+<pre class="sh_ruby"><code>automatic_splitter = Picky::Splitters::Automatic.new index[:text], partial: true</code></pre>
+<p>What does it mean? It means that it will</p>
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopic' # =&gt; ['hello', 'pic']</code></pre>
+<p>correctly split off the partial &#8216;pic&#8217;. The non-partial version would simply split off &#8216;hello&#8217;:</p>
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopic' # =&gt; ['hello']</code></pre>
+<h2>Have fun!</h2>
+<p>As Picky grows and grows, I am especially happy that Picky is fed well by its enthusiastic and helpful users.</p>
+<p>This is much appreciated, amigos! Keep it coming :D</p>
+<h2>Outlook for Picky 5</h2>
+<p>The above features will – after some polishing and feedback – be included into Picky 5.</p>
+<h3>Environments</h3>
+<p>After a discussion with <a href="http://twitter.com/kasparschiess">Kaspar Schiess</a> (my cofounder at <a href="http://technologyastronauts.ch">The Technology Astronauts</a>), I am very inclined to drop environments (ie. <em>development</em>, <em>test</em>, <em>production</em>) in the next Picky.</p>
+<p>Have you ever asked yourself if you really need environments?</p>
+<p>I hope to cover this topic in the next post.</p>
+<p>Cheers, and have (pink, tentacly) fun!</p>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="Experimental&amp;nbsp;Features&amp;nbsp;for&amp;nbsp;Picky&amp;nbsp;5" data-url="http://florianhanke.com/blog/2012/11/20/experimental-features-for-picky-5.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/10/15/picky-stemming.html" title="Previous post: Picky&amp;nbsp;Stemming">Picky&nbsp;Stemming</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/11/20/experimental-features-for-picky-5';
+          var disqus_url = 'http://florianhanke.com/blog/2012/11/20/experimental-features-for-picky-5.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

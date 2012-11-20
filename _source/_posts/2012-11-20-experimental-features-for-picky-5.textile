@@ -1,0 +1,154 @@
+---
+layout: post
+title: Experimental&nbsp;Features&nbsp;for&nbsp;Picky&nbsp;5
+categories:
+  - ruby
+  - picky
+---
+
+This is a quick post about two experimental features in Picky 4.11+ that will be available stably in Picky 5.
+
+h2. Intro
+
+Picky is very much driven by its users.
+
+After adding "stemming":http://en.wikipedia.org/wiki/Stemming in Picky 4.6.6 from a push I got by "John Barton":http://twitter.com/johnbarton and "Glen Maddern":http://twitter.com/glenmaddern of "goodfil.ms":http://goodfil.ms fame, "Andy Kitchen":http://twitter.com/auastro supplied a piece of code for "automatic word segmentation":http://norvig.com/ngrams/ch14.pdf, while also mentioning that he needs a range queries.
+
+They are now both available as experimental features.
+
+h2. Range queries
+
+Let's say you'd like to find all people born in 1977, 1978, and 1979. Previously, this was not too easy to do in Picky.
+
+Now you can. Let's look at a full copy-and-paste-able example:
+
+<pre class="sh_ruby"><code>require 'picky'
+  
+index = Picky::Index.new :people do
+  key_format :to_s
+  category :year
+end
+
+Person = Struct.new :id, :year
+
+index.add Person.new('Picky',   2008)
+index.add Person.new('Kaspar',  1978)
+index.add Person.new('Florian', 1977)
+index.add Person.new('Joe',     1955)
+
+people = Picky::Search.new index
+
+p people.search('1977-1979').ids
+p people.search('year:1977-1979').ids
+p people.search('year:1900-2010').ids</code></pre>
+
+The first result will be 
+
+<pre class="sh_ruby"><code>["Florian", "Kaspar"]</code></pre>
+
+since I was born in 1977, and Kaspar was born in 1978. If you categorize it with @year:1977-1979@ it will yield the same result. If you only want results for a specific category, remember to categorize it by prefixing a search term or range @category_name:@.
+
+By going over the whole range, as in the third result, you'll get
+
+<pre class="sh_ruby"><code>["Joe", "Florian", "Kaspar", "Picky"]</code></pre>
+
+as the range @year:1900-2010@ includes all the results.
+
+h2. Range queries the Ruby way
+
+Picky internally uses @Enumerable#inject@, so any range will work. For example, @initial:a-d@ will yield results for each @"a", "b", "c", and "d"@. Cool, eh?
+
+Not impressed? Read on…
+
+h2. Custom ranges!
+
+Andy Kitchen was happy with the range queries, however he needed range queries that were wrapping. If somebody wanted to find eg. an event that was on between 10pm and 2am in the morning, the current range query implementation did not allow that, as @event_start:10-2@ did not work (@#each@ or @#inject@ will yield nothing).
+
+Because Picky accepts any kind of range, he implemented a wrapping range (the version here is a slight rewrite of the original):
+
+<pre class="sh_ruby"><code>class Wrap12Hours
+  include Enumerable
+
+  def initialize(min, max)
+    @hours = 12
+    @min   = min.to_i
+    @top   = max.to_i
+    @top   += @hours if @top < @min
+  end
+
+  def each
+    @min.upto(@top).each do |i|
+      yield (i % @hours).to_s
+    end
+  end
+end</code></pre>
+
+This is then passed into an index category like this
+
+<pre class="sh_ruby"><code>category :hour, ranging: Wrap12Hours</code></pre>
+
+to make Picky use this "ranging" for that category.
+
+The result: If @Wrap12Hours@ is given a range like @10-2@, it will @#each@ this: @[10, 11, 0, 1, 2]@, which is exactly what he needed.
+
+Picky range queries use @#inject@, but there is no @#inject@ on @Wrap12Hours@ – so why does it work? Note that Andy does an @include Enumerable@. @Enumerable#inject@ uses the @#each@ method which is already there to implement @#inject@ and some other methods. Pretty snazzy! (And, I might add, the Ruby way of doing things)
+
+The ability to implement custom ranges is very powerful and underlines the flexibility of Picky.
+
+h2. Automatic word segmentation
+
+Just a quick note on this as it is just a sketch, currently. A fully functional sketch, though.
+
+What if you want to not split on a regexp as you would usually, but you'd like Picky to split on words in the index.
+
+So if you had "purple", "rainbow", and "pony" (don't ask) in your index, then you'd want Picky to automatically split a query like "purplerainbowpony" into "purple", "rainbow", "pony".
+
+This can be achieved by giving the search category option @splits_text_on@ an automatic splitter rather than a regexp. The automatic splitter is initialized with the index category you'd like to use for the splitter.
+
+<pre class="sh_ruby"><code>automatic_splitter = Picky::Splitters::Automatic.new index[:text]
+
+some_search = Picky::Search.new index do
+  searching splits_text_on: automatic_splitter
+end</code></pre>
+
+That's it!
+
+Note that if you want to test the spitter itself you can simply call @#split@ on it, as this is the method called by the Picky @Tokenizer@ to split incoming queries:
+
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopicky' # => ['hello', 'picky']</code></pre>
+
+Please give it a go and report back!
+
+h3. The partial option
+
+The automatic splitter supports a @partial@ option. This will make Picky also use the partial index.
+
+<pre class="sh_ruby"><code>automatic_splitter = Picky::Splitters::Automatic.new index[:text], partial: true</code></pre>
+
+What does it mean? It means that it will
+
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopic' # => ['hello', 'pic']</code></pre>
+
+correctly split off the partial 'pic'. The non-partial version would simply split off 'hello':
+
+<pre class="sh_ruby"><code>automatic_splitter.split 'hellopic' # => ['hello']</code></pre>
+
+h2. Have fun!
+
+As Picky grows and grows, I am especially happy that Picky is fed well by its enthusiastic and helpful users.
+
+This is much appreciated, amigos! Keep it coming :D
+
+h2. Outlook for Picky 5
+
+The above features will – after some polishing and feedback – be included into Picky 5.
+
+h3. Environments
+
+After a discussion with "Kaspar Schiess":http://twitter.com/kasparschiess (my cofounder at "The Technology Astronauts":http://technologyastronauts.ch), I am very inclined to drop environments (ie. _development_, _test_, _production_) in the next Picky.
+
+Have you ever asked yourself if you really need environments?
+
+I hope to cover this topic in the next post.
+
+Cheers, and have (pink, tentacly) fun!

@@ -12,7 +12,7 @@ h2. Intro
 
 Picky is very much driven by its users.
 
-After adding "stemming":http://en.wikipedia.org/wiki/Stemming in Picky 4.6.6 from a push I got by "John Barton":http://twitter.com/johnbarton and "Glen Maddern":http://twitter.com/glenmaddern of "goodfil.ms":http://goodfil.ms fame, "Andy Kitchen":http://twitter.com/auastro supplied a piece of code for "automatic word segmentation":http://norvig.com/ngrams/ch14.pdf, while also mentioning that he needs a range queries.
+After adding "stemming":http://en.wikipedia.org/wiki/Stemming in Picky 4.6.6 from a push I got by "John Barton":http://twitter.com/johnbarton and "Glen Maddern":http://twitter.com/glenmaddern of "goodfil.ms":http://goodfil.ms fame, "Andy Kitchen":http://twitter.com/auastro supplied a piece of code for "automatic word segmentation":http://norvig.com/ngrams/ch14.pdf, while also mentioning that he needs a range query.
 
 They are now both available as experimental features.
 

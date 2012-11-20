@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-11-20T17:39:32+11:00</updated>
+ <updated>2012-11-20T18:58:56+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -20,7 +20,7 @@
    <content type="html">&lt;p&gt;This is a quick post about two experimental features in Picky 4.11+ that will be available stably in Picky 5.&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;Picky is very much driven by its users.&lt;/p&gt;
-&lt;p&gt;After adding &lt;a href=&quot;http://en.wikipedia.org/wiki/Stemming&quot;&gt;stemming&lt;/a&gt; in Picky 4.6.6 from a push I got by &lt;a href=&quot;http://twitter.com/johnbarton&quot;&gt;John Barton&lt;/a&gt; and &lt;a href=&quot;http://twitter.com/glenmaddern&quot;&gt;Glen Maddern&lt;/a&gt; of &lt;a href=&quot;http://goodfil.ms&quot;&gt;goodfil.ms&lt;/a&gt; fame, &lt;a href=&quot;http://twitter.com/auastro&quot;&gt;Andy Kitchen&lt;/a&gt; supplied a piece of code for &lt;a href=&quot;http://norvig.com/ngrams/ch14.pdf&quot;&gt;automatic word segmentation&lt;/a&gt;, while also mentioning that he needs a range queries.&lt;/p&gt;
+&lt;p&gt;After adding &lt;a href=&quot;http://en.wikipedia.org/wiki/Stemming&quot;&gt;stemming&lt;/a&gt; in Picky 4.6.6 from a push I got by &lt;a href=&quot;http://twitter.com/johnbarton&quot;&gt;John Barton&lt;/a&gt; and &lt;a href=&quot;http://twitter.com/glenmaddern&quot;&gt;Glen Maddern&lt;/a&gt; of &lt;a href=&quot;http://goodfil.ms&quot;&gt;goodfil.ms&lt;/a&gt; fame, &lt;a href=&quot;http://twitter.com/auastro&quot;&gt;Andy Kitchen&lt;/a&gt; supplied a piece of code for &lt;a href=&quot;http://norvig.com/ngrams/ch14.pdf&quot;&gt;automatic word segmentation&lt;/a&gt;, while also mentioning that he needs a range query.&lt;/p&gt;
 &lt;p&gt;They are now both available as experimental features.&lt;/p&gt;
 &lt;h2&gt;Range queries&lt;/h2&gt;
 &lt;p&gt;Let&amp;#8217;s say you&amp;#8217;d like to find all people born in 1977, 1978, and 1979. Previously, this was not too easy to do in Picky.&lt;/p&gt;

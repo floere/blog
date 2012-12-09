@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-type" />
+    <link href="../../../favico.ico" rel="shortcut icon" />
+    <script src="../../../javascripts/shjs-0.6/sh_main.min.js" type="text/javascript"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+    <link href="../../../javascripts/shjs-0.6/css/sh_nedit.min.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/basic.css" rel="stylesheet" type="text/css" />
+    <link href="../../../stylesheets/specific.css" rel="stylesheet" type="text/css" />
+    <title>Picky&nbsp;Tutorial&#58;&nbsp;Rails&nbsp;3.2</title>
+    <script type="text/javascript">
+      //<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20991642-1']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+      //]]>
+    </script>
+  </head>
+  <body onload='sh_highlightDocument("../../../javascripts/shjs-0.6/lang/", ".min.js");'>
+    <ol class="nav">
+      <li>
+        <a href="./../../../../">home</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../">blog</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../picky/">picky</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phd/">phd</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../phony/">phony</a>
+        •
+      </li>
+      <li>
+        <a href="./../../../../view_models/">view models</a>
+      </li>
+    </ol>
+    <div class="post">
+      <h1>
+        Picky&nbsp;Tutorial&#58;&nbsp;Rails&nbsp;3.2
+        <a class="twitter-share-button" data-count="none" data-text="Picky&amp;nbsp;Tutorial&amp;#58;&amp;nbsp;Rails&amp;nbsp;3.2" data-url="http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </h1>
+      <div class="categories">
+        ruby / picky / rails
+      </div>
+      <!-- /  - page.categories.each do |category| -->
+      <!-- /    %a{ :href => "/blog/category/#{category}" }= category -->
+      <p>A note: The main Picky site is now running at <a href="http://pickyrb.com">pickyrb.com</a></p>
+<h2>Intro</h2>
+<p>You&#8217;d like to integrate a small Picky server directly in the Rails 3.2 Rails app you are running?</p>
+<p>This is the tutorial for you.</p>
+<p>To make things a bit more interesting, I want to be able to filter a query with the current user – and also have an <span class="caps">AJAX</span> search interface.</p>
+<h2>Files We Will Touch</h2>
+<ol>
+	<li>Gemfile</li>
+	<li>initializers/picky.rb</li>
+	<li>model.rb</li>
+	<li>controller.rb</li>
+	<li>JavaScript</li>
+</ol>
+<h2>Gemfile</h2>
+<p>First of all, we start out by adding picky and the picky-client to the Gemfile, like so:</p>
+<pre class="sh_ruby"><code>gem 'picky', '~&gt; 4.9'&#x000A;gem 'picky-client', '~&gt; 4.9'</code></pre>
+<p>The spermy operator <code>~&gt;</code> results in versions <code>4.9</code> up to but not including <code>5.0</code> being used, at which point the <span class="caps">API</span> changes which might result in your application not running anymore.</p>
+<p>Then do a</p>
+<pre class="sh_shell"><code>bundle install</code></pre>
+<p>like the latest code preachers tell us to.</p>
+<h2>initializers/picky.rb</h2>
+<p>Here&#8217;s where you define the actual indexes and configure Picky. This is an example where we use a very generic model, imaginatively named &#8220;things&#8221;:</p>
+<pre class="sh_ruby"><code># Silence Picky, as an example.&#x000A;#&#x000A;Picky.logger = Picky::Loggers::Silent.new&#x000A;&#x000A;# We create a new index and store it in the constant ThingsIndex.&#x000A;#&#x000A;ThingsIndex = Picky::Index.new :things do&#x000A;  # Our keys are integers.&#x000A;  #&#x000A;  key_format :to_i&#x000A;    &#x000A;  # Default indexing options.&#x000A;  # Please see: https://github.com/floere/picky/wiki/Indexing-configuration&#x000A;  # for more information.&#x000A;  #&#x000A;  indexing removes_characters: /[^a-z0-9\s\/\-\_\:\"\&amp;\.]/i,&#x000A;           stopwords:          /\b(and|the|of|it|in|for)\b/i,&#x000A;           splits_text_on:     /[\s\/\-\_\:\"\&amp;\/]/,&#x000A;           rejects_token_if:   lambda { |token| token.size &lt; 2 }&#x000A;  &#x000A;  # We should be able to restrict searches to a specific user.&#x000A;  #&#x000A;  category :user,&#x000A;           :partial =&gt; Picky::Partial::None.new, &#x000A;           :from =&gt; :user_ids&#x000A;  &#x000A;  # We can search on the titles of the thing.&#x000A;  #&#x000A;  # We use postfix partials which means a word can&#x000A;  # be found if only part has been entered (from the beginning).&#x000A;  #&#x000A;  category :title, :partial =&gt; Picky::Partial::Postfix.new :from =&gt; 1&#x000A;  &#x000A;  # We should also be able to search the years that the things have.&#x000A;  #&#x000A;  # We want the exact year, so no partial searching.&#x000A;  #&#x000A;  category :year,&#x000A;           :partial =&gt; Picky::Partial::None.new&#x000A;  &#x000A;end&#x000A;&#x000A;# ThingsSearch is the search interface&#x000A;# on the things index.&#x000A;#&#x000A;# See https://github.com/floere/picky/wiki/Searching-Configuration&#x000A;# for some tokenizing options.&#x000A;#&#x000A;ThingsSearch = Picky::Search.new ThingsIndex&#x000A;&#x000A;# We are indexing at the end of this method&#x000A;# using explicit indexing.&#x000A;#&#x000A;# Feel free to run the initial indexing somewhere else.&#x000A;#&#x000A;Thing.order('title ASC').each do |thing|&#x000A;  ThingsIndex.add thing&#x000A;end</code></pre>
+<p>Next up is the model.</p>
+<h2>model.rb</h2>
+<p>The model is straightforward: we want to index when saving a model, or delete the model from the index.</p>
+<pre class="sh_ruby"><code># After saving or destroying, index.&#x000A;#&#x000A;after_save { |thing| ThingsIndex.replace thing }&#x000A;after_destroy { |thing| ThingsIndex.remove thing.id }&#x000A; &#x000A;# Since we want to index all users that have something to&#x000A;# do with this thing together with it, we return a string&#x000A;# of comma separated user ids.&#x000A;#&#x000A;def user_ids&#x000A;  users.inject([]) do |result, user|&#x000A;    result &lt;&lt; user.id&#x000A;  end.uniq.join ' '&#x000A;end</code></pre>
+<p>If we didn&#8217;t have the special case with the user ids, we&#8217;d only have two lines in the model.</p>
+<p>Now, the controller is a bit bigger…</p>
+<h2>controller.rb</h2>
+<p>Create a controller action and wire it up in the routes.rb correctly. For example:</p>
+<pre class="sh_ruby"><code>resources :things do&#x000A;  collection { get :search }&#x000A;end</code></pre>
+<p>Now, back to the <code>search</code> action.</p>
+<pre class="sh_ruby"><code>def search&#x000A;  # This line prepends the current user to the query.&#x000A;  #&#x000A;  # Since we have indexed the thing's user in the&#x000A;  # user category, we can prepend a filter to the&#x000A;  # currently received query.&#x000A;  #&#x000A;  # A query like&#x000A;  #   "one two three"&#x000A;  # will be transformed into&#x000A;  #   "user:15 one two three"&#x000A;  # which will result in things only&#x000A;  # being found if it is associated to the current user.&#x000A;  #&#x000A;  query = "user:#{current_user.id} #{params[:query]}"&#x000A;&#x000A;  # Perform the search.&#x000A;  #&#x000A;  results = ThingsSearch.search query, params[:ids] || 20, params[:offset] || 0&#x000A;  &#x000A;  # Render each thing in the results nicely as a partial.&#x000A;  #&#x000A;  # (You need to have a "thing" partial file)&#x000A;  #&#x000A;  results = results.to_hash&#x000A;  results.extend Picky::Convenience&#x000A;  results.populate_with Thing do |thing|&#x000A;    render_to_string :partial =&gt; "thing", :object =&gt; thing&#x000A;  end&#x000A;  &#x000A;  # We respond with a nice JSON result.&#x000A;  #&#x000A;  respond_to do |format|&#x000A;    format.html do&#x000A;      # Homework: Make this a nice HTML results page.&#x000A;      #&#x000A;      render :text =&gt; "Deal result ids: #{results.ids.to_s}"&#x000A;    end&#x000A;    format.json do&#x000A;      render :text =&gt; results.to_json&#x000A;    end&#x000A;  end&#x000A;end</code></pre>
+<h2>JavaScript</h2>
+<pre class="sh_js"><code></code></pre>
+      <h2>Share</h2>
+      <p>
+        <a class="twitter-share-button" data-count="none" data-text="Picky&amp;nbsp;Tutorial&amp;#58;&amp;nbsp;Rails&amp;nbsp;3.2" data-url="http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3.html" data-via="hanke" data-width="55px" href="http://twitter.com/share">Tweet</a>
+      </p>
+      <br />
+      Previous
+      <a class="previous" href="../../../2012/11/20/experimental-features-for-picky-5.html" title="Previous post: Experimental&amp;nbsp;Features&amp;nbsp;for&amp;nbsp;Picky&amp;nbsp;5">Experimental&nbsp;Features&nbsp;for&nbsp;Picky&nbsp;5</a>
+      <h2>Comments?</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        //<![CDATA[
+          var disqus_shortname = 'florianhanke';
+          var disqus_developer = location.host.match(/\.dev$|^localhost/) ? 1 : 0;
+          var disqus_identifier = '/2012/12/09/picky-tutorial-rails-3';
+          var disqus_url = 'http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3.html';
+          
+          /* * * DON'T EDIT BELOW THIS LINE * * */
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        //]]>
+      </script>
+      <noscript>
+        Please enable JavaScript to view the
+        <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+      </noscript>
+    </div>
+  </body>
+</html>

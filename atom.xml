@@ -4,13 +4,172 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-11-20T18:58:56+11:00</updated>
+ <updated>2012-12-09T22:36:33+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
    <email>florian.hanke@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title type="html">Picky&amp;nbsp;Tutorial&amp;#58;&amp;nbsp;Rails&amp;nbsp;3.2</title>
+   <link href="http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3.html"/>
+   <updated>2012-12-09T00:00:00+11:00</updated>
+   <id>http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3</id>
+   <content type="html">&lt;p&gt;A note: The main Picky site is now running at &lt;a href=&quot;http://pickyrb.com&quot;&gt;pickyrb.com&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;You&amp;#8217;d like to integrate a small Picky server directly in the Rails 3.2 Rails app you are running?&lt;/p&gt;
+&lt;p&gt;This is the tutorial for you.&lt;/p&gt;
+&lt;p&gt;To make things a bit more interesting, I want to be able to filter a query with the current user – and also have an &lt;span class=&quot;caps&quot;&gt;AJAX&lt;/span&gt; search interface.&lt;/p&gt;
+&lt;h2&gt;Files We Will Touch&lt;/h2&gt;
+&lt;ol&gt;
+	&lt;li&gt;Gemfile&lt;/li&gt;
+	&lt;li&gt;initializers/picky.rb&lt;/li&gt;
+	&lt;li&gt;model.rb&lt;/li&gt;
+	&lt;li&gt;controller.rb&lt;/li&gt;
+	&lt;li&gt;JavaScript&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Gemfile&lt;/h2&gt;
+&lt;p&gt;First of all, we start out by adding picky and the picky-client to the Gemfile, like so:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;gem 'picky', '~&amp;gt; 4.9'
+gem 'picky-client', '~&amp;gt; 4.9'&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The spermy operator &lt;code&gt;~&amp;gt;&lt;/code&gt; results in versions &lt;code&gt;4.9&lt;/code&gt; up to but not including &lt;code&gt;5.0&lt;/code&gt; being used, at which point the &lt;span class=&quot;caps&quot;&gt;API&lt;/span&gt; changes which might result in your application not running anymore.&lt;/p&gt;
+&lt;p&gt;Then do a&lt;/p&gt;
+&lt;pre class=&quot;sh_shell&quot;&gt;&lt;code&gt;bundle install&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;like the latest code preachers tell us to.&lt;/p&gt;
+&lt;h2&gt;initializers/picky.rb&lt;/h2&gt;
+&lt;p&gt;Here&amp;#8217;s where you define the actual indexes and configure Picky. This is an example where we use a very generic model, imaginatively named &amp;#8220;things&amp;#8221;:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# Silence Picky, as an example.
+#
+Picky.logger = Picky::Loggers::Silent.new
+
+# We create a new index and store it in the constant ThingsIndex.
+#
+ThingsIndex = Picky::Index.new :things do
+  # Our keys are integers.
+  #
+  key_format :to_i
+    
+  # Default indexing options.
+  # Please see: https://github.com/floere/picky/wiki/Indexing-configuration
+  # for more information.
+  #
+  indexing removes_characters: /[^a-z0-9\s\/\-\_\:\&quot;\&amp;amp;\.]/i,
+           stopwords:          /\b(and|the|of|it|in|for)\b/i,
+           splits_text_on:     /[\s\/\-\_\:\&quot;\&amp;amp;\/]/,
+           rejects_token_if:   lambda { |token| token.size &amp;lt; 2 }
+  
+  # We should be able to restrict searches to a specific user.
+  #
+  category :user,
+           :partial =&amp;gt; Picky::Partial::None.new, 
+           :from =&amp;gt; :user_ids
+  
+  # We can search on the titles of the thing.
+  #
+  # We use postfix partials which means a word can
+  # be found if only part has been entered (from the beginning).
+  #
+  category :title, :partial =&amp;gt; Picky::Partial::Postfix.new :from =&amp;gt; 1
+  
+  # We should also be able to search the years that the things have.
+  #
+  # We want the exact year, so no partial searching.
+  #
+  category :year,
+           :partial =&amp;gt; Picky::Partial::None.new
+  
+end
+
+# ThingsSearch is the search interface
+# on the things index.
+#
+# See https://github.com/floere/picky/wiki/Searching-Configuration
+# for some tokenizing options.
+#
+ThingsSearch = Picky::Search.new ThingsIndex
+
+# We are indexing at the end of this method
+# using explicit indexing.
+#
+# Feel free to run the initial indexing somewhere else.
+#
+Thing.order('title ASC').each do |thing|
+  ThingsIndex.add thing
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next up is the model.&lt;/p&gt;
+&lt;h2&gt;model.rb&lt;/h2&gt;
+&lt;p&gt;The model is straightforward: we want to index when saving a model, or delete the model from the index.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# After saving or destroying, index.
+#
+after_save { |thing| ThingsIndex.replace thing }
+after_destroy { |thing| ThingsIndex.remove thing.id }
+ 
+# Since we want to index all users that have something to
+# do with this thing together with it, we return a string
+# of comma separated user ids.
+#
+def user_ids
+  users.inject([]) do |result, user|
+    result &amp;lt;&amp;lt; user.id
+  end.uniq.join ' '
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we didn&amp;#8217;t have the special case with the user ids, we&amp;#8217;d only have two lines in the model.&lt;/p&gt;
+&lt;p&gt;Now, the controller is a bit bigger…&lt;/p&gt;
+&lt;h2&gt;controller.rb&lt;/h2&gt;
+&lt;p&gt;Create a controller action and wire it up in the routes.rb correctly. For example:&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;resources :things do
+  collection { get :search }
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, back to the &lt;code&gt;search&lt;/code&gt; action.&lt;/p&gt;
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;def search
+  # This line prepends the current user to the query.
+  #
+  # Since we have indexed the thing's user in the
+  # user category, we can prepend a filter to the
+  # currently received query.
+  #
+  # A query like
+  #   &quot;one two three&quot;
+  # will be transformed into
+  #   &quot;user:15 one two three&quot;
+  # which will result in things only
+  # being found if it is associated to the current user.
+  #
+  query = &quot;user:#{current_user.id} #{params[:query]}&quot;
+
+  # Perform the search.
+  #
+  results = ThingsSearch.search query, params[:ids] || 20, params[:offset] || 0
+  
+  # Render each thing in the results nicely as a partial.
+  #
+  # (You need to have a &quot;thing&quot; partial file)
+  #
+  results = results.to_hash
+  results.extend Picky::Convenience
+  results.populate_with Thing do |thing|
+    render_to_string :partial =&amp;gt; &quot;thing&quot;, :object =&amp;gt; thing
+  end
+  
+  # We respond with a nice JSON result.
+  #
+  respond_to do |format|
+    format.html do
+      # Homework: Make this a nice HTML results page.
+      #
+      render :text =&amp;gt; &quot;Deal result ids: #{results.ids.to_s}&quot;
+    end
+    format.json do
+      render :text =&amp;gt; results.to_json
+    end
+  end
+end&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;JavaScript&lt;/h2&gt;
+&lt;pre class=&quot;sh_js&quot;&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;</content>
+   
+ </entry>
  
  <entry>
    <title type="html">Experimental&amp;nbsp;Features&amp;nbsp;for&amp;nbsp;Picky&amp;nbsp;5</title>

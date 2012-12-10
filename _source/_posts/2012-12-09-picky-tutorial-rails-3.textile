@@ -7,7 +7,9 @@ categories:
   - rails
 ---
 
-A note: The main Picky site is now running at "pickyrb.com":http://pickyrb.com
+A quick sidenote: The main Picky site is now running at "pickyrb.com":http://pickyrb.com
+
+Update: Thanks to Gleb Mazovetskiy (@glebm) on his input on ActiveRecord.
 
 h2. Intro
 
@@ -88,11 +90,11 @@ ThingsIndex = Picky::Index.new :things do
   # This needs to be an exact (non-partial) search, as we don't 
   # want user 15 to be found when searching for user 1.
   #
-  # The :from designates the message used to get the user_ids from.
+  # The :from designates the message used to get the user_ids.
   #
   category :user,
            :partial => Picky::Partial::None.new, 
-           :from => :user_ids
+           :from => :user_ids_as_string
 
 end
 
@@ -119,19 +121,28 @@ h2. model.rb
 
 The model is straightforward: we want to index when saving a model, or delete the model from the index.
 
-<pre class="sh_ruby"><code># After saving or destroying, index.
+<pre class="sh_ruby"><code># After committing, index.
 #
-after_save { |thing| ThingsIndex.replace thing }
-after_destroy { |thing| ThingsIndex.remove thing.id }
- 
+after_commit :picky_index
+
+# Index correctly, depending on whether it
+# was destroyed or updated/created.
+#
+def picky_index
+  if destroyed?
+    ThingsIndex.remove id
+  else
+    ThingsIndex.replace self
+  end
+end
+
 # Since we want to index all users that have something to
 # do with this thing together with it, we return a string
-# of comma separated user ids.
+# of space separated user ids.
+# (Picky version 5 will be able to use user_ids directly)
 #
-def user_ids
-  users.inject([]) do |result, user|
-    result << user.id
-  end.uniq.join ' '
+def user_ids_as_string
+  user_ids.join ' '
 end</code></pre>
 
 If we didn't have the special case with the user ids, we'd only have two lines in the model.

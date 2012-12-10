@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-12-10T17:21:32+11:00</updated>
+ <updated>2012-12-10T22:21:13+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -17,7 +17,8 @@
    <link href="http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3.html"/>
    <updated>2012-12-09T00:00:00+11:00</updated>
    <id>http://florianhanke.com/blog/2012/12/09/picky-tutorial-rails-3</id>
-   <content type="html">&lt;p&gt;A note: The main Picky site is now running at &lt;a href=&quot;http://pickyrb.com&quot;&gt;pickyrb.com&lt;/a&gt;&lt;/p&gt;
+   <content type="html">&lt;p&gt;A quick sidenote: The main Picky site is now running at &lt;a href=&quot;http://pickyrb.com&quot;&gt;pickyrb.com&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Update: Thanks to Gleb Mazovetskiy (@glebm) on his input on ActiveRecord.&lt;/p&gt;
 &lt;h2&gt;Intro&lt;/h2&gt;
 &lt;p&gt;You&amp;#8217;d like to integrate a small Picky server directly in the Rails 3.2 Rails app you are running?&lt;/p&gt;
 &lt;p&gt;This is the tutorial for you.&lt;/p&gt;
@@ -82,11 +83,11 @@ ThingsIndex = Picky::Index.new :things do
   # This needs to be an exact (non-partial) search, as we don't 
   # want user 15 to be found when searching for user 1.
   #
-  # The :from designates the message used to get the user_ids from.
+  # The :from designates the message used to get the user_ids.
   #
   category :user,
            :partial =&amp;gt; Picky::Partial::None.new, 
-           :from =&amp;gt; :user_ids
+           :from =&amp;gt; :user_ids_as_string
 
 end
 
@@ -109,19 +110,28 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Next up is the model.&lt;/p&gt;
 &lt;h2&gt;model.rb&lt;/h2&gt;
 &lt;p&gt;The model is straightforward: we want to index when saving a model, or delete the model from the index.&lt;/p&gt;
-&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# After saving or destroying, index.
+&lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;# After committing, index.
 #
-after_save { |thing| ThingsIndex.replace thing }
-after_destroy { |thing| ThingsIndex.remove thing.id }
- 
+after_commit :picky_index
+
+# Index correctly, depending on whether it
+# was destroyed or updated/created.
+#
+def picky_index
+  if destroyed?
+    ThingsIndex.remove id
+  else
+    ThingsIndex.replace self
+  end
+end
+
 # Since we want to index all users that have something to
 # do with this thing together with it, we return a string
-# of comma separated user ids.
+# of space separated user ids.
+# (Picky version 5 will be able to use user_ids directly)
 #
-def user_ids
-  users.inject([]) do |result, user|
-    result &amp;lt;&amp;lt; user.id
-  end.uniq.join ' '
+def user_ids_as_string
+  user_ids.join ' '
 end&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If we didn&amp;#8217;t have the special case with the user ids, we&amp;#8217;d only have two lines in the model.&lt;/p&gt;
 &lt;p&gt;Now, the controller is a bit bigger…&lt;/p&gt;

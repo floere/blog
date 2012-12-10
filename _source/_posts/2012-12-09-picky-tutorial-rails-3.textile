@@ -17,13 +17,17 @@ This is the tutorial for you.
 
 To make things a bit more interesting, I want to be able to filter a query with the current user – and also have an AJAX search interface.
 
+Note that the indexes for this search will be created on startup and that they will live in your app. If you need big indexes, or a more elaborate search you should go for a separate Picky search server.
+
+The code pieces below are quite large mostly because of the elaborate comments. In reality, the whole search clocks in at about 30 lines – and could be further reduced to about 15, without any configuration.
+
 h2. Files We Will Touch
 
 # Gemfile
 # initializers/picky.rb
 # model.rb
 # controller.rb
-# JavaScript
+# views/JavaScript
 
 h2. Gemfile
 
@@ -52,9 +56,10 @@ Picky.logger = Picky::Loggers::Silent.new
 #
 ThingsIndex = Picky::Index.new :things do
   # Our keys are integers.
+  # Use :to_s if you have strings.
   #
   key_format :to_i
-    
+
   # Default indexing options.
   # Please see: https://github.com/floere/picky/wiki/Indexing-configuration
   # for more information.
@@ -63,27 +68,32 @@ ThingsIndex = Picky::Index.new :things do
            stopwords:          /\b(and|the|of|it|in|for)\b/i,
            splits_text_on:     /[\s\/\-\_\:\"\&\/]/,
            rejects_token_if:   lambda { |token| token.size < 2 }
-  
-  # We should be able to restrict searches to a specific user.
-  #
-  category :user,
-           :partial => Picky::Partial::None.new, 
-           :from => :user_ids
-  
+
   # We can search on the titles of the thing.
   #
   # We use postfix partials which means a word can
   # be found if only part has been entered (from the beginning).
   #
-  category :title, :partial => Picky::Partial::Postfix.new :from => 1
-  
+  category :title, :partial => Picky::Partial::Postfix.new(:from => 1)
+
   # We should also be able to search the years that the things have.
   #
   # We want the exact year, so no partial searching.
   #
   category :year,
            :partial => Picky::Partial::None.new
-  
+
+  # We should be able to restrict searches to a specific user.
+  #
+  # This needs to be an exact (non-partial) search, as we don't 
+  # want user 15 to be found when searching for user 1.
+  #
+  # The :from designates the message used to get the user_ids from.
+  #
+  category :user,
+           :partial => Picky::Partial::None.new, 
+           :from => :user_ids
+
 end
 
 # ThingsSearch is the search interface
@@ -184,4 +194,59 @@ end</code></pre>
 
 h2. JavaScript
 
-<pre class="sh_js"><code></code></pre>
+The javascript is a bit more elaborate.
+
+The picky-client helper method @.cached_interface@ ("code":https://github.com/floere/picky/blob/master/client/lib/picky-client/helper.rb#L51-L55) gives you the HTML:
+
+<pre class="sh_html"><code><%= Picky::Helper.cached_interface %></code></pre>
+
+Picky comes with its own JS library ("code":https://github.com/floere/picky/blob/master/client/javascripts/picky.min.js, 12kB), and lots of configuration options ("list":https://github.com/floere/picky/issues/98).
+
+It knows two modes of searching: full and live. Full searching is run on pressing enter and expected to return rendered results, to show them in a results list. Live searching runs while typing and only updates the counts next to the input box.
+
+This example is a bit special as it renders live searches as if they were full ones. It's like pressing enter while typing.
+
+So in a JS file – or coffeescript, if you like that – insert this:
+
+<pre class="sh_js"><code>$(window).load(function() {
+  pickyClient = new PickyClient({
+    full: '/things/search',  // The URL that maps to our search action.
+    fullResults: 50,         // Default is 20.
+    live: '/things/search',  // Use the same URL as the full search.
+    liveResults: 20,         // Default is 0.
+    liveRendered: true,      // Render live results as if they were full ones.
+    liveSearchInterval: 166, // Time between keystrokes before it sends the query.
+    searchOnEmpty: true,     // Search even when the query field is empty.
+    
+    // beforeInsert: function(query) {  },   // Optional. Before a query is inserted via pickyClient.insert(...).
+    // before: function(query, params) {  }, // Optional. Before Picky sends any data. Return modified query.
+    // success: function(data, query) {  },  // Optional. Just after Picky receives data. (Get a PickyData object)
+    // after: function(data, query) {  },    // Optional. After Picky has handled the data and updated the view.
+  });
+};</code></pre>
+
+As you can see, the Picky JS interface offers you four callbacks that are called: before inserting a query (sanitize a query), before sending the query (add any filters from radio buttons, checkboxes etc.), just after receiving the data (modify the incoming data as you wish), and after updating the view (make modifications and necessary updates to the view).
+
+This is pretty handy and is used in the "cocoapods.org":http://cocoapods.org search ("example code":https://github.com/CocoaPods/cocoapods.org/blob/master/views/index.erb#L214-L265) to add the OS filter to the query without it being visible in the search field (but in the URL).
+
+h2. End
+
+I hope this helps getting Picky into your Rails app :)
+
+Finally, if you don't want to index each time your app is started, you could use load and dump on the index. Perhaps like this…
+
+<pre class="sh_ruby"><code>at_exit do
+  ThingsIndex.dump
+end</code></pre>
+
+<pre class="sh_ruby"><code>tries = 0
+begin
+  exit 1 if tries > 1
+  ThingsIndex.load
+rescue
+  tries = tries + 1
+  ThingsIndex.index
+  retry
+end</code></pre>
+
+Cheers and have fun!

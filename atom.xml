@@ -4,7 +4,7 @@
  <title>code is code</title>
  <link href="http://florianhanke.com/blog/atom.xml" rel="self"/>
  <link href="http://florianhanke.com/blog/"/>
- <updated>2012-12-10T11:58:35+11:00</updated>
+ <updated>2012-12-10T17:21:32+11:00</updated>
  <id>http://florianhanke.com/blog/</id>
  <author>
    <name>Florian Hanke</name>
@@ -203,10 +203,11 @@ end&lt;/code&gt;&lt;/pre&gt;
 &lt;h2&gt;End&lt;/h2&gt;
 &lt;p&gt;I hope this helps getting Picky into your Rails app :)&lt;/p&gt;
 &lt;p&gt;Finally, if you don&amp;#8217;t want to index each time your app is started, you could use load and dump on the index. Perhaps like this…&lt;/p&gt;
+&lt;p&gt;In the initializer, to save the index:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;at_exit do
   ThingsIndex.dump
 end&lt;/code&gt;&lt;/pre&gt;
-
+&lt;p&gt;To load the index:&lt;/p&gt;
 &lt;pre class=&quot;sh_ruby&quot;&gt;&lt;code&gt;tries = 0
 begin
   exit 1 if tries &amp;gt; 1

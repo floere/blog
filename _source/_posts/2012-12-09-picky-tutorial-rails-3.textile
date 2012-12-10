@@ -235,9 +235,13 @@ I hope this helps getting Picky into your Rails app :)
 
 Finally, if you don't want to index each time your app is started, you could use load and dump on the index. Perhaps like this…
 
+In the initializer, to save the index:
+
 <pre class="sh_ruby"><code>at_exit do
   ThingsIndex.dump
 end</code></pre>
+
+To load the index:
 
 <pre class="sh_ruby"><code>tries = 0
 begin
